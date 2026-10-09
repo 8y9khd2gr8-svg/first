@@ -38,6 +38,14 @@ Teknoloji: Phaser 3 + TypeScript + Vite, GitHub Pages ile yayın. İleride Capac
   kostümler. Sonra: kardeş modu, sınıf/anaokulu modu, 23 Nisan özel bölümü.
 - İleriki bölümler için fikir: evdeki eşyalarla hareket (en sevdiği oyuncak, yumuşak top,
   balon, yastık): yerden alıp kaldırma, taşıma, başının üstünde tutma, balonu yere düşürmeme.
+- Ses: bütün seslendirilen cümleler `src/metinler.ts`'de. `npm run seslendir` eksik cümleleri
+  doğal sesle (Azure veya ElevenLabs anahtarıyla) public/ses/ altına kaydeder; kaydı olmayan
+  cümle telefonun sesiyle okunur. Çocuğun adı sesli söylenmez ("Merhaba gezgin!"), sadece yazılır.
+  Yeni bir konus() cümlesi eklenince metinler.ts'e de eklenmeli.
+- Çıkış planı: Kasım'da ~100 kişilik beta (TestFlight / Google kapalı test), Ocak sonu yarıyıl
+  tatilinde mağaza, 23 Nisan büyük güncelleme. Yorumlar organize ettirilmez (mağaza kuralı);
+  çevre beta testçisi olarak kullanılır.
+- Hareketler futbol takımının fizyoterapistlerine danışılacak (hareket kataloğu sayfası).
 - Durak simgeleri şimdilik emoji; ileride çizerin çizdiği özel görseller gelecek.
 
 ## Kod düzeni

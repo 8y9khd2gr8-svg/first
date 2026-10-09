@@ -3,6 +3,7 @@ import { RENK, YAZI_TIPI } from '../ayarlar';
 import { buyukDugme, yildizliArkaPlan } from '../arayuz';
 import { durakBul } from '../duraklar';
 import { tamamla, tamamlananlar } from '../ilerleme';
+import { M } from '../metinler';
 import { bip, konus, sustur, zaferMuzigi } from '../ses';
 
 const KONFETI_RENKLERI = [0xffc93c, 0xff8a3d, 0x3fbf5f, 0x2f80ed, 0xff6b6b, 0xffffff];
@@ -89,7 +90,7 @@ export class OdulScene extends Phaser.Scene {
     });
 
     zaferMuzigi();
-    this.time.delayedCall(500, () => konus(`Süpersin! ${durak.yer} damgasını kazandın!`));
+    this.time.delayedCall(500, () => konus(M.damgaKazandin(durak.yer)));
 
     buyukDugme(this, x, 1010, 'Haritaya dön ▶', RENK.turuncu, () => {
       sustur();

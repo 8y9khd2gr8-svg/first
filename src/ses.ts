@@ -1,6 +1,8 @@
-// Sesler: kısa "bip" efektleri (Web Audio) ve geçici Türkçe seslendirme
-// (telefonun kendi konuşma motoru). Gerçek seslendirme kayıtları gelince
-// konus() bu kayıtları çalacak şekilde değişecek.
+// Sesler: kısa "bip" efektleri (Web Audio) ve seslendirme.
+// konus(): cümlenin doğal ses kaydı varsa (public/ses/, npm run seslendir ile üretilir) onu çalar;
+// yoksa telefonun kendi Türkçe konuşma motoruyla okur. Böylece oyun hiç sessiz kalmaz.
+import { sesAnahtari } from './sesAnahtari';
+import { SES_DOSYALARI } from './sesDosyalari';
 
 let baglam: AudioContext | null = null;
 
@@ -49,7 +51,42 @@ if ('speechSynthesis' in window) {
   speechSynthesis.addEventListener('voiceschanged', turkceSesiBul);
 }
 
+const kayitlar = new Map<string, Promise<AudioBuffer | null>>();
+let calan: AudioBufferSourceNode | null = null;
+let konusmaNo = 0;
+
+function kaydiYukle(anahtar: string): Promise<AudioBuffer | null> {
+  let kayit = kayitlar.get(anahtar);
+  if (!kayit) {
+    kayit = fetch(`ses/${anahtar}.mp3`)
+      .then((c) => (c.ok ? c.arrayBuffer() : Promise.reject()))
+      .then((veri) => sesBaglami()!.decodeAudioData(veri))
+      .catch(() => null);
+    kayitlar.set(anahtar, kayit);
+  }
+  return kayit;
+}
+
 export function konus(metin: string) {
+  sustur();
+  const anahtar = sesAnahtari(metin);
+  if (SES_DOSYALARI.has(anahtar) && sesBaglami()) {
+    const no = ++konusmaNo;
+    void kaydiYukle(anahtar).then((kayit) => {
+      if (no !== konusmaNo) return; // bu arada başka bir cümle başladı
+      if (!kayit) return telefonSesi(metin);
+      const b = sesBaglami()!;
+      calan = b.createBufferSource();
+      calan.buffer = kayit;
+      calan.connect(b.destination);
+      calan.start();
+    });
+    return;
+  }
+  telefonSesi(metin);
+}
+
+function telefonSesi(metin: string) {
   if (!('speechSynthesis' in window)) return;
   if (!turkceSes) turkceSesiBul();
   speechSynthesis.cancel();
@@ -62,5 +99,12 @@ export function konus(metin: string) {
 }
 
 export function sustur() {
+  konusmaNo++;
+  try {
+    calan?.stop();
+  } catch {
+    // zaten bitmiş
+  }
+  calan = null;
   if ('speechSynthesis' in window) speechSynthesis.cancel();
 }

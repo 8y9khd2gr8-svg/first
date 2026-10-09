@@ -4,6 +4,7 @@ import { evDugmesi, yildizliArkaPlan } from '../arayuz';
 import { Durak, TURKIYE } from '../duraklar';
 import { DURAK_KONUMLARI, HARITA_BOYUTU } from '../haritaKonumlar';
 import { tamamlananlar } from '../ilerleme';
+import { M } from '../metinler';
 import { bip, konus, sustur, zaferMuzigi } from '../ses';
 import { Zipzip } from '../zipzip';
 
@@ -114,13 +115,7 @@ export class HaritaScene extends Phaser.Scene {
 
     const durumuSoyle = () => {
       altYazi.setText(siradaki === -1 ? 'Türkiye Turu’nu bitirdin! 🏆' : siradaki === 0 ? 'İlk durağa dokun ve başla!' : `Sıradaki durak: ${TURKIYE[siradaki].yer}`);
-      konus(
-        siradaki === -1
-          ? 'Tebrikler! Türkiye turunu bitirdin!'
-          : siradaki === 0
-            ? 'Türkiye turuna hoş geldin! İlk durağımız İstanbul. Dokun ve başla!'
-            : `Sıradaki durağımız ${TURKIYE[siradaki].yer}!`,
-      );
+      konus(siradaki === -1 ? M.turBitti : siradaki === 0 ? M.turaHosgeldin : M.siradaki(TURKIYE[siradaki].yer));
     };
 
     if (yolculukVar) {
@@ -131,7 +126,7 @@ export class HaritaScene extends Phaser.Scene {
       const izSon = konum(hedef.id);
       let adimNo = 0;
       altYazi.setText('Yola çıkıyoruz!');
-      konus('Yola çıkıyoruz!');
+      konus(M.yolaCikiyoruz);
       this.time.delayedCall(700, () =>
         zipzip.yolculuk(
           noktalar,
@@ -178,7 +173,7 @@ export class HaritaScene extends Phaser.Scene {
       if (!acik) {
         bip(220, 0.15, 'square', 0.12);
         this.tweens.add({ targets: isaret, x: dx + 8, duration: 50, yoyo: true, repeat: 3 });
-        konus('Önce sıradaki durağı bitirelim!');
+        konus(M.oncekiniBitir);
         return;
       }
       bip(880, 0.08, 'square', 0.12);
