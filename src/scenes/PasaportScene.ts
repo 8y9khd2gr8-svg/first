@@ -170,9 +170,9 @@ export class PasaportScene extends Phaser.Scene {
     });
 
     if (!pasaport.ad) {
-      buyukDugme(this, x, 1180, 'Haritaya git ▶', RENK.turuncu, () => {
+      buyukDugme(this, x, 1180, 'Maceraya başla ▶', RENK.turuncu, () => {
         sustur();
-        this.scene.start(this.sayfaNo === 'uzay' && dunyaAcik(DUNYA.map((d) => d.id)) ? 'Uzay' : this.sayfaNo === 'dunya' && dunyaAcik(TURKIYE.map((d) => d.id)) ? 'Dunya' : 'Harita', { giris: 'uzay' });
+        this.scene.start('Macera', {});
       }, { genislik: 420, yukseklik: 120, yaziBoyu: 52 });
       konus(pasaport.avatar ? M.pasaportHazir : M.pasaportIlk);
     } else {

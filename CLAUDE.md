@@ -72,6 +72,9 @@ Teknoloji: Phaser 3 + TypeScript + Vite, GitHub Pages ile yayın. İleride Capac
   tutulur. "Üst üste gün" gibi baskı yaratan rozet yok. Durak sonunda yeni rozet kutlanır.
 - Uzay Yolculuğu (3. bölüm, UzayScene): dikey Güneş Sistemi; Ay → Venüs → Merkür → Mars →
   Jüpiter → Satürn → Uranüs → Neptün. Dünya Harikaları bitince açılır. Rozet: Uzay Yolcusu.
+- Büyük Macera (MaceraScene): Oyna → bütün bölümler kıvrımlı yolda; açık bölümler ilerlemesiyle,
+  gelecekler "Yakında" (ebeveyne "daha çok şey gelecek" vaadi). Bölüm haritalarının ⌂'si buraya döner.
+  Vaat: tek ödemeyle gelecek bütün bölümler dahil.
 - Durak simgeleri şimdilik emoji; ileride çizerin çizdiği özel görseller gelecek.
 
 ## Kod düzeni
