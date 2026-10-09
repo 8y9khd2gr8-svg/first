@@ -1,4 +1,4 @@
-import { DUNYA, TURKIYE } from './duraklar';
+import { DUNYA, TURKIYE, UZAY } from './duraklar';
 import { H, ISINMA, SOGUMA } from './hareketler';
 import { AVATARLAR } from './pasaport';
 import { ROZETLER } from './rozetler';
@@ -30,6 +30,9 @@ export const M = {
   dunyaHosgeldin: 'Dünya Harikaları turuna hoş geldin! İlk durağımız Efes. Dokun ve başla!',
   dunyaBitti: 'İnanılmaz! Dünyanın bütün harikalarını gezdin!',
   dunyaKilitli: 'Dünya turu, Türkiye turunu bitirince açılacak!',
+  uzayHosgeldin: 'Uzay yolculuğuna hoş geldin! İlk durağımız, Güneş’e en yakın gezegen Merkür. Dokun ve başla!',
+  uzayBitti: 'Muhteşem! Bütün gezegenleri gezdin, gerçek bir uzay yolcususun!',
+  uzayKilitli: 'Uzay yolculuğu, dünya turunu bitirince açılacak!',
   yeniRozet: (ad: string) => `Yeni rozet kazandın: ${ad}!`,
   rozetAdi: (ad: string) => `${ad} rozeti!`,
   rozetNasil: (nasil: string) => `Bu rozeti kazanmak için: ${nasil}.`,
@@ -41,14 +44,14 @@ export function tumMetinler(): string[] {
     ...SAYILAR,
     ...GERI_SAYIM,
     M.yaptinMi, M.aferin, M.yolaCikiyoruz, M.oncekiniBitir, M.turBitti, M.turaHosgeldin,
-    M.karakterSec, M.pasaportIlk, M.pasaportHazir, M.pasaportSifir, M.sertifika, M.dunyaHosgeldin, M.dunyaBitti, M.dunyaKilitli,
+    M.karakterSec, M.pasaportIlk, M.pasaportHazir, M.pasaportSifir, M.sertifika, M.dunyaHosgeldin, M.dunyaBitti, M.dunyaKilitli, M.uzayHosgeldin, M.uzayBitti, M.uzayKilitli,
     ...Object.values(H).map((h) => h.sesli),
     ISINMA.sesli,
     SOGUMA.sesli,
     ...AVATARLAR.map((a) => M.karakterSecildi(a.ad)),
     ...ROZETLER.flatMap((r) => [M.yeniRozet(r.ad), M.rozetAdi(r.ad), M.rozetNasil(r.nasil)]),
   ]);
-  [TURKIYE, DUNYA].forEach((bolum) =>
+  [TURKIYE, DUNYA, UZAY].forEach((bolum) =>
     bolum.forEach((d, i) => {
       liste.add(M.durakGiris(d.yer, d.ad, d.bilgi));
       liste.add(M.damgaKazandin(d.yer));
@@ -56,6 +59,6 @@ export function tumMetinler(): string[] {
       if (i > 0) liste.add(M.siradaki(d.yer));
     }),
   );
-  for (let i = 1; i <= TURKIYE.length + DUNYA.length; i++) liste.add(M.pasaportDamga(i));
+  for (let i = 1; i <= TURKIYE.length + DUNYA.length + UZAY.length; i++) liste.add(M.pasaportDamga(i));
   return [...liste];
 }

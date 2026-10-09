@@ -167,11 +167,11 @@ export class HaritaScene extends Phaser.Scene {
           },
           () => {
             const eski = isaretler.get(hedef.id)!;
-            const yeni = this.isaret(hedef, true, false, true);
+            const yeni = this.isaret(hedef, true, false, false);
             this.harita.addAt(yeni, this.harita.getIndex(eski));
             eski.destroy();
             yeni.setScale(0);
-            this.tweens.add({ targets: yeni, scale: 1.3, duration: 260, ease: 'Back.easeOut', yoyo: true, hold: 120, onComplete: () => this.nabiz(yeni) });
+            this.tweens.add({ targets: yeni, scale: 1, duration: 450, ease: 'Back.easeOut', onComplete: () => this.nabiz(yeni) });
             zaferMuzigi();
             zipzip.surekli('zipla', 1200);
             this.time.delayedCall(500, durumuSoyle);

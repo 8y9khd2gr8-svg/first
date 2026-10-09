@@ -27,7 +27,8 @@ export class DurakScene extends Phaser.Scene {
       this.scene.start(haritaSahnesi(durak), {});
     });
 
-    this.add.text(x, 170, durak.yer, { fontFamily: YAZI_TIPI, fontSize: '44px', color: '#cfe3ff' }).setOrigin(0.5);
+    // Gezegenlerde yer ve ad aynı ("Satürn"); iki kez yazmayalım.
+    if (durak.yer !== durak.ad) this.add.text(x, 170, durak.yer, { fontFamily: YAZI_TIPI, fontSize: '44px', color: '#cfe3ff' }).setOrigin(0.5);
     this.add
       .text(x, 250, durak.ad, { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '88px', color: '#FFC93C', stroke: '#0b1430', strokeThickness: 14 })
       .setOrigin(0.5);
@@ -39,9 +40,25 @@ export class DurakScene extends Phaser.Scene {
     kutu.fillStyle(0xffffff, 0.1).fillRoundedRect(50, 640, 620, 320, 36);
     kutu.lineStyle(4, RENK.sari, 0.8).strokeRoundedRect(50, 640, 620, 320, 36);
     this.add.text(x, 690, 'Biliyor muydun?', { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '44px', color: '#FFC93C' }).setOrigin(0.5);
-    this.add
-      .text(x, 820, durak.bilgi, { fontFamily: YAZI_TIPI, fontSize: '36px', color: '#ffffff', align: 'center', wordWrap: { width: 560 }, lineSpacing: 4 })
-      .setOrigin(0.5);
+    // "Biliyor muydun?" yazısı, ses okurken harf harf ekrana akar.
+    const bilgi = this.add
+      .text(x, 735, durak.bilgi, { fontFamily: YAZI_TIPI, fontSize: '36px', color: '#ffffff', align: 'center', wordWrap: { width: 560 }, lineSpacing: 4 })
+      .setOrigin(0.5, 0);
+    const satirlar = bilgi.getWrappedText(durak.bilgi);
+    bilgi.setText('');
+    const harfSayisi = durak.bilgi.length;
+    const sayac = { n: 0 };
+    this.tweens.add({
+      targets: sayac,
+      n: harfSayisi,
+      delay: 1300, // önce yer ve durak adı okunur
+      duration: harfSayisi * 62,
+      onUpdate: () => {
+        let kalan = Math.floor(sayac.n);
+        bilgi.setText(satirlar.map((s) => { const p = s.slice(0, Math.max(0, kalan)); kalan -= s.length + 1; return p; }).join('\n'));
+      },
+      onComplete: () => bilgi.setText(satirlar.join('\n')),
+    });
 
     konus(M.durakGiris(durak.yer, durak.ad, durak.bilgi));
 

@@ -1,4 +1,4 @@
-import { DUNYA, TURKIYE } from './duraklar';
+import { DUNYA, TURKIYE, UZAY } from './duraklar';
 import { tamamlananlar } from './ilerleme';
 import { H, ISINMA, SOGUMA } from './hareketler';
 import { haftalikOzet } from './istatistik';
@@ -21,7 +21,7 @@ type Durum = {
 
 const toplam = (d: Durum, ...animasyonlar: string[]) => animasyonlar.reduce((t, a) => t + (d.sayac[a] ?? 0), 0);
 // "Hareket Kâşifi" için oyundaki bütün hareket türleri.
-const TUM_ANIMASYONLAR = [...new Set([...Object.values(H), ISINMA, SOGUMA, ...TURKIYE.map((x) => x.ozel), ...DUNYA.map((x) => x.ozel)].map((h) => h.animasyon))];
+const TUM_ANIMASYONLAR = [...new Set([...Object.values(H), ISINMA, SOGUMA, ...TURKIYE.map((x) => x.ozel), ...DUNYA.map((x) => x.ozel), ...UZAY.map((x) => x.ozel)].map((h) => h.animasyon))];
 
 const KOSULLAR: (Rozet & { kazanildi: (d: Durum) => boolean })[] = [
   { id: 'ilkAdim', simge: '🌱', ad: 'İlk Adım', nasil: 'İlk hareketini tamamla', kazanildi: (d) => d.hareket >= 1 },
@@ -45,6 +45,7 @@ const KOSULLAR: (Rozet & { kazanildi: (d: Durum) => boolean })[] = [
   { id: 'onDamga', simge: '📚', ad: '10 Damga', nasil: '10 damga topla', kazanildi: (d) => d.biten.size >= 10 },
   { id: 'turkiyeGezgini', simge: '🇹🇷', ad: 'Türkiye Gezgini', nasil: 'Türkiye Turu’nu bitir', bolum: true, kazanildi: (d) => TURKIYE.every((x) => d.biten.has(x.id)) },
   { id: 'dunyaKasifi', simge: '🌍', ad: 'Dünya Kâşifi', nasil: 'Dünya Harikaları’nı bitir', bolum: true, kazanildi: (d) => DUNYA.every((x) => d.biten.has(x.id)) },
+  { id: 'uzayYolcusu', simge: '🪐', ad: 'Uzay Yolcusu', nasil: 'Uzay Yolculuğu’nu bitir', bolum: true, kazanildi: (d) => UZAY.every((x) => d.biten.has(x.id)) },
 ];
 
 export const ROZETLER: Rozet[] = KOSULLAR.map(({ kazanildi: _k, ...r }) => r);

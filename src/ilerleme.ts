@@ -20,19 +20,18 @@ export function tamamla(durakId: string) {
   }
 }
 
-// Dünya Harikaları bölümü: Türkiye Turu bitince açılır (mağazada ileride tek ödemeyle).
-// Beta testi için ebeveyn köşesinden de açılabilir (mağazaya çıkmadan kaldırılacak).
+// Bir bölüm, önceki bölüm bitince açılır (mağazada ileride tek ödemeyle).
+// Beta testi için ebeveyn köşesinden bütün bölümler açılabilir (mağazaya çıkmadan kaldırılacak).
 const BETA_ANAHTAR = 'zipzip-beta-dunya';
 
-export function dunyaAcik(turkiyeIdler: string[]): boolean {
+export function bolumAcik(oncekiBolumIdleri: string[]): boolean {
   const biten = new Set(tamamlananlar());
-  if (turkiyeIdler.every((id) => biten.has(id))) return true;
-  try {
-    return localStorage.getItem(BETA_ANAHTAR) === '1';
-  } catch {
-    return false;
-  }
+  if (oncekiBolumIdleri.every((id) => biten.has(id))) return true;
+  return betaDunyaAcikMi();
 }
+
+// Eski ad (Dünya bölümü = Türkiye bitince).
+export const dunyaAcik = bolumAcik;
 
 export function betaDunyaAc(acik: boolean) {
   try {
