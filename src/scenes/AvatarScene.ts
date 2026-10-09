@@ -15,7 +15,7 @@ export class AvatarScene extends Phaser.Scene {
     yildizliArkaPlan(this);
     const x = this.scale.gameSize.width / 2;
     const secili = pasaportOku().avatar;
-    evDugmesi(this, () => this.scene.start('Pasaport'));
+    evDugmesi(this, () => this.scene.start('Pasaport', {}));
 
     this.add
       .text(x, 190, 'Karakterini seç!', { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '76px', color: '#FFC93C', stroke: '#0b1430', strokeThickness: 12 })
@@ -36,7 +36,7 @@ export class AvatarScene extends Phaser.Scene {
         bip(880, 0.1, 'triangle', 0.2);
         pasaportYaz({ avatar: avatar.simge });
         konus(M.karakterSecildi(avatar.ad));
-        this.tweens.add({ targets: kart, scale: 1.15, duration: 150, yoyo: true, onComplete: () => this.scene.start('Pasaport') });
+        this.tweens.add({ targets: kart, scale: 1.15, duration: 150, yoyo: true, onComplete: () => this.scene.start('Pasaport', {}) });
       });
     });
   }

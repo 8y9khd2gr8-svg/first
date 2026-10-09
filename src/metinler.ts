@@ -1,6 +1,7 @@
 import { DUNYA, TURKIYE } from './duraklar';
 import { H, ISINMA, SOGUMA } from './hareketler';
 import { AVATARLAR } from './pasaport';
+import { ROZETLER } from './rozetler';
 
 // Oyunda seslendirilen bütün cümleler. Doğal ses kayıtları bu listeden üretilir
 // (npm run seslendir); listede olmayan bir cümle telefonun kendi sesiyle okunur.
@@ -29,6 +30,9 @@ export const M = {
   dunyaHosgeldin: 'Dünya Harikaları turuna hoş geldin! İlk durağımız Efes. Dokun ve başla!',
   dunyaBitti: 'İnanılmaz! Dünyanın bütün harikalarını gezdin!',
   dunyaKilitli: 'Dünya turu, Türkiye turunu bitirince açılacak!',
+  yeniRozet: (ad: string) => `Yeni rozet kazandın: ${ad}!`,
+  rozetAdi: (ad: string) => `${ad} rozeti!`,
+  rozetNasil: (nasil: string) => `Bu rozeti kazanmak için: ${nasil}.`,
 };
 
 // Seslendirme aracı için: oyunda söylenebilecek her cümlenin tam listesi.
@@ -42,6 +46,7 @@ export function tumMetinler(): string[] {
     ISINMA.sesli,
     SOGUMA.sesli,
     ...AVATARLAR.map((a) => M.karakterSecildi(a.ad)),
+    ...ROZETLER.flatMap((r) => [M.yeniRozet(r.ad), M.rozetAdi(r.ad), M.rozetNasil(r.nasil)]),
   ]);
   [TURKIYE, DUNYA].forEach((bolum) =>
     bolum.forEach((d, i) => {

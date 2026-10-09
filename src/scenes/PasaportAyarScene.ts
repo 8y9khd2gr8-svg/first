@@ -70,7 +70,7 @@ export class PasaportAyarScene extends Phaser.Scene {
 
     buyukDugme(this, x, 1060, 'Kaydet ✓', RENK.yesil, () => {
       pasaportYaz({ ad: giris.value.trim(), foto: this.foto, soruldu: true });
-      this.scene.start('Pasaport');
+      this.scene.start('Pasaport', {});
     }, { genislik: 420, yukseklik: 140, yaziBoyu: 64 });
 
     if (this.foto || pasaport.ad) {
