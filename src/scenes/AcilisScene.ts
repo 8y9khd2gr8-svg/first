@@ -3,6 +3,7 @@ import { RENK, YAZI_TIPI } from '../ayarlar';
 import { buyukDugme, yildizliArkaPlan } from '../arayuz';
 import { sesiAc } from '../ses';
 import { Zipzip } from '../zipzip';
+import { pasaportOku, pasaportYaz } from '../pasaport';
 
 // Açılış ekranı: oyunun adı, zıplayan Zıpzıp ve büyük "Oyna" düğmesi.
 export class AcilisScene extends Phaser.Scene {
@@ -33,7 +34,9 @@ export class AcilisScene extends Phaser.Scene {
       RENK.turuncu,
       () => {
         sesiAc();
-        this.scene.start('Harita');
+        const ilkSefer = !pasaportOku().soruldu;
+        if (ilkSefer) pasaportYaz({ soruldu: true });
+        this.scene.start(ilkSefer ? 'Pasaport' : 'Harita');
       },
       { genislik: 480, yukseklik: 160, yaziBoyu: 80 },
     );

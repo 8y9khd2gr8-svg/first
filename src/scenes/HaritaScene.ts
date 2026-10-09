@@ -29,6 +29,16 @@ export class HaritaScene extends Phaser.Scene {
       this.scene.start('Acilis');
     });
 
+    const pasaportDugmesi = this.add.container(640, 80);
+    pasaportDugmesi.add(this.add.circle(0, 0, 50, RENK.turuncu).setStrokeStyle(5, RENK.beyaz));
+    pasaportDugmesi.add(this.add.text(0, 2, '🛂', { fontSize: '50px' }).setOrigin(0.5));
+    pasaportDugmesi.setSize(100, 100).setInteractive({ useHandCursor: true });
+    pasaportDugmesi.on('pointerdown', () => {
+      bip(880, 0.08, 'square', 0.12);
+      sustur();
+      this.scene.start('Pasaport');
+    });
+
     this.add
       .text(x, 150, 'Türkiye Turu', { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '84px', color: '#FFC93C', stroke: '#0b1430', strokeThickness: 14 })
       .setOrigin(0.5);

@@ -28,9 +28,11 @@ Teknoloji: Phaser 3 + TypeScript + Vite, GitHub Pages ile yayın. İleride Capac
 - Harika listesini biz seçeriz; dini figür/ibadet odaklı yapılar (ör. Kurtarıcı İsa heykeli)
   Türkiye'de yanlış anlaşılabileceği için listeye alınmaz.
 
-- Pasaport (sıradaki iş): çocuğun adı ve fotoğrafı olan çocuk pasaportu; damgalar burada
-  toplanır. Ad ve fotoğraf sadece cihazda saklanır, hiçbir yere gönderilmez; fotoğraf/ad
-  girişi ebeveyn kilidinin arkasında.
+- Pasaport: çocuğun adı, görünümü ve damgaları. Görünüm varsayılan olarak çocuğun kendi
+  seçtiği hayvan karakteri; fotoğraf tamamen isteğe bağlı (bazı aileler istemez). Ad ve
+  fotoğraf sadece cihazda saklanır; ad/fotoğraf girişi ebeveyn kilidinin (çarpma sorusu) arkasında.
+- Harita ilerleme stili (sıradaki iş): uzaydan iniş + Zıpzıp'ın rota üzerinde zıplayarak
+  bir sonraki durağa gitmesi.
 - İleriki bölümler için fikir: evdeki eşyalarla hareket (en sevdiği oyuncak, yumuşak top,
   balon, yastık): yerden alıp kaldırma, taşıma, başının üstünde tutma, balonu yere düşürmeme.
 - Durak simgeleri şimdilik emoji; ileride çizerin çizdiği özel görseller gelecek.
