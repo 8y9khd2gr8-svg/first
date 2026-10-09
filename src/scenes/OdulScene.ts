@@ -1,10 +1,11 @@
 import Phaser from 'phaser';
 import { RENK, YAZI_TIPI } from '../ayarlar';
 import { buyukDugme, rozetCiz, yildizliArkaPlan } from '../arayuz';
-import { durakBul, haritaSahnesi } from '../duraklar';
+import { durakBul, haritaSahnesi, oturum } from '../duraklar';
 import { tamamla, tamamlananlar } from '../ilerleme';
 import { M } from '../metinler';
 import { yeniRozetleriAl } from '../rozetler';
+import { yeniKostumleriAl } from '../kostumler';
 import { bip, konus, sustur, zaferMuzigi } from '../ses';
 
 const KONFETI_RENKLERI = [0xffc93c, 0xff8a3d, 0x3fbf5f, 0x2f80ed, 0xff6b6b, 0xffffff];
@@ -68,6 +69,11 @@ export class OdulScene extends Phaser.Scene {
       });
     });
 
+    // Kazanılan yıldızlar (her "Yaptım!" 1 yıldız): kostümler bu yıldızlarla açılır.
+    this.add
+      .text(x, 425, `+${oturum(durak).length} ⭐ yıldız`, { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '34px', color: '#FFC93C' })
+      .setOrigin(0.5);
+
     // Pasaport damgası: yukarıdan "pat" diye basılır.
     const damga = this.add.container(x, 650).setAngle(-10);
     const cember = this.add.graphics();
@@ -94,9 +100,14 @@ export class OdulScene extends Phaser.Scene {
     zaferMuzigi();
     this.time.delayedCall(500, () => konus(M.damgaKazandin(durak.yer)));
 
-    // Yeni rozet varsa damgadan sonra kutla (birden fazlaysa ilki gösterilir, "+2" yazar).
-    const yeniler = yeniRozetleriAl();
-    if (yeniler.length) this.time.delayedCall(3400, () => this.rozetKutla(yeniler[0].simge, yeniler[0].ad, yeniler.length - 1));
+    // Yeni rozet ve kostümler damgadan sonra sırayla kutlanır (rozetlerden en fazla ilki, "+2" yazar).
+    const rozetler = yeniRozetleriAl();
+    const kostumler = yeniKostumleriAl();
+    const kutlamalar: (() => void)[] = [];
+    if (rozetler.length) kutlamalar.push(() => this.rozetKutla(rozetler[0].simge, rozetler[0].ad, rozetler.length - 1, 'Yeni rozet!', M.yeniRozet(rozetler[0].ad), sonraki));
+    kostumler.forEach((k) => kutlamalar.push(() => this.rozetKutla(k.simge, k.ad, 0, 'Yeni kostüm!', M.yeniKostum(k.ad), sonraki, 'Kostüm dolabında seni bekliyor!')));
+    const sonraki = () => kutlamalar.shift()?.();
+    if (kutlamalar.length) this.time.delayedCall(3400, sonraki);
 
     this.kutlamaKatmani = this.add.container(0, 0).setDepth(10);
 
@@ -111,23 +122,24 @@ export class OdulScene extends Phaser.Scene {
     }, { genislik: 400, yukseklik: 110, yaziBoyu: 52 });
   }
 
-  private rozetKutla(simge: string, ad: string, digerSayisi: number) {
+  private rozetKutla(simge: string, ad: string, digerSayisi: number, baslikYazi = 'Yeni rozet!', sesli = M.yeniRozet(ad), bitince?: () => void, altYazi = 'Pasaportunda seni bekliyor!') {
     const { width, height } = this.scale.gameSize;
     const x = width / 2;
     const k = this.kutlamaKatmani;
     const perde = this.add.rectangle(x, height / 2, width, height, 0x0b1430, 0.85).setInteractive();
-    const baslik = this.add.text(x, 330, 'Yeni rozet!', { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '84px', color: '#FFC93C', stroke: '#0b1430', strokeThickness: 12 }).setOrigin(0.5);
+    const baslik = this.add.text(x, 330, baslikYazi, { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '84px', color: '#FFC93C', stroke: '#0b1430', strokeThickness: 12 }).setOrigin(0.5);
     const rozet = rozetCiz(this, x, 600, 120, simge, true).setScale(0);
     const isim = this.add.text(x, 800, ad, { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '56px', color: '#ffffff' }).setOrigin(0.5);
-    const ek = this.add.text(x, 870, digerSayisi > 0 ? `+${digerSayisi} rozet daha! Pasaportuna bak.` : 'Pasaportunda seni bekliyor!', { fontFamily: YAZI_TIPI, fontSize: '32px', color: '#cfe3ff' }).setOrigin(0.5);
+    const ek = this.add.text(x, 870, digerSayisi > 0 ? `+${digerSayisi} rozet daha! Pasaportuna bak.` : altYazi, { fontFamily: YAZI_TIPI, fontSize: '32px', color: '#cfe3ff' }).setOrigin(0.5);
     const tamam = this.add.text(x, 1000, 'Harika! ✓', { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '52px', color: '#ffffff', backgroundColor: '#3FBF5F', padding: { x: 40, y: 14 } }).setOrigin(0.5).setInteractive({ useHandCursor: true });
     k.add([perde, baslik, rozet, isim, ek, tamam]);
     this.tweens.add({ targets: rozet, scale: 1, angle: 360, duration: 700, ease: 'Back.easeOut' });
     zaferMuzigi();
-    konus(M.yeniRozet(ad));
+    konus(sesli);
     tamam.on('pointerdown', () => {
       bip(880, 0.08, 'square', 0.12);
       k.removeAll(true);
+      bitince?.();
     });
   }
 }

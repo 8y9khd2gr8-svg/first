@@ -75,6 +75,9 @@ Teknoloji: Phaser 3 + TypeScript + Vite, GitHub Pages ile yayın. İleride Capac
 - Büyük Macera (MaceraScene): Oyna → bütün bölümler kıvrımlı yolda; açık bölümler ilerlemesiyle,
   gelecekler "Yakında" (ebeveyne "daha çok şey gelecek" vaadi). Bölüm haritalarının ⌂'si buraya döner.
   Vaat: tek ödemeyle gelecek bütün bölümler dahil.
+- Kostümler (src/kostumler.ts): her "Yaptım!" 1 yıldız; 9 kostüm yıldız eşiğiyle kendiliğinden
+  açılır (harcama/satın alma yok). Giyilen kostüm her ekrandaki Zıpzıp'ta görünür. Kostüm dolabı
+  pasaporttan (👕). Durak sonunda yeni rozet ve kostümler sırayla kutlanır.
 - Durak simgeleri şimdilik emoji; ileride çizerin çizdiği özel görseller gelecek.
 
 ## Kod düzeni

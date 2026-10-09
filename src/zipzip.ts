@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import type { Animasyon } from './hareketler';
+import { seciliKostum } from './kostumler';
 
 // Zıpzıp: gövde (yüzlü dünya) + iki parçalı kollar (omuz-dirsek) ve bacaklar (kalça-diz).
 // Tüm ölçüler maskot çiziminin birimleriyle; "birim" bir çizim biriminin ekranda kaç piksel olduğu.
@@ -179,6 +180,7 @@ export class Zipzip extends Phaser.GameObjects.Container {
     const govde = sahne.add.image(0, 0, 'govde').setScale(birim / 2);
     const { solKol, sagKol, solBacak, sagBacak } = this.uzuvlar;
     this.add([solKol.kok, sagKol.kok, govde, solBacak.kok, sagBacak.kok]);
+    this.kostumGiy(seciliKostum());
 
     this.durusAl(D.normal, 0);
     sahne.add.existing(this);
@@ -252,6 +254,47 @@ export class Zipzip extends Phaser.GameObjects.Container {
     let tekrarNo = 1;
     this.birKez(animasyon, tempo, tekrarNo);
     this.dongu = this.scene.time.addEvent({ delay: tempo, loop: true, callback: () => this.birKez(animasyon, tempo, ++tekrarNo) });
+  }
+
+  private kostumParcalari: Phaser.GameObjects.GameObject[] = [];
+
+  // Kostümü giydirir (undefined: kostümsüz). Şapka ve gözlük başın üstünde, pelerin gövdenin arkasında.
+  kostumGiy(id: string | undefined) {
+    this.kostumParcalari.forEach((p) => p.destroy());
+    this.kostumParcalari = [];
+    if (!id) return;
+    const b = this.birim;
+    const emoji = (simge: string, x: number, y: number, boy: number, aci = 0) => {
+      const t = this.scene.add.text(x * b, y * b, simge, { fontSize: `${Math.round(boy * b)}px` }).setOrigin(0.5).setAngle(aci);
+      this.add(t);
+      this.kostumParcalari.push(t);
+    };
+    switch (id) {
+      case 'kep': return emoji('🧢', 0, -112, 92, -12);
+      case 'gozluk': return emoji('🕶️', 0, -48, 100);
+      case 'fiyonk': return emoji('🎀', 62, -92, 62, 18);
+      case 'atki': return emoji('🧣', 0, 80, 74);
+      case 'tac': return emoji('👑', 0, -128, 82);
+      case 'sihirbaz': return emoji('🎩', 0, -138, 96, -6);
+      case 'kasif': return emoji('🤠', 0, -126, 104);
+      case 'pelerin': {
+        const g = this.scene.add.graphics();
+        g.fillStyle(0xe63946).fillPoints([{ x: -80 * b, y: -30 * b }, { x: 80 * b, y: -30 * b }, { x: 130 * b, y: 150 * b }, { x: -130 * b, y: 150 * b }], true);
+        g.fillStyle(0xb5232f).fillPoints([{ x: -80 * b, y: -30 * b }, { x: -20 * b, y: -30 * b }, { x: -60 * b, y: 150 * b }, { x: -130 * b, y: 150 * b }], true);
+        this.addAt(g, 0); // en arkada
+        this.kostumParcalari.push(g);
+        return;
+      }
+      case 'astronot': {
+        const g = this.scene.add.graphics();
+        g.fillStyle(0xffffff, 0.14).fillCircle(0, -4 * b, 132 * b);
+        g.lineStyle(7 * b, 0xe8eef7, 0.9).strokeCircle(0, -4 * b, 132 * b);
+        g.fillStyle(0xffffff, 0.35).fillEllipse(-62 * b, -70 * b, 46 * b, 26 * b);
+        this.add(g);
+        this.kostumParcalari.push(g);
+        return;
+      }
+    }
   }
 
   // Zıpzıp'ı (gölgesiyle birlikte) yeni bir yere koyar.
