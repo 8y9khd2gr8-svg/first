@@ -123,13 +123,13 @@ export class PasaportScene extends Phaser.Scene {
     if (!pasaport.ad) {
       buyukDugme(this, x, 1180, 'Haritaya git ▶', RENK.turuncu, () => {
         sustur();
-        this.scene.start('Harita');
+        this.scene.start('Harita', { giris: 'uzay' });
       }, { genislik: 420, yukseklik: 120, yaziBoyu: 52 });
       konus(pasaport.avatar ? 'Harika! Şimdi damga toplamaya başlayalım!' : 'Bu senin pasaportun! Önce kendine bir karakter seç. Adını da bir büyüğüne yazdırabilirsin.');
     } else {
       buyukDugme(this, x, 1180, 'Haritaya dön ▶', RENK.turuncu, () => {
         sustur();
-        this.scene.start('Harita');
+        this.scene.start('Harita', { giris: 'uzay' });
       }, { genislik: 420, yukseklik: 120, yaziBoyu: 52 });
       konus(damgaSayisi === 0 ? `Merhaba ${pasaport.ad}! Hadi ilk damganı kazanalım!` : `${pasaport.ad}, ${damgaSayisi} damga topladın!`);
     }

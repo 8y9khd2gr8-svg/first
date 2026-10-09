@@ -105,7 +105,7 @@ type UzuvParcasi = { kok: Phaser.GameObjects.Container; dirsek: Phaser.GameObjec
 
 export class Zipzip extends Phaser.GameObjects.Container {
   private readonly birim: number;
-  private readonly tabanY: number;
+  private tabanY: number;
   private readonly uzuvlar: Record<keyof Durus, UzuvParcasi>;
   private readonly golge: Phaser.GameObjects.Ellipse;
   private dongu?: Phaser.Time.TimerEvent;
@@ -203,6 +203,55 @@ export class Zipzip extends Phaser.GameObjects.Container {
     let tekrarNo = 1;
     this.birKez(animasyon, tempo, tekrarNo);
     this.dongu = this.scene.time.addEvent({ delay: tempo, loop: true, callback: () => this.birKez(animasyon, tempo, ++tekrarNo) });
+  }
+
+  // Zıpzıp'ı (gölgesiyle birlikte) yeni bir yere koyar.
+  yerlestir(x: number, y: number) {
+    this.setPosition(x, y);
+    this.tabanY = y;
+    this.golge.setPosition(x, y + 160 * this.birim);
+  }
+
+  get golgesi() {
+    return this.golge;
+  }
+
+  // Haritada bir duraktan ötekine zıplaya zıplaya gider. Her zıplamanın sonunda adim() çağrılır
+  // (ör. arkada altın iz bırakmak için).
+  yolculuk(noktalar: { x: number; y: number }[], ziplamaMs: number, adim: (a: { x: number; y: number }, b: { x: number; y: number }) => void, bitince: () => void) {
+    this.durdur();
+    const yukseklik = 120 * this.birim;
+    const golgeFarki = 160 * this.birim;
+    const sonraki = (i: number) => {
+      if (i >= noktalar.length) {
+        this.tabanY = this.y;
+        this.durusAl(D.normal, 150);
+        bitince();
+        return;
+      }
+      const bas = { x: this.x, y: this.tabanY };
+      const son = noktalar[i];
+      const ilerleme = { t: 0 };
+      this.durusAl(D.havada, ziplamaMs * 0.4);
+      this.scene.tweens.add({
+        targets: ilerleme,
+        t: 1,
+        duration: ziplamaMs,
+        onUpdate: () => {
+          const x = Phaser.Math.Linear(bas.x, son.x, ilerleme.t);
+          const y = Phaser.Math.Linear(bas.y, son.y, ilerleme.t);
+          this.setPosition(x, y - Math.sin(Math.PI * ilerleme.t) * yukseklik);
+          this.golge.setPosition(x, y + golgeFarki).setScale(1 - Math.sin(Math.PI * ilerleme.t) * 0.4);
+        },
+        onComplete: () => {
+          this.tabanY = son.y;
+          this.durusAl(D.hazirlan, ziplamaMs * 0.3);
+          adim(bas, son);
+          sonraki(i + 1);
+        },
+      });
+    };
+    sonraki(0);
   }
 
   durdur() {

@@ -34,7 +34,7 @@ export class HareketScene extends Phaser.Scene {
 
     evDugmesi(this, () => {
       sustur();
-      this.scene.start('Harita');
+      this.scene.start('Harita', {});
     });
 
     // İlerleme noktaları: kaçıncı hareketteyiz?

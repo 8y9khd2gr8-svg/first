@@ -2,7 +2,7 @@ import Phaser from 'phaser';
 import { RENK, YAZI_TIPI } from '../ayarlar';
 import { buyukDugme, yildizliArkaPlan } from '../arayuz';
 import { durakBul } from '../duraklar';
-import { tamamla } from '../ilerleme';
+import { tamamla, tamamlananlar } from '../ilerleme';
 import { bip, konus, sustur, zaferMuzigi } from '../ses';
 
 const KONFETI_RENKLERI = [0xffc93c, 0xff8a3d, 0x3fbf5f, 0x2f80ed, 0xff6b6b, 0xffffff];
@@ -24,6 +24,7 @@ export class OdulScene extends Phaser.Scene {
     const { width, height } = this.scale.gameSize;
     const x = width / 2;
     const durak = durakBul(this.durakId);
+    const yeniBitti = !tamamlananlar().includes(durak.id);
     tamamla(durak.id);
 
     for (let i = 0; i < 90; i++) {
@@ -92,7 +93,7 @@ export class OdulScene extends Phaser.Scene {
 
     buyukDugme(this, x, 1010, 'Haritaya dön ▶', RENK.turuncu, () => {
       sustur();
-      this.scene.start('Harita');
+      this.scene.start('Harita', yeniBitti ? { yolculukDen: durak.id } : {});
     }, { genislik: 540, yukseklik: 150, yaziBoyu: 64 });
 
     buyukDugme(this, x, 1170, 'Bir daha ↻', RENK.mavi, () => {

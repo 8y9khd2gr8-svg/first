@@ -1,34 +1,90 @@
 import Phaser from 'phaser';
 import { RENK, YAZI_TIPI } from '../ayarlar';
 import { evDugmesi, yildizliArkaPlan } from '../arayuz';
-import { TURKIYE } from '../duraklar';
+import { Durak, TURKIYE } from '../duraklar';
 import { DURAK_KONUMLARI, HARITA_BOYUTU } from '../haritaKonumlar';
 import { tamamlananlar } from '../ilerleme';
-import { bip, konus, sustur } from '../ses';
+import { bip, konus, sustur, zaferMuzigi } from '../ses';
 import { Zipzip } from '../zipzip';
 
 const HARITA_Y = 250; // haritanın üst kenarı
+const MERKEZ = { x: 360, y: HARITA_Y + 280 }; // uzaydan inişte yakınlaşılan nokta
 // Birbirine çok yakın duraklar üst üste binmesin diye küçük kaydırmalar.
 const KAYDIRMA: Record<string, [number, number]> = { nemrut: [-10, -22], gobeklitepe: [14, 22] };
+// Şehir adı işaretin altında durur; sıkışık yerlerde üstüne alınır.
+const AD_USTTE = new Set(['nemrut', 'karadeniz']);
+// Zıpzıp işaretin sol üstünde durur; haritanın sol kenarındaki durakta sağ üstte.
+const ZIPZIP_SAGDA = new Set(['truva']);
 
-// Türkiye haritası: duraklar sırayla açılır, Zıpzıp sıradaki durağın üstünde zıplar.
+type Veri = { giris?: 'uzay'; yolculukDen?: string };
+type Nokta = { x: number; y: number };
+
+// Türkiye haritası: duraklar sırayla açılır, Zıpzıp sıradaki durağın yanında zıplar.
+// Girişte "uzaydan iniş", bir durak bitince Zıpzıp'ın yolda zıplayarak ilerlemesi oynatılır.
 export class HaritaScene extends Phaser.Scene {
+  private veri: Veri = {};
+  private harita!: Phaser.GameObjects.Container;
+
   constructor() {
     super('Harita');
   }
 
+  init(veri: Veri) {
+    this.veri = veri ?? {};
+  }
+
   preload() {
     this.load.svg('haritaTurkiye', 'harita-turkiye.svg', { width: HARITA_BOYUTU.genislik * 2, height: HARITA_BOYUTU.yukseklik * 2 });
+    this.load.svg('dunya', 'dunya.svg', { width: 484, height: 484 });
   }
 
   create() {
     yildizliArkaPlan(this);
     const x = this.scale.gameSize.width / 2;
-    evDugmesi(this, () => {
-      sustur();
-      this.scene.start('Acilis');
+    const biten = new Set(tamamlananlar());
+    const siradaki = TURKIYE.findIndex((d) => !biten.has(d.id));
+    const yolculukDen = this.veri.yolculukDen;
+    const yolculukVar = !!yolculukDen && siradaki > 0 && TURKIYE[siradaki - 1].id === yolculukDen;
+
+    // Haritaya ait her şey tek katmanda: uzaydan inişte birlikte büyür.
+    this.harita = this.add.container(0, 0);
+    this.harita.add(this.add.image(0, HARITA_Y, 'haritaTurkiye').setOrigin(0).setScale(0.5));
+
+    // Rota: duraklar arası kesikli çizgi; Zıpzıp'ın geçtiği yollar altın sarısı.
+    const rota = this.add.graphics();
+    this.harita.add(rota);
+    TURKIYE.slice(1).forEach((d, i) => {
+      const gecildi = biten.has(TURKIYE[i].id) && !(yolculukVar && TURKIYE[i].id === yolculukDen);
+      kesikliCiz(rota, konum(TURKIYE[i].id), konum(d.id), gecildi ? RENK.sari : RENK.beyaz, gecildi ? 1 : 0.6);
+    });
+    const iz = this.add.graphics();
+    this.harita.add(iz);
+
+    const isaretler = new Map<string, Phaser.GameObjects.Container>();
+    TURKIYE.forEach((durak, i) => {
+      // Yolculukta varılacak durak önce kilitli görünür, Zıpzıp varınca açılır.
+      const acik = siradaki === -1 || i < siradaki || (i === siradaki && !yolculukVar);
+      isaretler.set(durak.id, this.isaret(durak, acik, biten.has(durak.id), i === siradaki));
     });
 
+    const zipzipDurak = yolculukVar ? TURKIYE[siradaki - 1] : TURKIYE[siradaki === -1 ? TURKIYE.length - 1 : siradaki];
+    const zipzip = new Zipzip(this, 0, 0, 0.3);
+    const zipzipYeri = (d: Durak): Nokta => {
+      const k = konum(d.id);
+      return { x: k.x + (ZIPZIP_SAGDA.has(d.id) ? 58 : -58), y: k.y - 60 };
+    };
+    const ilkYer = zipzipYeri(zipzipDurak);
+    zipzip.yerlestir(ilkYer.x, ilkYer.y);
+    this.harita.add([zipzip.golgesi, zipzip]);
+
+    // Harita dışındaki her şey: başlık, pasaport, alt yazı, 2. bölüm kapısı.
+    const arayuz: Phaser.GameObjects.GameObject[] = [];
+    arayuz.push(
+      evDugmesi(this, () => {
+        sustur();
+        this.scene.start('Acilis');
+      }),
+    );
     const pasaportDugmesi = this.add.container(640, 80);
     pasaportDugmesi.add(this.add.circle(0, 0, 50, RENK.turuncu).setStrokeStyle(5, RENK.beyaz));
     pasaportDugmesi.add(this.add.text(0, 2, '🛂', { fontSize: '50px' }).setOrigin(0.5));
@@ -38,93 +94,164 @@ export class HaritaScene extends Phaser.Scene {
       sustur();
       this.scene.start('Pasaport');
     });
-
-    this.add
-      .text(x, 150, 'Türkiye Turu', { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '84px', color: '#FFC93C', stroke: '#0b1430', strokeThickness: 14 })
+    arayuz.push(pasaportDugmesi);
+    arayuz.push(
+      this.add
+        .text(x, 150, 'Türkiye Turu', { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '84px', color: '#FFC93C', stroke: '#0b1430', strokeThickness: 14 })
+        .setOrigin(0.5),
+    );
+    const altYazi = this.add
+      .text(x, 900, '', { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '44px', color: '#ffffff' })
       .setOrigin(0.5);
-
-    this.add.image(0, HARITA_Y, 'haritaTurkiye').setOrigin(0).setScale(0.5);
-
-    const biten = new Set(tamamlananlar());
-    const siradaki = TURKIYE.findIndex((d) => !biten.has(d.id));
-    const konum = (id: string) => {
-      const [px, py] = DURAK_KONUMLARI[id];
-      const [kx, ky] = KAYDIRMA[id] ?? [0, 0];
-      return { x: px + kx, y: HARITA_Y + py + ky };
-    };
-
-    // Rota: duraklar arasında kesikli çizgi; gidilen kısım altın sarısı.
-    const rota = this.add.graphics();
-    TURKIYE.slice(1).forEach((d, i) => {
-      const a = konum(TURKIYE[i].id);
-      const b = konum(d.id);
-      const gidildi = biten.has(d.id);
-      rota.lineStyle(6, gidildi ? RENK.sari : RENK.beyaz, gidildi ? 1 : 0.6);
-      const adim = Math.ceil(Phaser.Math.Distance.Between(a.x, a.y, b.x, b.y) / 18);
-      for (let k = 0; k < adim; k += 2) {
-        rota.lineBetween(
-          Phaser.Math.Linear(a.x, b.x, k / adim),
-          Phaser.Math.Linear(a.y, b.y, k / adim),
-          Phaser.Math.Linear(a.x, b.x, Math.min(1, (k + 1) / adim)),
-          Phaser.Math.Linear(a.y, b.y, Math.min(1, (k + 1) / adim)),
-        );
-      }
-    });
-
-    TURKIYE.forEach((durak, i) => {
-      const { x: dx, y: dy } = konum(durak.id);
-      const acik = i <= siradaki || siradaki === -1;
-      const bitti = biten.has(durak.id);
-      const isaret = this.add.container(dx, dy);
-      isaret.add(this.add.circle(0, 0, 34, bitti ? RENK.sari : acik ? RENK.turuncu : 0x6b7280).setStrokeStyle(5, RENK.beyaz));
-      isaret.add(this.add.text(0, 2, acik ? durak.simge : '🔒', { fontSize: '36px' }).setOrigin(0.5));
-      isaret.add(
-        this.add
-          .text(0, 50, durak.yer, { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '24px', color: '#ffffff', stroke: '#0b1430', strokeThickness: 6 })
-          .setOrigin(0.5),
-      );
-      isaret.setSize(80, 80).setInteractive({ useHandCursor: true });
-      isaret.on('pointerdown', () => {
-        if (!acik) {
-          bip(220, 0.15, 'square', 0.12);
-          this.tweens.add({ targets: isaret, x: dx + 8, duration: 50, yoyo: true, repeat: 3 });
-          konus('Önce sıradaki durağı bitirelim!');
-          return;
-        }
-        bip(880, 0.08, 'square', 0.12);
-        sustur();
-        this.scene.start('Durak', { durakId: durak.id });
-      });
-      if (i === siradaki) this.tweens.add({ targets: isaret, scale: 1.15, duration: 600, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
-    });
-
-    // Zıpzıp sıradaki durağın üstünde (tur bittiyse son durakta) zıplar.
-    const zipzipDurak = TURKIYE[siradaki === -1 ? TURKIYE.length - 1 : siradaki];
-    const zk = konum(zipzipDurak.id);
-    new Zipzip(this, zk.x, zk.y - 95, 0.32).surekli('zipla', 1200);
-
-    const altYazi =
-      siradaki === -1
-        ? 'Türkiye Turu’nu bitirdin! 🏆'
-        : siradaki === 0
-          ? 'İlk durağa dokun ve başla!'
-          : `Sıradaki durak: ${TURKIYE[siradaki].yer}`;
-    this.add.text(x, 900, altYazi, { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '44px', color: '#ffffff' }).setOrigin(0.5);
-
-    // 2. bölüm şimdilik kilitli.
+    arayuz.push(altYazi);
     const kapi = this.add.container(x, 1100);
     const g = this.add.graphics();
     g.fillStyle(0xffffff, 0.12).fillRoundedRect(-280, -70, 560, 140, 40);
     kapi.add(g);
     kapi.add(this.add.text(0, -10, '🔒 Dünya Harikaları', { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '44px', color: '#cfe3ff' }).setOrigin(0.5));
     kapi.add(this.add.text(0, 38, 'Türkiye Turu’ndan sonra', { fontFamily: YAZI_TIPI, fontSize: '28px', color: '#9fb6d9' }).setOrigin(0.5));
+    arayuz.push(kapi);
 
-    konus(
-      siradaki === -1
-        ? 'Tebrikler! Türkiye turunu bitirdin!'
-        : siradaki === 0
-          ? 'Türkiye turuna hoş geldin! İlk durağımız İstanbul. Dokun ve başla!'
-          : `Sıradaki durağımız ${TURKIYE[siradaki].yer}!`,
-    );
+    const durumuSoyle = () => {
+      altYazi.setText(siradaki === -1 ? 'Türkiye Turu’nu bitirdin! 🏆' : siradaki === 0 ? 'İlk durağa dokun ve başla!' : `Sıradaki durak: ${TURKIYE[siradaki].yer}`);
+      konus(
+        siradaki === -1
+          ? 'Tebrikler! Türkiye turunu bitirdin!'
+          : siradaki === 0
+            ? 'Türkiye turuna hoş geldin! İlk durağımız İstanbul. Dokun ve başla!'
+            : `Sıradaki durağımız ${TURKIYE[siradaki].yer}!`,
+      );
+    };
+
+    if (yolculukVar) {
+      // Zıpzıp tamamlanan duraktan sıradakine zıplayarak gider, arkasında altın iz kalır.
+      const hedef = TURKIYE[siradaki];
+      const noktalar = yolNoktalari(zipzipYeri(TURKIYE[siradaki - 1]), zipzipYeri(hedef), 46);
+      const izBas = konum(TURKIYE[siradaki - 1].id);
+      const izSon = konum(hedef.id);
+      let adimNo = 0;
+      altYazi.setText('Yola çıkıyoruz!');
+      konus('Yola çıkıyoruz!');
+      this.time.delayedCall(700, () =>
+        zipzip.yolculuk(
+          noktalar,
+          430,
+          () => {
+            adimNo++;
+            bip(500 + adimNo * 30, 0.08, 'triangle', 0.15);
+            iz.clear();
+            kesikliCiz(iz, izBas, yolNoktasi(izBas, izSon, adimNo / noktalar.length), RENK.sari, 1);
+          },
+          () => {
+            const eski = isaretler.get(hedef.id)!;
+            const yeni = this.isaret(hedef, true, false, true);
+            this.harita.addAt(yeni, this.harita.getIndex(eski));
+            eski.destroy();
+            yeni.setScale(0);
+            this.tweens.add({ targets: yeni, scale: 1.3, duration: 260, ease: 'Back.easeOut', yoyo: true, hold: 120, onComplete: () => this.nabiz(yeni) });
+            zaferMuzigi();
+            zipzip.surekli('zipla', 1200);
+            this.time.delayedCall(500, durumuSoyle);
+          },
+        ),
+      );
+    } else {
+      zipzip.surekli('zipla', 1200);
+      if (this.veri.giris === 'uzay') this.uzaydanIn(arayuz, durumuSoyle);
+      else durumuSoyle();
+    }
+  }
+
+  private isaret(durak: Durak, acik: boolean, bitti: boolean, siradaki: boolean) {
+    const { x: dx, y: dy } = konum(durak.id);
+    const isaret = this.add.container(dx, dy);
+    isaret.add(this.add.circle(0, 0, 34, bitti ? RENK.sari : acik ? RENK.turuncu : 0x6b7280).setStrokeStyle(5, RENK.beyaz));
+    isaret.add(this.add.text(0, 2, acik ? durak.simge : '🔒', { fontSize: '36px' }).setOrigin(0.5));
+    const ad = this.add
+      .text(0, AD_USTTE.has(durak.id) ? -52 : 52, durak.yer, { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '24px', color: '#ffffff', stroke: '#0b1430', strokeThickness: 6 })
+      .setOrigin(0.5);
+    // Haritanın kenarında yazı kesilmesin.
+    ad.x = Phaser.Math.Clamp(dx, ad.width / 2 + 6, HARITA_BOYUTU.genislik - ad.width / 2 - 6) - dx;
+    isaret.add(ad);
+    isaret.setSize(80, 80).setInteractive({ useHandCursor: true });
+    isaret.on('pointerdown', () => {
+      if (!acik) {
+        bip(220, 0.15, 'square', 0.12);
+        this.tweens.add({ targets: isaret, x: dx + 8, duration: 50, yoyo: true, repeat: 3 });
+        konus('Önce sıradaki durağı bitirelim!');
+        return;
+      }
+      bip(880, 0.08, 'square', 0.12);
+      sustur();
+      this.scene.start('Durak', { durakId: durak.id });
+    });
+    if (siradaki && acik) this.nabiz(isaret);
+    this.harita.add(isaret);
+    return isaret;
+  }
+
+  private nabiz(isaret: Phaser.GameObjects.Container) {
+    this.tweens.add({ targets: isaret, scale: 1.15, duration: 600, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
+  }
+
+  // Uzayda dönen dünya büyür ve kaybolur, altından Türkiye haritası açılır. Dokununca atlanır.
+  private uzaydanIn(arayuz: Phaser.GameObjects.GameObject[], bitince: () => void) {
+    const kamera = this.cameras.main;
+    const dunya = this.add.image(MERKEZ.x, MERKEZ.y, 'dunya').setScale(0.9);
+    this.tweens.add({ targets: dunya, angle: 8, duration: 900, yoyo: true, ease: 'Sine.easeInOut' });
+    const olcek = { s: 0.12 };
+    const uygula = () => this.harita.setScale(olcek.s).setPosition(MERKEZ.x * (1 - olcek.s), MERKEZ.y * (1 - olcek.s));
+    uygula();
+    this.harita.setAlpha(0);
+    arayuz.forEach((o) => (o as unknown as Phaser.GameObjects.Components.Alpha).setAlpha(0));
+
+    let bitti = false;
+    const bitir = () => {
+      if (bitti) return;
+      bitti = true;
+      this.tweens.killTweensOf([dunya, olcek, this.harita]);
+      dunya.destroy();
+      olcek.s = 1;
+      uygula();
+      this.harita.setAlpha(1);
+      arayuz.forEach((o) => this.tweens.add({ targets: o, alpha: 1, duration: 300 }));
+      bitince();
+    };
+    this.input.once('pointerdown', bitir);
+
+    bip(300, 0.6, 'sine', 0.15);
+    this.time.delayedCall(900, () => {
+      if (bitti) return;
+      this.tweens.add({ targets: dunya, scale: 7, alpha: 0, duration: 1100, ease: 'Quad.easeIn' });
+      this.tweens.add({ targets: this.harita, alpha: 1, duration: 700, delay: 350 });
+      this.tweens.add({ targets: olcek, s: 1, duration: 1100, ease: 'Cubic.easeOut', delay: 250, onUpdate: uygula, onComplete: bitir });
+      kamera.shake(250, 0.003);
+    });
+  }
+}
+
+function konum(id: string): Nokta {
+  const [px, py] = DURAK_KONUMLARI[id];
+  const [kx, ky] = KAYDIRMA[id] ?? [0, 0];
+  return { x: px + kx, y: HARITA_Y + py + ky };
+}
+
+function yolNoktasi(a: Nokta, b: Nokta, t: number): Nokta {
+  return { x: Phaser.Math.Linear(a.x, b.x, t), y: Phaser.Math.Linear(a.y, b.y, t) };
+}
+
+// İki nokta arasını yaklaşık "aralik" piksellik zıplamalara böler.
+function yolNoktalari(a: Nokta, b: Nokta, aralik: number): Nokta[] {
+  const adim = Math.max(2, Math.round(Phaser.Math.Distance.Between(a.x, a.y, b.x, b.y) / aralik));
+  return Array.from({ length: adim }, (_, i) => yolNoktasi(a, b, (i + 1) / adim));
+}
+
+function kesikliCiz(g: Phaser.GameObjects.Graphics, a: Nokta, b: Nokta, renk: number, saydamlik: number) {
+  g.lineStyle(6, renk, saydamlik);
+  const adim = Math.ceil(Phaser.Math.Distance.Between(a.x, a.y, b.x, b.y) / 18);
+  for (let k = 0; k < adim; k += 2) {
+    const p = yolNoktasi(a, b, k / adim);
+    const q = yolNoktasi(a, b, Math.min(1, (k + 1) / adim));
+    g.lineBetween(p.x, p.y, q.x, q.y);
   }
 }

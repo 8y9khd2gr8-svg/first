@@ -23,7 +23,7 @@ export class DurakScene extends Phaser.Scene {
 
     evDugmesi(this, () => {
       sustur();
-      this.scene.start('Harita');
+      this.scene.start('Harita', {});
     });
 
     this.add.text(x, 170, durak.yer, { fontFamily: YAZI_TIPI, fontSize: '44px', color: '#cfe3ff' }).setOrigin(0.5);
