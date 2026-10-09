@@ -1,60 +1,70 @@
 import Phaser from 'phaser';
 import type { Animasyon } from './hareketler';
 
-// Zıpzıp: gövde (yüzlü dünya) + ayrı ayrı dönebilen iki kol ve iki bacak.
+// Zıpzıp: gövde (yüzlü dünya) + iki parçalı kollar (omuz-dirsek) ve bacaklar (kalça-diz).
 // Tüm ölçüler maskot çiziminin birimleriyle; "birim" bir çizim biriminin ekranda kaç piksel olduğu.
 
-const KOL_RENGI = 0xffb627;
+const UZUV_RENGI = 0xffb627;
 const AYAKKABI_RENGI = 0xff6b6b;
-const KOL_BOYU = 72;
-const BACAK_BOYU = 52;
 const KALINLIK = 13;
+const KOL = { ust: 38, alt: 36 };
+const BACAK = { ust: 30, alt: 30 };
 
-// Bir duruş: uzuvların açıları (derece, 0 = sağa, 90 = aşağı) ve bacak boyları (1 = düz, 0.5 = bükülü).
-type Durus = {
-  solKol: number;
-  sagKol: number;
-  solBacak: number;
-  sagBacak: number;
-  solBacakBoy?: number;
-  sagBacakBoy?: number;
-};
+// Bir uzvun duruşu: a = üst parçanın açısı (derece, 0 sağ, 90 aşağı, 180 sol),
+// b = alt parçanın üst parçaya göre bükülmesi (dirsek/diz).
+// Açılar bilerek "sarmalanmaz": sol kol 90..270, sağ kol -90..90 aralığında kalır ki
+// kollar gövdenin içinden değil, yandan dönerek kalkıp insin.
+type Uzuv = { a: number; b: number };
+type Durus = { solKol: Uzuv; sagKol: Uzuv; solBacak: Uzuv; sagBacak: Uzuv };
 
-const D: Record<string, Durus> = {
-  normal: { solKol: -132, sagKol: -48, solBacak: 112, sagBacak: 68 },
-  yukari: { solKol: -100, sagKol: -80, solBacak: 100, sagBacak: 80 },
-  comel: { solKol: 180, sagKol: 0, solBacak: 150, sagBacak: 30, solBacakBoy: 0.75, sagBacakBoy: 0.75 },
-  kanatYukari: { solKol: -155, sagKol: -25, solBacak: 105, sagBacak: 75 },
-  kanatAsagi: { solKol: 150, sagKol: 30, solBacak: 105, sagBacak: 75 },
-  yildizAcik: { solKol: -160, sagKol: -20, solBacak: 130, sagBacak: 50 },
-  yildizKapali: { solKol: 105, sagKol: 75, solBacak: 96, sagBacak: 84 },
-  kosA: { solKol: -150, sagKol: -95, solBacak: 70, sagBacak: 95, solBacakBoy: 0.75 },
-  kosB: { solKol: -85, sagKol: -30, solBacak: 85, sagBacak: 110, sagBacakBoy: 0.75 },
-  leylek: { solKol: -175, sagKol: -5, solBacak: 92, sagBacak: 35, sagBacakBoy: 0.8 },
-};
+const u = (a: number, b = 0): Uzuv => ({ a, b });
+
+const D = {
+  normal: { solKol: u(228), sagKol: u(-48), solBacak: u(105), sagBacak: u(75) },
+  hazirlan: { solKol: u(150, 20), sagKol: u(30, -20), solBacak: u(130, -40), sagBacak: u(50, 40) },
+  havada: { solKol: u(258), sagKol: u(-78), solBacak: u(100), sagBacak: u(80) },
+  comel: { solKol: u(180), sagKol: u(0), solBacak: u(160, -70), sagBacak: u(20, 70) },
+  solDiz: { solKol: u(200, -50), sagKol: u(-20, 50), solBacak: u(215, -115), sagBacak: u(88) },
+  sagDiz: { solKol: u(200, -50), sagKol: u(-20, 50), solBacak: u(92), sagBacak: u(-35, 115) },
+  kollarAsagi: { solKol: u(100), sagKol: u(80), solBacak: u(100), sagBacak: u(80) },
+  kollarYukari: { solKol: u(262), sagKol: u(-82), solBacak: u(100), sagBacak: u(80) },
+  acik: { solKol: u(232), sagKol: u(-52), solBacak: u(135), sagBacak: u(45) },
+  kapali: { solKol: u(100), sagKol: u(80), solBacak: u(97), sagBacak: u(83) },
+  kosA: { solKol: u(215, -70), sagKol: u(-60, 40), solBacak: u(190, -90), sagBacak: u(88) },
+  kosB: { solKol: u(240, -40), sagKol: u(-35, 70), solBacak: u(92), sagBacak: u(-10, 90) },
+  uzan: { solKol: u(265), sagKol: u(-85), solBacak: u(97), sagBacak: u(83) },
+} satisfies Record<string, Durus>;
 
 // Bir tekrar içindeki adımlar: duruş, gövdenin yukarı/aşağı kayması (birim) ve tekrar süresine oranı.
 type Adim = { durus: Durus; y: number; oran: number; yumusama?: string };
 
 const ADIMLAR: Record<Animasyon, Adim[]> = {
   zipla: [
-    { durus: D.yukari, y: -130, oran: 0.35, yumusama: 'Quad.easeOut' },
-    { durus: D.normal, y: 0, oran: 0.35, yumusama: 'Quad.easeIn' },
+    { durus: D.hazirlan, y: 25, oran: 0.15 },
+    { durus: D.havada, y: -130, oran: 0.3, yumusama: 'Quad.easeOut' },
+    { durus: D.hazirlan, y: 25, oran: 0.3, yumusama: 'Quad.easeIn' },
+    { durus: D.normal, y: 0, oran: 0.15 },
   ],
   comel: [
-    { durus: D.comel, y: 45, oran: 0.4 },
+    { durus: D.comel, y: 50, oran: 0.4 },
     { durus: D.normal, y: 0, oran: 0.4 },
   ],
-  kanat: [
-    { durus: D.kanatYukari, y: -18, oran: 0.3 },
-    { durus: D.kanatAsagi, y: 0, oran: 0.3 },
+  dizler: [
+    { durus: D.solDiz, y: -10, oran: 0.4, yumusama: 'Sine.easeOut' },
+    { durus: D.normal, y: 0, oran: 0.4, yumusama: 'Sine.easeIn' },
   ],
-  yildiz: [
-    { durus: D.yildizAcik, y: -70, oran: 0.35, yumusama: 'Quad.easeOut' },
-    { durus: D.yildizKapali, y: 0, oran: 0.35, yumusama: 'Quad.easeIn' },
+  kollar: [
+    { durus: D.kollarYukari, y: -15, oran: 0.45 },
+    { durus: D.kollarAsagi, y: 0, oran: 0.45 },
+  ],
+  acKapa: [
+    { durus: D.acik, y: -60, oran: 0.22, yumusama: 'Quad.easeOut' },
+    { durus: D.acik, y: 0, oran: 0.18, yumusama: 'Quad.easeIn' },
+    { durus: D.kapali, y: -60, oran: 0.22, yumusama: 'Quad.easeOut' },
+    { durus: D.kapali, y: 0, oran: 0.18, yumusama: 'Quad.easeIn' },
   ],
   uzan: [
-    { durus: D.yukari, y: -40, oran: 0.45 },
+    { durus: D.uzan, y: -45, oran: 0.45 },
     { durus: D.normal, y: 0, oran: 0.4 },
   ],
   kos: [
@@ -63,19 +73,20 @@ const ADIMLAR: Record<Animasyon, Adim[]> = {
     { durus: D.kosB, y: -16, oran: 0.25, yumusama: 'Sine.easeOut' },
     { durus: D.kosB, y: 0, oran: 0.25, yumusama: 'Sine.easeIn' },
   ],
-  denge: [{ durus: D.leylek, y: -10, oran: 1 }],
 };
+
+// Diz kaldırmada çift tekrarlarda öbür diz kalkar.
+const SAG_DIZ: Adim[] = [{ ...ADIMLAR.dizler[0], durus: D.sagDiz }, ADIMLAR.dizler[1]];
 
 // Süreli hareketlerde bir tekrarın süresi (ms).
 const SUREKLI_TEMPO: Partial<Record<Animasyon, number>> = { kos: 520 };
 
+type UzuvParcasi = { kok: Phaser.GameObjects.Container; dirsek: Phaser.GameObjects.Container; durum: Uzuv };
+
 export class Zipzip extends Phaser.GameObjects.Container {
   private readonly birim: number;
   private readonly tabanY: number;
-  private readonly solKol: Phaser.GameObjects.Graphics;
-  private readonly sagKol: Phaser.GameObjects.Graphics;
-  private readonly solBacak: Phaser.GameObjects.Graphics;
-  private readonly sagBacak: Phaser.GameObjects.Graphics;
+  private readonly uzuvlar: Record<keyof Durus, UzuvParcasi>;
   private readonly golge: Phaser.GameObjects.Ellipse;
   private dongu?: Phaser.Time.TimerEvent;
   private bekleyenler: Phaser.Time.TimerEvent[] = [];
@@ -90,40 +101,56 @@ export class Zipzip extends Phaser.GameObjects.Container {
     this.tabanY = y;
 
     // Gölge ayrı durur: Zıpzıp zıplarken yerde kalır ve küçülür.
-    this.golge = sahne.add.ellipse(x, y + 150 * birim, 150 * birim, 24 * birim, 0x000000, 0.35);
+    this.golge = sahne.add.ellipse(x, y + 160 * birim, 150 * birim, 24 * birim, 0x000000, 0.35);
 
-    this.solBacak = this.uzuv(-32, 82, BACAK_BOYU, true);
-    this.sagBacak = this.uzuv(32, 82, BACAK_BOYU, true);
-    this.solKol = this.uzuv(-96, -6, KOL_BOYU, false);
-    this.sagKol = this.uzuv(96, -6, KOL_BOYU, false);
+    this.uzuvlar = {
+      solBacak: this.uzuv(-30, 92, BACAK, true),
+      sagBacak: this.uzuv(30, 92, BACAK, true),
+      solKol: this.uzuv(-96, -6, KOL, false),
+      sagKol: this.uzuv(96, -6, KOL, false),
+    };
+    // Kollar gövdenin arkasında, bacaklar önünde: diz kalkınca gövdenin önüne gelir.
     const govde = sahne.add.image(0, 0, 'govde').setScale(birim / 2);
-    this.add([this.solBacak, this.sagBacak, this.solKol, this.sagKol, govde]);
+    const { solKol, sagKol, solBacak, sagBacak } = this.uzuvlar;
+    this.add([solKol.kok, sagKol.kok, govde, solBacak.kok, sagBacak.kok]);
 
     this.durusAl(D.normal, 0);
     sahne.add.existing(this);
   }
 
-  // Uzuv, eklem noktasından sağa doğru çizilir; açısı değişince eklem etrafında döner.
-  private uzuv(ex: number, ey: number, boy: number, bacak: boolean) {
+  // Uzuv eklemden sağa doğru çizilir: üst parça + ucunda dönebilen alt parça (el ya da ayakkabıyla).
+  private uzuv(ex: number, ey: number, boy: { ust: number; alt: number }, bacak: boolean): UzuvParcasi {
     const b = this.birim;
-    const g = this.scene.add.graphics({ x: ex * b, y: ey * b });
-    g.lineStyle(KALINLIK * b, KOL_RENGI).lineBetween(0, 0, boy * b, 0);
-    g.fillStyle(KOL_RENGI).fillCircle(0, 0, (KALINLIK / 2) * b);
-    if (bacak) g.fillStyle(AYAKKABI_RENGI).fillEllipse((boy + 4) * b, 0, 22 * b, 40 * b);
-    else g.fillStyle(KOL_RENGI).fillCircle(boy * b, 0, 13 * b);
-    return g;
+    const cizgi = (uzunluk: number) => {
+      const g = this.scene.add.graphics();
+      g.lineStyle(KALINLIK * b, UZUV_RENGI).lineBetween(0, 0, uzunluk * b, 0);
+      g.fillStyle(UZUV_RENGI).fillCircle(0, 0, (KALINLIK / 2) * b);
+      return g;
+    };
+    const altParca = cizgi(boy.alt);
+    if (bacak) altParca.fillStyle(AYAKKABI_RENGI).fillEllipse((boy.alt + 4) * b, 0, 24 * b, 38 * b);
+    else altParca.fillStyle(UZUV_RENGI).fillCircle(boy.alt * b, 0, 13 * b);
+
+    const dirsek = this.scene.add.container(boy.ust * b, 0, [altParca]);
+    const kok = this.scene.add.container(ex * b, ey * b, [cizgi(boy.ust), dirsek]);
+    return { kok, dirsek, durum: u(0) };
+  }
+
+  private uygula(p: UzuvParcasi) {
+    p.kok.setAngle(p.durum.a);
+    p.dirsek.setAngle(p.durum.b);
   }
 
   private durusAl(d: Durus, sure: number, yumusama = 'Sine.easeInOut') {
-    const hedefler: [Phaser.GameObjects.Graphics, number, number][] = [
-      [this.solKol, d.solKol, 1],
-      [this.sagKol, d.sagKol, 1],
-      [this.solBacak, d.solBacak, d.solBacakBoy ?? 1],
-      [this.sagBacak, d.sagBacak, d.sagBacakBoy ?? 1],
-    ];
-    for (const [uzuv, aci, boy] of hedefler) {
-      if (sure === 0) uzuv.setAngle(aci).setScale(boy, 1);
-      else this.scene.tweens.add({ targets: uzuv, angle: aci, scaleX: boy, duration: sure, ease: yumusama });
+    for (const ad of Object.keys(this.uzuvlar) as (keyof Durus)[]) {
+      const p = this.uzuvlar[ad];
+      const hedef = d[ad];
+      if (sure === 0) {
+        p.durum = { ...hedef };
+        this.uygula(p);
+      } else {
+        this.scene.tweens.add({ targets: p.durum, a: hedef.a, b: hedef.b, duration: sure, ease: yumusama, onUpdate: () => this.uygula(p) });
+      }
     }
   }
 
@@ -134,11 +161,12 @@ export class Zipzip extends Phaser.GameObjects.Container {
     this.scene.tweens.add({ targets: this.golge, scale: 1 - yukseklik * 0.45, alpha: 0.35 - yukseklik * 0.15, duration: sure, ease: yumusama });
   }
 
-  // Hareketi bir kez yapar. sure: bir tekrarın süresi (ms).
-  birKez(animasyon: Animasyon, sure: number) {
+  // Hareketi bir kez yapar. sure: bir tekrarın süresi (ms). tekrarNo: kaçıncı tekrar (1'den başlar).
+  birKez(animasyon: Animasyon, sure: number, tekrarNo = 1) {
     this.bekleyenler = this.bekleyenler.filter((o) => o.getProgress() < 1);
+    const adimlar = animasyon === 'dizler' && tekrarNo % 2 === 0 ? SAG_DIZ : ADIMLAR[animasyon];
     let t = 0;
-    for (const adim of ADIMLAR[animasyon]) {
+    for (const adim of adimlar) {
       const adimSuresi = sure * adim.oran;
       const olay = this.scene.time.delayedCall(t, () => {
         this.durusAl(adim.durus, adimSuresi, adim.yumusama);
@@ -149,16 +177,12 @@ export class Zipzip extends Phaser.GameObjects.Container {
     }
   }
 
-  // Hareketi durdurulana kadar tekrarlar (yerinde koşu, denge, açılıştaki neşeli zıplama).
+  // Hareketi durdurulana kadar tekrarlar (yerinde koşu, açılıştaki neşeli zıplama).
   surekli(animasyon: Animasyon, tempo = SUREKLI_TEMPO[animasyon] ?? 1000) {
     this.durdur();
-    if (animasyon === 'denge') {
-      this.birKez('denge', 400);
-      this.scene.tweens.add({ targets: this, angle: { from: -6, to: 6 }, duration: 1000, yoyo: true, repeat: -1, ease: 'Sine.easeInOut', delay: 400 });
-      return;
-    }
-    this.birKez(animasyon, tempo);
-    this.dongu = this.scene.time.addEvent({ delay: tempo, loop: true, callback: () => this.birKez(animasyon, tempo) });
+    let tekrarNo = 1;
+    this.birKez(animasyon, tempo, tekrarNo);
+    this.dongu = this.scene.time.addEvent({ delay: tempo, loop: true, callback: () => this.birKez(animasyon, tempo, ++tekrarNo) });
   }
 
   durdur() {
@@ -166,7 +190,8 @@ export class Zipzip extends Phaser.GameObjects.Container {
     this.dongu = undefined;
     this.bekleyenler.forEach((o) => o.remove());
     this.bekleyenler = [];
-    this.scene.tweens.killTweensOf([this, this.golge, this.solKol, this.sagKol, this.solBacak, this.sagBacak]);
+    const durumlar = Object.values(this.uzuvlar).map((p) => p.durum);
+    this.scene.tweens.killTweensOf([this, this.golge, ...durumlar]);
     this.setAngle(0);
     this.durusAl(D.normal, 200);
     this.kay(0, 200);

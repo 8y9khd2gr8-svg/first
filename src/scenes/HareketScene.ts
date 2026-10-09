@@ -60,7 +60,7 @@ export class HareketScene extends Phaser.Scene {
     const gosterimSuresi = 2600;
     if (hareket.tur === 'sayi') {
       this.zipzip.birKez(hareket.animasyon, hareket.tempoMs);
-      this.time.delayedCall(hareket.tempoMs, () => this.zipzip.birKez(hareket.animasyon, hareket.tempoMs));
+      this.time.delayedCall(hareket.tempoMs, () => this.zipzip.birKez(hareket.animasyon, hareket.tempoMs, 2));
     } else {
       this.zipzip.surekli(hareket.animasyon);
       this.time.delayedCall(gosterimSuresi - 400, () => this.zipzip.durdur());
@@ -88,7 +88,7 @@ export class HareketScene extends Phaser.Scene {
     if (hareket.tur === 'sayi') {
       for (let k = 1; k <= hareket.adet; k++) {
         this.time.delayedCall((k - 1) * hareket.tempoMs, () => {
-          this.zipzip.birKez(hareket.animasyon, hareket.tempoMs);
+          this.zipzip.birKez(hareket.animasyon, hareket.tempoMs, k);
           this.sayacGoster(String(k));
           bip(560 + k * 50, 0.12);
         });

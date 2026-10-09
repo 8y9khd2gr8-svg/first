@@ -66,7 +66,7 @@ export class OdulScene extends Phaser.Scene {
       });
     });
 
-    new Zipzip(this, x, 690, 1.1).surekli('yildiz', 900);
+    new Zipzip(this, x, 690, 1.1).surekli('acKapa', 1200);
 
     zaferMuzigi();
     this.time.delayedCall(500, () => konus('Süpersin! Üç yıldız kazandın!'));
