@@ -3,7 +3,7 @@ import { RENK, YAZI_TIPI } from '../ayarlar';
 import { buyukDugme, evDugmesi, yildizliArkaPlan } from '../arayuz';
 import { Durak, TURKIYE } from '../duraklar';
 import { DURAK_KONUMLARI, HARITA_BOYUTU } from '../haritaKonumlar';
-import { tamamlananlar } from '../ilerleme';
+import { dunyaAcik, tamamlananlar } from '../ilerleme';
 import { M } from '../metinler';
 import { bip, konus, sustur, zaferMuzigi } from '../ses';
 import { Zipzip } from '../zipzip';
@@ -109,8 +109,26 @@ export class HaritaScene extends Phaser.Scene {
     const g = this.add.graphics();
     g.fillStyle(0xffffff, 0.12).fillRoundedRect(-280, -70, 560, 140, 40);
     kapi.add(g);
-    kapi.add(this.add.text(0, -10, '🔒 Dünya Harikaları', { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '44px', color: '#cfe3ff' }).setOrigin(0.5));
-    kapi.add(this.add.text(0, 38, 'Türkiye Turu’ndan sonra', { fontFamily: YAZI_TIPI, fontSize: '28px', color: '#9fb6d9' }).setOrigin(0.5));
+    const dunyaAcilmis = dunyaAcik(TURKIYE.map((d) => d.id));
+    kapi.add(
+      this.add
+        .text(0, -10, dunyaAcilmis ? '🌍 Dünya Harikaları ▶' : '🔒 Dünya Harikaları', { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '44px', color: dunyaAcilmis ? '#FFC93C' : '#cfe3ff' })
+        .setOrigin(0.5),
+    );
+    kapi.add(this.add.text(0, 38, dunyaAcilmis ? 'Yeni bölüm seni bekliyor!' : 'Türkiye Turu’ndan sonra', { fontFamily: YAZI_TIPI, fontSize: '28px', color: '#9fb6d9' }).setOrigin(0.5));
+    kapi.setSize(560, 140).setInteractive({ useHandCursor: true });
+    kapi.on('pointerdown', () => {
+      if (!dunyaAcilmis) {
+        bip(220, 0.15, 'square', 0.12);
+        this.tweens.add({ targets: kapi, x: x + 8, duration: 50, yoyo: true, repeat: 3 });
+        konus(M.dunyaKilitli);
+        return;
+      }
+      bip(880, 0.08, 'square', 0.12);
+      sustur();
+      this.scene.start('Dunya', { giris: 'uzay' });
+    });
+    if (dunyaAcilmis) this.tweens.add({ targets: kapi, scale: 1.05, duration: 700, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
     arayuz.push(kapi);
 
     const durumuSoyle = () => {

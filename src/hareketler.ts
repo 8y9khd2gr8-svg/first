@@ -6,7 +6,8 @@
 
 export type Animasyon =
   | 'zipla' | 'comel' | 'kos' | 'dizler' | 'kollar' | 'acKapa' | 'uzan'
-  | 'balon' | 'heykel' | 'horon' | 'tasKaldir';
+  | 'balon' | 'heykel' | 'horon' | 'tasKaldir'
+  | 'sutun' | 'piramit' | 'yanAdim' | 'parmakUcu' | 'tirman';
 
 export type Hareket = {
   baslik: string; // ekranda büyük yazan komut

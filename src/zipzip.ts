@@ -38,6 +38,13 @@ const D = {
   horonA: { solKol: u(215, 40), sagKol: u(-35, -40), solBacak: u(125, -35), sagBacak: u(80) },
   horonB: { solKol: u(215, 40), sagKol: u(-35, -40), solBacak: u(100), sagBacak: u(55, 35) },
   tasAl: { solKol: u(115), sagKol: u(65), solBacak: u(160, -70), sagBacak: u(20, 70) },
+  piramit: { solKol: u(240, 45), sagKol: u(-60, -45), solBacak: u(130), sagBacak: u(50) },
+  yanAcik: { solKol: u(185), sagKol: u(-5), solBacak: u(132), sagBacak: u(48) },
+  yanKapali: { solKol: u(185), sagKol: u(-5), solBacak: u(97), sagBacak: u(83) },
+  parmakA: { solKol: u(190), sagKol: u(-10), solBacak: u(150, -60), sagBacak: u(88) },
+  parmakB: { solKol: u(190), sagKol: u(-10), solBacak: u(92), sagBacak: u(30, 60) },
+  tirmanA: { solKol: u(258), sagKol: u(-25, 70), solBacak: u(92), sagBacak: u(-30, 110) },
+  tirmanB: { solKol: u(205, -70), sagKol: u(-78), solBacak: u(210, -110), sagBacak: u(88) },
 } satisfies Record<string, Durus>;
 
 // Bir tekrar içindeki adımlar: duruş, gövdenin yukarı/aşağı kayması (birim) ve tekrar süresine oranı.
@@ -87,6 +94,20 @@ const ADIMLAR: Record<Animasyon, Adim[]> = {
     { durus: D.kollarYukari, y: -20, oran: 0.35, yumusama: 'Sine.easeOut' },
     { durus: D.normal, y: 0, oran: 0.2 },
   ],
+  sutun: [{ durus: D.uzan, y: -20, oran: 0.3 }],
+  piramit: [{ durus: D.piramit, y: 0, oran: 0.3 }],
+  yanAdim: [
+    { durus: D.yanAcik, y: -8, oran: 0.4 },
+    { durus: D.yanKapali, y: 0, oran: 0.4 },
+  ],
+  parmakUcu: [
+    { durus: D.parmakA, y: -25, oran: 0.5, yumusama: 'Sine.easeOut' },
+    { durus: D.parmakB, y: -25, oran: 0.5, yumusama: 'Sine.easeOut' },
+  ],
+  tirman: [
+    { durus: D.tirmanA, y: -15, oran: 0.45 },
+    { durus: D.normal, y: 0, oran: 0.35 },
+  ],
   kos: [
     { durus: D.kosA, y: -16, oran: 0.25, yumusama: 'Sine.easeOut' },
     { durus: D.kosA, y: 0, oran: 0.25, yumusama: 'Sine.easeIn' },
@@ -97,9 +118,11 @@ const ADIMLAR: Record<Animasyon, Adim[]> = {
 
 // Diz kaldırmada çift tekrarlarda öbür diz kalkar.
 const SAG_DIZ: Adim[] = [{ ...ADIMLAR.dizler[0], durus: D.sagDiz }, ADIMLAR.dizler[1]];
+// Tırmanmada da çift tekrarlarda öbür kol ve diz.
+const TIRMAN_B: Adim[] = [{ ...ADIMLAR.tirman[0], durus: D.tirmanB }, ADIMLAR.tirman[1]];
 
 // Süreli hareketlerde bir tekrarın süresi (ms).
-const SUREKLI_TEMPO: Partial<Record<Animasyon, number>> = { kos: 520, horon: 380, heykel: 2000 };
+const SUREKLI_TEMPO: Partial<Record<Animasyon, number>> = { kos: 520, horon: 380, heykel: 2000, sutun: 2000, piramit: 2000, parmakUcu: 700 };
 
 type UzuvParcasi = { kok: Phaser.GameObjects.Container; dirsek: Phaser.GameObjects.Container; durum: Uzuv };
 
@@ -184,7 +207,8 @@ export class Zipzip extends Phaser.GameObjects.Container {
   // Hareketi bir kez yapar. sure: bir tekrarın süresi (ms). tekrarNo: kaçıncı tekrar (1'den başlar).
   birKez(animasyon: Animasyon, sure: number, tekrarNo = 1) {
     this.bekleyenler = this.bekleyenler.filter((o) => o.getProgress() < 1);
-    const adimlar = animasyon === 'dizler' && tekrarNo % 2 === 0 ? SAG_DIZ : ADIMLAR[animasyon];
+    const cift = tekrarNo % 2 === 0;
+    const adimlar = animasyon === 'dizler' && cift ? SAG_DIZ : animasyon === 'tirman' && cift ? TIRMAN_B : ADIMLAR[animasyon];
     let t = 0;
     for (const adim of adimlar) {
       const adimSuresi = sure * adim.oran;
