@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { RENK, YAZI_TIPI } from '../ayarlar';
 import { buyukDugme, yildizliArkaPlan } from '../arayuz';
 import { sesiAc } from '../ses';
+import { Zipzip } from '../zipzip';
 
 // Açılış ekranı: oyunun adı, zıplayan Zıpzıp ve büyük "Oyna" düğmesi.
 export class AcilisScene extends Phaser.Scene {
@@ -10,7 +11,7 @@ export class AcilisScene extends Phaser.Scene {
   }
 
   preload() {
-    this.load.svg('maskot', 'maskot.svg', { width: 640, height: 570 });
+    Zipzip.yukle(this);
   }
 
   create() {
@@ -22,10 +23,7 @@ export class AcilisScene extends Phaser.Scene {
     this.add.text(x, 200, 'Zıp Zıp', { ...baslikStili, fontSize: '130px', color: '#FFC93C' }).setOrigin(0.5);
     this.add.text(x, 320, 'Dünya', { ...baslikStili, fontSize: '110px', color: '#ffffff' }).setOrigin(0.5);
 
-    const golge = this.add.ellipse(x, 900, 280, 44, 0x000000, 0.35);
-    const maskot = this.add.image(x, 650, 'maskot').setScale(0.85);
-    this.tweens.add({ targets: maskot, y: 560, duration: 600, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
-    this.tweens.add({ targets: golge, scale: 0.7, alpha: 0.2, duration: 600, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
+    new Zipzip(this, x, 660, 1.6).surekli('zipla', 1300);
 
     buyukDugme(
       this,
