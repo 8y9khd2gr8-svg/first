@@ -3,6 +3,7 @@ import { RENK, YAZI_TIPI } from '../ayarlar';
 import { buyukDugme, evDugmesi, yildizliArkaPlan } from '../arayuz';
 import { durakBul, oturum } from '../duraklar';
 import { Hareket } from '../hareketler';
+import { hareketKaydet } from '../istatistik';
 import { GERI_SAYIM, M, SAYILAR } from '../metinler';
 import { bip, konus, sustur, zaferMuzigi } from '../ses';
 import { Zipzip } from '../zipzip';
@@ -113,7 +114,7 @@ export class HareketScene extends Phaser.Scene {
           konus(SAYILAR[k - 1]);
         });
       }
-      this.time.delayedCall(hareket.adet * hareket.tempoMs, () => this.bitir());
+      this.time.delayedCall(hareket.adet * hareket.tempoMs, () => this.bitir(hareket));
     } else {
       this.zipzip.surekli(hareket.animasyon);
       for (let s = hareket.saniye; s >= 1; s--) {
@@ -123,11 +124,11 @@ export class HareketScene extends Phaser.Scene {
           if (s <= 3) konus(GERI_SAYIM[3 - s]);
         });
       }
-      this.time.delayedCall(hareket.saniye * 1000, () => this.bitir());
+      this.time.delayedCall(hareket.saniye * 1000, () => this.bitir(hareket));
     }
   }
 
-  private bitir() {
+  private bitir(hareket: Hareket) {
     this.zipzip.durdur();
     this.sayac.setText('');
     this.bilgi.setText('');
@@ -136,6 +137,7 @@ export class HareketScene extends Phaser.Scene {
     const x = this.scale.gameSize.width / 2;
     const dugme = buyukDugme(this, x, 1080, 'Yaptım!', RENK.yesil, () => {
       sustur();
+      hareketKaydet(hareket);
       dugme.destroy();
       this.sonraki();
     }, { genislik: 500, yukseklik: 170, yaziBoyu: 84 });

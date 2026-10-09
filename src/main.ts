@@ -6,6 +6,9 @@ import { HaritaScene } from './scenes/HaritaScene';
 import { HareketScene } from './scenes/HareketScene';
 import { OdulScene } from './scenes/OdulScene';
 import { AvatarScene } from './scenes/AvatarScene';
+import { EbeveynMenuScene } from './scenes/EbeveynMenuScene';
+import { EbeveynOzetScene } from './scenes/EbeveynOzetScene';
+import { SertifikaScene } from './scenes/SertifikaScene';
 import { EbeveynScene } from './scenes/EbeveynScene';
 import { PasaportAyarScene } from './scenes/PasaportAyarScene';
 import { PasaportScene } from './scenes/PasaportScene';
@@ -23,7 +26,7 @@ function oyunuBaslat() {
     },
     // Ad yazma kutusu ve fotoğraf düğmesi gibi HTML öğeleri için.
     dom: { createContainer: true },
-    scene: [AcilisScene, HaritaScene, DurakScene, HareketScene, OdulScene, PasaportScene, PasaportAyarScene, EbeveynScene, AvatarScene],
+    scene: [AcilisScene, HaritaScene, DurakScene, HareketScene, OdulScene, PasaportScene, PasaportAyarScene, EbeveynScene, AvatarScene, EbeveynMenuScene, EbeveynOzetScene, SertifikaScene],
   });
   // Geliştirme sırasında otomatik testlerin oyuna erişebilmesi için.
   if (import.meta.env.DEV) (window as unknown as { oyun: Phaser.Game }).oyun = oyun;

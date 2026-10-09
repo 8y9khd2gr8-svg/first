@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { RENK, YAZI_TIPI } from '../ayarlar';
-import { evDugmesi, yildizliArkaPlan } from '../arayuz';
+import { buyukDugme, evDugmesi, yildizliArkaPlan } from '../arayuz';
 import { Durak, TURKIYE } from '../duraklar';
 import { DURAK_KONUMLARI, HARITA_BOYUTU } from '../haritaKonumlar';
 import { tamamlananlar } from '../ilerleme';
@@ -15,7 +15,7 @@ const KAYDIRMA: Record<string, [number, number]> = { nemrut: [-10, -22], gobekli
 // Şehir adı işaretin altında durur; sıkışık yerlerde üstüne alınır.
 const AD_USTTE = new Set(['nemrut', 'karadeniz']);
 // Zıpzıp işaretin sol üstünde durur; haritanın sol kenarındaki durakta sağ üstte.
-const ZIPZIP_SAGDA = new Set(['truva']);
+const ZIPZIP_SAGDA = new Set(['truva', 'karadeniz']);
 
 type Veri = { giris?: 'uzay'; yolculukDen?: string };
 type Nokta = { x: number; y: number };
@@ -117,6 +117,16 @@ export class HaritaScene extends Phaser.Scene {
       altYazi.setText(siradaki === -1 ? 'Türkiye Turu’nu bitirdin! 🏆' : siradaki === 0 ? 'İlk durağa dokun ve başla!' : `Sıradaki durak: ${TURKIYE[siradaki].yer}`);
       konus(siradaki === -1 ? M.turBitti : siradaki === 0 ? M.turaHosgeldin : M.siradaki(TURKIYE[siradaki].yer));
     };
+
+    if (siradaki === -1) {
+      arayuz.push(
+        buyukDugme(this, x, 900, '🏆 Sertifikanı al', RENK.yesil, () => {
+          sustur();
+          this.scene.start('Sertifika');
+        }, { genislik: 520, yukseklik: 130, yaziBoyu: 54 }),
+      );
+      altYazi.setVisible(false);
+    }
 
     if (yolculukVar) {
       // Zıpzıp tamamlanan duraktan sıradakine zıplayarak gider, arkasında altın iz kalır.

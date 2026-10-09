@@ -45,7 +45,11 @@ Teknoloji: Phaser 3 + TypeScript + Vite, GitHub Pages ile yayın. İleride Capac
 - Çıkış planı: Kasım'da ~100 kişilik beta (TestFlight / Google kapalı test), Ocak sonu yarıyıl
   tatilinde mağaza, 23 Nisan büyük güncelleme. Yorumlar organize ettirilmez (mağaza kuralı);
   çevre beta testçisi olarak kullanılır.
-- Hareketler futbol takımının fizyoterapistlerine danışılacak (hareket kataloğu sayfası).
+- Hareketler futbol takımının fizyoterapistlerine danışılacak (hareket kataloğu sayfası; ertelendi).
+- Ebeveyn köşesi (kilitli): haftalık hareket özeti + paylaş, pasaport düzenleme. Özet dürüst:
+  sayılar çocuğun "Yaptım!" dediği hareketler; oyun gerçekten yapıldığını algılayamaz. Kamera ile
+  algılama (cihaz içinde, görüntü gönderilmeden) bu yüzden önemli bir sonraki adım.
+- Türkiye Turu bitince Gezgin Sertifikası (resim olarak kaydet/paylaş).
 - Durak simgeleri şimdilik emoji; ileride çizerin çizdiği özel görseller gelecek.
 
 ## Kod düzeni

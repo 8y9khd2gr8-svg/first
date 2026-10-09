@@ -25,6 +25,7 @@ export const M = {
   pasaportHazir: 'Harika! Şimdi damga toplamaya başlayalım!',
   pasaportSifir: 'Merhaba gezgin! Hadi ilk damganı kazanalım!',
   pasaportDamga: (sayi: number) => `Harika gezgin! ${sayi} damga topladın!`,
+  sertifika: 'Tebrikler gezgin! Türkiye Gezgini sertifikanı kazandın!',
 };
 
 // Seslendirme aracı için: oyunda söylenebilecek her cümlenin tam listesi.
@@ -33,7 +34,7 @@ export function tumMetinler(): string[] {
     ...SAYILAR,
     ...GERI_SAYIM,
     M.yaptinMi, M.aferin, M.yolaCikiyoruz, M.oncekiniBitir, M.turBitti, M.turaHosgeldin,
-    M.karakterSec, M.pasaportIlk, M.pasaportHazir, M.pasaportSifir,
+    M.karakterSec, M.pasaportIlk, M.pasaportHazir, M.pasaportSifir, M.sertifika,
     ...Object.values(H).map((h) => h.sesli),
     ISINMA.sesli,
     SOGUMA.sesli,
