@@ -31,8 +31,11 @@ Teknoloji: Phaser 3 + TypeScript + Vite, GitHub Pages ile yayın. İleride Capac
 - Pasaport: çocuğun adı, görünümü ve damgaları. Görünüm varsayılan olarak çocuğun kendi
   seçtiği hayvan karakteri; fotoğraf tamamen isteğe bağlı (bazı aileler istemez). Ad ve
   fotoğraf sadece cihazda saklanır; ad/fotoğraf girişi ebeveyn kilidinin (çarpma sorusu) arkasında.
-- Harita ilerleme stili (sıradaki iş): uzaydan iniş + Zıpzıp'ın rota üzerinde zıplayarak
-  bir sonraki durağa gitmesi.
+- Harita: girişte uzaydan iniş; durak bitince Zıpzıp rota üzerinde zıplayarak sıradaki
+  durağa gider, arkasında altın iz kalır.
+- Yol haritası ("mutlaka indirin" özellikleri): Zıpzıp şarkısı + doğal ses, ebeveyn hareket
+  özeti, paylaşılabilir Gezgin Sertifikası, aileyle (anne-baba) hareketler, hareketle kazanılan
+  kostümler. Sonra: kardeş modu, sınıf/anaokulu modu, 23 Nisan özel bölümü.
 - İleriki bölümler için fikir: evdeki eşyalarla hareket (en sevdiği oyuncak, yumuşak top,
   balon, yastık): yerden alıp kaldırma, taşıma, başının üstünde tutma, balonu yere düşürmeme.
 - Durak simgeleri şimdilik emoji; ileride çizerin çizdiği özel görseller gelecek.
@@ -46,8 +49,9 @@ Teknoloji: Phaser 3 + TypeScript + Vite, GitHub Pages ile yayın. İleride Capac
 
 ## Proje sahibiyle çalışma şekli
 - Proje sahibi yazılım bilmiyor: her şeyi sade Türkçeyle anlat, teknik terimleri açıkla.
-- Karar gereken her noktada AskUserQuestion ile 4 seçenek sun (önerilen ilk sırada,
-  "(Önerilen)" etiketiyle); kullanıcı yazmadan seçebilsin. Her zaman en iyisi için kafa yor.
+- Karar gereken her noktada önce metinde 5+ seçeneği sıralı bir tabloyla yaz (önerilen en
+  başta), sonra AskUserQuestion ile en güçlü 4'ünü sun (önerilen ilk sırada, "(Önerilen)"
+  etiketiyle); kullanıcı yazmadan seçebilsin. Her zaman en iyisi için kafa yor.
 - Her aşama küçük ve telefonda test edilebilir olsun; sonunda Yağız (6 yaş) test eder.
 - Değişiklikler PR olarak açılır; testleri geçince PR'ı Claude birleştirir (kullanıcı onayladı).
 - Kodda isimler ve yorumlar Türkçe.
