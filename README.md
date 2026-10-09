@@ -1,7 +1,7 @@
-# Hareketli Dünya Turu 🌍🏃
+# Zıp Zıp Dünya 🌍🏃
 
 4-9 yaş arası çocuklar için **reklamsız, şiddetsiz** bir hareket oyunu.
-Sevimli bir karakter çocukla birlikte dünyanın harikalarını gezer; her durakta
+Sevimli maskot Zıpzıp çocukla birlikte dünyanın harikalarını gezer; her durakta
 zıplama, çömelme, denge gibi hareketler ister. Macera Türkiye'den
 (Efes – Artemis Tapınağı) başlar.
 
