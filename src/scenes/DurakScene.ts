@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import { RENK, YAZI_TIPI } from '../ayarlar';
 import { buyukDugme, evDugmesi, yildizliArkaPlan } from '../arayuz';
-import { durakBul } from '../duraklar';
+import { durakBul, haritaSahnesi } from '../duraklar';
 import { M } from '../metinler';
 import { konus, sustur } from '../ses';
 
@@ -24,7 +24,7 @@ export class DurakScene extends Phaser.Scene {
 
     evDugmesi(this, () => {
       sustur();
-      this.scene.start('Harita', {});
+      this.scene.start(haritaSahnesi(durak), {});
     });
 
     this.add.text(x, 170, durak.yer, { fontFamily: YAZI_TIPI, fontSize: '44px', color: '#cfe3ff' }).setOrigin(0.5);

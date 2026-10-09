@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import { RENK, YAZI_TIPI } from '../ayarlar';
 import { buyukDugme, yildizliArkaPlan } from '../arayuz';
-import { durakBul } from '../duraklar';
+import { durakBul, haritaSahnesi } from '../duraklar';
 import { tamamla, tamamlananlar } from '../ilerleme';
 import { M } from '../metinler';
 import { bip, konus, sustur, zaferMuzigi } from '../ses';
@@ -94,7 +94,7 @@ export class OdulScene extends Phaser.Scene {
 
     buyukDugme(this, x, 1010, 'Haritaya dön ▶', RENK.turuncu, () => {
       sustur();
-      this.scene.start('Harita', yeniBitti ? { yolculukDen: durak.id } : {});
+      this.scene.start(haritaSahnesi(durak), yeniBitti ? { yolculukDen: durak.id } : {});
     }, { genislik: 540, yukseklik: 150, yaziBoyu: 64 });
 
     buyukDugme(this, x, 1170, 'Bir daha ↻', RENK.mavi, () => {

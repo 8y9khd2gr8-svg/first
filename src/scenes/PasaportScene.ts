@@ -1,8 +1,8 @@
 import Phaser from 'phaser';
 import { RENK, YAZI_TIPI } from '../ayarlar';
 import { buyukDugme, yildizliArkaPlan } from '../arayuz';
-import { TURKIYE } from '../duraklar';
-import { tamamlananlar } from '../ilerleme';
+import { BOLUMLER, BolumId, DUNYA, TURKIYE } from '../duraklar';
+import { dunyaAcik, tamamlananlar } from '../ilerleme';
 import { fotoDokusuYukle, pasaportOku } from '../pasaport';
 import { M } from '../metinler';
 import { bip, konus, sustur } from '../ses';
@@ -13,8 +13,14 @@ const MUREKKEP = '#14213D';
 
 // Çocuğun pasaportu: fotoğraf, ad ve toplanan damgalar.
 export class PasaportScene extends Phaser.Scene {
+  private sayfaNo: BolumId = 'turkiye';
+
   constructor() {
     super('Pasaport');
+  }
+
+  init(veri: { sayfa?: BolumId }) {
+    this.sayfaNo = veri?.sayfa ?? 'turkiye';
   }
 
   create() {
@@ -22,7 +28,8 @@ export class PasaportScene extends Phaser.Scene {
     const x = this.scale.gameSize.width / 2;
     const pasaport = pasaportOku();
     const biten = new Set(tamamlananlar());
-    const damgaSayisi = TURKIYE.filter((d) => biten.has(d.id)).length;
+    const damgaSayisi = [...TURKIYE, ...DUNYA].filter((d) => biten.has(d.id)).length;
+    const bolum = BOLUMLER[this.sayfaNo];
 
     // Pasaport sayfası ekrana aşağıdan kayarak gelir.
     const sayfa = this.add.container(0, 0);
@@ -78,11 +85,11 @@ export class PasaportScene extends Phaser.Scene {
     etiket(390, 'Görevi');
     deger(418, 'Dünya Gezgini', 36);
     etiket(475, 'Damgalar');
-    deger(500, `${damgaSayisi} / ${TURKIYE.length}`, 40);
+    deger(500, `${damgaSayisi} / ${TURKIYE.length + DUNYA.length}`, 40);
 
     // Damga yuvaları: 4 + 3.
-    sayfa.add(this.add.text(x, 590, 'Türkiye Turu Damgalarım', { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '36px', color: MUREKKEP }).setOrigin(0.5));
-    TURKIYE.forEach((durak, i) => {
+    sayfa.add(this.add.text(x, 590, `${bolum.ad} Damgalarım`, { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '36px', color: MUREKKEP }).setOrigin(0.5));
+    bolum.duraklar.forEach((durak, i) => {
       const satir = i < 4 ? 0 : 1;
       const sutunSayisi = satir === 0 ? 4 : 3;
       const sutun = satir === 0 ? i : i - 4;
@@ -108,6 +115,27 @@ export class PasaportScene extends Phaser.Scene {
       }
     });
 
+    // Sayfa çevir: Türkiye / Dünya damgaları.
+    (['turkiye', 'dunya'] as BolumId[]).forEach((id, i) => {
+      const secili = id === this.sayfaNo;
+      const sekme = this.add
+        .text(x + (i === 0 ? -150 : 150), 1030, i === 0 ? '🇹🇷 Türkiye' : '🌍 Dünya', {
+          fontFamily: YAZI_TIPI,
+          fontStyle: 'bold',
+          fontSize: '32px',
+          color: secili ? '#ffffff' : MUREKKEP,
+          backgroundColor: secili ? '#FF8A3D' : '#14213D1a',
+          padding: { x: 22, y: 8 },
+        })
+        .setOrigin(0.5);
+      if (!secili)
+        sekme.setInteractive({ useHandCursor: true }).on('pointerdown', () => {
+          bip(700, 0.08);
+          this.scene.restart({ sayfa: id });
+        });
+      sayfa.add(sekme);
+    });
+
     sayfa.y = 1300;
     this.tweens.add({ targets: sayfa, y: 0, duration: 650, ease: 'Back.easeOut' });
 
@@ -124,13 +152,13 @@ export class PasaportScene extends Phaser.Scene {
     if (!pasaport.ad) {
       buyukDugme(this, x, 1180, 'Haritaya git ▶', RENK.turuncu, () => {
         sustur();
-        this.scene.start('Harita', { giris: 'uzay' });
+        this.scene.start(this.sayfaNo === 'dunya' && dunyaAcik(TURKIYE.map((d) => d.id)) ? 'Dunya' : 'Harita', { giris: 'uzay' });
       }, { genislik: 420, yukseklik: 120, yaziBoyu: 52 });
       konus(pasaport.avatar ? M.pasaportHazir : M.pasaportIlk);
     } else {
       buyukDugme(this, x, 1180, 'Haritaya dön ▶', RENK.turuncu, () => {
         sustur();
-        this.scene.start('Harita', { giris: 'uzay' });
+        this.scene.start(this.sayfaNo === 'dunya' && dunyaAcik(TURKIYE.map((d) => d.id)) ? 'Dunya' : 'Harita', { giris: 'uzay' });
       }, { genislik: 420, yukseklik: 120, yaziBoyu: 52 });
       konus(damgaSayisi === 0 ? M.pasaportSifir : M.pasaportDamga(damgaSayisi));
     }

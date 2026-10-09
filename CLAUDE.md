@@ -54,6 +54,11 @@ Teknoloji: Phaser 3 + TypeScript + Vite, GitHub Pages ile yayın. İleride Capac
   (@fontsource/baloo-2); oyun hiçbir dış sunucuya bağlanmaz, öyle kalmalı.
 - Avatar hayvanları çizim olarak kalır (gerçek fotoğraf değil); ileride çizer Zıpzıp
   tarzında çizecek. İkonlar: public/ikon/ (Zıpzıp'tan üretildi).
+- Dünya Harikaları (2. bölüm, ücretli kısım): dönen küre (DunyaScene, d3-geo ile canvas'a
+  çizilir); Efes → Kolezyum → Piramitler → Petra → Tac Mahal → Çin Seddi → Machu Picchu.
+  Türkiye Turu bitince açılır; beta için ebeveyn köşesinde geçici "Beta: Dünya bölümünü aç"
+  (mağazadan önce kaldırılacak). Ödeme mağaza (Capacitor) aşamasında bağlanacak.
+- Para modeli kesinleşti: Türkiye ücretsiz + tek ödemeyle tam sürüm; sonra okul lisansı.
 - Durak simgeleri şimdilik emoji; ileride çizerin çizdiği özel görseller gelecek.
 
 ## Kod düzeni

@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import { RENK, YAZI_TIPI } from '../ayarlar';
 import { buyukDugme, evDugmesi, yildizliArkaPlan } from '../arayuz';
-import { durakBul, oturum } from '../duraklar';
+import { durakBul, haritaSahnesi, oturum } from '../duraklar';
 import { Hareket } from '../hareketler';
 import { hareketKaydet } from '../istatistik';
 import { GERI_SAYIM, M, SAYILAR } from '../metinler';
@@ -36,7 +36,7 @@ export class HareketScene extends Phaser.Scene {
 
     evDugmesi(this, () => {
       sustur();
-      this.scene.start('Harita', {});
+      this.scene.start(haritaSahnesi(durakBul(this.durakId)), {});
     });
 
     // İlerleme noktaları: kaçıncı hareketteyiz?
