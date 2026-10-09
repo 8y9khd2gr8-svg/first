@@ -18,6 +18,9 @@ Teknoloji: Phaser 3 + TypeScript + Vite, GitHub Pages ile yayın. İleride Capac
   Ödeme ekranı ebeveyn kilidinin arkasında. Kostüm/kıyafet satılmaz; hareketle kazanılan
   yıldızlarla açılır. İleride okullara/anaokullarına lisans düşünülebilir.
 - Önce web (PWA), oyun olgunlaşınca Capacitor ile Play Store ve App Store.
+  Hedef sadece mağazalar: web adresi (GitHub Pages) beta sonuna kadar yalnızca test için kalır;
+  mağazaya çıkarken oyun siteden kaldırılır, sadece gizlilik.html ve kosullar.html kalır
+  (mağazalar gizlilik politikası adresi ister).
 - Kamera ile hareket algılama sonraya bırakıldı; şimdilik çocuk "Yaptım!" düğmesine basar.
 
 - Hareket komutları benzetme değil, vücut parçasını söyleyen tek ve net eylem olmalı
