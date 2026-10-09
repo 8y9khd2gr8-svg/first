@@ -4,7 +4,8 @@ import type { Hareket } from './hareketler';
 // Sadece çocuğun "Yaptım!" dediği hareketler sayılır.
 const ANAHTAR = 'zipzip-istatistik-v1';
 
-type Gun = { saniye: number; hareket: number; ziplama: number };
+// sayac: hangi animasyondan kaç tekrar yapıldı (süreli hareketlerde 1 sayılır).
+type Gun = { saniye: number; hareket: number; ziplama: number; sayac?: Record<string, number> };
 type Kayit = { gunler: Record<string, Gun>; ilkGun?: string };
 
 function oku(): Kayit {
@@ -29,6 +30,8 @@ export function hareketKaydet(h: Hareket) {
   gun.saniye += Math.round(h.tur === 'sayi' ? (h.adet * h.tempoMs) / 1000 : h.saniye);
   gun.hareket += 1;
   if (h.tur === 'sayi' && (h.animasyon === 'zipla' || h.animasyon === 'acKapa')) gun.ziplama += h.adet;
+  gun.sayac ??= {};
+  gun.sayac[h.animasyon] = (gun.sayac[h.animasyon] ?? 0) + (h.tur === 'sayi' ? h.adet : 1);
   kayit.gunler[bugun] = gun;
   kayit.ilkGun ??= bugun;
   try {
@@ -38,7 +41,7 @@ export function hareketKaydet(h: Hareket) {
   }
 }
 
-export type Ozet = { gunler: { gun: string; saniye: number }[]; saniye: number; hareket: number; ziplama: number; toplamSaniye: number; toplamHareket: number };
+export type Ozet = { gunler: { gun: string; saniye: number }[]; saniye: number; hareket: number; ziplama: number; toplamSaniye: number; toplamHareket: number; toplamZiplama: number; gunSayisi: number; animasyonSayac: Record<string, number>; haftaSonuOynadi: boolean };
 
 // Son 7 gün (bugün dahil) ve başlangıçtan beri toplam.
 export function haftalikOzet(): Ozet {
@@ -58,5 +61,17 @@ export function haftalikOzet(): Ozet {
     ziplama: hafta.reduce((t, g) => t + g.ziplama, 0),
     toplamSaniye: tum.reduce((t, g) => t + g.saniye, 0),
     toplamHareket: tum.reduce((t, g) => t + g.hareket, 0),
+    toplamZiplama: tum.reduce((t, g) => t + g.ziplama, 0),
+    gunSayisi: tum.filter((g) => g.hareket > 0).length,
+    animasyonSayac: tum.reduce<Record<string, number>>((t, g) => {
+      for (const [a, n] of Object.entries(g.sayac ?? {})) t[a] = (t[a] ?? 0) + n;
+      return t;
+    }, {}),
+    haftaSonuOynadi: Object.entries(kayit.gunler).some(([gun, g]) => {
+      if (!g.hareket) return false;
+      const [yil, ay, gn] = gun.split('-').map(Number);
+      const hafta = new Date(yil, ay - 1, gn).getDay();
+      return hafta === 0 || hafta === 6;
+    }),
   };
 }

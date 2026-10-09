@@ -13,7 +13,7 @@ export class EbeveynMenuScene extends Phaser.Scene {
   create() {
     yildizliArkaPlan(this);
     const x = this.scale.gameSize.width / 2;
-    evDugmesi(this, () => this.scene.start('Pasaport'));
+    evDugmesi(this, () => this.scene.start('Pasaport', {}));
     this.add.text(x, 170, 'Ebeveyn köşesi', { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '68px', color: '#FFC93C' }).setOrigin(0.5);
 
     const dugme = (y: number, yazi: string, renk: number, sahne: string, veri?: object) =>

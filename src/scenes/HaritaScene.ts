@@ -93,7 +93,7 @@ export class HaritaScene extends Phaser.Scene {
     pasaportDugmesi.on('pointerdown', () => {
       bip(880, 0.08, 'square', 0.12);
       sustur();
-      this.scene.start('Pasaport');
+      this.scene.start('Pasaport', {});
     });
     arayuz.push(pasaportDugmesi);
     arayuz.push(

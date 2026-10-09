@@ -78,3 +78,22 @@ export function evDugmesi(sahne: Phaser.Scene, basinca: () => void) {
   });
   return d;
 }
+
+// Madalya biçiminde rozet: kurdele, altın (kazanıldıysa) ya da gri daire, ortada simge.
+export function rozetCiz(sahne: Phaser.Scene, x: number, y: number, r: number, simge: string, kazanildi: boolean) {
+  const rozet = sahne.add.container(x, y);
+  const g = sahne.add.graphics();
+  const kurdele = kazanildi ? [0xff6b6b, 0x2f80ed] : [0x6b7280, 0x6b7280];
+  g.fillStyle(kurdele[0]).fillTriangle(-r * 0.7, -r * 0.2, -r * 0.05, -r * 0.2, -r * 0.55, r * 1.25);
+  g.fillStyle(kurdele[1]).fillTriangle(r * 0.05, -r * 0.2, r * 0.7, -r * 0.2, r * 0.55, r * 1.25);
+  g.fillStyle(kazanildi ? 0xe0a100 : 0x4b5563).fillCircle(0, 0, r);
+  g.fillStyle(kazanildi ? 0xffc93c : 0x6b7280).fillCircle(0, 0, r * 0.82);
+  rozet.add(g);
+  rozet.add(
+    sahne.add
+      .text(0, 2, kazanildi ? simge : '?', { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: `${Math.round(r * 0.95)}px`, color: '#ffffff' })
+      .setOrigin(0.5)
+      .setAlpha(kazanildi ? 1 : 0.6),
+  );
+  return rozet;
+}

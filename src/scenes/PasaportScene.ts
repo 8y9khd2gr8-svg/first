@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { RENK, YAZI_TIPI } from '../ayarlar';
-import { buyukDugme, yildizliArkaPlan } from '../arayuz';
+import { buyukDugme, rozetCiz, yildizliArkaPlan } from '../arayuz';
+import { kazanilanlar, ROZETLER } from '../rozetler';
 import { BOLUMLER, BolumId, DUNYA, TURKIYE } from '../duraklar';
 import { dunyaAcik, tamamlananlar } from '../ilerleme';
 import { fotoDokusuYukle, pasaportOku } from '../pasaport';
@@ -119,7 +120,7 @@ export class PasaportScene extends Phaser.Scene {
     (['turkiye', 'dunya'] as BolumId[]).forEach((id, i) => {
       const secili = id === this.sayfaNo;
       const sekme = this.add
-        .text(x + (i === 0 ? -150 : 150), 1030, i === 0 ? '🇹🇷 Türkiye' : '🌍 Dünya', {
+        .text(x + (i === 0 ? -150 : 150), 1052, i === 0 ? '🇹🇷 Türkiye' : '🌍 Dünya', {
           fontFamily: YAZI_TIPI,
           fontStyle: 'bold',
           fontSize: '32px',
@@ -136,7 +137,25 @@ export class PasaportScene extends Phaser.Scene {
       sayfa.add(sekme);
     });
 
+    // Bölüm rozetleri: kazanıldıysa fotoğraf çerçevesinin köşesinde parlar.
+    const kazanilan = kazanilanlar();
+    ROZETLER.filter((r) => r.bolum && kazanilan.has(r.id)).forEach((r, i) => sayfa.add(rozetCiz(this, 290 - i * 70, 525, 30, r.simge, true)));
+
     sayfa.y = 1300;
+
+    // Rozetlerim
+    const rozetDugmesi = this.add.container(80, 70);
+    rozetDugmesi.add(this.add.circle(0, 0, 44, 0xffffff, 0.15));
+    rozetDugmesi.add(this.add.text(0, 2, '🏅', { fontSize: '44px' }).setOrigin(0.5));
+    rozetDugmesi.add(
+      this.add.text(0, 0, String(kazanilan.size), { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '24px', color: '#14213D', backgroundColor: '#FFC93C', padding: { x: 8, y: 0 } }).setOrigin(-0.6, 1.4),
+    );
+    rozetDugmesi.setSize(88, 88).setInteractive({ useHandCursor: true });
+    rozetDugmesi.on('pointerdown', () => {
+      bip(880, 0.08, 'square', 0.12);
+      sustur();
+      this.scene.start('Rozet', {});
+    });
     this.tweens.add({ targets: sayfa, y: 0, duration: 650, ease: 'Back.easeOut' });
 
     // Ebeveyn düzenleme düğmesi (kilitli).
