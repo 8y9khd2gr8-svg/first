@@ -59,6 +59,15 @@ Teknoloji: Phaser 3 + TypeScript + Vite, GitHub Pages ile yayın. İleride Capac
   Türkiye Turu bitince açılır; beta için ebeveyn köşesinde geçici "Beta: Dünya bölümünü aç"
   (mağazadan önce kaldırılacak). Ödeme mağaza (Capacitor) aşamasında bağlanacak.
 - Para modeli kesinleşti: Türkiye ücretsiz + tek ödemeyle tam sürüm; sonra okul lisansı.
+- Beta hazırlığı: ilk açılışta bir kez ebeveyn güvenlik notu; durak girişinde kısa hatırlatma;
+  public/gizlilik.html ve kosullar.html (taslak, avukata gösterilecek; iletişim adresi eklenecek);
+  ebeveyn köşesinde "Tüm verileri sil" (zipzip- ile başlayan bütün anahtarlar). Yeni bir cihaz
+  kaydı eklenirse anahtarı zipzip- ile başlamalı ve gizlilik.html'deki tabloya eklenmeli.
+- Cinsiyet sorulmaz (veri azaltma, kalıp yargı). "Herkes kendini bulsun" ihtiyacı cinsiyetle
+  değil, çocuğun seçtiği ilgi alanıyla karşılanır (ör. Spor Kampı'nda sporunu seçer).
+- Bölüm yol haritası: Türkiye (ücretsiz) → Dünya Harikaları → Uzay Yolculuğu (sıradaki büyük
+  bölüm) → İstanbul'un 7 Tepesi (Şehir Turları; çizer gelince) → Spor Kampı → Dinozorlar →
+  Okyanus → Evde Macera → mevsim/bayram bölümleri. Bölüm bitince rozet (pasaport + sertifika).
 - Durak simgeleri şimdilik emoji; ileride çizerin çizdiği özel görseller gelecek.
 
 ## Kod düzeni

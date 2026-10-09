@@ -1,0 +1,19 @@
+/* Gizlilik politikası ve kullanım koşulları sayfaları için ortak görünüm. */
+:root { --zemin: #fff8e8; --yazi: #14213d; --soluk: #5b6b85; --vurgu: #e0a100; --kutu: #ffffff; color-scheme: light; }
+@media (prefers-color-scheme: dark) {
+  :root { --zemin: #14213d; --yazi: #f3f6fb; --soluk: #a9bad6; --vurgu: #ffc93c; --kutu: #1c2c52; color-scheme: dark; }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--zemin); color: var(--yazi); font: 17px/1.65 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+main { max-width: 720px; margin: 0 auto; padding-block: 40px 64px; padding-inline: 20px; }
+header { display: flex; align-items: center; gap: 16px; margin-bottom: 8px; }
+header img { width: 64px; height: 64px; border-radius: 16px; }
+h1 { font-size: 30px; line-height: 1.2; margin: 0; text-wrap: balance; }
+.tarih { color: var(--soluk); margin: 4px 0 28px; font-size: 15px; }
+h2 { font-size: 21px; margin: 32px 0 8px; color: var(--vurgu); }
+.ozet { background: var(--kutu); border-radius: 16px; padding: 16px 20px; border-left: 6px solid var(--vurgu); }
+.ozet ul { margin: 8px 0 0; padding-left: 20px; }
+table { width: 100%; border-collapse: collapse; font-size: 15px; }
+th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid color-mix(in srgb, var(--soluk) 35%, transparent); vertical-align: top; }
+.tablo { overflow-x: auto; }
+a { color: var(--vurgu); }
