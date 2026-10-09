@@ -1,32 +1,30 @@
 import Phaser from 'phaser';
 import { RENK, YAZI_TIPI } from '../ayarlar';
-import { buyukDugme, evDugmesi, yildizliArkaPlan } from '../arayuz';
+import { buyukDugme, yildizliArkaPlan } from '../arayuz';
+import { durakBul } from '../duraklar';
+import { tamamla } from '../ilerleme';
 import { bip, konus, sustur, zaferMuzigi } from '../ses';
-import { Zipzip } from '../zipzip';
 
 const KONFETI_RENKLERI = [0xffc93c, 0xff8a3d, 0x3fbf5f, 0x2f80ed, 0xff6b6b, 0xffffff];
 
-// Ödül ekranı: konfeti, üç yıldız ve sıradaki adım için düğmeler.
+// Durak bitti: konfeti, üç yıldız ve pasaport damgası.
 export class OdulScene extends Phaser.Scene {
-  private sira = 0;
+  private durakId = '';
 
   constructor() {
     super('Odul');
   }
 
-  init(veri: { sira?: number }) {
-    this.sira = veri.sira ?? 0;
+  init(veri: { durakId: string }) {
+    this.durakId = veri.durakId;
   }
 
   create() {
     yildizliArkaPlan(this);
     const { width, height } = this.scale.gameSize;
     const x = width / 2;
-
-    evDugmesi(this, () => {
-      sustur();
-      this.scene.start('Acilis');
-    });
+    const durak = durakBul(this.durakId);
+    tamamla(durak.id);
 
     for (let i = 0; i < 90; i++) {
       const parca = this.add.rectangle(
@@ -48,13 +46,13 @@ export class OdulScene extends Phaser.Scene {
     }
 
     const baslik = this.add
-      .text(x, 200, 'Süpersin!', { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '120px', color: '#FFC93C', stroke: '#0b1430', strokeThickness: 16 })
+      .text(x, 150, 'Süpersin!', { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '120px', color: '#FFC93C', stroke: '#0b1430', strokeThickness: 16 })
       .setOrigin(0.5)
       .setScale(0);
     this.tweens.add({ targets: baslik, scale: 1, duration: 500, ease: 'Back.easeOut' });
 
-    [-180, 0, 180].forEach((dx, i) => {
-      const yildiz = this.add.star(x + dx, 400, 5, 42, 95, RENK.sari).setStrokeStyle(7, RENK.beyaz).setScale(0);
+    [-160, 0, 160].forEach((dx, i) => {
+      const yildiz = this.add.star(x + dx, 320, 5, 36, 80, RENK.sari).setStrokeStyle(6, RENK.beyaz).setScale(0);
       this.tweens.add({
         targets: yildiz,
         scale: 1,
@@ -66,19 +64,40 @@ export class OdulScene extends Phaser.Scene {
       });
     });
 
-    new Zipzip(this, x, 690, 1.1).surekli('acKapa', 1200);
+    // Pasaport damgası: yukarıdan "pat" diye basılır.
+    const damga = this.add.container(x, 650).setAngle(-10);
+    const cember = this.add.graphics();
+    cember.lineStyle(10, RENK.turuncu).strokeCircle(0, 0, 170);
+    cember.lineStyle(4, RENK.turuncu).strokeCircle(0, 0, 145);
+    damga.add(cember);
+    damga.add(this.add.text(0, -40, durak.simge, { fontSize: '120px' }).setOrigin(0.5));
+    damga.add(this.add.text(0, 70, durak.yer.toLocaleUpperCase('tr'), { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '46px', color: '#FF8A3D' }).setOrigin(0.5));
+    damga.add(this.add.text(0, 115, 'ZIP ZIP DÜNYA', { fontFamily: YAZI_TIPI, fontSize: '24px', color: '#FF8A3D' }).setOrigin(0.5));
+    damga.setScale(2.5).setAlpha(0);
+    this.tweens.add({
+      targets: damga,
+      scale: 1,
+      alpha: 1,
+      duration: 350,
+      delay: 1700,
+      ease: 'Quad.easeIn',
+      onComplete: () => {
+        bip(110, 0.25, 'square', 0.3);
+        this.cameras.main.shake(150, 0.01);
+      },
+    });
 
     zaferMuzigi();
-    this.time.delayedCall(500, () => konus('Süpersin! Üç yıldız kazandın!'));
+    this.time.delayedCall(500, () => konus(`Süpersin! ${durak.yer} damgasını kazandın!`));
 
-    buyukDugme(this, x, 1010, 'Yeni hareket ▶', RENK.turuncu, () => {
+    buyukDugme(this, x, 1010, 'Haritaya dön ▶', RENK.turuncu, () => {
       sustur();
-      this.scene.start('Hareket', { sira: this.sira + 1 });
-    }, { genislik: 540, yukseklik: 150, yaziBoyu: 66 });
+      this.scene.start('Harita');
+    }, { genislik: 540, yukseklik: 150, yaziBoyu: 64 });
 
     buyukDugme(this, x, 1170, 'Bir daha ↻', RENK.mavi, () => {
       sustur();
-      this.scene.start('Hareket', { sira: this.sira });
+      this.scene.start('Hareket', { durakId: durak.id, adim: 0 });
     }, { genislik: 400, yukseklik: 110, yaziBoyu: 52 });
   }
 }

@@ -3,7 +3,9 @@
 ## Proje
 4-9 yaş çocuklar için reklamsız, şiddetsiz, Türkçe hareket oyunu. Maskot "Zıpzıp":
 Türkiye merkezli, kollu-bacaklı gülen dünya; Türkiye altın sarısı (#FFC93C).
-Tema: Dünyanın 7 harikası turu, Türkiye'den (Efes – Artemis Tapınağı) başlar.
+Yapı: 1. bölüm Türkiye Turu (ücretsiz): İstanbul → Truva → Pamukkale → Kapadokya → Nemrut →
+Göbeklitepe → Karadeniz. 2. bölüm Dünya Harikaları (Efes'ten başlar; Rio yerine Piramitler).
+Sonra ülke turları. Her durak 5 hareketlik antrenman: ısınma → özel hareket → 2 hareket → soğuma.
 Teknoloji: Phaser 3 + TypeScript + Vite, GitHub Pages ile yayın. İleride Capacitor ile mağazalar.
 
 ## Değişmez kurallar
@@ -26,8 +28,17 @@ Teknoloji: Phaser 3 + TypeScript + Vite, GitHub Pages ile yayın. İleride Capac
 - Harika listesini biz seçeriz; dini figür/ibadet odaklı yapılar (ör. Kurtarıcı İsa heykeli)
   Türkiye'de yanlış anlaşılabileceği için listeye alınmaz.
 
+- Pasaport (sıradaki iş): çocuğun adı ve fotoğrafı olan çocuk pasaportu; damgalar burada
+  toplanır. Ad ve fotoğraf sadece cihazda saklanır, hiçbir yere gönderilmez; fotoğraf/ad
+  girişi ebeveyn kilidinin arkasında.
+- İleriki bölümler için fikir: evdeki eşyalarla hareket (en sevdiği oyuncak, yumuşak top,
+  balon, yastık): yerden alıp kaldırma, taşıma, başının üstünde tutma, balonu yere düşürmeme.
+- Durak simgeleri şimdilik emoji; ileride çizerin çizdiği özel görseller gelecek.
+
 ## Kod düzeni
 - `src/zipzip.ts`: maskot; duruşlar (uzuv açıları) ve her hareketin adımları burada.
+- `src/duraklar.ts`: duraklar, bilgiler, özel hareketler. `src/ilerleme.ts`: cihazdaki kayıt.
+- `npm run harita`: harita SVG'sini ve durak konumlarını yeniden üretir (scripts/harita-uret.mjs).
 - `src/hareketler.ts`: hareket listesi. `src/ses.ts`: sesler. `src/arayuz.ts`: düğmeler, arka plan.
 - Test: `npm run dev` ile açınca `window.oyun` üzerinden sahneler başlatılabilir (sadece geliştirmede).
 
