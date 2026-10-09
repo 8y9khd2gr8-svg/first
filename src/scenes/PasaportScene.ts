@@ -4,6 +4,7 @@ import { buyukDugme, yildizliArkaPlan } from '../arayuz';
 import { TURKIYE } from '../duraklar';
 import { tamamlananlar } from '../ilerleme';
 import { fotoDokusuYukle, pasaportOku } from '../pasaport';
+import { M } from '../metinler';
 import { bip, konus, sustur } from '../ses';
 import { Zipzip } from '../zipzip';
 
@@ -125,13 +126,13 @@ export class PasaportScene extends Phaser.Scene {
         sustur();
         this.scene.start('Harita', { giris: 'uzay' });
       }, { genislik: 420, yukseklik: 120, yaziBoyu: 52 });
-      konus(pasaport.avatar ? 'Harika! Şimdi damga toplamaya başlayalım!' : 'Bu senin pasaportun! Önce kendine bir karakter seç. Adını da bir büyüğüne yazdırabilirsin.');
+      konus(pasaport.avatar ? M.pasaportHazir : M.pasaportIlk);
     } else {
       buyukDugme(this, x, 1180, 'Haritaya dön ▶', RENK.turuncu, () => {
         sustur();
         this.scene.start('Harita', { giris: 'uzay' });
       }, { genislik: 420, yukseklik: 120, yaziBoyu: 52 });
-      konus(damgaSayisi === 0 ? `Merhaba ${pasaport.ad}! Hadi ilk damganı kazanalım!` : `${pasaport.ad}, ${damgaSayisi} damga topladın!`);
+      konus(damgaSayisi === 0 ? M.pasaportSifir : M.pasaportDamga(damgaSayisi));
     }
   }
 }

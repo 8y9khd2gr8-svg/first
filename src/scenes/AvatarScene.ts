@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { RENK, YAZI_TIPI } from '../ayarlar';
 import { evDugmesi, yildizliArkaPlan } from '../arayuz';
 import { AVATARLAR, pasaportOku, pasaportYaz } from '../pasaport';
+import { M } from '../metinler';
 import { bip, konus } from '../ses';
 
 // Çocuk pasaport karakterini kendisi seçer (ebeveyn kilidi gerekmez).
@@ -19,7 +20,7 @@ export class AvatarScene extends Phaser.Scene {
     this.add
       .text(x, 190, 'Karakterini seç!', { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '76px', color: '#FFC93C', stroke: '#0b1430', strokeThickness: 12 })
       .setOrigin(0.5);
-    konus('Pasaportun için bir karakter seç!');
+    konus(M.karakterSec);
 
     AVATARLAR.forEach((avatar, i) => {
       const ax = x + ((i % 2) - 0.5) * 300;
@@ -34,7 +35,7 @@ export class AvatarScene extends Phaser.Scene {
       kart.on('pointerdown', () => {
         bip(880, 0.1, 'triangle', 0.2);
         pasaportYaz({ avatar: avatar.simge });
-        konus(`${avatar.ad}! Harika seçim!`);
+        konus(M.karakterSecildi(avatar.ad));
         this.tweens.add({ targets: kart, scale: 1.15, duration: 150, yoyo: true, onComplete: () => this.scene.start('Pasaport') });
       });
     });

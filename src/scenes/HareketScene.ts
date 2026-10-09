@@ -3,6 +3,7 @@ import { RENK, YAZI_TIPI } from '../ayarlar';
 import { buyukDugme, evDugmesi, yildizliArkaPlan } from '../arayuz';
 import { durakBul, oturum } from '../duraklar';
 import { Hareket } from '../hareketler';
+import { GERI_SAYIM, M, SAYILAR } from '../metinler';
 import { bip, konus, sustur, zaferMuzigi } from '../ses';
 import { Zipzip } from '../zipzip';
 
@@ -95,6 +96,7 @@ export class HareketScene extends Phaser.Scene {
         const basla = i === 3;
         this.sayacGoster(s, basla ? '#3FBF5F' : '#ffffff');
         bip(basla ? 880 : 520, basla ? 0.35 : 0.15, 'triangle');
+        konus(GERI_SAYIM[i]);
         if (basla) this.time.delayedCall(600, bitince);
       });
     });
@@ -108,6 +110,7 @@ export class HareketScene extends Phaser.Scene {
           this.zipzip.birKez(hareket.animasyon, hareket.tempoMs, k);
           this.sayacGoster(String(k));
           bip(560 + k * 40, 0.12);
+          konus(SAYILAR[k - 1]);
         });
       }
       this.time.delayedCall(hareket.adet * hareket.tempoMs, () => this.bitir());
@@ -117,6 +120,7 @@ export class HareketScene extends Phaser.Scene {
         this.time.delayedCall((hareket.saniye - s) * 1000, () => {
           this.sayacGoster(String(s));
           bip(600, 0.08);
+          if (s <= 3) konus(GERI_SAYIM[3 - s]);
         });
       }
       this.time.delayedCall(hareket.saniye * 1000, () => this.bitir());
@@ -127,7 +131,7 @@ export class HareketScene extends Phaser.Scene {
     this.zipzip.durdur();
     this.sayac.setText('');
     this.bilgi.setText('');
-    konus('Süper! Yaptıysan, Yaptım düğmesine bas!');
+    konus(M.yaptinMi);
 
     const x = this.scale.gameSize.width / 2;
     const dugme = buyukDugme(this, x, 1080, 'Yaptım!', RENK.yesil, () => {
@@ -149,6 +153,7 @@ export class HareketScene extends Phaser.Scene {
     }
     const x = this.scale.gameSize.width / 2;
     zaferMuzigi();
+    konus(M.aferin);
     const aferin = this.add
       .text(x, 1080, 'Aferin!', { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '120px', color: '#FFC93C', stroke: '#0b1430', strokeThickness: 16 })
       .setOrigin(0.5)

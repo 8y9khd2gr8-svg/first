@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { RENK, YAZI_TIPI } from '../ayarlar';
 import { buyukDugme, evDugmesi, yildizliArkaPlan } from '../arayuz';
 import { durakBul } from '../duraklar';
+import { M } from '../metinler';
 import { konus, sustur } from '../ses';
 
 // Durak girişi: yerin adı, simgesi ve "Biliyor muydun?" bilgisi.
@@ -42,7 +43,7 @@ export class DurakScene extends Phaser.Scene {
       .text(x, 820, durak.bilgi, { fontFamily: YAZI_TIPI, fontSize: '36px', color: '#ffffff', align: 'center', wordWrap: { width: 560 }, lineSpacing: 4 })
       .setOrigin(0.5);
 
-    konus(`${durak.yer}! ${durak.ad}. Biliyor muydun? ${durak.bilgi}`);
+    konus(M.durakGiris(durak.yer, durak.ad, durak.bilgi));
 
     buyukDugme(this, x, 1110, 'Başla ▶', RENK.turuncu, () => {
       sustur();
