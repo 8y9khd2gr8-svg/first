@@ -7,7 +7,7 @@ import ulkeVerisi from 'world-atlas/countries-110m.json';
 import { RENK, YAZI_TIPI } from '../ayarlar';
 import { evDugmesi, yildizliArkaPlan } from '../arayuz';
 import { DUNYA, Durak } from '../duraklar';
-import { tamamlananlar } from '../ilerleme';
+import { bolumAcik, tamamlananlar } from '../ilerleme';
 import { M } from '../metinler';
 import { bip, konus, sustur, zaferMuzigi } from '../ses';
 import { Zipzip } from '../zipzip';
@@ -90,6 +90,29 @@ export class DunyaScene extends Phaser.Scene {
       sustur();
       this.scene.start('Harita', {});
     });
+    const uzayAcik = bolumAcik(DUNYA.map((d) => d.id));
+    const uzay = this.add
+      .text(640, 160, uzayAcik ? 'Uzay 🚀 ▶' : '🔒 Uzay', {
+        fontFamily: YAZI_TIPI,
+        fontStyle: 'bold',
+        fontSize: '30px',
+        color: uzayAcik ? '#14213D' : '#cfe3ff',
+        backgroundColor: uzayAcik ? '#FFC93C' : '#ffffff1f',
+        padding: { x: 16, y: 8 },
+      })
+      .setOrigin(1, 0.5)
+      .setInteractive({ useHandCursor: true });
+    uzay.on('pointerdown', () => {
+      if (!uzayAcik) {
+        bip(220, 0.15, 'square', 0.12);
+        konus(M.uzayKilitli);
+        return;
+      }
+      bip(880, 0.08, 'square', 0.12);
+      sustur();
+      this.scene.start('Uzay', { giris: 'uzay' });
+    });
+    if (uzayAcik) this.tweens.add({ targets: uzay, scale: 1.06, duration: 700, yoyo: true, repeat: -1 });
     const pasaport = this.add.container(640, 80);
     pasaport.add(this.add.circle(0, 0, 50, RENK.turuncu).setStrokeStyle(5, RENK.beyaz));
     pasaport.add(this.add.text(0, 2, '🛂', { fontSize: '50px' }).setOrigin(0.5));
@@ -140,12 +163,12 @@ export class DunyaScene extends Phaser.Scene {
           this.iz = null;
           this.suruyorDen = null; // bu yol artık altın sarısı çizilsin
           const eski = this.isaretler.get(hedef.id)!;
-          const yeni = this.isaret(hedef, true, false, true);
+          const yeni = this.isaret(hedef, true, false, false);
           eski.destroy();
           this.isaretler.set(hedef.id, yeni);
           this.ciz();
           yeni.setScale(0);
-          this.tweens.add({ targets: yeni, scale: 1.3, duration: 260, ease: 'Back.easeOut', yoyo: true, hold: 120, onComplete: () => this.nabiz(yeni) });
+          this.tweens.add({ targets: yeni, scale: 1, duration: 450, ease: 'Back.easeOut', onComplete: () => this.nabiz(yeni) });
           zaferMuzigi();
           zipzip.surekli('zipla', 1200);
           this.time.delayedCall(500, durumuSoyle);

@@ -70,6 +70,8 @@ Teknoloji: Phaser 3 + TypeScript + Vite, GitHub Pages ile yayın. İleride Capac
   Okyanus → Evde Macera → mevsim/bayram bölümleri. Bölüm bitince rozet (pasaport + sertifika).
 - Rozetler (src/rozetler.ts, 21 adet): kayıtlardan hesaplanır; cihazda sadece kutlananlar
   tutulur. "Üst üste gün" gibi baskı yaratan rozet yok. Durak sonunda yeni rozet kutlanır.
+- Uzay Yolculuğu (3. bölüm, UzayScene): dikey Güneş Sistemi; Ay → Venüs → Merkür → Mars →
+  Jüpiter → Satürn → Uranüs → Neptün. Dünya Harikaları bitince açılır. Rozet: Uzay Yolcusu.
 - Durak simgeleri şimdilik emoji; ileride çizerin çizdiği özel görseller gelecek.
 
 ## Kod düzeni

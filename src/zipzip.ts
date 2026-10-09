@@ -48,7 +48,8 @@ const D = {
 } satisfies Record<string, Durus>;
 
 // Bir tekrar içindeki adımlar: duruş, gövdenin yukarı/aşağı kayması (birim) ve tekrar süresine oranı.
-type Adim = { durus: Durus; y: number; oran: number; yumusama?: string };
+// aci: Zıpzıp'ın bütün olarak yana eğilmesi (derece); yon: 1 öne, -1 arkasını dönmüş.
+type Adim = { durus: Durus; y: number; oran: number; yumusama?: string; aci?: number; yon?: number };
 
 const ADIMLAR: Record<Animasyon, Adim[]> = {
   zipla: [
@@ -95,6 +96,28 @@ const ADIMLAR: Record<Animasyon, Adim[]> = {
     { durus: D.normal, y: 0, oran: 0.2 },
   ],
   sutun: [{ durus: D.uzan, y: -20, oran: 0.3 }],
+  // Uzay bölümü
+  donus: [
+    { durus: D.yanAcik, y: 0, oran: 0.4, yon: -1 },
+    { durus: D.yanAcik, y: 0, oran: 0.4, yon: 1 },
+  ],
+  kocaman: [{ durus: D.acik, y: -10, oran: 0.3 }],
+  belDondur: [
+    { durus: D.heykel, y: 0, oran: 0.25, aci: -12 },
+    { durus: D.heykel, y: 6, oran: 0.25, aci: 0 },
+    { durus: D.heykel, y: 0, oran: 0.25, aci: 12 },
+    { durus: D.heykel, y: -6, oran: 0.25, aci: 0 },
+  ],
+  yanaEgil: [
+    { durus: D.kollarYukari, y: 0, oran: 0.3, aci: -18 },
+    { durus: D.kollarYukari, y: 0, oran: 0.2, aci: 0 },
+    { durus: D.kollarYukari, y: 0, oran: 0.3, aci: 18 },
+    { durus: D.kollarYukari, y: 0, oran: 0.2, aci: 0 },
+  ],
+  kolSalla: [
+    { durus: D.kollarYukari, y: 0, oran: 0.5, aci: -10 },
+    { durus: D.kollarYukari, y: 0, oran: 0.5, aci: 10 },
+  ],
   piramit: [{ durus: D.piramit, y: 0, oran: 0.3 }],
   yanAdim: [
     { durus: D.yanAcik, y: -8, oran: 0.4 },
@@ -122,7 +145,7 @@ const SAG_DIZ: Adim[] = [{ ...ADIMLAR.dizler[0], durus: D.sagDiz }, ADIMLAR.dizl
 const TIRMAN_B: Adim[] = [{ ...ADIMLAR.tirman[0], durus: D.tirmanB }, ADIMLAR.tirman[1]];
 
 // Süreli hareketlerde bir tekrarın süresi (ms).
-const SUREKLI_TEMPO: Partial<Record<Animasyon, number>> = { kos: 520, horon: 380, heykel: 2000, sutun: 2000, piramit: 2000, parmakUcu: 700 };
+const SUREKLI_TEMPO: Partial<Record<Animasyon, number>> = { kos: 520, horon: 380, heykel: 2000, sutun: 2000, piramit: 2000, parmakUcu: 700, kocaman: 2000, belDondur: 1600 };
 
 type UzuvParcasi = { kok: Phaser.GameObjects.Container; dirsek: Phaser.GameObjects.Container; durum: Uzuv };
 
@@ -215,6 +238,8 @@ export class Zipzip extends Phaser.GameObjects.Container {
       const olay = this.scene.time.delayedCall(t, () => {
         this.durusAl(adim.durus, adimSuresi, adim.yumusama);
         this.kay(adim.y, adimSuresi, adim.yumusama);
+        if (adim.aci !== undefined) this.scene.tweens.add({ targets: this, angle: adim.aci, duration: adimSuresi, ease: 'Sine.easeInOut' });
+        if (adim.yon !== undefined) this.scene.tweens.add({ targets: this, scaleX: adim.yon, duration: adimSuresi, ease: 'Sine.easeInOut' });
       });
       this.bekleyenler.push(olay);
       t += adimSuresi;
@@ -286,6 +311,7 @@ export class Zipzip extends Phaser.GameObjects.Container {
     const durumlar = Object.values(this.uzuvlar).map((p) => p.durum);
     this.scene.tweens.killTweensOf([this, this.golge, ...durumlar]);
     this.setAngle(0);
+    this.setScale(1);
     this.durusAl(D.normal, 200);
     this.kay(0, 200);
   }

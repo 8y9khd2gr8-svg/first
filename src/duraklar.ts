@@ -1,7 +1,7 @@
 import { H, Hareket, ISINMA, SOGUMA } from './hareketler';
 
 // Türkiye Turu durakları (batıdan doğuya). Kural: ibadet yeri olarak kullanılan yapılar yok.
-export type BolumId = 'turkiye' | 'dunya';
+export type BolumId = 'turkiye' | 'dunya' | 'uzay';
 
 export type Durak = {
   id: string;
@@ -169,13 +169,98 @@ export const DUNYA: Durak[] = [
   },
 ];
 
+// 3. bölüm: Uzay Yolculuğu. Gerçek sırayla, Güneş'ten dışarı doğru: Merkür, Venüs, (Dünya) Ay, Mars...
+export const UZAY: Durak[] = [
+  {
+    id: 'merkur',
+    bolum: 'uzay',
+    ad: 'Merkür',
+    yer: 'Merkür',
+    simge: '☀️',
+    bilgi: 'Merkür Güneş’e en yakın ve en hızlı gezegen. Güneş’in etrafını sadece 88 günde dolaşır!',
+    ozel: { hikaye: 'En hızlı gezegen!', baslik: 'Yerinde hızlı koş!', sesli: 'En hızlı gezegen Merkür! Yerinde hızlı hızlı koş!', animasyon: 'kos', tur: 'sure', saniye: 8 },
+    ekler: [H.acKapa, H.kollar],
+  },
+  {
+    id: 'venus',
+    bolum: 'uzay',
+    ad: 'Venüs',
+    yer: 'Venüs',
+    simge: '✨',
+    bilgi: 'Venüs gökyüzündeki en parlak gezegen. Kendi etrafında ters yöne döner!',
+    ozel: { hikaye: 'Venüs ters dönüyor!', baslik: 'Kollarını aç, arkanı dön,\ngeri dön!', sesli: 'Venüs ters dönüyor! Kollarını aç, arkanı dön, sonra geri dön!', animasyon: 'donus', tur: 'sayi', adet: 4, tempoMs: 2400 },
+    ekler: [H.zipla, H.comel],
+  },
+  {
+    id: 'ay',
+    bolum: 'uzay',
+    ad: 'Ay',
+    yer: 'Ay',
+    simge: '🌙',
+    bilgi: 'Ay’da yerçekimi Dünya’dakinden altı kat azdır. Orada çok yükseğe zıplayabilirsin!',
+    ozel: { hikaye: 'Ay’da her şey yavaş!', baslik: 'Yavaş yavaş zıpla!', sesli: 'Ay’da her şey yavaş! Yavaş yavaş zıpla!', animasyon: 'zipla', tur: 'sayi', adet: 5, tempoMs: 2200 },
+    ekler: [H.kollar, H.dizler],
+  },
+  {
+    id: 'mars',
+    bolum: 'uzay',
+    ad: 'Mars',
+    yer: 'Mars',
+    simge: '🔴',
+    bilgi: 'Mars’a kırmızı gezegen denir. Güneş Sistemi’nin en yüksek dağı Olimpos, Mars’tadır!',
+    ozel: { hikaye: 'Dev dağa tırmanalım!', baslik: 'Dizini kaldır,\nkolunu uzat!', sesli: 'Mars’taki dev dağa tırmanalım! Bir dizini kaldır, öbür kolunu uzat!', animasyon: 'tirman', tur: 'sayi', adet: 8, tempoMs: 1200 },
+    ekler: [H.zipla, H.comel],
+  },
+  {
+    id: 'jupiter',
+    bolum: 'uzay',
+    ad: 'Jüpiter',
+    yer: 'Jüpiter',
+    simge: '🟠',
+    bilgi: 'Jüpiter en büyük gezegen. İçine binden fazla Dünya sığar!',
+    ozel: { hikaye: 'En büyük gezegen!', baslik: 'Kollarını ve bacaklarını\naç, kocaman ol!', sesli: 'En büyük gezegen Jüpiter! Kollarını ve bacaklarını aç, kocaman ol!', animasyon: 'kocaman', tur: 'sure', saniye: 6 },
+    ekler: [H.dizler, H.acKapa],
+  },
+  {
+    id: 'saturn',
+    bolum: 'uzay',
+    ad: 'Satürn',
+    yer: 'Satürn',
+    simge: '🪐',
+    bilgi: 'Satürn’ün buzdan ve kayadan yapılmış kocaman halkaları var!',
+    ozel: { hikaye: 'Halkalar dönüyor!', baslik: 'Ellerini beline koy,\nbelini döndür!', sesli: 'Satürn’ün halkaları dönüyor! Ellerini beline koy, belini döndür!', animasyon: 'belDondur', tur: 'sayi', adet: 4, tempoMs: 2000 },
+    ekler: [H.kos, H.kollar],
+  },
+  {
+    id: 'uranus',
+    bolum: 'uzay',
+    ad: 'Uranüs',
+    yer: 'Uranüs',
+    simge: '🔵',
+    bilgi: 'Uranüs yan yatmış hâlde döner, sanki yuvarlanan bir top gibi!',
+    ozel: { hikaye: 'Yan yatan gezegen!', baslik: 'Kollarını kaldır,\nyana eğil!', sesli: 'Yan yatan gezegen Uranüs! Kollarını kaldır, bir yana eğil, sonra öbür yana!', animasyon: 'yanaEgil', tur: 'sayi', adet: 4, tempoMs: 2400 },
+    ekler: [H.zipla, H.dizler],
+  },
+  {
+    id: 'neptun',
+    bolum: 'uzay',
+    ad: 'Neptün',
+    yer: 'Neptün',
+    simge: '🌀',
+    bilgi: 'Neptün en uzak gezegen. Orada çok güçlü rüzgârlar eser!',
+    ozel: { hikaye: 'Rüzgâr esiyor!', baslik: 'Kollarını kaldır,\nsağa sola salla!', sesli: 'Neptün’de rüzgâr esiyor! Kollarını kaldır, sağa sola salla!', animasyon: 'kolSalla', tur: 'sayi', adet: 8, tempoMs: 1200 },
+    ekler: [H.acKapa, H.comel],
+  },
+];
+
 export const BOLUMLER: Record<BolumId, { ad: string; duraklar: Durak[]; sahne: string }> = {
   turkiye: { ad: 'Türkiye Turu', duraklar: TURKIYE, sahne: 'Harita' },
   dunya: { ad: 'Dünya Harikaları', duraklar: DUNYA, sahne: 'Dunya' },
+  uzay: { ad: 'Uzay Yolculuğu', duraklar: UZAY, sahne: 'Uzay' },
 };
 
 export function durakBul(id: string): Durak {
-  return [...TURKIYE, ...DUNYA].find((d) => d.id === id) ?? TURKIYE[0];
+  return [...TURKIYE, ...DUNYA, ...UZAY].find((d) => d.id === id) ?? TURKIYE[0];
 }
 
 // Durağın bölümünün harita sahnesi ('Harita' ya da 'Dunya').
