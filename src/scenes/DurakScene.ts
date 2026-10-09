@@ -45,7 +45,11 @@ export class DurakScene extends Phaser.Scene {
 
     konus(M.durakGiris(durak.yer, durak.ad, durak.bilgi));
 
-    buyukDugme(this, x, 1110, 'Başla ▶', RENK.turuncu, () => {
+    this.add
+      .text(x, 1225, '⚠️ Etrafın boş mu? Bir büyüğün yanında mı?', { fontFamily: YAZI_TIPI, fontSize: '28px', color: '#9fb6d9' })
+      .setOrigin(0.5);
+
+    buyukDugme(this, x, 1100, 'Başla ▶', RENK.turuncu, () => {
       sustur();
       this.scene.start('Hareket', { durakId: durak.id, adim: 0 });
     }, { genislik: 460, yukseklik: 150, yaziBoyu: 72 });

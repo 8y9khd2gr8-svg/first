@@ -4,6 +4,7 @@ import { buyukDugme, yildizliArkaPlan } from '../arayuz';
 import { sesiAc } from '../ses';
 import { Zipzip } from '../zipzip';
 import { pasaportOku, pasaportYaz } from '../pasaport';
+import { guvenlikNotuGoruldu } from '../guvenlik';
 
 // Açılış ekranı: oyunun adı, zıplayan Zıpzıp ve büyük "Oyna" düğmesi.
 export class AcilisScene extends Phaser.Scene {
@@ -37,7 +38,10 @@ export class AcilisScene extends Phaser.Scene {
         sesiAc();
         const ilkSefer = !pasaportOku().soruldu;
         if (ilkSefer) pasaportYaz({ soruldu: true });
-        this.scene.start(ilkSefer ? 'Pasaport' : 'Harita', { giris: 'uzay' });
+        const sonra = ilkSefer ? 'Pasaport' : 'Harita';
+        // İlk açılışta önce ebeveyn güvenlik notu (bir kez).
+        if (!guvenlikNotuGoruldu()) this.scene.start('Guvenlik', { sonra, sonraVeri: { giris: 'uzay' } });
+        else this.scene.start(sonra, { giris: 'uzay' });
       },
       { genislik: 480, yukseklik: 160, yaziBoyu: 80 },
     );
