@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { RENK, YAZI_TIPI } from '../ayarlar';
 import { buyukDugme, evDugmesi, yildizliArkaPlan } from '../arayuz';
 import { bip, konus, sustur, zaferMuzigi } from '../ses';
+import { Zipzip } from '../zipzip';
 
 const KONFETI_RENKLERI = [0xffc93c, 0xff8a3d, 0x3fbf5f, 0x2f80ed, 0xff6b6b, 0xffffff];
 
@@ -65,8 +66,7 @@ export class OdulScene extends Phaser.Scene {
       });
     });
 
-    const maskot = this.add.image(x, 720, 'maskot').setScale(0.6);
-    this.tweens.add({ targets: maskot, y: 640, duration: 380, yoyo: true, repeat: -1, ease: 'Quad.easeOut' });
+    new Zipzip(this, x, 690, 1.1).surekli('yildiz', 900);
 
     zaferMuzigi();
     this.time.delayedCall(500, () => konus('Süpersin! Üç yıldız kazandın!'));

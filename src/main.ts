@@ -5,7 +5,7 @@ import { HareketScene } from './scenes/HareketScene';
 import { OdulScene } from './scenes/OdulScene';
 
 function oyunuBaslat() {
-  new Phaser.Game({
+  const oyun = new Phaser.Game({
     type: Phaser.AUTO,
     parent: 'oyun',
     backgroundColor: RENK.uzay,
@@ -17,6 +17,8 @@ function oyunuBaslat() {
     },
     scene: [AcilisScene, HareketScene, OdulScene],
   });
+  // Geliştirme sırasında otomatik testlerin oyuna erişebilmesi için.
+  if (import.meta.env.DEV) (window as unknown as { oyun: Phaser.Game }).oyun = oyun;
 }
 
 // Yazı tipi inmeden başlarsak ilk ekranda yedek yazı tipi görünür; en fazla 2 sn bekle.
