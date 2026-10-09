@@ -5,7 +5,7 @@ import type { Topology } from 'topojson-specification';
 import karaVerisi from 'world-atlas/land-110m.json';
 import ulkeVerisi from 'world-atlas/countries-110m.json';
 import { RENK, YAZI_TIPI } from '../ayarlar';
-import { evDugmesi, yildizliArkaPlan } from '../arayuz';
+import { buyukDugme, evDugmesi, yildizliArkaPlan } from '../arayuz';
 import { DUNYA, Durak } from '../duraklar';
 import { bolumAcik, tamamlananlar } from '../ilerleme';
 import { M } from '../metinler';
@@ -145,6 +145,13 @@ export class DunyaScene extends Phaser.Scene {
     });
 
     const altYazi = this.add.text(x, 1060, '', { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '40px', color: '#ffffff' }).setOrigin(0.5);
+    if (siradaki === -1) {
+      altYazi.setVisible(false);
+      buyukDugme(this, x, 1060, '🏆 Sertifikanı al', RENK.yesil, () => {
+        sustur();
+        this.scene.start('Sertifika', { bolum: 'dunya' });
+      }, { genislik: 500, yukseklik: 110, yaziBoyu: 48 });
+    }
     const durumuSoyle = () => {
       altYazi.setText(siradaki === -1 ? 'Bütün harikaları gezdin! 🏆' : siradaki === 0 ? 'İlk harikaya dokun ve başla!' : `Sıradaki durak: ${DUNYA[siradaki].yer}`);
       konus(siradaki === -1 ? M.dunyaBitti : siradaki === 0 ? M.dunyaHosgeldin : M.siradaki(DUNYA[siradaki].yer));
