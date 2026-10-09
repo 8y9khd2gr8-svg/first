@@ -1,19 +1,23 @@
 import Phaser from 'phaser';
-import { MerhabaScene } from './scenes/MerhabaScene';
+import { GENISLIK, RENK, YUKSEKLIK } from './ayarlar';
+import { AcilisScene } from './scenes/AcilisScene';
+import { HareketScene } from './scenes/HareketScene';
+import { OdulScene } from './scenes/OdulScene';
 
-// Telefon dik tutulduğunda (portre) en iyi görünen oyun alanı.
-export const GENISLIK = 720;
-export const YUKSEKLIK = 1280;
+function oyunuBaslat() {
+  new Phaser.Game({
+    type: Phaser.AUTO,
+    parent: 'oyun',
+    backgroundColor: RENK.uzay,
+    scale: {
+      mode: Phaser.Scale.FIT,
+      autoCenter: Phaser.Scale.CENTER_BOTH,
+      width: GENISLIK,
+      height: YUKSEKLIK,
+    },
+    scene: [AcilisScene, HareketScene, OdulScene],
+  });
+}
 
-new Phaser.Game({
-  type: Phaser.AUTO,
-  parent: 'oyun',
-  backgroundColor: '#7EC8F0',
-  scale: {
-    mode: Phaser.Scale.FIT,
-    autoCenter: Phaser.Scale.CENTER_BOTH,
-    width: GENISLIK,
-    height: YUKSEKLIK,
-  },
-  scene: [MerhabaScene],
-});
+// Yazı tipi inmeden başlarsak ilk ekranda yedek yazı tipi görünür; en fazla 2 sn bekle.
+Promise.race([document.fonts.load("700 64px 'Baloo 2'"), new Promise((r) => setTimeout(r, 2000))]).finally(oyunuBaslat);
