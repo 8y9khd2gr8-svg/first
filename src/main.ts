@@ -1,4 +1,10 @@
 import Phaser from 'phaser';
+// Yazı tipi oyunun içinde: internetsiz çalışır ve açılışta Google'a bağlanılmaz.
+import '@fontsource/baloo-2/latin-ext-700.css';
+import '@fontsource/baloo-2/latin-ext-800.css';
+import '@fontsource/baloo-2/latin-700.css';
+import '@fontsource/baloo-2/latin-800.css';
+import { kurulumuDinle } from './kurulum';
 import { GENISLIK, RENK, YUKSEKLIK } from './ayarlar';
 import { AcilisScene } from './scenes/AcilisScene';
 import { DurakScene } from './scenes/DurakScene';
@@ -9,9 +15,12 @@ import { AvatarScene } from './scenes/AvatarScene';
 import { EbeveynMenuScene } from './scenes/EbeveynMenuScene';
 import { EbeveynOzetScene } from './scenes/EbeveynOzetScene';
 import { SertifikaScene } from './scenes/SertifikaScene';
+import { KurulumScene } from './scenes/KurulumScene';
 import { EbeveynScene } from './scenes/EbeveynScene';
 import { PasaportAyarScene } from './scenes/PasaportAyarScene';
 import { PasaportScene } from './scenes/PasaportScene';
+
+kurulumuDinle();
 
 function oyunuBaslat() {
   const oyun = new Phaser.Game({
@@ -26,7 +35,7 @@ function oyunuBaslat() {
     },
     // Ad yazma kutusu ve fotoğraf düğmesi gibi HTML öğeleri için.
     dom: { createContainer: true },
-    scene: [AcilisScene, HaritaScene, DurakScene, HareketScene, OdulScene, PasaportScene, PasaportAyarScene, EbeveynScene, AvatarScene, EbeveynMenuScene, EbeveynOzetScene, SertifikaScene],
+    scene: [AcilisScene, HaritaScene, DurakScene, HareketScene, OdulScene, PasaportScene, PasaportAyarScene, EbeveynScene, AvatarScene, EbeveynMenuScene, EbeveynOzetScene, SertifikaScene, KurulumScene],
   });
   // Geliştirme sırasında otomatik testlerin oyuna erişebilmesi için.
   if (import.meta.env.DEV) (window as unknown as { oyun: Phaser.Game }).oyun = oyun;
