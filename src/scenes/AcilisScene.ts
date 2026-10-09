@@ -13,6 +13,7 @@ export class AcilisScene extends Phaser.Scene {
 
   preload() {
     Zipzip.yukle(this);
+    this.load.image('ikon', 'ikon/ikon-192.png');
   }
 
   create() {

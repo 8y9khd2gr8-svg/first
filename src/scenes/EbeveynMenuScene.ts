@@ -15,8 +15,9 @@ export class EbeveynMenuScene extends Phaser.Scene {
     this.add.text(x, 220, 'Ebeveyn köşesi', { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '72px', color: '#FFC93C' }).setOrigin(0.5);
     buyukDugme(this, x, 460, '📊 Hareket özeti', RENK.turuncu, () => this.scene.start('EbeveynOzet'), { genislik: 560, yukseklik: 150, yaziBoyu: 54 });
     buyukDugme(this, x, 660, '✏️ Pasaportu düzenle', RENK.mavi, () => this.scene.start('PasaportAyar'), { genislik: 560, yukseklik: 150, yaziBoyu: 54 });
+    buyukDugme(this, x, 860, '📲 Telefona yükle', RENK.yesil, () => this.scene.start('Kurulum'), { genislik: 560, yukseklik: 150, yaziBoyu: 54 });
     this.add
-      .text(x, 900, 'Reklam yok. Hesap yok.\nBütün bilgiler sadece bu telefonda saklanır.', {
+      .text(x, 1080, 'Reklam yok. Hesap yok.\nBütün bilgiler sadece bu telefonda saklanır.', {
         fontFamily: YAZI_TIPI,
         fontSize: '32px',
         color: '#9fb6d9',

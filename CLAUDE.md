@@ -50,6 +50,10 @@ Teknoloji: Phaser 3 + TypeScript + Vite, GitHub Pages ile yayın. İleride Capac
   sayılar çocuğun "Yaptım!" dediği hareketler; oyun gerçekten yapıldığını algılayamaz. Kamera ile
   algılama (cihaz içinde, görüntü gönderilmeden) bu yüzden önemli bir sonraki adım.
 - Türkiye Turu bitince Gezgin Sertifikası (resim olarak kaydet/paylaş).
+- PWA: ana ekrana yüklenir, internetsiz çalışır (vite-plugin-pwa). Yazı tipi pakette
+  (@fontsource/baloo-2); oyun hiçbir dış sunucuya bağlanmaz, öyle kalmalı.
+- Avatar hayvanları çizim olarak kalır (gerçek fotoğraf değil); ileride çizer Zıpzıp
+  tarzında çizecek. İkonlar: public/ikon/ (Zıpzıp'tan üretildi).
 - Durak simgeleri şimdilik emoji; ileride çizerin çizdiği özel görseller gelecek.
 
 ## Kod düzeni
