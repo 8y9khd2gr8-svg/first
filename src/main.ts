@@ -5,6 +5,10 @@ import { DurakScene } from './scenes/DurakScene';
 import { HaritaScene } from './scenes/HaritaScene';
 import { HareketScene } from './scenes/HareketScene';
 import { OdulScene } from './scenes/OdulScene';
+import { AvatarScene } from './scenes/AvatarScene';
+import { EbeveynScene } from './scenes/EbeveynScene';
+import { PasaportAyarScene } from './scenes/PasaportAyarScene';
+import { PasaportScene } from './scenes/PasaportScene';
 
 function oyunuBaslat() {
   const oyun = new Phaser.Game({
@@ -17,7 +21,9 @@ function oyunuBaslat() {
       width: GENISLIK,
       height: YUKSEKLIK,
     },
-    scene: [AcilisScene, HaritaScene, DurakScene, HareketScene, OdulScene],
+    // Ad yazma kutusu ve fotoğraf düğmesi gibi HTML öğeleri için.
+    dom: { createContainer: true },
+    scene: [AcilisScene, HaritaScene, DurakScene, HareketScene, OdulScene, PasaportScene, PasaportAyarScene, EbeveynScene, AvatarScene],
   });
   // Geliştirme sırasında otomatik testlerin oyuna erişebilmesi için.
   if (import.meta.env.DEV) (window as unknown as { oyun: Phaser.Game }).oyun = oyun;
