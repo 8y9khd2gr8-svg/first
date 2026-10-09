@@ -38,7 +38,7 @@ export class AcilisScene extends Phaser.Scene {
         sesiAc();
         const ilkSefer = !pasaportOku().soruldu;
         if (ilkSefer) pasaportYaz({ soruldu: true });
-        const sonra = ilkSefer ? 'Pasaport' : 'Harita';
+        const sonra = ilkSefer ? 'Pasaport' : 'Macera';
         // İlk açılışta önce ebeveyn güvenlik notu (bir kez).
         if (!guvenlikNotuGoruldu()) this.scene.start('Guvenlik', { sonra, sonraVeri: { giris: 'uzay' } });
         else this.scene.start(sonra, { giris: 'uzay' });

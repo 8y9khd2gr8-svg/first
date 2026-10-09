@@ -83,7 +83,7 @@ export class HaritaScene extends Phaser.Scene {
     arayuz.push(
       evDugmesi(this, () => {
         sustur();
-        this.scene.start('Acilis');
+        this.scene.start('Macera', {});
       }),
     );
     const pasaportDugmesi = this.add.container(640, 80);

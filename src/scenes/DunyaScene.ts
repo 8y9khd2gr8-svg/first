@@ -79,7 +79,7 @@ export class DunyaScene extends Phaser.Scene {
     // Üst kısım: ana ekran, Türkiye'ye dönüş, pasaport, başlık.
     evDugmesi(this, () => {
       sustur();
-      this.scene.start('Acilis');
+      this.scene.start('Macera', {});
     });
     const geri = this.add
       .text(80, 160, '◀ Türkiye', { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '30px', color: '#cfe3ff', backgroundColor: '#ffffff1f', padding: { x: 16, y: 8 } })
