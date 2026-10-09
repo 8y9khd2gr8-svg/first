@@ -1,6 +1,8 @@
 import Phaser from 'phaser';
 import { GENISLIK, RENK, YUKSEKLIK } from './ayarlar';
 import { AcilisScene } from './scenes/AcilisScene';
+import { DurakScene } from './scenes/DurakScene';
+import { HaritaScene } from './scenes/HaritaScene';
 import { HareketScene } from './scenes/HareketScene';
 import { OdulScene } from './scenes/OdulScene';
 
@@ -15,7 +17,7 @@ function oyunuBaslat() {
       width: GENISLIK,
       height: YUKSEKLIK,
     },
-    scene: [AcilisScene, HareketScene, OdulScene],
+    scene: [AcilisScene, HaritaScene, DurakScene, HareketScene, OdulScene],
   });
   // Geliştirme sırasında otomatik testlerin oyuna erişebilmesi için.
   if (import.meta.env.DEV) (window as unknown as { oyun: Phaser.Game }).oyun = oyun;

@@ -33,6 +33,11 @@ const D = {
   kosA: { solKol: u(215, -70), sagKol: u(-60, 40), solBacak: u(190, -90), sagBacak: u(88) },
   kosB: { solKol: u(240, -40), sagKol: u(-35, 70), solBacak: u(92), sagBacak: u(-10, 90) },
   uzan: { solKol: u(265), sagKol: u(-85), solBacak: u(97), sagBacak: u(83) },
+  balonAcik: { solKol: u(240), sagKol: u(-60), solBacak: u(97), sagBacak: u(83) },
+  heykel: { solKol: u(160, -110), sagKol: u(20, 110), solBacak: u(100), sagBacak: u(80) },
+  horonA: { solKol: u(215, 40), sagKol: u(-35, -40), solBacak: u(125, -35), sagBacak: u(80) },
+  horonB: { solKol: u(215, 40), sagKol: u(-35, -40), solBacak: u(100), sagBacak: u(55, 35) },
+  tasAl: { solKol: u(115), sagKol: u(65), solBacak: u(160, -70), sagBacak: u(20, 70) },
 } satisfies Record<string, Durus>;
 
 // Bir tekrar içindeki adımlar: duruş, gövdenin yukarı/aşağı kayması (birim) ve tekrar süresine oranı.
@@ -67,6 +72,21 @@ const ADIMLAR: Record<Animasyon, Adim[]> = {
     { durus: D.uzan, y: -45, oran: 0.45 },
     { durus: D.normal, y: 0, oran: 0.4 },
   ],
+  balon: [
+    { durus: D.comel, y: 50, oran: 0.3 },
+    { durus: D.balonAcik, y: -55, oran: 0.45, yumusama: 'Sine.easeOut' },
+    { durus: D.normal, y: 0, oran: 0.2 },
+  ],
+  heykel: [{ durus: D.heykel, y: 0, oran: 0.3 }],
+  horon: [
+    { durus: D.horonA, y: -10, oran: 0.5, yumusama: 'Sine.easeOut' },
+    { durus: D.horonB, y: -10, oran: 0.5, yumusama: 'Sine.easeOut' },
+  ],
+  tasKaldir: [
+    { durus: D.tasAl, y: 50, oran: 0.3 },
+    { durus: D.kollarYukari, y: -20, oran: 0.35, yumusama: 'Sine.easeOut' },
+    { durus: D.normal, y: 0, oran: 0.2 },
+  ],
   kos: [
     { durus: D.kosA, y: -16, oran: 0.25, yumusama: 'Sine.easeOut' },
     { durus: D.kosA, y: 0, oran: 0.25, yumusama: 'Sine.easeIn' },
@@ -79,7 +99,7 @@ const ADIMLAR: Record<Animasyon, Adim[]> = {
 const SAG_DIZ: Adim[] = [{ ...ADIMLAR.dizler[0], durus: D.sagDiz }, ADIMLAR.dizler[1]];
 
 // Süreli hareketlerde bir tekrarın süresi (ms).
-const SUREKLI_TEMPO: Partial<Record<Animasyon, number>> = { kos: 520 };
+const SUREKLI_TEMPO: Partial<Record<Animasyon, number>> = { kos: 520, horon: 380, heykel: 2000 };
 
 type UzuvParcasi = { kok: Phaser.GameObjects.Container; dirsek: Phaser.GameObjects.Container; durum: Uzuv };
 

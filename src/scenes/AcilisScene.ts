@@ -33,7 +33,7 @@ export class AcilisScene extends Phaser.Scene {
       RENK.turuncu,
       () => {
         sesiAc();
-        this.scene.start('Hareket', { sira: 0 });
+        this.scene.start('Harita');
       },
       { genislik: 480, yukseklik: 160, yaziBoyu: 80 },
     );
