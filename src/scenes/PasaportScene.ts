@@ -152,6 +152,15 @@ export class PasaportScene extends Phaser.Scene {
       this.add.text(0, 0, String(kazanilan.size), { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '24px', color: '#14213D', backgroundColor: '#FFC93C', padding: { x: 8, y: 0 } }).setOrigin(-0.6, 1.4),
     );
     rozetDugmesi.setSize(88, 88).setInteractive({ useHandCursor: true });
+    const kostumDugmesi = this.add.container(190, 70);
+    kostumDugmesi.add(this.add.circle(0, 0, 44, 0xffffff, 0.15));
+    kostumDugmesi.add(this.add.text(0, 2, '👕', { fontSize: '44px' }).setOrigin(0.5));
+    kostumDugmesi.setSize(88, 88).setInteractive({ useHandCursor: true });
+    kostumDugmesi.on('pointerdown', () => {
+      bip(880, 0.08, 'square', 0.12);
+      sustur();
+      this.scene.start('Kostum', {});
+    });
     rozetDugmesi.on('pointerdown', () => {
       bip(880, 0.08, 'square', 0.12);
       sustur();

@@ -2,6 +2,7 @@ import { DUNYA, TURKIYE, UZAY } from './duraklar';
 import { H, ISINMA, SOGUMA } from './hareketler';
 import { AVATARLAR } from './pasaport';
 import { ROZETLER } from './rozetler';
+import { KOSTUMLER } from './kostumler';
 
 // Oyunda seslendirilen bütün cümleler. Doğal ses kayıtları bu listeden üretilir
 // (npm run seslendir); listede olmayan bir cümle telefonun kendi sesiyle okunur.
@@ -35,6 +36,10 @@ export const M = {
   uzayKilitli: 'Uzay yolculuğu, dünya turunu bitirince açılacak!',
   maceraHosgeldin: 'Büyük maceraya hoş geldin! Bir bölüm seç!',
   yakinda: 'Bu bölüm çok yakında geliyor!',
+  kostumDolabi: 'Burası kostüm dolabın! Hareket ettikçe yıldız kazanırsın, yıldızlarla yeni kostümler açılır.',
+  kostumSecildi: (ad: string) => `${ad} çok yakıştı!`,
+  kostumKilitli: (kalan: number) => `Bu kostüm için ${kalan} yıldız daha lazım. Hareket ettikçe yıldız kazanırsın!`,
+  yeniKostum: (ad: string) => `Yeni kostüm açıldı: ${ad}!`,
   yeniRozet: (ad: string) => `Yeni rozet kazandın: ${ad}!`,
   rozetAdi: (ad: string) => `${ad} rozeti!`,
   rozetNasil: (nasil: string) => `Bu rozeti kazanmak için: ${nasil}.`,
@@ -52,6 +57,8 @@ export function tumMetinler(): string[] {
     SOGUMA.sesli,
     ...AVATARLAR.map((a) => M.karakterSecildi(a.ad)),
     ...ROZETLER.flatMap((r) => [M.yeniRozet(r.ad), M.rozetAdi(r.ad), M.rozetNasil(r.nasil)]),
+    M.kostumDolabi,
+    ...KOSTUMLER.flatMap((k) => [M.kostumSecildi(k.ad), M.yeniKostum(k.ad)]),
   ]);
   [TURKIYE, DUNYA, UZAY].forEach((bolum) =>
     bolum.forEach((d, i) => {
