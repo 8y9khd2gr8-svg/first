@@ -18,6 +18,14 @@ Teknoloji: Phaser 3 + TypeScript + Vite, GitHub Pages ile yayın. İleride Capac
 - Önce web (PWA), oyun olgunlaşınca Capacitor ile Play Store ve App Store.
 - Kamera ile hareket algılama sonraya bırakıldı; şimdilik çocuk "Yaptım!" düğmesine basar.
 
+- Hareket komutları benzetme değil, vücut parçasını söyleyen tek ve net eylem olmalı
+  ("Tek ayağını kaldır", "Dizlerini sırayla kaldır"). "Leylek gibi", "kuş gibi kanat çırp",
+  "yıldız gibi açıl kapan" 6 yaşa anlaşılır gelmedi (Yağız testi).
+- Aşama 3: her harikanın kendine özgü, hikâyeli bir hareketi olacak (ör. Efes: sütun gibi
+  dimdik dur; Çin Seddi: duvarda dizleri kaldırarak yürü; Piramitler: kollarla piramit yap).
+- Harika listesini biz seçeriz; dini figür/ibadet odaklı yapılar (ör. Kurtarıcı İsa heykeli)
+  Türkiye'de yanlış anlaşılabileceği için listeye alınmaz.
+
 ## Kod düzeni
 - `src/zipzip.ts`: maskot; duruşlar (uzuv açıları) ve her hareketin adımları burada.
 - `src/hareketler.ts`: hareket listesi. `src/ses.ts`: sesler. `src/arayuz.ts`: düğmeler, arka plan.
