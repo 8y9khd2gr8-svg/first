@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { RENK, YAZI_TIPI } from '../ayarlar';
-import { evDugmesi, yildizliArkaPlan } from '../arayuz';
+import { buyukDugme, evDugmesi, yildizliArkaPlan } from '../arayuz';
 import { Durak, UZAY } from '../duraklar';
 import { tamamlananlar } from '../ilerleme';
 import { M } from '../metinler';
@@ -145,6 +145,13 @@ export class UzayScene extends Phaser.Scene {
       .setOrigin(0.5);
 
     const altYazi = this.add.text(x + 60, 1180, '', { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '38px', color: '#ffffff', align: 'center' }).setOrigin(0.5);
+    if (siradaki === -1) {
+      altYazi.setVisible(false);
+      buyukDugme(this, x + 60, 1180, '🏆 Sertifikanı al', RENK.yesil, () => {
+        sustur();
+        this.scene.start('Sertifika', { bolum: 'uzay' });
+      }, { genislik: 460, yukseklik: 110, yaziBoyu: 46 });
+    }
     const durumuSoyle = () => {
       altYazi.setText(siradaki === -1 ? 'Bütün gezegenleri gezdin! 🏆' : siradaki === 0 ? 'Merkür’e dokun ve başla!' : `Sıradaki durak: ${UZAY[siradaki].ad}`);
       konus(siradaki === -1 ? M.uzayBitti : siradaki === 0 ? M.uzayHosgeldin : M.siradaki(UZAY[siradaki].yer));

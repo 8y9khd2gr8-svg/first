@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import { RENK, YAZI_TIPI } from '../ayarlar';
 import { evDugmesi, yildizliArkaPlan } from '../arayuz';
-import { TURKIYE } from '../duraklar';
+import { BOLUMLER, BolumId } from '../duraklar';
 import { haftalikOzet } from '../istatistik';
 import { M } from '../metinler';
 import { fotoDokusuYukle, pasaportOku } from '../pasaport';
@@ -13,10 +13,22 @@ const ALTIN = 0xe0a100;
 const MUREKKEP = '#14213D';
 const ALAN = { x: 36, y: 100, g: 648, y2: 960 }; // sertifikanın kaydedilen kısmı
 
-// Türkiye Turu bitince: çocuğun adı ve karakteriyle Türkiye Gezgini Sertifikası.
+// Bir bölüm bitince: çocuğun adı ve karakteriyle bölüm sertifikası.
+const UNVAN: Record<BolumId, { unvan: string; metin: string; birim: string }> = {
+  turkiye: { unvan: 'Türkiye Gezgini', metin: 'Zıp Zıp Dünya Türkiye Turu’nu\nhareket ederek tamamladı!', birim: 'şehir' },
+  dunya: { unvan: 'Dünya Kâşifi', metin: 'Dünyanın harikalarını\nhareket ederek gezdi!', birim: 'harika' },
+  uzay: { unvan: 'Uzay Yolcusu', metin: 'Güneş Sistemi’ni\nhareket ederek dolaştı!', birim: 'durak' },
+};
+
 export class SertifikaScene extends Phaser.Scene {
+  private bolum: BolumId = 'turkiye';
+
   constructor() {
     super('Sertifika');
+  }
+
+  init(veri: { bolum?: BolumId }) {
+    this.bolum = veri?.bolum ?? 'turkiye';
   }
 
   create() {
@@ -25,7 +37,7 @@ export class SertifikaScene extends Phaser.Scene {
     const pasaport = pasaportOku();
     evDugmesi(this, () => {
       sustur();
-      this.scene.start('Harita', {});
+      this.scene.start(BOLUMLER[this.bolum].sahne, {});
     });
 
     const g = this.add.graphics();
@@ -34,7 +46,9 @@ export class SertifikaScene extends Phaser.Scene {
     g.lineStyle(3, ALTIN).strokeRoundedRect(ALAN.x + 32, ALAN.y + 32, ALAN.g - 64, ALAN.y2 - 64, 14);
 
     this.add.text(x, 185, 'S E R T İ F İ K A', { fontFamily: YAZI_TIPI, fontSize: '30px', color: '#B07D00' }).setOrigin(0.5);
-    this.add.text(x, 250, 'Türkiye Gezgini', { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '76px', color: '#FF8A3D' }).setOrigin(0.5);
+    const { unvan, metin, birim } = UNVAN[this.bolum];
+    const duraklar = BOLUMLER[this.bolum].duraklar;
+    this.add.text(x, 250, unvan, { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '76px', color: '#FF8A3D' }).setOrigin(0.5);
 
     // Görünüm: fotoğraf, yoksa seçilen karakter, o da yoksa Zıpzıp.
     g.fillStyle(0xdde7f5).fillCircle(x, 410, 95);
@@ -55,17 +69,18 @@ export class SertifikaScene extends Phaser.Scene {
       .setOrigin(0.5);
     ad.setScale(Math.min(1, 540 / ad.width));
     this.add
-      .text(x, 650, 'Zıp Zıp Dünya Türkiye Turu’nu\nhareket ederek tamamladı!', { fontFamily: YAZI_TIPI, fontSize: '34px', color: MUREKKEP, align: 'center' })
+      .text(x, 650, metin, { fontFamily: YAZI_TIPI, fontSize: '34px', color: MUREKKEP, align: 'center' })
       .setOrigin(0.5);
 
-    TURKIYE.forEach((d, i) => {
-      const dx = x + (i - 3) * 76;
-      g.lineStyle(4, RENK.turuncu).strokeCircle(dx, 770, 31);
+    const aralik = duraklar.length > 7 ? 68 : 76;
+    duraklar.forEach((d, i) => {
+      const dx = x + (i - (duraklar.length - 1) / 2) * aralik;
+      g.lineStyle(4, RENK.turuncu).strokeCircle(dx, 770, aralik === 68 ? 28 : 31);
       this.add.text(dx, 770, d.simge, { fontSize: '32px' }).setOrigin(0.5);
     });
     const ozet = haftalikOzet();
     this.add
-      .text(x, 840, `${TURKIYE.length} şehir  ·  ${ozet.toplamHareket} hareket  ·  ${Math.round(ozet.toplamSaniye / 60)} dakika`, {
+      .text(x, 840, `${duraklar.length} ${birim}  ·  ${ozet.toplamHareket} hareket  ·  ${Math.round(ozet.toplamSaniye / 60)} dakika`, {
         fontFamily: YAZI_TIPI,
         fontStyle: 'bold',
         fontSize: '30px',
@@ -80,7 +95,7 @@ export class SertifikaScene extends Phaser.Scene {
     this.add.text(560, 970, 'Zıpzıp', { fontFamily: YAZI_TIPI, fontStyle: 'bold italic', fontSize: '30px', color: MUREKKEP }).setOrigin(0.5);
 
     zaferMuzigi();
-    this.time.delayedCall(400, () => konus(M.sertifika));
+    this.time.delayedCall(400, () => konus(M.sertifikaBolum(unvan)));
 
     // Kaydet / paylaş: sertifikanın resmini çekip telefonun paylaşma menüsünü açar
     // (yoksa resmi indirir). Gerçek HTML düğmesi, çünkü bu işlemler doğrudan dokunuş ister.
@@ -98,10 +113,10 @@ export class SertifikaScene extends Phaser.Scene {
       tuval.getContext('2d')!.drawImage(r, 0, 0);
       const blob = await new Promise<Blob | null>((ok) => tuval.toBlob(ok, 'image/png'));
       if (!blob) return;
-      const dosya = new File([blob], 'zipzip-turkiye-gezgini.png', { type: 'image/png' });
+      const dosya = new File([blob], `zipzip-${this.bolum}-sertifika.png`, { type: 'image/png' });
       try {
         if (navigator.canShare?.({ files: [dosya] })) {
-          await navigator.share({ files: [dosya], title: 'Türkiye Gezgini Sertifikası' });
+          await navigator.share({ files: [dosya], title: `${UNVAN[this.bolum].unvan} Sertifikası` });
           return;
         }
       } catch {

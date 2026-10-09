@@ -140,7 +140,7 @@ export class HaritaScene extends Phaser.Scene {
       arayuz.push(
         buyukDugme(this, x, 900, '🏆 Sertifikanı al', RENK.yesil, () => {
           sustur();
-          this.scene.start('Sertifika');
+          this.scene.start('Sertifika', { bolum: 'turkiye' });
         }, { genislik: 520, yukseklik: 130, yaziBoyu: 54 }),
       );
       altYazi.setVisible(false);
