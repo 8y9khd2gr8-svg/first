@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { RENK, YAZI_TIPI } from './ayarlar';
+import { RENK, YAZI_TIPI, HAREKETI_AZALT } from './ayarlar';
 import { bip } from './ses';
 
 // Çocuk parmağına uygun, büyük ve yuvarlak köşeli düğme.
@@ -55,7 +55,7 @@ export function yildizliArkaPlan(sahne: Phaser.Scene) {
       RENK.beyaz,
       Phaser.Math.FloatBetween(0.3, 0.9),
     );
-    sahne.tweens.add({
+    if (!HAREKETI_AZALT) sahne.tweens.add({
       targets: yildiz,
       alpha: 0.15,
       duration: Phaser.Math.Between(900, 2400),

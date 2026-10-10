@@ -12,3 +12,7 @@ export const RENK = {
   mavi: 0x2f80ed,
   beyaz: 0xffffff,
 };
+
+// Telefonda "hareketi azalt" (erişilebilirlik) açıksa süs animasyonları çalışmaz;
+// anlamlı hareketler (Zıpzıp'ın gösterimi, sıradaki durağın parlaması, kutlamalar) kalır.
+export const HAREKETI_AZALT = typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
