@@ -82,7 +82,7 @@ test('en uzun sayılı hareket sonuna kadar gider ("Yaptım!" çıkar)', async (
   const kayit = await oyunuAc(page);
   // Çin Seddi: 12 tekrar (eskiden 11'de takılıyordu).
   await sahneAc(page, 'Hareket', { durakId: 'cinseddi', adim: 1 });
-  await page.waitForFunction(() => (window as any).oyun.scene.getScene('Hareket').children.list.some((c: any) => c.list?.some?.((t: any) => t.text === 'Yaptım!')), null, { timeout: 30_000 });
+  await page.waitForFunction(() => (window as any).oyun.scene.getScene('Hareket').children.list.some((c: any) => c.list?.some?.((t: any) => t.text === 'Yaptım!')), null, { timeout: 45_000 }); // bulut bilgisayarı yavaş: 12 tekrar ~30 sn sürebilir
   expect(kayit.hatalar).toEqual([]);
 });
 
@@ -210,6 +210,85 @@ test('yazılar ekrana sığar, çocuk düğmeleri yeterince büyük', async ({ p
         }
         return bulunan;
       }, dugmeOlc)),
+    );
+  }
+  expect(sorunlar).toEqual([]);
+  expect(kayit.hatalar).toEqual([]);
+});
+
+// Erişilebilirlik: yazı ile arkasındaki zemin arasındaki renk zıtlığı (WCAG). Küçük yazı en az 4.5:1,
+// büyük yazı (telefonda ~24 piksel ve üstü) en az 3:1. Zemin, yazılar gizlenip ekran çizilerek ölçülür.
+test('yazılar okunur (renk zıtlığı)', async ({ page }) => {
+  test.setTimeout(120_000);
+  const kayit = await oyunuAc(page, { ...BETA, 'zipzip-ilerleme-v1': JSON.stringify(['istanbul', 'truva']), 'zipzip-pasaport-v1': JSON.stringify({ ad: '', avatar: '🐼', soruldu: true }) });
+  const sahneler: [string, object][] = [
+    ['Acilis', {}], ['Macera', {}], ['Harita', {}], ['Dunya', {}], ['Uzay', {}], ['Spor', {}], ['Durak', { durakId: 'efes' }], ['Hareket', { durakId: 'istanbul', adim: 1 }],
+    ['Pasaport', {}], ['Rozet', { sayfa: 1 }], ['Kostum', {}], ['Avatar', {}], ['Guvenlik', {}], ['Ebeveyn', { hedef: 'EbeveynMenu', geri: 'Pasaport' }],
+    ['EbeveynMenu', {}], ['EbeveynOzet', {}], ['PasaportAyar', {}], ['Sertifika', { bolum: 'turkiye' }],
+  ];
+  const sorunlar: string[] = [];
+  for (const [ad, veri] of sahneler) {
+    await sahneAc(page, ad, veri);
+    await page.waitForTimeout(1500);
+    sorunlar.push(
+      ...(await page.evaluate(async () => {
+        const oyun = (window as any).oyun;
+        const parlaklik = ([r, g, b]: number[]) => {
+          const d = (c: number) => ((c /= 255) <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4);
+          return 0.2126 * d(r) + 0.7152 * d(g) + 0.0722 * d(b);
+        };
+        const zitlik = (a: number[], b: number[]) => {
+          const [x, y] = [parlaklik(a), parlaklik(b)].sort((m, n) => m - n);
+          return (y + 0.05) / (x + 0.05);
+        };
+        const renk = (s: string): number[] | null => {
+          const m = /^#([0-9a-f]{6})([0-9a-f]{2})?$/i.exec(s ?? '');
+          if (!m) return null;
+          const n = parseInt(m[1], 16);
+          return [n >> 16, (n >> 8) & 255, n & 255, m[2] ? parseInt(m[2], 16) / 255 : 1];
+        };
+        const karis = (ust: number[], alt: number[], a: number) => [0, 1, 2].map((i) => ust[i] * a + alt[i] * (1 - a));
+        // Görünen yazıları topla (kabın saydamlığıyla birlikte), sonra gizle.
+        const yazilar: { o: any; alfa: number }[] = [];
+        for (const s of oyun.scene.getScenes(true)) {
+          const gez = (o: any, alfa: number) => {
+            if (o.visible === false || o.alpha === 0) return;
+            if (o.type === 'Container') return o.list.forEach((c: any) => gez(c, alfa * o.alpha));
+            if (o.type === 'Text' && /\p{L}/u.test(o.text) && !o.style.strokeThickness) yazilar.push({ o, alfa: alfa * o.alpha });
+          };
+          s.children.list.forEach((o: any) => gez(o, 1));
+        }
+        yazilar.forEach(({ o }) => o.setVisible(false));
+        const resim: HTMLImageElement = await new Promise((r) => oyun.renderer.snapshot(r));
+        yazilar.forEach(({ o }) => o.setVisible(true));
+        const tuval = document.createElement('canvas');
+        [tuval.width, tuval.height] = [resim.width, resim.height];
+        const ctx = tuval.getContext('2d')!;
+        ctx.drawImage(resim, 0, 0);
+        const olcek = resim.width / 720;
+        const bulunan: string[] = [];
+        for (const { o, alfa } of yazilar) {
+          const r = o.getBounds();
+          const x0 = Math.max(0, r.left * olcek), y0 = Math.max(0, r.top * olcek);
+          const w = Math.min(resim.width - x0, r.width * olcek), h = Math.min(resim.height - y0, r.height * olcek);
+          if (w < 2 || h < 2) continue;
+          const v = ctx.getImageData(x0, y0, w, h).data;
+          // Zemin: yazı alanındaki piksellerin ortanca parlaklıktaki rengi (yıldız gibi tek tük noktalar sonucu bozmaz).
+          const pikseller: number[][] = [];
+          for (let i = 0; i < v.length; i += 4 * 7) pikseller.push([v[i], v[i + 1], v[i + 2]]);
+          pikseller.sort((a, b) => parlaklik(a) - parlaklik(b));
+          let zemin = pikseller[pikseller.length >> 1];
+          const arka = renk(o.style.backgroundColor);
+          if (arka) zemin = karis(arka, zemin, arka[3]);
+          const yazi = renk(o.style.color);
+          if (!yazi) continue;
+          const z = zitlik(karis(yazi, zemin, alfa * yazi[3]), zemin);
+          const boy = parseInt(o.style.fontSize) * Math.abs(o.scaleY) * (o.parentContainer?.scaleY ?? 1);
+          const buyuk = boy >= 48 || (boy >= 37 && /bold/.test(o.style.fontStyle));
+          if (z < (buyuk ? 3 : 4.5)) bulunan.push(`"${o.text.replace(/\n/g, ' ').slice(0, 30)}" ${o.style.color} zıtlık ${z.toFixed(2)}`);
+        }
+        return bulunan.map((b) => `[${oyun.scene.getScenes(true).map((s: any) => s.scene.key).join('+')}] ${b}`);
+      })),
     );
   }
   expect(sorunlar).toEqual([]);

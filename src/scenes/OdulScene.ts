@@ -153,13 +153,13 @@ export class OdulScene extends Phaser.Scene {
     const rozet = rozetCiz(this, x, 600, 120, simge, true).setScale(0);
     const isim = this.add.text(x, 800, ad, { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '56px', color: '#ffffff' }).setOrigin(0.5);
     const ek = this.add.text(x, 870, digerSayisi > 0 ? `+${digerSayisi} rozet daha! Pasaportuna bak.` : altYazi, { fontFamily: YAZI_TIPI, fontSize: '32px', color: '#cfe3ff' }).setOrigin(0.5);
-    const tamam = this.add.text(x, 1000, 'Harika! ✓', { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '52px', color: '#ffffff', backgroundColor: '#3FBF5F', padding: { x: 40, y: 14 } }).setOrigin(0.5).setInteractive({ useHandCursor: true });
+    const tamam = this.add.text(x, 1000, 'Harika! ✓', { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '52px', color: '#ffffff', backgroundColor: '#2FA84F', padding: { x: 40, y: 14 } }).setOrigin(0.5).setInteractive({ useHandCursor: true });
     k.add([perde, baslik, rozet, isim, ek, tamam]);
     // Kostümde "Giy!" düğmesi: dolabı aramadan hemen giyilir.
     if (giy) {
       tamam.setText('Sonra');
       tamam.setPosition(x - 150, 1000).setBackgroundColor('#2F80ED');
-      const giyDugme = this.add.text(x + 150, 1000, 'Giy! 👕', { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '52px', color: '#ffffff', backgroundColor: '#3FBF5F', padding: { x: 40, y: 14 } }).setOrigin(0.5).setInteractive({ useHandCursor: true });
+      const giyDugme = this.add.text(x + 150, 1000, 'Giy! 👕', { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '52px', color: '#ffffff', backgroundColor: '#2FA84F', padding: { x: 40, y: 14 } }).setOrigin(0.5).setInteractive({ useHandCursor: true });
       k.add(giyDugme);
       giyDugme.on('pointerdown', () => {
         bip(880, 0.08, 'square', 0.12);

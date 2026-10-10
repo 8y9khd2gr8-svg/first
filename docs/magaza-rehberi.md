@@ -101,6 +101,9 @@ Mağaza hesabı açılmadan önce oyunu **gerçek bir Android uygulaması olarak
 - [ ] Web sitesinden oyunu kaldırmak; sadece gizlilik.html ve kosullar.html kalsın
 - [ ] Gizlilik ve koşullar sayfalarına iletişim adresi (avukat kontrolünden sonra)
 - [ ] Mağaza ekran görüntüleri ve tanıtım metinleri (Türkçe + İngilizce)
+- [ ] "Bilgiler sadece bu telefonda" sözünü mağazada da kanıtlamak: Android paketinden internet iznini
+      (`android.permission.INTERNET`) kaldırıp APK'yla denemek. Oyun hâlâ açılıyorsa Play Store sayfasında
+      "internet erişimi yok" görünür; açılmıyorsa izin kalır (ebeveyn köşesindeki "Bu telefonda neler var?" ekranı yeter)
 - [ ] Beta testçilerine docs/beta-rehberi.md (sonundaki WhatsApp mesajı); Yağız testi için docs/yagiz-testi.md
 - [ ] Sürüm numarası ve imzalama anahtarı (Android imzalama anahtarı **sizde güvenli saklanmalı**; kaybolursa güncelleme yapılamaz)
 
