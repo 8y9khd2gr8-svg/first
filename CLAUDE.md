@@ -77,7 +77,8 @@ Teknoloji: Phaser 3 + TypeScript + Vite, GitHub Pages ile yayın. İleride Capac
 - Beta hazırlığı: ilk açılışta bir kez ebeveyn güvenlik notu; durak girişinde kısa hatırlatma;
   public/gizlilik.html ve kosullar.html (taslak, avukata gösterilecek; iletişim adresi eklenecek);
   ebeveyn köşesinde "Tüm verileri sil" (zipzip- ile başlayan bütün anahtarlar). Yeni bir cihaz
-  kaydı eklenirse anahtarı zipzip- ile başlamalı ve gizlilik.html'deki tabloya eklenmeli.
+  kaydı eklenirse anahtarı zipzip- ile başlamalı ve gizlilik.html'deki tabloya ve "Teknik ayrıntı"
+  satırına eklenmeli (`npm test` denetler).
 - İletişim/geri bildirim: adres alan adı alınınca (ör. merhaba@zipzipdunya.com) `src/iletisim.ts`'e yazılır;
   boşken ebeveyn köşesinde "beta grubuna yazın" notu görünür, doluysa "✉️ Geri bildirim yaz" telefonun e-posta
   uygulamasını açar (sadece sürüm numarası eklenir). Adres gelince gizlilik.html ve kosullar.html de güncellenir.

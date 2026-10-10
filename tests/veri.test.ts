@@ -108,6 +108,13 @@ test('cihaz kayıt anahtarları "zipzip-" ile başlar ("Tüm verileri sil" hepsi
   }
 });
 
+test('cihazdaki her kayıt gizlilik.html sayfasında yazılı', () => {
+  const gizlilik = fs.readFileSync('public/gizlilik.html', 'utf8');
+  const anahtarlar = new Set(dosyalar('src').flatMap((f) => [...fs.readFileSync(f, 'utf8').matchAll(/'(zipzip-[a-z0-9-]+)'/g)].map((m) => m[1])));
+  assert.ok(anahtarlar.size > 0);
+  for (const a of anahtarlar) assert.ok(gizlilik.includes(a), `gizlilik.html'de yok: ${a}`);
+});
+
 test('oyun kodunda dış sunucu adresi yok', () => {
   for (const f of dosyalar('src')) {
     const kod = fs.readFileSync(f, 'utf8');
