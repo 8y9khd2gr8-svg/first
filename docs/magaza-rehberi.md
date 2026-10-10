@@ -101,6 +101,7 @@ Mağaza hesabı açılmadan önce oyunu **gerçek bir Android uygulaması olarak
 - [ ] Web sitesinden oyunu kaldırmak; sadece gizlilik.html ve kosullar.html kalsın
 - [ ] Gizlilik ve koşullar sayfalarına iletişim adresi (avukat kontrolünden sonra)
 - [ ] Mağaza ekran görüntüleri ve tanıtım metinleri (Türkçe + İngilizce)
+- [ ] Beta testçilerine docs/beta-rehberi.md (sonundaki WhatsApp mesajı); Yağız testi için docs/yagiz-testi.md
 - [ ] Sürüm numarası ve imzalama anahtarı (Android imzalama anahtarı **sizde güvenli saklanmalı**; kaybolursa güncelleme yapılamaz)
 
 ## 7. Avukata sorulacaklar (beta öncesi görüşme)

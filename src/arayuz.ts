@@ -72,6 +72,11 @@ export function yildizliArkaPlan(sahne: Phaser.Scene) {
 export function genisDokunma(yazi: Phaser.GameObjects.Text, enAz = 88) {
   const ex = Math.max(0, (enAz - yazi.width) / 2);
   const ey = Math.max(0, (enAz - yazi.height) / 2);
+  // Yazı sonradan değişirse (setText) alan yeniden hesaplanır: zaten dokunulabilirse sadece alanı güncellenir.
+  if (yazi.input) {
+    (yazi.input.hitArea as Phaser.Geom.Rectangle).setTo(-ex, -ey, yazi.width + 2 * ex, yazi.height + 2 * ey);
+    return yazi;
+  }
   return yazi.setInteractive({
     hitArea: new Phaser.Geom.Rectangle(-ex, -ey, yazi.width + 2 * ex, yazi.height + 2 * ey),
     hitAreaCallback: Phaser.Geom.Rectangle.Contains,

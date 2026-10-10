@@ -75,7 +75,7 @@ export class PasaportAyarScene extends Phaser.Scene {
 
     if (this.foto || pasaport.ad) {
       const sil = this.add.text(x, 1190, 'Fotoğrafı ve adı sil', { fontFamily: YAZI_TIPI, fontSize: '30px', color: '#ff9b9b', backgroundColor: '#ffffff1f', padding: { x: 20, y: 10 } }).setOrigin(0.5);
-      genisDokunma(sil, 72).on('pointerdown', () => {
+      genisDokunma(sil).on('pointerdown', () => {
         pasaportYaz({ ad: '', foto: undefined, soruldu: true });
         this.scene.restart();
       });
