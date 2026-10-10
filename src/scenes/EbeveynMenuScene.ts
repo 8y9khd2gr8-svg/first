@@ -40,12 +40,14 @@ export class EbeveynMenuScene extends Phaser.Scene {
 
     // Kamerayla sayma (deneme): açıkken kamera zıplama, çömelme, kol, diz, ayak aç-kapa ve yana adım hareketlerini sayar.
     // Görüntü telefonun içinde işlenir; kaydedilmez, gönderilmez.
+    // Yanında "Dene": kameranın neyi gördüğünü ve nasıl saydığını canlı gösteren deneme ekranı.
     if (kameraDesteklenir()) {
       const acik = kameraAcikMi();
-      baglanti(720, acik ? '📷 Kamerayla sayma: AÇIK (deneme)' : '📷 Kamerayla sayma: kapalı (deneme)').on('pointerdown', () => {
+      baglanti(720, acik ? '📷 Kamerayla sayma: AÇIK' : '📷 Kamerayla sayma: kapalı').setX(x - 95).on('pointerdown', () => {
         kameraAyarla(!acik);
         this.scene.restart();
       });
+      baglanti(720, '🔍 Dene').setX(x + 235).on('pointerdown', () => this.scene.start('EbeveynKamera', {}));
     }
 
     // Gizlilik ve koşullar ayrı web sayfaları; gerçek bağlantı (yeni sekmede açılır).
