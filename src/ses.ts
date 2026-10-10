@@ -165,3 +165,42 @@ export function sustur() {
   if (uygulamada) void TextToSpeech.stop().catch(() => undefined);
   else if ('speechSynthesis' in window) speechSynthesis.cancel();
 }
+
+// Ebeveyn köşesindeki "Sesi dene" için: oyun bu telefonda hangi sesle konuşuyor?
+export type SesDurumu = { kayitli: number; turkce: boolean; sesAdi?: string; internetsiz?: boolean };
+
+function tarayiciSesleri(): Promise<SpeechSynthesisVoice[]> {
+  const sesler = speechSynthesis.getVoices();
+  if (sesler.length) return Promise.resolve(sesler);
+  // Bazı tarayıcılar ses listesini geç verir; en fazla 1,5 sn beklenir.
+  return new Promise((coz) => {
+    const bitir = () => coz(speechSynthesis.getVoices());
+    speechSynthesis.addEventListener('voiceschanged', bitir, { once: true });
+    setTimeout(bitir, 1500);
+  });
+}
+
+export async function sesDurumu(): Promise<SesDurumu> {
+  const kayitli = SES_DOSYALARI.size;
+  try {
+    if (uygulamada) {
+      const { voices } = await TextToSpeech.getSupportedVoices();
+      const ses = voices[enIyiSes(voices)];
+      if (ses) return { kayitli, turkce: true, sesAdi: ses.name, internetsiz: ses.localService };
+      const { supported } = await TextToSpeech.isLanguageSupported({ lang: 'tr-TR' });
+      return { kayitli, turkce: supported };
+    }
+    if (!('speechSynthesis' in window)) return { kayitli, turkce: false };
+    const sesler = await tarayiciSesleri();
+    const ses = sesler[enIyiSes(sesler)];
+    return ses ? { kayitli, turkce: true, sesAdi: ses.name, internetsiz: ses.localService } : { kayitli, turkce: false };
+  } catch {
+    return { kayitli, turkce: false };
+  }
+}
+
+// Android uygulamasında telefonun "ses verilerini yükle" ekranını açar (iPhone'da ve tarayıcıda yok).
+export const sesYuklemeAcilir = () => uygulamada && Capacitor.getPlatform() === 'android';
+export function sesYuklemeEkraniniAc() {
+  if (sesYuklemeAcilir()) void TextToSpeech.openInstall().catch(() => undefined);
+}
