@@ -49,6 +49,30 @@ Hesap açmak, para ödemek ve uygulamayı mağazaya göndermek sizde. Teknik haz
    - **Veri güvenliği formu:** "Hiçbir veri toplanmıyor ve paylaşılmıyor". Kamera görüntüsü telefonda işlenir, gönderilmez.
    - **Gizlilik politikası adresi:** `https://8y9khd2gr8-svg.github.io/first/gizlilik.html`
 
+## 3b. Play kapalı test paketi (yükleme anahtarı + AAB)
+
+Play'e **AAB** denen imzalı paket yüklenir (APK sadece elden kurulum içindir). Paketi imzalayan
+**yükleme anahtarı** üretildi ve size `PLAY-ANAHTARI-GIZLI.txt` + `zipzip-yukleme.jks` olarak gönderildi.
+Uygulamanın asıl imzasını Google saklar (Play App Signing). Yükleme anahtarı kaybolursa Play Console'dan
+yenisi istenebilir. Yine de **güvenli saklayın, kimseyle paylaşmayın**.
+
+**Bir kez yapılacaklar:**
+1. GitHub'da proje → **Settings** → **Secrets and variables** → **Actions** → **New repository secret**.
+2. `PLAY-ANAHTARI-GIZLI.txt` içindeki üç değeri (ad + değer) tek tek ekleyin: `ANDROID_KEY_ALIAS`,
+   `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEYSTORE_BASE64`. Değerler eklendikten sonra GitHub da göstermez, kimse göremez.
+3. İki dosyayı da güvenli bir yerde saklayın (şifre yöneticisi ya da sadece sizin erişebildiğiniz bulut klasörü).
+   Sonra telefonunuzdaki indirilmiş kopyaları silebilirsiniz.
+
+**Her yeni test sürümünde:**
+1. GitHub → **Actions** → **Play kapalı test paketi** → **Run workflow**.
+2. 5-10 dakika sonra işin içine girin, en altta **zip-zip-dunya-play** dosyasını indirin, zip'i açın: `app-release.aab`.
+3. Play Console → uygulama → **Test → Kapalı test** → yeni sürüm oluşturun → `app-release.aab` dosyasını yükleyin.
+   İlk yüklemede Play, **Play App Signing**'i açmayı sorar: **kabul edin** (Google'ın önerdiği varsayılan).
+4. Test kullanıcıları: e-posta listesi (beta grubundaki ailelerin Google hesapları). Play size bir **davet bağlantısı** verir.
+   Bu bağlantı `docs/beta-rehberi.md`'nin sonundaki mesajdaki [BAĞLANTI] yerine yazılır.
+
+Sürüm kodu her çalıştırmada kendiliğinden artar. Play aynı kodu ikinci kez kabul etmez, bu yüzden elle bir şey yapmanız gerekmez.
+
 ## 4. Apple geliştirici hesabı
 
 1. [developer.apple.com/programs](https://developer.apple.com/programs) adresinden **Bireysel (Individual)** üyelik başlatın. Apple ID'nizde iki aşamalı doğrulama açık olmalı.
