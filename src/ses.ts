@@ -69,6 +69,7 @@ function kaydiYukle(anahtar: string): Promise<AudioBuffer | null> {
 
 export function konus(metin: string) {
   sustur();
+  if (!metin) return; // söylenecek cümle yoksa sessiz geç (oyun asla takılmasın)
   const anahtar = sesAnahtari(metin);
   if (SES_DOSYALARI.has(anahtar) && sesBaglami()) {
     const no = ++konusmaNo;
