@@ -46,11 +46,40 @@ const D = {
   parmakB: { solKol: u(190), sagKol: u(-10), solBacak: u(92), sagBacak: u(30, 60) },
   tirmanA: { solKol: u(258), sagKol: u(-25, 70), solBacak: u(92), sagBacak: u(-30, 110) },
   tirmanB: { solKol: u(205, -70), sagKol: u(-78), solBacak: u(210, -110), sagBacak: u(88) },
+  // Spor Kampı
+  sutSag: { solKol: u(200, -30), sagKol: u(-30), solBacak: u(97), sagBacak: u(15, 20) },
+  sutSol: { solKol: u(210), sagKol: u(-20, 30), solBacak: u(165, -20), sagBacak: u(83) },
+  kulacA: { solKol: u(265), sagKol: u(80), solBacak: u(100), sagBacak: u(80) },
+  kulacB: { solKol: u(100), sagKol: u(-85), solBacak: u(100), sagBacak: u(80) },
+  tekSol: { solKol: u(185), sagKol: u(-5), solBacak: u(205, -110), sagBacak: u(90) },
+  tekSag: { solKol: u(185), sagKol: u(-5), solBacak: u(90), sagBacak: u(-25, 110) },
+  raketA: { solKol: u(200, -20), sagKol: u(-60, -20), solBacak: u(110), sagBacak: u(70) },
+  raketB: { solKol: u(200, -20), sagKol: u(40, 30), solBacak: u(110), sagBacak: u(70) },
+  engelHava: { solKol: u(240, -40), sagKol: u(-60, 40), solBacak: u(160, -80), sagBacak: u(20, 80) },
+  // Dinozorlar Diyarı
+  trexSol: { solKol: u(120, -100), sagKol: u(60, 100), solBacak: u(130, -40), sagBacak: u(85) },
+  trexSag: { solKol: u(120, -100), sagKol: u(60, 100), solBacak: u(95), sagBacak: u(50, 40) },
+  kanatYukari: { solKol: u(215), sagKol: u(-35), solBacak: u(100), sagBacak: u(80) },
+  kanatAsagi: { solKol: u(150), sagKol: u(30), solBacak: u(100), sagBacak: u(80) },
+  tepinSol: { solKol: u(130, -40), sagKol: u(50, 40), solBacak: u(140, -60), sagBacak: u(85) },
+  tepinSag: { solKol: u(130, -40), sagKol: u(50, 40), solBacak: u(95), sagBacak: u(40, 60) },
+  tepinYer: { solKol: u(130, -40), sagKol: u(50, 40), solBacak: u(100), sagBacak: u(80) },
+  kucul: { solKol: u(110, -60), sagKol: u(70, 60), solBacak: u(160, -70), sagBacak: u(20, 70) },
+  kaziA: { solKol: u(120), sagKol: u(30, 40), solBacak: u(160, -70), sagBacak: u(20, 70) },
+  kaziB: { solKol: u(150, -40), sagKol: u(60), solBacak: u(160, -70), sagBacak: u(20, 70) },
+  // Evde Macera
+  basUstuSol: { solKol: u(240, 45), sagKol: u(-60, -45), solBacak: u(215, -115), sagBacak: u(88) },
+  basUstuSag: { solKol: u(240, 45), sagKol: u(-60, -45), solBacak: u(92), sagBacak: u(-35, 115) },
+  basUstu: { solKol: u(240, 45), sagKol: u(-60, -45), solBacak: u(100), sagBacak: u(80) },
+  eldenSol: { solKol: u(170, -50), sagKol: u(40, 30), solBacak: u(100), sagBacak: u(80) },
+  eldenSag: { solKol: u(140, -30), sagKol: u(10, 50), solBacak: u(100), sagBacak: u(80) },
+  saril: { solKol: u(130, -100), sagKol: u(50, 100), solBacak: u(100), sagBacak: u(80) },
 } satisfies Record<string, Durus>;
 
 // Bir tekrar içindeki adımlar: duruş, gövdenin yukarı/aşağı kayması (birim) ve tekrar süresine oranı.
 // aci: Zıpzıp'ın bütün olarak yana eğilmesi (derece); yon: 1 öne, -1 arkasını dönmüş.
-type Adim = { durus: Durus; y: number; oran: number; yumusama?: string; aci?: number; yon?: number };
+// x: yana kayma (birim), ör. yastığın üstünden yana zıplarken.
+type Adim = { durus: Durus; y: number; oran: number; yumusama?: string; aci?: number; yon?: number; x?: number };
 
 const ADIMLAR: Record<Animasyon, Adim[]> = {
   zipla: [
@@ -132,6 +161,81 @@ const ADIMLAR: Record<Animasyon, Adim[]> = {
     { durus: D.tirmanA, y: -15, oran: 0.45 },
     { durus: D.normal, y: 0, oran: 0.35 },
   ],
+  // Spor Kampı
+  sut: [
+    { durus: D.sutSag, y: -5, oran: 0.4, yumusama: 'Quad.easeOut' },
+    { durus: D.normal, y: 0, oran: 0.4 },
+  ],
+  basket: [
+    { durus: D.comel, y: 50, oran: 0.3 },
+    { durus: D.uzan, y: -110, oran: 0.3, yumusama: 'Quad.easeOut' },
+    { durus: D.hazirlan, y: 25, oran: 0.25, yumusama: 'Quad.easeIn' },
+    { durus: D.normal, y: 0, oran: 0.15 },
+  ],
+  kulac: [
+    { durus: D.kulacA, y: 0, oran: 0.5 },
+    { durus: D.kulacB, y: 0, oran: 0.5 },
+  ],
+  tekAyak: [{ durus: D.tekSol, y: -10, oran: 0.3 }],
+  raket: [
+    { durus: D.raketA, y: 0, oran: 0.45, aci: -8 },
+    { durus: D.raketB, y: 0, oran: 0.35, aci: 10, yumusama: 'Quad.easeOut' },
+  ],
+  voleybol: [
+    { durus: D.piramit, y: 10, oran: 0.4 },
+    { durus: D.uzan, y: -40, oran: 0.35, yumusama: 'Quad.easeOut' },
+  ],
+  engel: [
+    { durus: D.hazirlan, y: 25, oran: 0.15 },
+    { durus: D.engelHava, y: -120, oran: 0.3, yumusama: 'Quad.easeOut' },
+    { durus: D.hazirlan, y: 25, oran: 0.3, yumusama: 'Quad.easeIn' },
+    { durus: D.normal, y: 0, oran: 0.15 },
+  ],
+  // Dinozorlar Diyarı
+  trex: [
+    { durus: D.trexSol, y: -10, oran: 0.45, aci: -5 },
+    { durus: D.trexSol, y: 0, oran: 0.35, aci: 0 },
+  ],
+  kanat: [
+    { durus: D.kanatYukari, y: -10, oran: 0.5 },
+    { durus: D.kanatAsagi, y: 0, oran: 0.5 },
+  ],
+  tepin: [
+    { durus: D.tepinSol, y: -15, oran: 0.45, yumusama: 'Sine.easeOut' },
+    { durus: D.tepinYer, y: 5, oran: 0.35, yumusama: 'Quad.easeIn' },
+  ],
+  yumurta: [
+    { durus: D.kucul, y: 55, oran: 0.35 },
+    { durus: D.balonAcik, y: -30, oran: 0.45, yumusama: 'Sine.easeOut' },
+    { durus: D.normal, y: 0, oran: 0.15 },
+  ],
+  kazi: [
+    { durus: D.kaziA, y: 50, oran: 0.5 },
+    { durus: D.kaziB, y: 50, oran: 0.5 },
+  ],
+  // Evde Macera
+  basUstu: [
+    { durus: D.basUstuSol, y: -10, oran: 0.4, yumusama: 'Sine.easeOut' },
+    { durus: D.basUstu, y: 0, oran: 0.4, yumusama: 'Sine.easeIn' },
+  ],
+  elden: [
+    { durus: D.eldenSol, y: 0, oran: 0.5 },
+    { durus: D.eldenSag, y: 0, oran: 0.5 },
+  ],
+  yanaZipla: [
+    { durus: D.hazirlan, y: 25, oran: 0.15, x: -50 },
+    { durus: D.havada, y: -90, oran: 0.3, x: 0, yumusama: 'Quad.easeOut' },
+    { durus: D.hazirlan, y: 25, oran: 0.3, x: 50, yumusama: 'Quad.easeIn' },
+    { durus: D.normal, y: 0, oran: 0.15, x: 50 },
+  ],
+  sallan: [
+    { durus: D.saril, y: 0, oran: 0.5, aci: -10 },
+    { durus: D.saril, y: 0, oran: 0.5, aci: 10 },
+  ],
+  topla: [
+    { durus: D.tasAl, y: 50, oran: 0.4 },
+    { durus: D.kollarAsagi, y: 0, oran: 0.4 },
+  ],
   kos: [
     { durus: D.kosA, y: -16, oran: 0.25, yumusama: 'Sine.easeOut' },
     { durus: D.kosA, y: 0, oran: 0.25, yumusama: 'Sine.easeIn' },
@@ -140,18 +244,28 @@ const ADIMLAR: Record<Animasyon, Adim[]> = {
   ],
 };
 
-// Diz kaldırmada çift tekrarlarda öbür diz kalkar.
-const SAG_DIZ: Adim[] = [{ ...ADIMLAR.dizler[0], durus: D.sagDiz }, ADIMLAR.dizler[1]];
-// Tırmanmada da çift tekrarlarda öbür kol ve diz.
-const TIRMAN_B: Adim[] = [{ ...ADIMLAR.tirman[0], durus: D.tirmanB }, ADIMLAR.tirman[1]];
+// Çift tekrarlarda öbür taraf çalışır (öbür diz, öbür ayak, öbür kol...).
+const ilkAdimi = (a: Animasyon, durus: Durus): Adim[] => [{ ...ADIMLAR[a][0], durus }, ...ADIMLAR[a].slice(1)];
+const CIFT: Partial<Record<Animasyon, Adim[]>> = {
+  dizler: ilkAdimi('dizler', D.sagDiz),
+  tirman: ilkAdimi('tirman', D.tirmanB),
+  sut: ilkAdimi('sut', D.sutSol),
+  tekAyak: ilkAdimi('tekAyak', D.tekSag),
+  trex: [{ ...ADIMLAR.trex[0], durus: D.trexSag, aci: 5 }, ADIMLAR.trex[1]],
+  tepin: ilkAdimi('tepin', D.tepinSag),
+  basUstu: ilkAdimi('basUstu', D.basUstuSag),
+  // Bir sağa, bir sola zıplar.
+  yanaZipla: ADIMLAR.yanaZipla.map((a) => ({ ...a, x: -(a.x ?? 0) })),
+};
 
 // Süreli hareketlerde bir tekrarın süresi (ms).
-const SUREKLI_TEMPO: Partial<Record<Animasyon, number>> = { kos: 520, horon: 380, heykel: 2000, sutun: 2000, piramit: 2000, parmakUcu: 700, kocaman: 2000, belDondur: 1600 };
+const SUREKLI_TEMPO: Partial<Record<Animasyon, number>> = { kos: 520, horon: 380, heykel: 2000, sutun: 2000, piramit: 2000, parmakUcu: 700, kocaman: 2000, belDondur: 1600, tekAyak: 4000, kulac: 1400, sallan: 1600, kanat: 900 };
 
 type UzuvParcasi = { kok: Phaser.GameObjects.Container; dirsek: Phaser.GameObjects.Container; durum: Uzuv };
 
 export class Zipzip extends Phaser.GameObjects.Container {
   private readonly birim: number;
+  private tabanX: number;
   private tabanY: number;
   private readonly uzuvlar: Record<keyof Durus, UzuvParcasi>;
   private readonly golge: Phaser.GameObjects.Ellipse;
@@ -165,6 +279,7 @@ export class Zipzip extends Phaser.GameObjects.Container {
   constructor(sahne: Phaser.Scene, x: number, y: number, birim: number) {
     super(sahne, x, y);
     this.birim = birim;
+    this.tabanX = x;
     this.tabanY = y;
 
     // Gölge ayrı durur: Zıpzıp zıplarken yerde kalır ve küçülür.
@@ -233,7 +348,7 @@ export class Zipzip extends Phaser.GameObjects.Container {
   birKez(animasyon: Animasyon, sure: number, tekrarNo = 1) {
     this.bekleyenler = this.bekleyenler.filter((o) => o.getProgress() < 1);
     const cift = tekrarNo % 2 === 0;
-    const adimlar = animasyon === 'dizler' && cift ? SAG_DIZ : animasyon === 'tirman' && cift ? TIRMAN_B : ADIMLAR[animasyon];
+    const adimlar = (cift && CIFT[animasyon]) || ADIMLAR[animasyon];
     let t = 0;
     for (const adim of adimlar) {
       const adimSuresi = sure * adim.oran;
@@ -242,6 +357,7 @@ export class Zipzip extends Phaser.GameObjects.Container {
         this.kay(adim.y, adimSuresi, adim.yumusama);
         if (adim.aci !== undefined) this.scene.tweens.add({ targets: this, angle: adim.aci, duration: adimSuresi, ease: 'Sine.easeInOut' });
         if (adim.yon !== undefined) this.scene.tweens.add({ targets: this, scaleX: adim.yon, duration: adimSuresi, ease: 'Sine.easeInOut' });
+        if (adim.x !== undefined) this.scene.tweens.add({ targets: [this, this.golge], x: this.tabanX + adim.x * this.birim, duration: adimSuresi, ease: 'Sine.easeInOut' });
       });
       this.bekleyenler.push(olay);
       t += adimSuresi;
@@ -300,6 +416,7 @@ export class Zipzip extends Phaser.GameObjects.Container {
   // Zıpzıp'ı (gölgesiyle birlikte) yeni bir yere koyar.
   yerlestir(x: number, y: number) {
     this.setPosition(x, y);
+    this.tabanX = x;
     this.tabanY = y;
     this.golge.setPosition(x, y + 160 * this.birim);
   }
@@ -316,6 +433,7 @@ export class Zipzip extends Phaser.GameObjects.Container {
     const golgeFarki = 160 * this.birim;
     const sonraki = (i: number) => {
       if (i >= noktalar.length) {
+        this.tabanX = this.x;
         this.tabanY = this.y;
         this.durusAl(D.normal, 150);
         bitince();
@@ -357,5 +475,6 @@ export class Zipzip extends Phaser.GameObjects.Container {
     this.setScale(1);
     this.durusAl(D.normal, 200);
     this.kay(0, 200);
+    if (this.x !== this.tabanX) this.scene.tweens.add({ targets: [this, this.golge], x: this.tabanX, duration: 200 });
   }
 }

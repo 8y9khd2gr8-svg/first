@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import { RENK, YAZI_TIPI, HAREKETI_AZALT } from '../ayarlar';
 import { buyukDugme, evDugmesi, yildizliArkaPlan } from '../arayuz';
-import { durakBul, haritaSahnesi } from '../duraklar';
+import { BOLUMLER, durakBul, haritaSahnesi } from '../duraklar';
 import { M } from '../metinler';
 import { konus, sustur } from '../ses';
 
@@ -21,13 +21,14 @@ export class DurakScene extends Phaser.Scene {
     yildizliArkaPlan(this);
     const x = this.scale.gameSize.width / 2;
     const durak = durakBul(this.durakId);
+    const kutuBaslik = BOLUMLER[durak.bolum].kutuBaslik ?? 'Biliyor muydun?';
 
     evDugmesi(this, () => {
       sustur();
       this.scene.start(haritaSahnesi(durak), {});
     });
 
-    // Gezegenlerde yer ve ad aynı ("Satürn"); iki kez yazmayalım.
+    // Gezegenlerde ve sporlarda yer ve ad aynı ("Satürn"); iki kez yazmayalım.
     if (durak.yer !== durak.ad) this.add.text(x, 170, durak.yer, { fontFamily: YAZI_TIPI, fontSize: '44px', color: '#cfe3ff' }).setOrigin(0.5);
     this.add
       .text(x, 250, durak.ad, { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '88px', color: '#FFC93C', stroke: '#0b1430', strokeThickness: 14 })
@@ -39,8 +40,8 @@ export class DurakScene extends Phaser.Scene {
     const kutu = this.add.graphics();
     kutu.fillStyle(0xffffff, 0.1).fillRoundedRect(50, 640, 620, 320, 36);
     kutu.lineStyle(4, RENK.sari, 0.8).strokeRoundedRect(50, 640, 620, 320, 36);
-    this.add.text(x, 690, 'Biliyor muydun?', { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '44px', color: '#FFC93C' }).setOrigin(0.5);
-    // "Biliyor muydun?" yazısı, ses okurken harf harf ekrana akar.
+    this.add.text(x, 690, kutuBaslik, { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '44px', color: '#FFC93C' }).setOrigin(0.5);
+    // Bilgi yazısı, ses okurken harf harf ekrana akar.
     const bilgi = this.add
       .text(x, 735, durak.bilgi, { fontFamily: YAZI_TIPI, fontSize: '36px', color: '#ffffff', align: 'center', wordWrap: { width: 560 }, lineSpacing: 4 })
       .setOrigin(0.5, 0);
@@ -60,7 +61,7 @@ export class DurakScene extends Phaser.Scene {
       onComplete: () => bilgi.setText(satirlar.join('\n')),
     });
 
-    konus(M.durakGiris(durak.yer, durak.ad, durak.bilgi));
+    konus(M.durakGiris(durak.yer, durak.ad, durak.bilgi, BOLUMLER[durak.bolum].kutuBaslik));
 
     this.add
       .text(x, 1225, '⚠️ Etrafın boş mu? Bir büyüğün yanında mı?', { fontFamily: YAZI_TIPI, fontSize: '28px', color: '#9fb6d9' })

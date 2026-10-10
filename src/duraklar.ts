@@ -1,7 +1,8 @@
 import { H, Hareket, ISINMA, SOGUMA } from './hareketler';
+import { bolumAcik } from './ilerleme';
 
 // Türkiye Turu durakları (batıdan doğuya). Kural: ibadet yeri olarak kullanılan yapılar yok.
-export type BolumId = 'turkiye' | 'dunya' | 'uzay';
+export type BolumId = 'turkiye' | 'dunya' | 'uzay' | 'spor' | 'dinozor' | 'evde';
 
 export type Durak = {
   id: string;
@@ -63,7 +64,7 @@ export const TURKIYE: Durak[] = [
     yer: 'Adıyaman',
     simge: '🗿',
     bilgi: 'Nemrut Dağı’nın tepesinde kocaman taş heykel başları var. Bazıları senin boyundan bile büyük!',
-    ozel: { hikaye: 'Taş heykeller seni izliyor!', baslik: 'Ellerini beline koy,\nkıpırdamadan dur!', sesli: 'Taş heykeller gibi olalım! Ellerini beline koy ve hiç kıpırdamadan dur!', animasyon: 'heykel', tur: 'sure', saniye: 6 },
+    ozel: { hikaye: 'Taş heykeller seni izliyor!', baslik: 'Ellerini beline koy,\nkıpırdamadan dur!', sesli: 'Taş heykeller seni izliyor! Ellerini beline koy ve hiç kıpırdamadan dur!', animasyon: 'heykel', tur: 'sure', saniye: 6 },
     ekler: [H.kos, H.dizler],
   },
   {
@@ -98,7 +99,7 @@ export const DUNYA: Durak[] = [
     yer: 'Efes',
     simge: '🏛️',
     bilgi: 'Efes’teki Artemis Tapınağı antik dünyanın yedi harikasından biriydi. Bugün sadece tek bir sütunu ayakta!',
-    ozel: { hikaye: 'Tek sütun hâlâ ayakta!', baslik: 'Dimdik dur,\nkollarını yukarı uzat!', sesli: 'Tek sütun gibi olalım! Dimdik dur ve kollarını yukarı uzat!', animasyon: 'sutun', tur: 'sure', saniye: 6 },
+    ozel: { hikaye: 'Tek sütun hâlâ ayakta!', baslik: 'Dimdik dur,\nkollarını yukarı uzat!', sesli: 'Tek sütun hâlâ ayakta! Dimdik dur ve kollarını yukarı uzat!', animasyon: 'sutun', tur: 'sure', saniye: 6 },
     ekler: [H.zipla, H.kollar],
   },
   {
@@ -253,17 +254,263 @@ export const UZAY: Durak[] = [
   },
 ];
 
-export const BOLUMLER: Record<BolumId, { ad: string; duraklar: Durak[]; sahne: string }> = {
-  turkiye: { ad: 'Türkiye Turu', duraklar: TURKIYE, sahne: 'Harita' },
-  dunya: { ad: 'Dünya Harikaları', duraklar: DUNYA, sahne: 'Dunya' },
-  uzay: { ad: 'Uzay Yolculuğu', duraklar: UZAY, sahne: 'Uzay' },
+// 4. bölüm: Spor Kampı. Sıra zorunlu değil: çocuk istediği sporla başlar ("herkes kendini bulsun").
+export const SPOR: Durak[] = [
+  {
+    id: 'futbol',
+    bolum: 'spor',
+    ad: 'Futbol',
+    yer: 'Futbol',
+    simge: '⚽',
+    bilgi: 'Futbol dünyada en çok oynanan oyun. Bir maçta oyuncular neredeyse on kilometre koşar!',
+    ozel: { hikaye: 'Gol atalım!', baslik: 'Ayağını öne doğru\nsalla, topa vur!', sesli: 'Gol atalım! Bir ayağını öne doğru salla, sonra öbür ayağını! Sekiz kere!', animasyon: 'sut', tur: 'sayi', adet: 8, tempoMs: 1200 },
+    ekler: [H.kos, H.zipla],
+  },
+  {
+    id: 'basketbol',
+    bolum: 'spor',
+    ad: 'Basketbol',
+    yer: 'Basketbol',
+    simge: '🏀',
+    bilgi: 'Basketbol potası yerden üç metre yüksekte. Bu, neredeyse iki büyüğün boyu kadar!',
+    ozel: { hikaye: 'Smaç zamanı!', baslik: 'Çömel, zıpla,\nkollarını yukarı uzat!', sesli: 'Smaç zamanı! Çömel, sonra zıpla ve kollarını yukarı uzat! Beş kere!', animasyon: 'basket', tur: 'sayi', adet: 5, tempoMs: 2000 },
+    ekler: [H.dizler, H.kollar],
+  },
+  {
+    id: 'yuzme',
+    bolum: 'spor',
+    ad: 'Yüzme',
+    yer: 'Yüzme',
+    simge: '🏊',
+    bilgi: 'Yüzerken kollarımız sırayla suyu iter. Suyun içinde vücudumuz çok daha hafif gelir!',
+    ozel: { hikaye: 'Havuzda yüzelim!', baslik: 'Kollarını sırayla\nöne doğru çevir!', sesli: 'Havuzda yüzelim! Kollarını sırayla öne doğru çevir! Bir bu kolun, bir öbür kolun!', animasyon: 'kulac', tur: 'sure', saniye: 10 },
+    ekler: [H.comel, H.acKapa],
+  },
+  {
+    id: 'jimnastik',
+    bolum: 'spor',
+    ad: 'Jimnastik',
+    yer: 'Jimnastik',
+    simge: '🤸',
+    bilgi: 'Jimnastikçiler denge aletinde, avuç içi kadar ince bir tahtanın üstünde yürür, döner, hatta zıplar!',
+    ozel: { hikaye: 'Denge zamanı!', baslik: 'Tek ayağını kaldır,\nkollarını yana aç!', sesli: 'Denge zamanı! Tek ayağını kaldır, kollarını yana aç! Sonra öbür ayağını kaldır!', animasyon: 'tekAyak', tur: 'sure', saniye: 8 },
+    ekler: [H.zipla, H.kollar],
+  },
+  {
+    id: 'tenis',
+    bolum: 'spor',
+    ad: 'Tenis',
+    yer: 'Tenis',
+    simge: '🎾',
+    bilgi: 'Tenis topu çok hızlı gider. En hızlı servisler otoyoldaki bir arabadan bile hızlıdır!',
+    ozel: { hikaye: 'Topa vur!', baslik: 'Kolunu yukarıdan\naşağı doğru salla!', sesli: 'Tenis zamanı! Kolunu yukarıdan aşağı doğru salla ve topa vur! Sekiz kere!', animasyon: 'raket', tur: 'sayi', adet: 8, tempoMs: 1300 },
+    ekler: [H.kos, H.comel],
+  },
+  {
+    id: 'voleybol',
+    bolum: 'spor',
+    ad: 'Voleybol',
+    yer: 'Voleybol',
+    simge: '🏐',
+    bilgi: 'Voleybolda top yere düşmeden takım arkadaşları üç kez vurabilir. Herkes birbirine yardım eder!',
+    ozel: { hikaye: 'Topu ağın üstünden at!', baslik: 'Ellerini başının üstünde\nbirleştir, yukarı it!', sesli: 'Topu ağın üstünden atalım! Ellerini başının üstünde birleştir ve yukarı it! Altı kere!', animasyon: 'voleybol', tur: 'sayi', adet: 6, tempoMs: 1600 },
+    ekler: [H.dizler, H.acKapa],
+  },
+  {
+    id: 'atletizm',
+    bolum: 'spor',
+    ad: 'Atletizm',
+    yer: 'Atletizm',
+    simge: '🏃',
+    bilgi: 'Atletizmde koşucular yarışırken engellerin üstünden atlar. Engeller bir çocuğun belinden bile yüksektir!',
+    ozel: { hikaye: 'Engelin üstünden atla!', baslik: 'Zıpla, dizlerini\nyukarı çek!', sesli: 'Engelin üstünden atlayalım! Zıpla ve dizlerini yukarı çek! Beş kere!', animasyon: 'engel', tur: 'sayi', adet: 5, tempoMs: 1600 },
+    ekler: [H.kollar, H.kos],
+  },
+];
+
+// 5. bölüm: Dinozorlar Diyarı. Yumurtadan çıkıştan fosil kazısına.
+export const DINOZOR: Durak[] = [
+  {
+    id: 'yumurta',
+    bolum: 'dinozor',
+    ad: 'Yumurta',
+    yer: 'Yumurta',
+    simge: '🥚',
+    bilgi: 'Bütün dinozorlar yumurtadan çıkardı. Bazı dinozor yumurtaları bir futbol topu kadar büyüktü!',
+    ozel: { hikaye: 'Yumurta çatlıyor!', baslik: 'Çömel, küçül, sonra\nkalk ve kollarını aç!', sesli: 'Yumurta çatlıyor! Çömel ve küçül, sonra yavaşça kalk ve kollarını aç! Dört kere!', animasyon: 'yumurta', tur: 'sayi', adet: 4, tempoMs: 3000 },
+    ekler: [H.kollar, H.zipla],
+  },
+  {
+    id: 'trex',
+    bolum: 'dinozor',
+    ad: 'T-Rex',
+    yer: 'T-Rex',
+    simge: '🦖',
+    bilgi: 'T-Rex’in dişleri bir muz kadar büyüktü ama kolları çok kısaydı!',
+    ozel: { hikaye: 'T-Rex yürüyor!', baslik: 'Dirseklerini bük,\nbüyük adımlarla yürü!', sesli: 'T-Rex yürüyor! Dirseklerini bük, kollarını göğsüne yaklaştır ve büyük adımlarla yürü!', animasyon: 'trex', tur: 'sayi', adet: 8, tempoMs: 1300 },
+    ekler: [H.comel, H.acKapa],
+  },
+  {
+    id: 'brakiyozor',
+    bolum: 'dinozor',
+    ad: 'Brakiyozor',
+    yer: 'Brakiyozor',
+    simge: '🦕',
+    bilgi: 'Brakiyozorun boynu o kadar uzundu ki ağaçların en tepesindeki yaprakları yiyebilirdi!',
+    ozel: { hikaye: 'En tepedeki yapraklar!', baslik: 'Parmak ucunda yüksel,\nkollarını uzat!', sesli: 'En tepedeki yapraklara uzanalım! Parmak uçlarında yüksel, kollarını yukarı uzat! Dört kere!', animasyon: 'uzan', tur: 'sayi', adet: 4, tempoMs: 2200 },
+    ekler: [H.dizler, H.kollar],
+  },
+  {
+    id: 'pterozor',
+    bolum: 'dinozor',
+    ad: 'Pterozor',
+    yer: 'Pterozor',
+    simge: '🪶',
+    bilgi: 'Pterozorlar dinozorların uçabilen akrabalarıydı. Bazılarının kanatları küçük bir uçak kadar genişti!',
+    ozel: { hikaye: 'Gökyüzünde süzül!', baslik: 'Kollarını yana aç,\nyukarı aşağı salla!', sesli: 'Gökyüzünde süzülelim! Kollarını yana aç, yukarı aşağı salla!', animasyon: 'kanat', tur: 'sure', saniye: 10 },
+    ekler: [H.comel, H.zipla],
+  },
+  {
+    id: 'ayakizi',
+    bolum: 'dinozor',
+    ad: 'Ayak İzleri',
+    yer: 'Ayak İzleri',
+    simge: '👣',
+    bilgi: 'Dinozorların ayak izleri taşa dönüşüp milyonlarca yıl kalmış. Bazı ayak izleri bir küvet kadar büyük!',
+    ozel: { hikaye: 'Dev ayak izleri bırakalım!', baslik: 'Ayaklarını sırayla\nyere vur!', sesli: 'Dev ayak izleri bırakalım! Ayaklarını sırayla güm güm yere vur! On kere!', animasyon: 'tepin', tur: 'sayi', adet: 10, tempoMs: 900 },
+    ekler: [H.kos, H.kollar],
+  },
+  {
+    id: 'raptor',
+    bolum: 'dinozor',
+    ad: 'Raptor',
+    yer: 'Raptor',
+    simge: '🌿',
+    bilgi: 'Raptorlar küçük ama çok hızlı dinozorlardı. Bir hindi kadar büyüklerdi ve tüyleri vardı!',
+    ozel: { hikaye: 'Ormanda sessizce yürü!', baslik: 'Parmak uçlarında yürü!', sesli: 'Ormanda sessizce yürüyelim! Parmak uçlarında yürü!', animasyon: 'parmakUcu', tur: 'sure', saniye: 8 },
+    ekler: [H.acKapa, H.dizler],
+  },
+  {
+    id: 'fosil',
+    bolum: 'dinozor',
+    ad: 'Fosil Kazısı',
+    yer: 'Fosil Kazısı',
+    simge: '🦴',
+    bilgi: 'Dinozor kemiklerini bulan bilim insanlarına paleontolog denir. Kemikleri fırçayla yavaş yavaş temizlerler!',
+    ozel: { hikaye: 'Dinozor kemiği bulalım!', baslik: 'Çömel, ellerinle\nyeri sırayla kaz!', sesli: 'Dinozor kemiği bulalım! Çömel ve ellerinle yeri sırayla kaz!', animasyon: 'kazi', tur: 'sayi', adet: 8, tempoMs: 1000 },
+    ekler: [H.zipla, H.kollar],
+  },
+];
+
+// 6. bölüm: Evde Macera. Evdeki yumuşak eşyalarla (oyuncak, yastık, çorap topu) hareket.
+// Durak girişindeki kutu "Biliyor muydun?" yerine "Hazırla!" der: ne hazırlanacağını ve güvenlik notunu söyler.
+// Balon bilerek yok: patlayan balon parçası küçük çocuklar için boğulma tehlikesi.
+export const EVDE: Durak[] = [
+  {
+    id: 'oyuncak',
+    bolum: 'evde',
+    ad: 'Oyuncak',
+    yer: 'Oyuncak',
+    simge: '🧸',
+    bilgi: 'En sevdiğin oyuncağı yanına al. Yumuşak bir oyuncak olursa daha iyi!',
+    ozel: { hikaye: 'Oyuncağını kurtar!', baslik: 'Çömel, oyuncağını al,\nyukarı kaldır!', sesli: 'Oyuncağını kurtaralım! Çömel, oyuncağını al ve başının üstüne kaldır! Beş kere!', animasyon: 'tasKaldir', tur: 'sayi', adet: 5, tempoMs: 2200 },
+    ekler: [H.zipla, H.kollar],
+  },
+  {
+    id: 'yastik',
+    bolum: 'evde',
+    ad: 'Yastık',
+    yer: 'Yastık',
+    simge: '🛏️',
+    bilgi: 'Bir yastık hazırla. Etrafında eşya olmayan, boş bir yer seç!',
+    ozel: { hikaye: 'Yastık taşıyalım!', baslik: 'Yastığı başının üstünde\ntut, yerinde yürü!', sesli: 'Yastık taşıyalım! Yastığı başının üstünde tut ve dizlerini kaldırarak yerinde yürü!', animasyon: 'basUstu', tur: 'sayi', adet: 10, tempoMs: 1000 },
+    ekler: [H.comel, H.acKapa],
+  },
+  {
+    id: 'corap',
+    bolum: 'evde',
+    ad: 'Çorap Topu',
+    yer: 'Çorap Topu',
+    simge: '🧦',
+    bilgi: 'Bir çift çorabı yuvarlayıp top yap. Çorap topu yumuşaktır, kimseyi acıtmaz!',
+    ozel: { hikaye: 'Topu yakala!', baslik: 'Topu bir elinden\nöbür eline at!', sesli: 'Çorap topunu yakalayalım! Topu bir elinden öbür eline at! On kere!', animasyon: 'elden', tur: 'sayi', adet: 10, tempoMs: 1100 },
+    ekler: [H.dizler, H.kollar],
+  },
+  {
+    id: 'yastikada',
+    bolum: 'evde',
+    ad: 'Yastık Adası',
+    yer: 'Yastık Adası',
+    simge: '🏝️',
+    bilgi: 'Yastığı yere koy. Üstüne basma, yanından atla. Kaygan yerde değil, halının üstünde oyna!',
+    ozel: { hikaye: 'Adanın üstünden atla!', baslik: 'Yastığın üstünden\nyana zıpla!', sesli: 'Yastığı yere koy. Yastığın üstünden bir sağa, bir sola zıpla! Altı kere!', animasyon: 'yanaZipla', tur: 'sayi', adet: 6, tempoMs: 1600 },
+    ekler: [H.kos, H.comel],
+  },
+  {
+    id: 'dans',
+    bolum: 'evde',
+    ad: 'Oyuncak Dansı',
+    yer: 'Dans',
+    simge: '🎶',
+    bilgi: 'Oyuncağın da dans etmek istiyor! Müzik yoksa bir şarkı mırıldanabilirsin.',
+    ozel: { hikaye: 'Oyuncağınla dans et!', baslik: 'Oyuncağına sarıl,\nsağa sola sallan!', sesli: 'Oyuncağınla dans edelim! Oyuncağına sarıl ve sağa sola sallan!', animasyon: 'sallan', tur: 'sure', saniye: 10 },
+    ekler: [H.zipla, H.acKapa],
+  },
+  {
+    id: 'kanguru',
+    bolum: 'evde',
+    ad: 'Kanguru',
+    yer: 'Kanguru',
+    simge: '🦘',
+    bilgi: 'Çorap topunu yine hazırla. Kangurular zıplayarak ilerler ve yavrularını karınlarındaki cepte taşır!',
+    ozel: { hikaye: 'Topu düşürmeden zıpla!', baslik: 'Topu dizlerinin\narasında tut, zıpla!', sesli: 'Çorap topunu dizlerinin arasında tut ve düşürmeden zıpla! Dört kere!', animasyon: 'zipla', tur: 'sayi', adet: 4, tempoMs: 1600 },
+    ekler: [H.kollar, H.dizler],
+  },
+  {
+    id: 'toplama',
+    bolum: 'evde',
+    ad: 'Toplama',
+    yer: 'Toplama',
+    simge: '🧺',
+    bilgi: 'Oyun bitince eşyaları toplamak da bir harekettir. Hadi her şeyi yerine koyalım!',
+    ozel: { hikaye: 'Her şeyi yerine koy!', baslik: 'Çömel, eşyayı al,\nyerine koy!', sesli: 'Toplama zamanı! Çömel, eşyayı al ve yerine koy! Altı kere!', animasyon: 'topla', tur: 'sayi', adet: 6, tempoMs: 2000 },
+    ekler: [H.zipla, H.kollar],
+  },
+];
+
+type Bolum = {
+  ad: string;
+  duraklar: Durak[];
+  sahne: string; // haritanın sahnesi
+  onceki: BolumId | null; // bu bölüm, önceki bölüm bitince açılır
+  serbest?: boolean; // duraklar istenen sırayla oynanır (Spor Kampı)
+  kutuBaslik?: string; // durak girişindeki bilgi kutusunun başlığı (varsayılan "Biliyor muydun?")
 };
 
-export function durakBul(id: string): Durak {
-  return [...TURKIYE, ...DUNYA, ...UZAY].find((d) => d.id === id) ?? TURKIYE[0];
+export const BOLUMLER: Record<BolumId, Bolum> = {
+  turkiye: { ad: 'Türkiye Turu', duraklar: TURKIYE, sahne: 'Harita', onceki: null },
+  dunya: { ad: 'Dünya Harikaları', duraklar: DUNYA, sahne: 'Dunya', onceki: 'turkiye' },
+  uzay: { ad: 'Uzay Yolculuğu', duraklar: UZAY, sahne: 'Uzay', onceki: 'dunya' },
+  spor: { ad: 'Spor Kampı', duraklar: SPOR, sahne: 'Spor', onceki: 'uzay', serbest: true },
+  dinozor: { ad: 'Dinozorlar Diyarı', duraklar: DINOZOR, sahne: 'Dinozor', onceki: 'spor' },
+  evde: { ad: 'Evde Macera', duraklar: EVDE, sahne: 'Evde', onceki: 'dinozor', kutuBaslik: 'Hazırla!' },
+};
+
+// Bölümlerin oyundaki sırası.
+export const BOLUM_SIRASI = Object.keys(BOLUMLER) as BolumId[];
+export const TUM_DURAKLAR: Durak[] = BOLUM_SIRASI.flatMap((id) => BOLUMLER[id].duraklar);
+
+// Bölüm açık mı? (önceki bölüm bittiyse ya da beta için hepsi açıldıysa)
+export function bolumuAcikMi(id: BolumId): boolean {
+  const onceki = BOLUMLER[id].onceki;
+  return !onceki || bolumAcik(BOLUMLER[onceki].duraklar.map((d) => d.id));
 }
 
-// Durağın bölümünün harita sahnesi ('Harita' ya da 'Dunya').
+export function durakBul(id: string): Durak {
+  return TUM_DURAKLAR.find((d) => d.id === id) ?? TURKIYE[0];
+}
+
+// Durağın bölümünün harita sahnesi ('Harita', 'Dunya', 'Uzay', ...).
 export const haritaSahnesi = (d: Durak) => BOLUMLER[d.bolum].sahne;
 
 // Bir duraktaki 5 hareketlik kısa antrenman.

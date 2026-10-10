@@ -2,8 +2,9 @@ import Phaser from 'phaser';
 import { RENK, YAZI_TIPI } from '../ayarlar';
 import { evDugmesi, yildizliArkaPlan } from '../arayuz';
 import { AILE_ID } from '../aile';
-import { BOLUMLER, BolumId, DUNYA, TURKIYE } from '../duraklar';
-import { bolumAcik, tamamlananlar } from '../ilerleme';
+import { BOLUMLER, BolumId, bolumuAcikMi } from '../duraklar';
+import { tamamlananlar } from '../ilerleme';
+import { BOLUM_KISA } from './BolumScene';
 import { M } from '../metinler';
 import { bip, konus, sustur } from '../ses';
 import { Zipzip } from '../zipzip';
@@ -11,18 +12,18 @@ import { Zipzip } from '../zipzip';
 // Büyük Macera: bütün bölümler kıvrımlı bir yol üzerinde. Açık bölümler ilerlemesiyle,
 // gelecek bölümler "Yakında" etiketiyle görünür (ebeveyn neyin geleceğini görür).
 type Satir =
-  | { tur: 'bolum'; id: BolumId; simge: string; renk: number; kilitMesaji?: string; acik: () => boolean }
+  | { tur: 'bolum'; id: BolumId; renk: number }
   | { tur: 'yakinda'; ad: string; simge: string };
 
 const SATIRLAR: Satir[] = [
-  { tur: 'bolum', id: 'turkiye', simge: '🇹🇷', renk: RENK.turuncu, acik: () => true },
-  { tur: 'bolum', id: 'dunya', simge: '🌍', renk: RENK.mavi, kilitMesaji: M.dunyaKilitli, acik: () => bolumAcik(TURKIYE.map((d) => d.id)) },
-  { tur: 'bolum', id: 'uzay', simge: '🪐', renk: 0x7c5cd6, kilitMesaji: M.uzayKilitli, acik: () => bolumAcik(DUNYA.map((d) => d.id)) },
+  { tur: 'bolum', id: 'turkiye', renk: RENK.turuncu },
+  { tur: 'bolum', id: 'dunya', renk: RENK.mavi },
+  { tur: 'bolum', id: 'uzay', renk: 0x7c5cd6 },
+  { tur: 'bolum', id: 'spor', renk: RENK.yesil },
+  { tur: 'bolum', id: 'dinozor', renk: 0x2c7a47 },
+  { tur: 'bolum', id: 'evde', renk: 0xd9534f },
   { tur: 'yakinda', ad: 'İstanbul’un 7 Tepesi', simge: '🏙️' },
-  { tur: 'yakinda', ad: 'Spor Kampı', simge: '⚽' },
-  { tur: 'yakinda', ad: 'Dinozorlar Diyarı', simge: '🦕' },
   { tur: 'yakinda', ad: 'Okyanus', simge: '🐠' },
-  { tur: 'yakinda', ad: 'Evde Macera', simge: '🧸' },
 ];
 
 const ILK_Y = 300;
@@ -68,7 +69,7 @@ export class MaceraScene extends Phaser.Scene {
 
     // Kıvrımlı yol: açık bölümler arası altın, sonrası beyaz kesikli.
     const yol = this.add.graphics();
-    const acikSayisi = SATIRLAR.filter((s) => s.tur === 'bolum' && s.acik()).length;
+    const acikSayisi = SATIRLAR.filter((s) => s.tur === 'bolum' && bolumuAcikMi(s.id)).length;
     for (let i = 0; i < SATIRLAR.length - 1; i++) {
       const a = konum(i);
       const b = konum(i + 1);
@@ -87,7 +88,7 @@ export class MaceraScene extends Phaser.Scene {
     // Zıpzıp, oynanmakta olan bölümün yanında zıplar.
     let simdiki = 0;
     SATIRLAR.forEach((s, i) => {
-      if (s.tur === 'bolum' && s.acik()) {
+      if (s.tur === 'bolum' && bolumuAcikMi(s.id)) {
         const duraklar = BOLUMLER[s.id].duraklar;
         if (i === 0 || !duraklar.every((d) => biten.has(d.id)) || simdiki === i - 1) simdiki = i;
       }
@@ -98,12 +99,12 @@ export class MaceraScene extends Phaser.Scene {
       const solda = i % 2 === 0;
       const kap = this.add.container(nx, ny);
       if (s.tur === 'bolum') {
-        const acik = s.acik();
+        const acik = bolumuAcikMi(s.id);
         const duraklar = BOLUMLER[s.id].duraklar;
         const bitenSayisi = duraklar.filter((d) => biten.has(d.id)).length;
         const tamam = bitenSayisi === duraklar.length;
         kap.add(this.add.circle(0, 0, 54, acik ? s.renk : 0x4b5563).setStrokeStyle(6, tamam ? RENK.sari : RENK.beyaz));
-        kap.add(this.add.text(0, 2, s.simge, { fontSize: '56px' }).setOrigin(0.5).setAlpha(acik ? 1 : 0.5));
+        kap.add(this.add.text(0, 2, BOLUM_KISA[s.id].simge, { fontSize: '56px' }).setOrigin(0.5).setAlpha(acik ? 1 : 0.5));
         if (!acik) kap.add(this.add.text(30, 30, '🔒', { fontSize: '30px' }).setOrigin(0.5));
         const yazi = this.add.container(solda ? 80 : -80, 0);
         yazi.add(
@@ -126,7 +127,7 @@ export class MaceraScene extends Phaser.Scene {
           if (!acik) {
             bip(220, 0.15, 'square', 0.12);
             this.tweens.add({ targets: kap, x: nx + 8, duration: 50, yoyo: true, repeat: 3 });
-            konus(s.kilitMesaji ?? M.oncekiniBitir);
+            konus(BOLUM_KISA[s.id].kilitli);
             return;
           }
           bip(880, 0.08, 'square', 0.12);

@@ -3,12 +3,12 @@
 // Çalıştırma: npm run seslendirme-metni
 import fs from 'node:fs';
 import { AILE_OTURUMU } from '../src/aile';
-import { DUNYA, TURKIYE, UZAY } from '../src/duraklar';
+import { BOLUMLER, TUM_DURAKLAR } from '../src/duraklar';
 import { H, ISINMA, SOGUMA } from '../src/hareketler';
 import { GERI_SAYIM, M, SAYILAR, tumMetinler } from '../src/metinler';
 import { sesAnahtari } from '../src/sesAnahtari';
 
-const duraklar = [...TURKIYE, ...DUNYA, ...UZAY];
+const duraklar = TUM_DURAKLAR;
 const komutlar = new Set([
   ...Object.values(H).map((h) => h.sesli),
   ISINMA.sesli,
@@ -16,7 +16,7 @@ const komutlar = new Set([
   ...AILE_OTURUMU.map((h) => h.sesli),
 ]);
 const sakin = new Set([SOGUMA.sesli, AILE_OTURUMU[AILE_OTURUMU.length - 1].sesli]);
-const bilgiler = new Set(duraklar.map((d) => M.durakGiris(d.yer, d.ad, d.bilgi)));
+const bilgiler = new Set(duraklar.map((d) => M.durakGiris(d.yer, d.ad, d.bilgi, BOLUMLER[d.bolum].kutuBaslik)));
 
 // Her cümlenin türü ve nasıl okunacağı.
 function tur(c: string): [string, string] {

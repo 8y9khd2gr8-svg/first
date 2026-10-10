@@ -23,13 +23,16 @@ export function gunAnahtari(tarih = new Date()): string {
   return `${tarih.getFullYear()}-${iki(tarih.getMonth() + 1)}-${iki(tarih.getDate())}`;
 }
 
+// Zıplama sayısına (ve zıplama rozetlerine) eklenen hareketler.
+const ZIPLAMALAR: string[] = ['zipla', 'acKapa', 'basket', 'engel', 'yanaZipla'];
+
 export function hareketKaydet(h: Hareket) {
   const kayit = oku();
   const bugun = gunAnahtari();
   const gun = kayit.gunler[bugun] ?? { saniye: 0, hareket: 0, ziplama: 0 };
   gun.saniye += Math.round(h.tur === 'sayi' ? (h.adet * h.tempoMs) / 1000 : h.saniye);
   gun.hareket += 1;
-  if (h.tur === 'sayi' && (h.animasyon === 'zipla' || h.animasyon === 'acKapa')) gun.ziplama += h.adet;
+  if (h.tur === 'sayi' && ZIPLAMALAR.includes(h.animasyon)) gun.ziplama += h.adet;
   gun.sayac ??= {};
   gun.sayac[h.animasyon] = (gun.sayac[h.animasyon] ?? 0) + (h.tur === 'sayi' ? h.adet : 1);
   kayit.gunler[bugun] = gun;
