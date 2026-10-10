@@ -159,7 +159,8 @@ test('Zıpzıp konuşurken ağzı oynar, susunca kapanır', async ({ page }) => 
 });
 
 // Beta öncesi deneme turundan: yazı ekrandan taşmasın, çocuk ekranlarında düğmeler parmağa yetecek kadar büyük olsun
-// (88 oyun noktası ≈ telefonda 48 piksel). Ebeveyn köşesi kilitli olduğu için düğme ölçüsüne katılmaz.
+// (88 oyun noktası ≈ telefonda 48 piksel). Ebeveyn ekranları da ölçülür (veliler de telefonda dokunur);
+// HTML düğmeleri ve bağlantıları (Paylaş, Gizlilik...) da en az 72 nokta olmalı.
 test('yazılar ekrana sığar, çocuk düğmeleri yeterince büyük', async ({ page }) => {
   test.setTimeout(120_000);
   const hepsi: string[] = await (async () => {
@@ -171,7 +172,8 @@ test('yazılar ekrana sığar, çocuk düğmeleri yeterince büyük', async ({ p
     ['Macera', {}, true], ['Harita', {}, true], ['Dunya', {}, true], ['Uzay', {}, true], ['Spor', {}, true], ['Dinozor', {}, true], ['Evde', {}, true],
     ['Durak', { durakId: 'efes' }, true], ['Durak', { durakId: 'nemrut' }, true], ['Hareket', { durakId: 'istanbul', adim: 1 }, true],
     ['Pasaport', {}, true], ['Rozet', { sayfa: 1 }, true], ['Kostum', {}, false], ['Avatar', {}, true],
-    ['EbeveynMenu', {}, false], ['EbeveynOzet', {}, false], ['Sertifika', { bolum: 'turkiye' }, false],
+    ['Ebeveyn', { hedef: 'EbeveynMenu', geri: 'Pasaport' }, true], ['EbeveynMenu', {}, true], ['EbeveynOzet', {}, true], ['PasaportAyar', {}, true],
+    ['Kurulum', {}, true], ['Sertifika', { bolum: 'turkiye' }, false],
   ];
   const sorunlar: string[] = [];
   for (const [ad, veri, dugmeOlc] of sahneler) {
@@ -195,6 +197,16 @@ test('yazılar ekrana sığar, çocuk düğmeleri yeterince büyük', async ({ p
             }
           };
           s.children.list.forEach(gez);
+        }
+        if (dugmeOlc) {
+          // HTML düğmeleri: ekrandaki boyları oyun noktasına çevrilir (oyun 720 nokta genişliğinde).
+          const tuval = document.querySelector('canvas')!.getBoundingClientRect();
+          const olcek = 720 / tuval.width;
+          for (const el of document.querySelectorAll<HTMLElement>('button, a, input')) {
+            const r = el.getBoundingClientRect();
+            if (!r.width || (el as HTMLInputElement).type === 'file') continue;
+            if (r.height * olcek < 72) bulunan.push(`[HTML] küçük düğme: "${(el.textContent || el.tagName).trim().slice(0, 30)}" (${(r.height * olcek) | 0})`);
+          }
         }
         return bulunan;
       }, dugmeOlc)),
