@@ -155,6 +155,9 @@ test('Zıpzıp konuşurken ağzı oynar, susunca kapanır', async ({ page }) => 
   });
   expect(sonuc.enCok).toBeGreaterThan(0.3);
   expect(sonuc.sonra).toBe(0);
+  expect(kayit.hatalar).toEqual([]);
+});
+
 // Beta öncesi deneme turundan: yazı ekrandan taşmasın, çocuk ekranlarında düğmeler parmağa yetecek kadar büyük olsun
 // (88 oyun noktası ≈ telefonda 48 piksel). Ebeveyn köşesi kilitli olduğu için düğme ölçüsüne katılmaz.
 test('yazılar ekrana sığar, çocuk düğmeleri yeterince büyük', async ({ page }) => {
