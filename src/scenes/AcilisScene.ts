@@ -27,7 +27,9 @@ export class AcilisScene extends Phaser.Scene {
     this.add.text(x, 200, 'Zıp Zıp', { ...baslikStili, fontSize: '130px', color: '#FFC93C' }).setOrigin(0.5);
     this.add.text(x, 320, 'Dünya', { ...baslikStili, fontSize: '110px', color: '#ffffff' }).setOrigin(0.5);
 
-    new Zipzip(this, x, 720, 1.4).surekli('zipla', 1300);
+    const zipzip = new Zipzip(this, x, 720, 1.4);
+    zipzip.ifadeSec('mutlu');
+    zipzip.surekli('zipla', 1300);
 
     buyukDugme(
       this,

@@ -1,6 +1,8 @@
 import Phaser from 'phaser';
 import type { Animasyon } from './hareketler';
 import { seciliKostum } from './kostumler';
+import { hareketiAzalt } from './ayarlar';
+import { ZipzipYuz, type Ifade } from './zipzipYuz';
 
 // Zıpzıp: gövde (yüzlü dünya) + iki parçalı kollar (omuz-dirsek) ve bacaklar (kalça-diz).
 // Tüm ölçüler maskot çiziminin birimleriyle; "birim" bir çizim biriminin ekranda kaç piksel olduğu.
@@ -275,6 +277,10 @@ export class Zipzip extends Phaser.GameObjects.Container {
   private tabanY: number;
   private readonly uzuvlar: Record<keyof Durus, UzuvParcasi>;
   private readonly golge: Phaser.GameObjects.Container;
+  // Gövde + uzuvlar + kostüm: zıplarken birlikte basılıp esner (dış kap yön ve konum için kalır).
+  private readonly beden: Phaser.GameObjects.Container;
+  private readonly yuz: ZipzipYuz;
+  private readonly esneme = { sx: 1, sy: 1 };
   private dongu?: Phaser.Time.TimerEvent;
   private bekleyenler: Phaser.Time.TimerEvent[] = [];
 
@@ -305,7 +311,9 @@ export class Zipzip extends Phaser.GameObjects.Container {
     // Kollar gövdenin arkasında, bacaklar önünde: diz kalkınca gövdenin önüne gelir.
     const govde = sahne.add.image(0, 0, 'govde').setScale(birim / 2);
     const { solKol, sagKol, solBacak, sagBacak } = this.uzuvlar;
-    this.add([solKol.kok, sagKol.kok, govde, solBacak.kok, sagBacak.kok]);
+    this.yuz = new ZipzipYuz(sahne, birim);
+    this.beden = sahne.add.container(0, 0, [solKol.kok, sagKol.kok, govde, this.yuz, solBacak.kok, sagBacak.kok]);
+    this.add(this.beden);
     this.kostumGiy(seciliKostum());
 
     this.durusAl(D.normal, 0);
@@ -355,6 +363,21 @@ export class Zipzip extends Phaser.GameObjects.Container {
     const comelme = Math.min(1, Math.max(0, yBirim / 50));
     this.scene.tweens.add({ targets: this, y, duration: sure, ease: yumusama });
     this.scene.tweens.add({ targets: this.golge, scaleX: 1 - yukseklik * 0.5 + comelme * 0.12, scaleY: 1 - yukseklik * 0.4, alpha: 1 - yukseklik * 0.55, duration: sure, ease: yumusama });
+    // Esneme (çizgi film "bas-uza"): inerken/çömelirken hafifçe basılır, yükselirken uzar. Süs sayılır.
+    if (hareketiAzalt()) return;
+    const hedef = yBirim > 10 ? { sx: 1.06, sy: 0.94 } : yBirim < -40 ? { sx: 0.96, sy: 1.05 } : { sx: 1, sy: 1 };
+    this.scene.tweens.add({ targets: this.esneme, ...hedef, duration: sure, ease: yumusama, onUpdate: () => this.esnet() });
+  }
+
+  // Ayaklar yerde kalsın diye gövde basılırken aşağı kayar.
+  private esnet() {
+    this.beden.setScale(this.esneme.sx, this.esneme.sy);
+    this.beden.y = (1 - this.esneme.sy) * 150 * this.birim;
+  }
+
+  // Yüz ifadesi (mutlu, uykulu...); süre verilirse sonra normale döner.
+  ifadeSec(ifade: Ifade, sureMs?: number) {
+    this.yuz.ifadeSec(ifade, sureMs);
   }
 
   // Hareketi bir kez yapar. sure: bir tekrarın süresi (ms). tekrarNo: kaçıncı tekrar (1'den başlar).
@@ -396,12 +419,12 @@ export class Zipzip extends Phaser.GameObjects.Container {
     const cizim = (ciz: (g: Phaser.GameObjects.Graphics) => void) => {
       const g = this.scene.add.graphics();
       ciz(g);
-      this.add(g);
+      this.beden.add(g);
       this.kostumParcalari.push(g);
     };
     const emoji = (simge: string, x: number, y: number, boy: number, aci = 0) => {
       const t = this.scene.add.text(x * b, y * b, simge, { fontSize: `${Math.round(boy * b)}px` }).setOrigin(0.5).setAngle(aci);
-      this.add(t);
+      this.beden.add(t);
       this.kostumParcalari.push(t);
     };
     switch (id) {
@@ -443,7 +466,7 @@ export class Zipzip extends Phaser.GameObjects.Container {
         const g = this.scene.add.graphics();
         g.fillStyle(0xe63946).fillPoints([{ x: -80 * b, y: -30 * b }, { x: 80 * b, y: -30 * b }, { x: 130 * b, y: 150 * b }, { x: -130 * b, y: 150 * b }], true);
         g.fillStyle(0xb5232f).fillPoints([{ x: -80 * b, y: -30 * b }, { x: -20 * b, y: -30 * b }, { x: -60 * b, y: 150 * b }, { x: -130 * b, y: 150 * b }], true);
-        this.addAt(g, 0); // en arkada
+        this.beden.addAt(g, 0); // en arkada
         this.kostumParcalari.push(g);
         return;
       }
@@ -452,7 +475,7 @@ export class Zipzip extends Phaser.GameObjects.Container {
         g.fillStyle(0xffffff, 0.14).fillCircle(0, -4 * b, 132 * b);
         g.lineStyle(7 * b, 0xe8eef7, 0.9).strokeCircle(0, -4 * b, 132 * b);
         g.fillStyle(0xffffff, 0.35).fillEllipse(-62 * b, -70 * b, 46 * b, 26 * b);
-        this.add(g);
+        this.beden.add(g);
         this.kostumParcalari.push(g);
         return;
       }
@@ -482,6 +505,7 @@ export class Zipzip extends Phaser.GameObjects.Container {
         this.tabanX = this.x;
         this.tabanY = this.y;
         this.durusAl(D.normal, 150);
+        this.ifadeSec('mutlu', 1500); // yeni durağa vardı
         bitince();
         return;
       }
@@ -516,9 +540,11 @@ export class Zipzip extends Phaser.GameObjects.Container {
     this.bekleyenler.forEach((o) => o.remove());
     this.bekleyenler = [];
     const durumlar = Object.values(this.uzuvlar).map((p) => p.durum);
-    this.scene.tweens.killTweensOf([this, this.golge, ...durumlar]);
+    this.scene.tweens.killTweensOf([this, this.golge, this.esneme, ...durumlar]);
     this.setAngle(0);
     this.setScale(1);
+    this.esneme.sx = this.esneme.sy = 1;
+    this.esnet();
     this.durusAl(D.normal, 200);
     this.kay(0, 200);
     if (this.x !== this.tabanX) this.scene.tweens.add({ targets: [this, this.golge], x: this.tabanX, duration: 200 });
