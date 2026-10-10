@@ -66,6 +66,9 @@ Teknoloji: Phaser 3 + TypeScript + Vite, GitHub Pages ile yayın. İleride Capac
   çizilir); Efes → Kolezyum → Piramitler → Petra → Tac Mahal → Çin Seddi → Machu Picchu.
   Türkiye Turu bitince açılır; beta için ebeveyn köşesinde geçici "Beta: Dünya bölümünü aç"
   (mağazadan önce kaldırılacak). Ödeme mağaza (Capacitor) aşamasında bağlanacak.
+- Yasal yol: bireysel geliştirici hesaplarıyla başlanır (GVK 20/B istisnası; mali müşavir doğrulayacak).
+  Marka: "Zıp Zıp Dünya" için TÜRKPATENT araştırması + başvuru betadan önce (Ekim-Kasım; sınıf 9 ve 41).
+  Şahıs şirketi okul lisansı satışı başlayınca (okullar fatura ister). Hesap/başvuruları kullanıcı yapar.
 - Para modeli kesinleşti: Türkiye ücretsiz + tek ödemeyle tam sürüm; sonra okul lisansı.
   Uygulama içi reklam ve abonelik yok. İkinci gelir ayağı (okul lisansı / İngilizce sürüm)
   mağazaya çıktıktan sonra satışlara bakılarak seçilecek.
