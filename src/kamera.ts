@@ -11,11 +11,21 @@ export const kameraAcikMi = () => localStorage.getItem(ANAHTAR) === '1';
 export const kameraAyarla = (acik: boolean) => (acik ? localStorage.setItem(ANAHTAR, '1') : localStorage.removeItem(ANAHTAR));
 export const kameraDesteklenir = () => !!navigator.mediaDevices?.getUserMedia;
 
-// Şimdilik kameranın sayabildiği hareketler.
-export const KAMERA_HAREKETLERI: Animasyon[] = ['zipla', 'comel', 'kollar'];
+// Kameranın sayabildiği hareketler ve nasıl sayıldıkları. Birbirine benzeyen hareketler aynı yolla sayılır
+// (ör. "çömel, sonra yüksel, kollarını aç" da bir çömelmedir). Listede olmayan harekette kamera açılmaz.
+type SaymaYolu = 'kollar' | 'comel' | 'zipla' | 'dizler' | 'acKapa' | 'yanAdim';
+const SAYMA_YOLU: Partial<Record<Animasyon, SaymaYolu>> = {
+  kollar: 'kollar', uzan: 'kollar', basket: 'kollar', tasKaldir: 'kollar',
+  comel: 'comel', balon: 'comel', yumurta: 'comel',
+  zipla: 'zipla', engel: 'zipla',
+  dizler: 'dizler', tirman: 'dizler',
+  acKapa: 'acKapa',
+  yanAdim: 'yanAdim',
+};
+export const KAMERA_HAREKETLERI = Object.keys(SAYMA_YOLU) as Animasyon[];
 
 // Vücut noktalarının numaraları (MediaPipe Pose).
-const BURUN = 0, SOL_OMUZ = 11, SAG_OMUZ = 12, SOL_BILEK = 15, SAG_BILEK = 16, SOL_KALCA = 23, SAG_KALCA = 24, SOL_TOPUK = 27, SAG_TOPUK = 28;
+export const BURUN = 0, SOL_OMUZ = 11, SAG_OMUZ = 12, SOL_BILEK = 15, SAG_BILEK = 16, SOL_KALCA = 23, SAG_KALCA = 24, SOL_DIZ = 25, SAG_DIZ = 26, SOL_TOPUK = 27, SAG_TOPUK = 28;
 
 let modelSozu: Promise<PoseLandmarker> | null = null;
 
@@ -46,8 +56,13 @@ export class Sayici {
   sayi = 0;
   private yukarida = false;
   private taban: number | null = null;
+  private yol: SaymaYolu | undefined;
+  private kalkanDiz: number | null = null; // dizler: o an havadaki diz
+  private taraf: -1 | 0 | 1 = 0; // yana adım: gövde ortanın solunda mı sağında mı
 
-  constructor(private animasyon: Animasyon) {}
+  constructor(animasyon: Animasyon) {
+    this.yol = SAYMA_YOLU[animasyon];
+  }
 
   besle(n: NormalizedLandmark[]) {
     const gorunur = (i: number) => (n[i]?.visibility ?? 0) > 0.5;
@@ -58,7 +73,7 @@ export class Sayici {
     const boy = topuk - omuz;
     if (boy <= 0.05) return;
 
-    if (this.animasyon === 'kollar') {
+    if (this.yol === 'kollar') {
       // İki bilek de başın üstündeyse "yukarı", omuzların altına inince bir tekrar.
       if (!gorunur(SOL_BILEK) || !gorunur(SAG_BILEK)) return;
       const bilek = Math.max(n[SOL_BILEK].y, n[SAG_BILEK].y);
@@ -67,7 +82,7 @@ export class Sayici {
         this.yukarida = false;
         this.sayi++;
       }
-    } else if (this.animasyon === 'comel') {
+    } else if (this.yol === 'comel') {
       // Kalça topuğa yaklaşınca "aşağı", tekrar yükselince bir tekrar.
       const oran = (topuk - kalca) / boy; // ayakta ~0.55, çömelince küçülür
       if (!this.yukarida && oran < 0.35) this.yukarida = true;
@@ -75,7 +90,7 @@ export class Sayici {
         this.yukarida = false;
         this.sayi++;
       }
-    } else if (this.animasyon === 'zipla') {
+    } else if (this.yol === 'zipla') {
       // Omuzlar ayakta durulan yükseklikten (taban) belirgin yükselince bir sıçrama.
       // Taban yavaşça güncellenir; sıçrama anında değişmez.
       if (this.taban === null) this.taban = omuz;
@@ -86,6 +101,40 @@ export class Sayici {
         this.yukarida = false;
         this.sayi++;
       }
+    } else if (this.yol === 'dizler') {
+      // Bir diz kalçaya yaklaşınca "kalktı", yeniden aşağı inince bir tekrar (her diz ayrı sayılır).
+      // Boy yerdeki ayağa göre ölçülür (havadaki ayak boyu kısaltmasın).
+      if (!gorunur(SOL_DIZ) || !gorunur(SAG_DIZ)) return;
+      const yerdeki = Math.max(n[SOL_TOPUK].y, n[SAG_TOPUK].y);
+      const ayaktaBoy = yerdeki - omuz;
+      if (this.kalkanDiz === null) {
+        for (const diz of [SOL_DIZ, SAG_DIZ]) if ((n[diz].y - kalca) / ayaktaBoy < 0.14) this.kalkanDiz = diz;
+      } else if ((n[this.kalkanDiz].y - kalca) / ayaktaBoy > 0.2) {
+        this.kalkanDiz = null;
+        this.sayi++;
+      }
+    } else if (this.yol === 'acKapa') {
+      // Ayaklar omuz genişliğinin belirgin dışına açılınca "açık", yeniden yaklaşınca bir tekrar.
+      const omuzGenisligi = Math.abs(n[SOL_OMUZ].x - n[SAG_OMUZ].x);
+      if (omuzGenisligi < 0.02) return;
+      const aciklik = Math.abs(n[SOL_TOPUK].x - n[SAG_TOPUK].x) / omuzGenisligi;
+      if (!this.yukarida && aciklik > 1.6) this.yukarida = true;
+      else if (this.yukarida && aciklik < 1.1) {
+        this.yukarida = false;
+        this.sayi++;
+      }
+    } else if (this.yol === 'yanAdim') {
+      // Kalça ortası, durduğu yerin (taban) bir yanına geçip öbür yanına geçince bir adım.
+      const x = (n[SOL_KALCA].x + n[SAG_KALCA].x) / 2;
+      if (this.taban === null) this.taban = x;
+      const kayma = (x - this.taban) / boy;
+      const yeniTaraf = kayma > 0.06 ? 1 : kayma < -0.06 ? -1 : 0;
+      if (yeniTaraf !== 0 && yeniTaraf !== this.taraf) {
+        this.sayi++;
+        this.taraf = yeniTaraf;
+      }
+      // Çocuk zamanla yerinden kayarsa taban da çok yavaş onu izler.
+      this.taban = this.taban * 0.995 + x * 0.005;
     }
   }
 }

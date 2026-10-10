@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>NSCameraUsageDescription</key>
-	<string>Ebeveyn açarsa kamera, çocuğun zıplama ve çömelme hareketlerini sayar. Görüntü telefonda işlenir; kaydedilmez ve hiçbir yere gönderilmez.</string>
+	<string>Ebeveyn açarsa kamera, çocuğun zıplama, çömelme, kol ve diz hareketlerini sayar. Görüntü telefonda işlenir; kaydedilmez ve hiçbir yere gönderilmez.</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>tr</string>
 	<key>CFBundleDisplayName</key>

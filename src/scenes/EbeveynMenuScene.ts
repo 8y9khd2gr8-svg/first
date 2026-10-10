@@ -36,7 +36,7 @@ export class EbeveynMenuScene extends Phaser.Scene {
           .setOrigin(0.5),
       );
 
-    // Kamerayla sayma (deneme): açıkken zıplama, çömelme ve kol hareketlerini kamera sayar.
+    // Kamerayla sayma (deneme): açıkken kamera zıplama, çömelme, kol, diz, ayak aç-kapa ve yana adım hareketlerini sayar.
     // Görüntü telefonun içinde işlenir; kaydedilmez, gönderilmez.
     if (kameraDesteklenir()) {
       const acik = kameraAcikMi();
