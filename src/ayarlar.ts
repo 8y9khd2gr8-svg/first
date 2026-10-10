@@ -16,3 +16,22 @@ export const RENK = {
 // Telefonda "hareketi azalt" (erişilebilirlik) açıksa süs animasyonları çalışmaz;
 // anlamlı hareketler (Zıpzıp'ın gösterimi, sıradaki durağın parlaması, kutlamalar) kalır.
 export const HAREKETI_AZALT = typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+// "Uzaktan oyna": telefon uzaktayken hareketler "Yaptım!" beklemeden kendiliğinden ilerler.
+// Seçim sadece bu cihazda saklanır.
+const UZAKTAN_ANAHTAR = 'zipzip-uzaktan-v1';
+export function uzaktanAcikMi(): boolean {
+  try {
+    return localStorage.getItem(UZAKTAN_ANAHTAR) === '1';
+  } catch {
+    return false;
+  }
+}
+export function uzaktanAyarla(acik: boolean) {
+  try {
+    if (acik) localStorage.setItem(UZAKTAN_ANAHTAR, '1');
+    else localStorage.removeItem(UZAKTAN_ANAHTAR);
+  } catch {
+    // kayıt olmazsa bu açılışta geçerli değil; sorun değil
+  }
+}

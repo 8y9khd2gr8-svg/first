@@ -1,27 +1,38 @@
 import { haftalikOzet } from './istatistik';
 
-// Kostümler: satın alınmaz, harcanmaz. Her "Yaptım!" 1 yıldız; yıldızlar biriktikçe kostümler
-// kendiliğinden açılır, çocuk açılanlardan birini giyer. Seçim sadece cihazda saklanır.
+import { BOLUMLER, BolumId, durakBul } from './duraklar';
+import { tamamlananlar } from './ilerleme';
 
-export type Kostum = { id: string; simge: string; ad: string; yildiz: number };
+// Kostümler: satın alınmaz, harcanmaz. Her biri bir durağın (ya da bölümün) hatırası:
+// o yer bitince kendiliğinden açılır (ör. Kapadokya → pilot gözlüğü). Herkese uygun, cinsiyetsiz hediyeler.
+// Yıldızlar (her "Yaptım!" 1 yıldız) sayılmaya devam eder; dolapta toplam olarak görünür.
+
+export type Kostum = { id: string; simge: string; ad: string; durak?: string; bolum?: BolumId };
 
 export const KOSTUMLER: Kostum[] = [
-  { id: 'kep', simge: '🧢', ad: 'Kep', yildiz: 10 },
-  { id: 'gozluk', simge: '🕶️', ad: 'Güneş Gözlüğü', yildiz: 25 },
-  { id: 'fiyonk', simge: '🎀', ad: 'Fiyonk', yildiz: 40 },
-  { id: 'pelerin', simge: '🦸', ad: 'Pelerin', yildiz: 60 },
-  { id: 'atki', simge: '🧣', ad: 'Atkı', yildiz: 80 },
-  { id: 'tac', simge: '👑', ad: 'Taç', yildiz: 100 },
-  { id: 'sihirbaz', simge: '🎩', ad: 'Sihirbaz Şapkası', yildiz: 150 },
-  { id: 'kasif', simge: '🤠', ad: 'Kâşif Şapkası', yildiz: 200 },
-  { id: 'astronot', simge: '🧑‍🚀', ad: 'Astronot Kaskı', yildiz: 300 },
+  { id: 'kaptan', simge: '⚓', ad: 'Kaptan Şapkası', durak: 'istanbul' },
+  { id: 'pilot', simge: '🥽', ad: 'Pilot Gözlüğü', durak: 'kapadokya' },
+  { id: 'atki', simge: '🧣', ad: 'Gezgin Atkısı', durak: 'karadeniz' },
+  { id: 'kasif', simge: '🤠', ad: 'Kâşif Şapkası', durak: 'piramitler' },
+  { id: 'gozluk', simge: '🕶️', ad: 'Dağcı Gözlüğü', durak: 'machupicchu' },
+  { id: 'astronot', simge: '🧑‍🚀', ad: 'Astronot Kaskı', durak: 'ay' },
+  { id: 'pelerin', simge: '🦸', ad: 'Uzay Pelerini', durak: 'neptun' },
+  { id: 'terBandi', simge: '🎽', ad: 'Ter Bandı', durak: 'basketbol' },
+  { id: 'madalya', simge: '🏅', ad: 'Altın Madalya', bolum: 'spor' },
+  { id: 'kabuk', simge: '🥚', ad: 'Yumurta Kabuğu', durak: 'yumurta' },
+  { id: 'dinoSapka', simge: '🦖', ad: 'Dinozor Şapkası', durak: 'fosil' },
+  { id: 'uykuSapka', simge: '🌙', ad: 'Uyku Şapkası', durak: 'yastik' },
+  { id: 'tac', simge: '👑', ad: 'Toplama Tacı', durak: 'toplama' },
 ];
+
+// Kostüm nasıl açılır: "Kapadokya’yı bitir" gibi (dolapta yazar, sesli de söylenir).
+export const kostumNasil = (k: Kostum) => (k.durak ? `${durakBul(k.durak).yer} durağını bitir` : `${BOLUMLER[k.bolum!].ad} bölümünü bitir`);
 
 export const yildizSayisi = () => haftalikOzet().toplamHareket;
 
 export const acikKostumler = () => {
-  const y = yildizSayisi();
-  return KOSTUMLER.filter((k) => y >= k.yildiz);
+  const biten = new Set(tamamlananlar());
+  return KOSTUMLER.filter((k) => (k.durak ? biten.has(k.durak) : BOLUMLER[k.bolum!].duraklar.every((d) => biten.has(d.id))));
 };
 
 const ANAHTAR = 'zipzip-kostum-v1';

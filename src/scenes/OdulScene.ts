@@ -1,12 +1,14 @@
 import Phaser from 'phaser';
 import { RENK, YAZI_TIPI } from '../ayarlar';
-import { buyukDugme, rozetCiz, yildizliArkaPlan } from '../arayuz';
-import { AILE_ID, AILE_OTURUMU } from '../aile';
-import { durakBul, haritaSahnesi, oturum } from '../duraklar';
+import { buyukDugme, rozetCiz, yildizliArkaPlan, durakSimgesi } from '../arayuz';
+import { AILE_ID } from '../aile';
+import { oturumListesi } from '../oturum';
+import { durakBul, haritaSahnesi } from '../duraklar';
 import { tamamla, tamamlananlar } from '../ilerleme';
 import { M } from '../metinler';
 import { yeniRozetleriAl } from '../rozetler';
-import { yeniKostumleriAl } from '../kostumler';
+import { kostumSec, yeniKostumleriAl } from '../kostumler';
+import { SOGUMA_ID } from '../oturum';
 import { bip, konus, sustur, zaferMuzigi } from '../ses';
 
 const KONFETI_RENKLERI = [0xffc93c, 0xff8a3d, 0x3fbf5f, 0x2f80ed, 0xff6b6b, 0xffffff];
@@ -74,16 +76,16 @@ export class OdulScene extends Phaser.Scene {
 
     // Kazanılan yıldızlar (her "Yaptım!" 1 yıldız): kostümler bu yıldızlarla açılır.
     this.add
-      .text(x, 425, `+${durak ? oturum(durak).length : AILE_OTURUMU.length} ⭐ yıldız`, { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '34px', color: '#FFC93C' })
+      .text(x, 425, `+${oturumListesi(this.durakId, 1).length} ⭐ yıldız`, { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '34px', color: '#FFC93C' })
       .setOrigin(0.5);
 
     // Pasaport damgası: yukarıdan "pat" diye basılır.
-    const damga = this.add.container(x, 650).setAngle(-10);
+    const damga = this.add.container(x, 630).setAngle(-10);
     const cember = this.add.graphics();
     cember.lineStyle(10, RENK.turuncu).strokeCircle(0, 0, 170);
     cember.lineStyle(4, RENK.turuncu).strokeCircle(0, 0, 145);
     damga.add(cember);
-    damga.add(this.add.text(0, -40, durak ? durak.simge : '👪', { fontSize: '120px' }).setOrigin(0.5));
+    damga.add(durak ? durakSimgesi(this, durak, 0, -40, 120) : this.add.text(0, -40, '👪', { fontSize: '120px' }).setOrigin(0.5));
     damga.add(this.add.text(0, 70, durak ? durak.yer.toLocaleUpperCase('tr') : 'AİLE TAKIMI', { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '46px', color: '#FF8A3D' }).setOrigin(0.5));
     damga.add(this.add.text(0, 115, 'ZIP ZIP DÜNYA', { fontFamily: YAZI_TIPI, fontSize: '24px', color: '#FF8A3D' }).setOrigin(0.5));
     damga.setScale(2.5).setAlpha(0);
@@ -103,14 +105,25 @@ export class OdulScene extends Phaser.Scene {
     zaferMuzigi();
     this.time.delayedCall(500, () => konus(durak ? M.damgaKazandin(durak.yer) : M.aileBitti));
 
+    // Merak sorusu: çocuk öğrendiğini evdekilere sorsun.
+    const soru = durak?.soru;
+    if (soru) {
+      const balon = this.add
+        .text(x, 878, `💬 ${soru}`, { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '28px', color: '#14213D', backgroundColor: '#FFF6E0', align: 'center', padding: { x: 18, y: 8 }, wordWrap: { width: 620 } })
+        .setOrigin(0.5)
+        .setAlpha(0);
+      this.tweens.add({ targets: balon, alpha: 1, duration: 400, delay: 2300 });
+      this.time.delayedCall(2800, () => konus(soru));
+    }
+
     // Yeni rozet ve kostümler damgadan sonra sırayla kutlanır (rozetlerden en fazla ilki, "+2" yazar).
     const rozetler = yeniRozetleriAl();
     const kostumler = yeniKostumleriAl();
     const kutlamalar: (() => void)[] = [];
     if (rozetler.length) kutlamalar.push(() => this.rozetKutla(rozetler[0].simge, rozetler[0].ad, rozetler.length - 1, 'Yeni rozet!', M.yeniRozet(rozetler[0].ad), sonraki));
-    kostumler.forEach((k) => kutlamalar.push(() => this.rozetKutla(k.simge, k.ad, 0, 'Yeni kostüm!', M.yeniKostum(k.ad), sonraki, 'Kostüm dolabında seni bekliyor!')));
+    kostumler.forEach((k) => kutlamalar.push(() => this.rozetKutla(k.simge, k.ad, 0, 'Yeni kostüm!', M.yeniKostum(k.ad), sonraki, 'Hemen giymek ister misin?', () => kostumSec(k.id))));
     const sonraki = () => kutlamalar.shift()?.();
-    if (kutlamalar.length) this.time.delayedCall(3400, sonraki);
+    if (kutlamalar.length) this.time.delayedCall(soru ? 6800 : 3400, sonraki);
 
     this.kutlamaKatmani = this.add.container(0, 0).setDepth(10);
 
@@ -120,13 +133,18 @@ export class OdulScene extends Phaser.Scene {
       else this.scene.start(haritaSahnesi(durak), yeniBitti ? { yolculukDen: durak.id } : {});
     }, { genislik: 540, yukseklik: 150, yaziBoyu: 64 });
 
-    buyukDugme(this, x, 1170, 'Bir daha ↻', RENK.mavi, () => {
+    buyukDugme(this, x - 165, 1170, 'Bir daha ↻', RENK.mavi, () => {
       sustur();
       this.scene.start('Hareket', { durakId: this.durakId, adim: 0 });
-    }, { genislik: 400, yukseklik: 110, yaziBoyu: 52 });
+    }, { genislik: 300, yukseklik: 110, yaziBoyu: 44 });
+    // Bugünlük bitir: kısa, sakin bir soğuma hareketi ve vedalaşma.
+    buyukDugme(this, x + 165, 1170, '🌙 Bitirelim', 0x7c5cd6, () => {
+      sustur();
+      this.scene.start('Hareket', { durakId: SOGUMA_ID, adim: 0 });
+    }, { genislik: 300, yukseklik: 110, yaziBoyu: 44 });
   }
 
-  private rozetKutla(simge: string, ad: string, digerSayisi: number, baslikYazi = 'Yeni rozet!', sesli = M.yeniRozet(ad), bitince?: () => void, altYazi = 'Pasaportunda seni bekliyor!') {
+  private rozetKutla(simge: string, ad: string, digerSayisi: number, baslikYazi = 'Yeni rozet!', sesli = M.yeniRozet(ad), bitince?: () => void, altYazi = 'Pasaportunda seni bekliyor!', giy?: () => void) {
     const { width, height } = this.scale.gameSize;
     const x = width / 2;
     const k = this.kutlamaKatmani;
@@ -137,6 +155,19 @@ export class OdulScene extends Phaser.Scene {
     const ek = this.add.text(x, 870, digerSayisi > 0 ? `+${digerSayisi} rozet daha! Pasaportuna bak.` : altYazi, { fontFamily: YAZI_TIPI, fontSize: '32px', color: '#cfe3ff' }).setOrigin(0.5);
     const tamam = this.add.text(x, 1000, 'Harika! ✓', { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '52px', color: '#ffffff', backgroundColor: '#3FBF5F', padding: { x: 40, y: 14 } }).setOrigin(0.5).setInteractive({ useHandCursor: true });
     k.add([perde, baslik, rozet, isim, ek, tamam]);
+    // Kostümde "Giy!" düğmesi: dolabı aramadan hemen giyilir.
+    if (giy) {
+      tamam.setText('Sonra');
+      tamam.setPosition(x - 150, 1000).setBackgroundColor('#2F80ED');
+      const giyDugme = this.add.text(x + 150, 1000, 'Giy! 👕', { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '52px', color: '#ffffff', backgroundColor: '#3FBF5F', padding: { x: 40, y: 14 } }).setOrigin(0.5).setInteractive({ useHandCursor: true });
+      k.add(giyDugme);
+      giyDugme.on('pointerdown', () => {
+        bip(880, 0.08, 'square', 0.12);
+        giy();
+        k.removeAll(true);
+        bitince?.();
+      });
+    }
     this.tweens.add({ targets: rozet, scale: 1, angle: 360, duration: 700, ease: 'Back.easeOut' });
     zaferMuzigi();
     konus(sesli);

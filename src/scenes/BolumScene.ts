@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { RENK, YAZI_TIPI, HAREKETI_AZALT } from '../ayarlar';
-import { buyukDugme, evDugmesi } from '../arayuz';
+import { buyukDugme, evDugmesi, durakSimgesi } from '../arayuz';
 import { BOLUM_SIRASI, BOLUMLER, BolumId, Durak, bolumuAcikMi } from '../duraklar';
 import { tamamlananlar } from '../ilerleme';
 import { M } from '../metinler';
@@ -276,7 +276,7 @@ export class BolumScene extends Phaser.Scene {
     g.fillStyle(0xffffff, acik ? 0.95 : 0.35).fillCircle(0, 0, R);
     g.lineStyle(bitti ? 9 : 5, bitti ? RENK.sari : RENK.turuncu, acik ? 1 : 0.5).strokeCircle(0, 0, R);
     kap.add(g);
-    kap.add(this.add.text(0, 2, durak.simge, { fontSize: '62px' }).setOrigin(0.5).setAlpha(acik ? 1 : 0.45));
+    kap.add(durakSimgesi(this, durak, 0, 2, 62).setAlpha(acik ? 1 : 0.45));
     if (bitti) kap.add(this.add.star(R * 0.7, -R * 0.7, 5, 11, 24, RENK.sari).setStrokeStyle(3, 0xffffff));
     if (!acik) kap.add(this.add.text(R * 0.6, R * 0.55, '🔒', { fontSize: '32px' }).setOrigin(0.5));
     kap.add(

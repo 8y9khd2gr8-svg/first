@@ -4,8 +4,8 @@ import { feature } from 'topojson-client';
 import type { Topology } from 'topojson-specification';
 import karaVerisi from 'world-atlas/land-110m.json';
 import ulkeVerisi from 'world-atlas/countries-110m.json';
-import { RENK, YAZI_TIPI } from '../ayarlar';
-import { buyukDugme, evDugmesi, yildizliArkaPlan } from '../arayuz';
+import { HAREKETI_AZALT, RENK, YAZI_TIPI } from '../ayarlar';
+import { buyukDugme, evDugmesi, yildizliArkaPlan, durakSimgesi } from '../arayuz';
 import { DUNYA, Durak } from '../duraklar';
 import { bolumAcik, tamamlananlar } from '../ilerleme';
 import { M } from '../metinler';
@@ -131,7 +131,7 @@ export class DunyaScene extends Phaser.Scene {
       const cx = x + (i - 3) * 92;
       const cip = this.add.container(cx, 1170);
       cip.add(this.add.circle(0, 0, 36, this.biten.has(durak.id) ? RENK.sari : acik ? RENK.turuncu : 0x6b7280).setStrokeStyle(4, RENK.beyaz));
-      cip.add(this.add.text(0, 2, acik ? durak.simge : '🔒', { fontSize: '34px' }).setOrigin(0.5));
+      cip.add(acik ? durakSimgesi(this, durak, 0, 2, 34) : this.add.text(0, 2, '🔒', { fontSize: '34px' }).setOrigin(0.5));
       cip.setSize(80, 80).setInteractive({ useHandCursor: true });
       cip.on('pointerdown', () => {
         if (!acik) {
@@ -184,13 +184,30 @@ export class DunyaScene extends Phaser.Scene {
     } else {
       zipzip.surekli('zipla', 1200);
       if (this.veri.giris === 'uzay') {
-        // Uzaydan geliş: küre küçükten büyür ve dönerek durağa gelir.
+        // Uzaydan geliş: küre uzaktan belirir, büyürken neredeyse tam bir tur döner ve
+        // yavaşlayarak sıradaki harikanın üstünde durur (yavaş ama etkileyici).
         const hedef = this.merkez;
-        this.merkez = [hedef[0] + 160, hedef[1]];
-        this.ciz();
-        this.kureResmi.setScale(0.25);
-        this.tweens.add({ targets: this.kureResmi, scale: 1, duration: 1200, ease: 'Cubic.easeOut' });
-        this.don(hedef, 1500, undefined, durumuSoyle);
+        const tur = HAREKETI_AZALT ? 0 : 300;
+        const sure = HAREKETI_AZALT ? 800 : 3200;
+        this.kureResmi.setScale(0.12).setAlpha(0);
+        this.tweens.add({ targets: this.kureResmi, alpha: 1, duration: 600 });
+        this.tweens.add({ targets: this.kureResmi, scale: 1, duration: sure * 0.8, ease: 'Cubic.easeOut' });
+        const donus = { t: 0 };
+        this.tweens.add({
+          targets: donus,
+          t: 1,
+          duration: sure,
+          ease: 'Cubic.easeOut',
+          onUpdate: () => {
+            this.merkez = [hedef[0] + tur * (1 - donus.t), hedef[1] * donus.t];
+            this.ciz();
+          },
+          onComplete: () => {
+            this.merkez = hedef;
+            this.ciz();
+            durumuSoyle();
+          },
+        });
       } else durumuSoyle();
     }
   }
@@ -323,7 +340,7 @@ export class DunyaScene extends Phaser.Scene {
   private isaret(durak: Durak, acik: boolean, bitti: boolean, siradaki: boolean) {
     const isaret = this.add.container(0, 0);
     isaret.add(this.add.circle(0, 0, 32, bitti ? RENK.sari : acik ? RENK.turuncu : 0x6b7280).setStrokeStyle(5, RENK.beyaz));
-    isaret.add(this.add.text(0, 2, acik ? durak.simge : '🔒', { fontSize: '34px' }).setOrigin(0.5));
+    isaret.add(acik ? durakSimgesi(this, durak, 0, 2, 34) : this.add.text(0, 2, '🔒', { fontSize: '34px' }).setOrigin(0.5));
     isaret.add(
       this.add
         .text(0, 50, durak.yer, { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '24px', color: '#ffffff', stroke: '#0b1430', strokeThickness: 6 })

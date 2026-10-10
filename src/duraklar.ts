@@ -1,4 +1,4 @@
-import { H, Hareket, ISINMA, SOGUMA } from './hareketler';
+import { Hareket, K, birlesik, hikayeli } from './hareketler';
 import { bolumAcik } from './ilerleme';
 
 // Türkiye Turu durakları (batıdan doğuya). Kural: ibadet yeri olarak kullanılan yapılar yok.
@@ -12,10 +12,14 @@ export type Durak = {
   yer: string; // şehir / bölge
   simge: string;
   bilgi: string; // "Biliyor muydun?" kutusu (aynı zamanda seslendirilir)
+  soru?: string; // durak sonunda "Evde birine sor: ..." (merak ve pekiştirme)
   ozel: Hareket; // durağa özel hareket
-  ekler: [Hareket, Hareket];
+  ekler: Hareket[]; // durağa ait 3 hikâyeli hareket
 };
 
+// Her durak: özel hareket + 3 hikâyeli hareket; hepsi o yerle bağlantılı ve YERİNDE yapılır.
+// Kural (testte): sıralı bölümde bir hareket türü, önceki iki durakta kullanıldıysa tekrar kullanılmaz.
+// Isınma, sürpriz an ve soğuma oturum.ts'de eklenir.
 export const TURKIYE: Durak[] = [
   {
     id: 'istanbul',
@@ -23,9 +27,14 @@ export const TURKIYE: Durak[] = [
     ad: 'Boğaz ve Galata',
     yer: 'İstanbul',
     simge: '🌉',
-    bilgi: 'İstanbul iki kıtada birden kurulu bir şehir: Avrupa ve Asya! Boğaz’daki köprüler iki kıtayı birleştirir. Galata Kulesi ise neredeyse yedi yüz yaşında.',
-    ozel: { hikaye: 'Kulenin tepesine bak!', baslik: 'Parmak ucunda yüksel,\nkollarını uzat!', sesli: 'Kulenin tepesine bakalım! Parmak uçlarında yüksel, kollarını yukarı uzat!', animasyon: 'uzan', tur: 'sayi', adet: 4, tempoMs: 2200 },
-    ekler: [H.zipla, H.comel],
+    bilgi: 'İstanbul’un bir yarısı Avrupa’da, öbür yarısı Asya’da! Köprüden geçince bir kıtadan öbür kıtaya geçersin.',
+    soru: 'Evde birine sor: Hangi şehir iki kıtadadır?',
+    ozel: hikayeli(K.uzan, 'Galata Kulesi’nin tepesine bak!'),
+    ekler: [
+      hikayeli(K.yanAdim, 'Köprüden Asya’ya geç, Avrupa’ya dön!'),
+      hikayeli(K.kulac, 'Boğaz’da yüzme yarışı var!'),
+      hikayeli(K.zipla, 'Vapur düdüğü çaldı!', { ritim: 'hizli' }),
+    ],
   },
   {
     id: 'truva',
@@ -33,9 +42,14 @@ export const TURKIYE: Durak[] = [
     ad: 'Truva Atı',
     yer: 'Çanakkale',
     simge: '🐴',
-    bilgi: 'Truva Antik Kenti Çanakkale’de. Masala göre insanlar kocaman tahta bir atın içine saklanmış!',
-    ozel: { hikaye: 'Truva Atı’na yetiş!', baslik: 'Yerinde hızlı koş!', sesli: 'Truva Atı’na yetişelim! Yerinde hızlı hızlı koş!', animasyon: 'kos', tur: 'sure', saniye: 8 },
-    ekler: [H.dizler, H.acKapa],
+    bilgi: 'Truva çok eski bir şehir; kalıntıları bugün Çanakkale’de. Efsaneye göre insanlar kocaman tahta bir atın içine saklanmış!',
+    soru: 'Evde birine sor: Truva Atı’nın içinde kimler saklanmış?',
+    ozel: hikayeli(K.kos, 'Truva Atı’na yetiş!'),
+    ekler: [
+      hikayeli(K.comel, 'Atın içine saklan, sonra dışarı bak!'),
+      hikayeli(K.tirman, 'Kalın surlara tırmanalım!'),
+      hikayeli(K.kolSalla, 'Surların üstünden el salla!'),
+    ],
   },
   {
     id: 'pamukkale',
@@ -43,9 +57,14 @@ export const TURKIYE: Durak[] = [
     ad: 'Pamukkale',
     yer: 'Denizli',
     simge: '🏞️',
-    bilgi: 'Pamukkale’nin bembeyaz basamakları kar gibi görünür ama kar değildir. Sıcak sudan oluşan taşlardır!',
-    ozel: { hikaye: 'Beyaz basamaklardan in!', baslik: 'Dizlerini kaldırarak\nyürü!', sesli: 'Beyaz basamaklardan inelim! Dizlerini kaldırarak yerinde yürü!', animasyon: 'dizler', tur: 'sayi', adet: 10, tempoMs: 1000 },
-    ekler: [H.kollar, H.zipla],
+    bilgi: 'Pamukkale’nin bembeyaz basamakları kara benzer ama kar değildir! Sıcak su taşları beyaza boyamıştır; orada ayakkabısız yürünür.',
+    soru: 'Evde birine sor: Pamukkale neden bembeyaz?',
+    ozel: hikayeli(K.yuru, 'Beyaz basamaklardan inelim!'),
+    ekler: [
+      hikayeli(K.tekAyak, 'Sıcak suya önce tek ayağını sok!'),
+      hikayeli(K.kollar, 'Sıcak sudan buhar yükseliyor!', { ritim: 'yavas', adet: 4 }),
+      hikayeli(K.acKapa, 'Su birikintilerinin üstünden atla!'),
+    ],
   },
   {
     id: 'kapadokya',
@@ -53,19 +72,29 @@ export const TURKIYE: Durak[] = [
     ad: 'Kapadokya',
     yer: 'Nevşehir',
     simge: '🎈',
-    bilgi: 'Kapadokya’da peri bacaları denen sivri kayalar var. Sabahları gökyüzü rengârenk sıcak hava balonlarıyla dolar!',
-    ozel: { hikaye: 'Balonlar havalanıyor!', baslik: 'Çömel, sonra\nyavaşça yüksel!', sesli: 'Balonlar havalanıyor! Önce çömel, sonra yavaşça yüksel ve kollarını aç!', animasyon: 'balon', tur: 'sayi', adet: 4, tempoMs: 3000 },
-    ekler: [H.acKapa, H.comel],
+    bilgi: 'Kapadokya’da şapkalı kocaman kayalar var, adları peri bacası! Sabahları gökyüzü rengârenk sıcak hava balonlarıyla dolar.',
+    soru: 'Evde birine sor: Peri bacası nedir?',
+    ozel: hikayeli(K.balon, 'Balonlar havalanıyor!'),
+    ekler: [
+      hikayeli(K.kocaman, 'Balon şişiyor, kocaman oluyor!'),
+      hikayeli(K.yanaEgil, 'Balon rüzgârda sallanıyor!'),
+      hikayeli(K.parmakUcu, 'Yeraltı şehrinde sessizce yürüyelim!'),
+    ],
   },
   {
     id: 'nemrut',
     bolum: 'turkiye',
     ad: 'Nemrut Dağı',
     yer: 'Adıyaman',
-    simge: '🗿',
-    bilgi: 'Nemrut Dağı’nın tepesinde kocaman taş heykel başları var. Bazıları senin boyundan bile büyük!',
-    ozel: { hikaye: 'Taş heykeller seni izliyor!', baslik: 'Ellerini beline koy,\nkıpırdamadan dur!', sesli: 'Taş heykeller seni izliyor! Ellerini beline koy ve hiç kıpırdamadan dur!', animasyon: 'heykel', tur: 'sure', saniye: 6 },
-    ekler: [H.kos, H.dizler],
+    simge: '⛰️',
+    bilgi: 'Nemrut Dağı’nın tepesinde çok eskiden yapılmış kocaman taş heykeller var. İnsanlar güneşin doğuşunu izlemek için gece yola çıkar!',
+    soru: 'Evde birine sor: Güneş hangi yönden doğar?',
+    ozel: hikayeli(K.tasKaldir, 'Nemrut’ta güneş doğuyor, güneşi selamla!'),
+    ekler: [
+      hikayeli(K.tirman, 'Nemrut Dağı’na tırmanalım!', { ritim: 'yavas', adet: 6 }),
+      hikayeli(K.piramit, 'Dağın tepesi üçgen!'),
+      hikayeli(K.engel, 'Yoldaki taşların üstünden atla!'),
+    ],
   },
   {
     id: 'gobeklitepe',
@@ -73,9 +102,14 @@ export const TURKIYE: Durak[] = [
     ad: 'Göbeklitepe',
     yer: 'Şanlıurfa',
     simge: '🪨',
-    bilgi: 'Göbeklitepe dünyanın bilinen en eski yapılarından biri. On bir bin yıldan daha yaşlı, piramitlerden bile çok daha eski!',
-    ozel: { hikaye: 'Kocaman taşları kaldıralım!', baslik: 'Çömel, taşı al,\nyukarı kaldır!', sesli: 'Kocaman taşları kaldıralım! Çömel, taşı al ve yukarı kaldır!', animasyon: 'tasKaldir', tur: 'sayi', adet: 5, tempoMs: 2200 },
-    ekler: [H.zipla, H.kollar],
+    bilgi: 'Göbeklitepe on bir bin yaşında, dünyanın en eski yapılarından biri! Kocaman taşlarına tilki, yaban domuzu ve kuş resimleri oyulmuş.',
+    soru: 'Evde birine sor: Göbeklitepe’nin taşlarında hangi hayvanlar var?',
+    ozel: hikayeli(K.belDondur, 'Göbeklitepe’de göbeğini çevir!', { baslik: 'Ellerini beline koy,\ngöbeğini çevir!' }),
+    ekler: [
+      hikayeli(K.tHarfi, 'Kocaman taşlar T harfine benziyor! Sen de T harfi ol!'),
+      hikayeli(K.donus, 'Taşların etrafına bak!'),
+      hikayeli(K.kazi, 'Bilim insanları burayı kazarak buldu!'),
+    ],
   },
   {
     id: 'karadeniz',
@@ -83,9 +117,14 @@ export const TURKIYE: Durak[] = [
     ad: 'Karadeniz',
     yer: 'Trabzon',
     simge: '🌲',
-    bilgi: 'Karadeniz’de insanlar el ele tutuşup horon oynar. Horonda ayaklar çok hızlı hareket eder!',
-    ozel: { hikaye: 'Horon zamanı!', baslik: 'Ayaklarını\nhızlı hızlı vur!', sesli: 'Horon zamanı! Kollarını kaldır, ayaklarını hızlı hızlı yere vur!', animasyon: 'horon', tur: 'sure', saniye: 8 },
-    ekler: [H.acKapa, H.kos],
+    bilgi: 'Karadeniz’de çok yağmur yağar, bu yüzden her yer yemyeşildir! Çay bahçeleri ve yüksek yaylalar buradadır.',
+    soru: 'Evde birine sor: Çay hangi bölgemizde yetişir?',
+    ozel: hikayeli(K.horon, 'Karadeniz müziği çalıyor!'),
+    ekler: [
+      hikayeli(K.zipla, 'Yağmur damlalarının üstünden zıpla!'),
+      hikayeli(K.uzan, 'Uzun ağaçların tepesine uzan!'),
+      hikayeli(K.kanat, 'Yaylada kartallar süzülüyor!'),
+    ],
   },
 ];
 
@@ -98,9 +137,14 @@ export const DUNYA: Durak[] = [
     ad: 'Artemis Tapınağı',
     yer: 'Efes',
     simge: '🏛️',
-    bilgi: 'Efes’teki Artemis Tapınağı antik dünyanın yedi harikasından biriydi. Bugün sadece tek bir sütunu ayakta!',
-    ozel: { hikaye: 'Tek sütun hâlâ ayakta!', baslik: 'Dimdik dur,\nkollarını yukarı uzat!', sesli: 'Tek sütun hâlâ ayakta! Dimdik dur ve kollarını yukarı uzat!', animasyon: 'sutun', tur: 'sure', saniye: 6 },
-    ekler: [H.zipla, H.kollar],
+    bilgi: 'Efes’teki Artemis Tapınağı eskiden dünyanın yedi harikasından biriydi. Bugün yerinde tek bir sütun kaldı!',
+    soru: 'Evde birine sor: Dünyanın yedi harikasından birini biliyor musun?',
+    ozel: hikayeli(K.sutun, 'Tek sütun hâlâ ayakta!'),
+    ekler: [
+      hikayeli(K.kulac, 'Efes eskiden deniz kıyısındaydı, yüzelim!'),
+      hikayeli(K.comel, 'Antik tiyatroda otur, alkış için kalk!'),
+      hikayeli(K.acKapa, 'Kütüphanenin önünde zıpla!'),
+    ],
   },
   {
     id: 'kolezyum',
@@ -109,9 +153,14 @@ export const DUNYA: Durak[] = [
     ad: 'Kolezyum',
     yer: 'Roma',
     simge: '🏟️',
-    bilgi: 'Kolezyum neredeyse iki bin yaşında kocaman bir stadyum. İçine elli bin kişi sığarmış!',
-    ozel: { hikaye: 'Dev stadyumda koşalım!', baslik: 'Yerinde hızlı koş!', sesli: 'Dev stadyumda koşalım! Yerinde hızlı hızlı koş!', animasyon: 'kos', tur: 'sure', saniye: 8 },
-    ekler: [H.comel, H.acKapa],
+    bilgi: 'Kolezyum iki bin yaşında kocaman bir yapı. İçine elli bin kişi sığarmış, bugün bir müze!',
+    soru: 'Evde birine sor: Kolezyum hangi ülkede?',
+    ozel: hikayeli(K.kos, 'Kolezyum’da koşalım!'),
+    ekler: [
+      hikayeli(K.dizler, 'Kolezyum’un basamaklarını çık!'),
+      hikayeli(K.kocaman, 'Kolezyum çok büyük, sen de kocaman ol!'),
+      hikayeli(K.kolSalla, 'Herkese el salla!'),
+    ],
   },
   {
     id: 'piramitler',
@@ -120,9 +169,14 @@ export const DUNYA: Durak[] = [
     ad: 'Piramitler',
     yer: 'Mısır',
     simge: '🔺',
-    bilgi: 'Büyük Piramit dört bin beş yüz yıl önce yapıldı. Milyonlarca kocaman taştan oluşuyor!',
-    ozel: { hikaye: 'Piramit olalım!', baslik: 'Ayaklarını aç, ellerini\nbaşının üstünde birleştir!', sesli: 'Piramit olalım! Ayaklarını aç ve ellerini başının üstünde birleştir!', animasyon: 'piramit', tur: 'sure', saniye: 6 },
-    ekler: [H.zipla, H.dizler],
+    bilgi: 'Büyük Piramit dört bin beş yüz yıl önce yapıldı. Milyonlarca kocaman taşı insanlar birlikte taşıdı!',
+    soru: 'Evde birine sor: Piramitler hangi ülkede?',
+    ozel: hikayeli(K.piramit, 'Piramit olalım!'),
+    ekler: [
+      hikayeli(K.parmakUcu, 'Kum çok sıcak, dikkat!'),
+      hikayeli(K.kazi, 'Kumda gizli hazine ara!'),
+      hikayeli(K.yanaEgil, 'Nil kıyısında palmiyeler rüzgârda eğiliyor!'),
+    ],
   },
   {
     id: 'petra',
@@ -131,9 +185,14 @@ export const DUNYA: Durak[] = [
     ad: 'Petra',
     yer: 'Ürdün',
     simge: '🏜️',
-    bilgi: 'Petra’nın binaları pembe kayaların içine oyulmuş. Şehre dar bir kanyondan yürüyerek girilir!',
-    ozel: { hikaye: 'Dar kanyondan geçelim!', baslik: 'Yana adım at,\nayaklarını birleştir!', sesli: 'Dar kanyondan geçelim! Yana adım at, sonra ayaklarını birleştir!', animasyon: 'yanAdim', tur: 'sayi', adet: 8, tempoMs: 1000 },
-    ekler: [H.kollar, H.comel],
+    bilgi: 'Petra, kayaların içine oyulmuş pembe bir şehir. Evler duvar örülerek değil, kaya oyularak yapılmış!',
+    soru: 'Evde birine sor: Kayanın içine ev yapılır mı?',
+    ozel: hikayeli(K.yanAdim, 'Dar kanyondan yan yan geçelim!'),
+    ekler: [
+      hikayeli(K.tirman, 'Kayadaki sekiz yüz basamağı çık!'),
+      hikayeli(K.zipla, 'Pembe kayaların arasında zıpla!', { ritim: 'yavas' }),
+      hikayeli(K.kollar, 'Pembe kayaları selamla!'),
+    ],
   },
   {
     id: 'tacmahal',
@@ -143,8 +202,13 @@ export const DUNYA: Durak[] = [
     yer: 'Hindistan',
     simge: '🌷',
     bilgi: 'Tac Mahal bembeyaz mermerden yapılmış. Güneş batarken rengi pembeye döner!',
-    ozel: { hikaye: 'Bahçede sessizce yürüyelim!', baslik: 'Parmak uçlarında yürü!', sesli: 'Bahçede sessizce yürüyelim! Parmak uçlarında yürü!', animasyon: 'parmakUcu', tur: 'sure', saniye: 8 },
-    ekler: [H.acKapa, H.kos],
+    soru: 'Evde birine sor: Mermer ne renktir?',
+    ozel: hikayeli(K.donus, 'Tac Mahal’in bahçesinde dönelim!'),
+    ekler: [
+      hikayeli(K.uzan, 'Beyaz kubbenin tepesine bak!'),
+      hikayeli(K.tekAyak, 'Havuzun kenarında dengede dur!'),
+      hikayeli(K.kanat, 'Bahçede tavus kuşları var!'),
+    ],
   },
   {
     id: 'cinseddi',
@@ -153,9 +217,14 @@ export const DUNYA: Durak[] = [
     ad: 'Çin Seddi',
     yer: 'Çin',
     simge: '🧱',
-    bilgi: 'Çin Seddi o kadar uzun ki baştan sona yürümek aylar sürer!',
-    ozel: { hikaye: 'Uzun duvarda yürüyelim!', baslik: 'Dizlerini kaldırarak\nyürü!', sesli: 'Uzun duvarda yürüyelim! Dizlerini kaldırarak yerinde yürü!', animasyon: 'dizler', tur: 'sayi', adet: 12, tempoMs: 900 },
-    ekler: [H.zipla, H.kollar],
+    bilgi: 'Çin Seddi o kadar uzun ki baştan sona yürümek aylar sürer! Uzaydan görünür diye bilinir ama aslında uzaydan gözle görülmez.',
+    soru: 'Evde birine sor: Çin Seddi uzaydan görünür mü?',
+    ozel: hikayeli(K.yuru, 'Uzun duvarda yürüyelim!', { adet: 12, tempoMs: 900 }),
+    ekler: [
+      hikayeli(K.kos, 'Duvar çok uzun, hızlanalım!'),
+      hikayeli(K.comel, 'Kulelerden dışarı bak!', { ritim: 'hizli' }),
+      hikayeli(K.yanaEgil, 'Panda bambuya uzanıyor!'),
+    ],
   },
   {
     id: 'machupicchu',
@@ -164,9 +233,14 @@ export const DUNYA: Durak[] = [
     ad: 'Machu Picchu',
     yer: 'Peru',
     simge: '⛰️',
-    bilgi: 'Machu Picchu bulutların arasında, yüksek bir dağın tepesindeki bir şehir. Orada lamalar dolaşır!',
-    ozel: { hikaye: 'Dağa tırmanalım!', baslik: 'Dizini kaldır,\nkolunu uzat!', sesli: 'Dağa tırmanalım! Bir dizini kaldır, öbür kolunu yukarı uzat! Sırayla!', animasyon: 'tirman', tur: 'sayi', adet: 8, tempoMs: 1200 },
-    ekler: [H.acKapa, H.comel],
+    bilgi: 'Machu Picchu bulutların arasında, yüksek bir dağın tepesinde kurulmuş bir şehir. Orada lamalar dolaşır!',
+    soru: 'Evde birine sor: Lama nasıl bir hayvandır?',
+    ozel: hikayeli(K.tirman, 'Machu Picchu’ya tırmanalım!'),
+    ekler: [
+      hikayeli(K.balon, 'Dağın tepesinde güneş doğuyor!'),
+      hikayeli(K.acKapa, 'Lamalarla dans et!'),
+      hikayeli(K.zipla, 'Bulutların üstünden zıpla!', { ritim: 'hizli' }),
+    ],
   },
 ];
 
@@ -179,8 +253,13 @@ export const UZAY: Durak[] = [
     yer: 'Merkür',
     simge: '☀️',
     bilgi: 'Merkür Güneş’e en yakın ve en hızlı gezegen. Güneş’in etrafını sadece 88 günde dolaşır!',
-    ozel: { hikaye: 'En hızlı gezegen!', baslik: 'Yerinde hızlı koş!', sesli: 'En hızlı gezegen Merkür! Yerinde hızlı hızlı koş!', animasyon: 'kos', tur: 'sure', saniye: 8 },
-    ekler: [H.acKapa, H.kollar],
+    soru: 'Evde birine sor: Güneş’e en yakın gezegen hangisi?',
+    ozel: hikayeli(K.kos, 'En hızlı gezegen Merkür!'),
+    ekler: [
+      hikayeli(K.engel, 'Kraterlerin üstünden atla!'),
+      hikayeli(K.kollar, 'Güneş’e merhaba de!'),
+      hikayeli(K.comel, 'Güneş çok parlak, gölgeye saklan!'),
+    ],
   },
   {
     id: 'venus',
@@ -189,8 +268,13 @@ export const UZAY: Durak[] = [
     yer: 'Venüs',
     simge: '✨',
     bilgi: 'Venüs gökyüzündeki en parlak gezegen. Kendi etrafında ters yöne döner!',
-    ozel: { hikaye: 'Venüs ters dönüyor!', baslik: 'Kollarını aç, arkanı dön,\ngeri dön!', sesli: 'Venüs ters dönüyor! Kollarını aç, arkanı dön, sonra geri dön!', animasyon: 'donus', tur: 'sayi', adet: 4, tempoMs: 2400 },
-    ekler: [H.zipla, H.comel],
+    soru: 'Evde birine sor: Akşam gökyüzündeki en parlak gezegen hangisi?',
+    ozel: hikayeli(K.donus, 'Venüs ters dönüyor!'),
+    ekler: [
+      hikayeli(K.tekAyak, 'Kalın bulutların üstünde dengede dur!'),
+      hikayeli(K.uzan, 'Parlayan Venüs’e uzan!'),
+      hikayeli(K.dizler, 'Uzay aracından in!'),
+    ],
   },
   {
     id: 'ay',
@@ -199,8 +283,13 @@ export const UZAY: Durak[] = [
     yer: 'Ay',
     simge: '🌙',
     bilgi: 'Ay’da yerçekimi Dünya’dakinden altı kat azdır. Orada çok yükseğe zıplayabilirsin!',
-    ozel: { hikaye: 'Ay’da her şey yavaş!', baslik: 'Yavaş yavaş zıpla!', sesli: 'Ay’da her şey yavaş! Yavaş yavaş zıpla!', animasyon: 'zipla', tur: 'sayi', adet: 5, tempoMs: 2200 },
-    ekler: [H.kollar, H.dizler],
+    soru: 'Evde birine sor: Ay’a giden ilk insan kim?',
+    ozel: hikayeli(K.zipla, 'Ay’da her şey yavaş!', { ritim: 'yavas' }),
+    ekler: [
+      hikayeli(K.parmakUcu, 'Ay’da ayak izi bırak!'),
+      hikayeli(K.kazi, 'Ay tozunu incele!'),
+      hikayeli(K.kolSalla, 'Dünya’ya el salla!'),
+    ],
   },
   {
     id: 'mars',
@@ -209,8 +298,13 @@ export const UZAY: Durak[] = [
     yer: 'Mars',
     simge: '🔴',
     bilgi: 'Mars’a kırmızı gezegen denir. Güneş Sistemi’nin en yüksek dağı Olimpos, Mars’tadır!',
-    ozel: { hikaye: 'Dev dağa tırmanalım!', baslik: 'Dizini kaldır,\nkolunu uzat!', sesli: 'Mars’taki dev dağa tırmanalım! Bir dizini kaldır, öbür kolunu uzat!', animasyon: 'tirman', tur: 'sayi', adet: 8, tempoMs: 1200 },
-    ekler: [H.zipla, H.comel],
+    soru: 'Evde birine sor: Mars neden kırmızı?',
+    ozel: hikayeli(K.tirman, 'Mars’taki dev dağa tırmanalım!'),
+    ekler: [
+      hikayeli(K.tepin, 'Kırmızı tozu havaya kaldır!'),
+      hikayeli(K.kulac, 'Mars robotu kollarını çeviriyor!'),
+      hikayeli(K.acKapa, 'Kırmızı gezegende zıpla!'),
+    ],
   },
   {
     id: 'jupiter',
@@ -219,8 +313,13 @@ export const UZAY: Durak[] = [
     yer: 'Jüpiter',
     simge: '🟠',
     bilgi: 'Jüpiter en büyük gezegen. İçine binden fazla Dünya sığar!',
-    ozel: { hikaye: 'En büyük gezegen!', baslik: 'Kollarını ve bacaklarını\naç, kocaman ol!', sesli: 'En büyük gezegen Jüpiter! Kollarını ve bacaklarını aç, kocaman ol!', animasyon: 'kocaman', tur: 'sure', saniye: 6 },
-    ekler: [H.dizler, H.acKapa],
+    soru: 'Evde birine sor: En büyük gezegen hangisi?',
+    ozel: hikayeli(K.kocaman, 'En büyük gezegen Jüpiter!'),
+    ekler: [
+      hikayeli(K.donus, 'Kırmızı fırtına dönüyor!', { ritim: 'hizli' }),
+      hikayeli(K.comel, 'Jüpiter’in yerçekimi çok güçlü!', { ritim: 'yavas', adet: 4 }),
+      hikayeli(K.basket, 'Jüpiter’in aylarına uzan!'),
+    ],
   },
   {
     id: 'saturn',
@@ -229,8 +328,13 @@ export const UZAY: Durak[] = [
     yer: 'Satürn',
     simge: '🪐',
     bilgi: 'Satürn’ün buzdan ve kayadan yapılmış kocaman halkaları var!',
-    ozel: { hikaye: 'Halkalar dönüyor!', baslik: 'Ellerini beline koy,\nbelini döndür!', sesli: 'Satürn’ün halkaları dönüyor! Ellerini beline koy, belini döndür!', animasyon: 'belDondur', tur: 'sayi', adet: 4, tempoMs: 2000 },
-    ekler: [H.kos, H.kollar],
+    soru: 'Evde birine sor: Halkaları olan gezegen hangisi?',
+    ozel: hikayeli(K.belDondur, 'Satürn’ün halkaları dönüyor!'),
+    ekler: [
+      hikayeli(K.yanAdim, 'Halkaların üstünde kayalım!'),
+      hikayeli(K.kollar, 'Buz parçaları parlıyor!', { ritim: 'hizli' }),
+      hikayeli(K.dizler, 'Halkanın etrafında yürüyelim!', { ritim: 'yavas', adet: 8 }),
+    ],
   },
   {
     id: 'uranus',
@@ -238,9 +342,14 @@ export const UZAY: Durak[] = [
     ad: 'Uranüs',
     yer: 'Uranüs',
     simge: '🔵',
-    bilgi: 'Uranüs yan yatmış hâlde döner, sanki yuvarlanan bir top gibi!',
-    ozel: { hikaye: 'Yan yatan gezegen!', baslik: 'Kollarını kaldır,\nyana eğil!', sesli: 'Yan yatan gezegen Uranüs! Kollarını kaldır, bir yana eğil, sonra öbür yana!', animasyon: 'yanaEgil', tur: 'sayi', adet: 4, tempoMs: 2400 },
-    ekler: [H.zipla, H.dizler],
+    bilgi: 'Uranüs yan yatmış hâlde döner, sanki yuvarlanan bir top!',
+    soru: 'Evde birine sor: Yan yatarak dönen gezegen hangisi?',
+    ozel: hikayeli(K.yanaEgil, 'Yan yatan gezegen Uranüs!'),
+    ekler: [
+      hikayeli(K.tekAyak, 'Sen de dengede dur!'),
+      hikayeli(K.zipla, 'Buz gezegeninde zıpla!'),
+      hikayeli(K.parmakUcu, 'Buzun üstünde dikkatli yürü!'),
+    ],
   },
   {
     id: 'neptun',
@@ -249,8 +358,13 @@ export const UZAY: Durak[] = [
     yer: 'Neptün',
     simge: '🌀',
     bilgi: 'Neptün en uzak gezegen. Orada çok güçlü rüzgârlar eser!',
-    ozel: { hikaye: 'Rüzgâr esiyor!', baslik: 'Kollarını kaldır,\nsağa sola salla!', sesli: 'Neptün’de rüzgâr esiyor! Kollarını kaldır, sağa sola salla!', animasyon: 'kolSalla', tur: 'sayi', adet: 8, tempoMs: 1200 },
-    ekler: [H.acKapa, H.comel],
+    soru: 'Evde birine sor: Güneş’e en uzak gezegen hangisi?',
+    ozel: hikayeli(K.kolSalla, 'Neptün’de rüzgâr esiyor!'),
+    ekler: [
+      hikayeli(K.kos, 'Rüzgâr çok hızlı, sen de hızlan!'),
+      hikayeli(K.kanat, 'Rüzgârda süzül!'),
+      hikayeli(K.balon, 'Eve dönüş vakti!'),
+    ],
   },
 ];
 
@@ -263,8 +377,13 @@ export const SPOR: Durak[] = [
     yer: 'Futbol',
     simge: '⚽',
     bilgi: 'Futbol dünyada en çok oynanan oyun. Bir maçta oyuncular neredeyse on kilometre koşar!',
-    ozel: { hikaye: 'Gol atalım!', baslik: 'Ayağını öne doğru\nsalla, topa vur!', sesli: 'Gol atalım! Bir ayağını öne doğru salla, sonra öbür ayağını! Sekiz kere!', animasyon: 'sut', tur: 'sayi', adet: 8, tempoMs: 1200 },
-    ekler: [H.kos, H.zipla],
+    soru: 'Evde birine sor: Bir futbol takımında kaç oyuncu var?',
+    ozel: hikayeli(K.sut, 'Topa vur!'),
+    ekler: [
+      hikayeli(K.dizler, 'Topu dizinle sektir!'),
+      hikayeli(K.yanAdim, 'Topla yana kaç!', { ritim: 'hizli' }),
+      birlesik('Gol oldu, sevin!', 'Zıpla, zıpla,\nkollarını kaldır!', ['zipla', 'zipla', 'kollar'], 6, 1200),
+    ],
   },
   {
     id: 'basketbol',
@@ -273,8 +392,13 @@ export const SPOR: Durak[] = [
     yer: 'Basketbol',
     simge: '🏀',
     bilgi: 'Basketbol potası yerden üç metre yüksekte. Bu, neredeyse iki büyüğün boyu kadar!',
-    ozel: { hikaye: 'Smaç zamanı!', baslik: 'Çömel, zıpla,\nkollarını yukarı uzat!', sesli: 'Smaç zamanı! Çömel, sonra zıpla ve kollarını yukarı uzat! Beş kere!', animasyon: 'basket', tur: 'sayi', adet: 5, tempoMs: 2000 },
-    ekler: [H.dizler, H.kollar],
+    soru: 'Evde birine sor: Basket potası ne kadar yüksek?',
+    ozel: hikayeli(K.basket, 'Smaç zamanı!'),
+    ekler: [
+      hikayeli(K.kolSalla, 'Savunma yap!', { ritim: 'hizli' }),
+      hikayeli(K.uzan, 'Pota çok yüksek!'),
+      hikayeli(K.kos, 'Sahada koş!'),
+    ],
   },
   {
     id: 'yuzme',
@@ -283,8 +407,13 @@ export const SPOR: Durak[] = [
     yer: 'Yüzme',
     simge: '🏊',
     bilgi: 'Yüzerken kollarımız sırayla suyu iter. Suyun içinde vücudumuz çok daha hafif gelir!',
-    ozel: { hikaye: 'Havuzda yüzelim!', baslik: 'Kollarını sırayla\nöne doğru çevir!', sesli: 'Havuzda yüzelim! Kollarını sırayla öne doğru çevir! Bir bu kolun, bir öbür kolun!', animasyon: 'kulac', tur: 'sure', saniye: 10 },
-    ekler: [H.comel, H.acKapa],
+    soru: 'Evde birine sor: Sen yüzmeyi biliyor musun?',
+    ozel: hikayeli(K.kulac, 'Havuzda yüzelim!', { saniye: 10 }),
+    ekler: [
+      hikayeli(K.sutun, 'Suya atlamaya hazırlan!', { saniye: 4 }),
+      hikayeli(K.tepin, 'Ayaklarınla suyu çırp!', { ritim: 'hizli' }),
+      hikayeli(K.yanaEgil, 'Havuzdan çık, havlunla kurulan!'),
+    ],
   },
   {
     id: 'jimnastik',
@@ -293,8 +422,13 @@ export const SPOR: Durak[] = [
     yer: 'Jimnastik',
     simge: '🤸',
     bilgi: 'Jimnastikçiler denge aletinde, avuç içi kadar ince bir tahtanın üstünde yürür, döner, hatta zıplar!',
-    ozel: { hikaye: 'Denge zamanı!', baslik: 'Tek ayağını kaldır,\nkollarını yana aç!', sesli: 'Denge zamanı! Tek ayağını kaldır, kollarını yana aç! Sonra öbür ayağını kaldır!', animasyon: 'tekAyak', tur: 'sure', saniye: 8 },
-    ekler: [H.zipla, H.kollar],
+    soru: 'Evde birine sor: Tek ayak üstünde ne kadar durabiliyorsun?',
+    ozel: hikayeli(K.tekAyak, 'Denge zamanı!'),
+    ekler: [
+      hikayeli(K.acKapa, 'Yıldız atlayışı!'),
+      hikayeli(K.kocaman, 'Kocaman bir açılış yap!'),
+      hikayeli(K.belDondur, 'Esnek ol!'),
+    ],
   },
   {
     id: 'tenis',
@@ -303,8 +437,13 @@ export const SPOR: Durak[] = [
     yer: 'Tenis',
     simge: '🎾',
     bilgi: 'Tenis topu çok hızlı gider. En hızlı servisler otoyoldaki bir arabadan bile hızlıdır!',
-    ozel: { hikaye: 'Topa vur!', baslik: 'Kolunu yukarıdan\naşağı doğru salla!', sesli: 'Tenis zamanı! Kolunu yukarıdan aşağı doğru salla ve topa vur! Sekiz kere!', animasyon: 'raket', tur: 'sayi', adet: 8, tempoMs: 1300 },
-    ekler: [H.kos, H.comel],
+    soru: 'Evde birine sor: Tenis topu ne renktir?',
+    ozel: hikayeli(K.raket, 'Topa vur!'),
+    ekler: [
+      hikayeli(K.comel, 'Alçak topu karşıla!'),
+      hikayeli(K.yanAdim, 'Topa yetiş!'),
+      hikayeli(K.engel, 'Fileden atla!'),
+    ],
   },
   {
     id: 'voleybol',
@@ -313,8 +452,13 @@ export const SPOR: Durak[] = [
     yer: 'Voleybol',
     simge: '🏐',
     bilgi: 'Voleybolda top yere düşmeden takım arkadaşları üç kez vurabilir. Herkes birbirine yardım eder!',
-    ozel: { hikaye: 'Topu ağın üstünden at!', baslik: 'Ellerini başının üstünde\nbirleştir, yukarı it!', sesli: 'Topu ağın üstünden atalım! Ellerini başının üstünde birleştir ve yukarı it! Altı kere!', animasyon: 'voleybol', tur: 'sayi', adet: 6, tempoMs: 1600 },
-    ekler: [H.dizler, H.acKapa],
+    soru: 'Evde birine sor: Voleybol kaç kişiyle oynanır?',
+    ozel: hikayeli(K.voleybol, 'Topu ağın üstünden at!'),
+    ekler: [
+      hikayeli(K.dizler, 'Sahaya koşarak gir!', { ritim: 'hizli' }),
+      hikayeli(K.zipla, 'Blok için zıpla!'),
+      hikayeli(K.yanaEgil, 'Topa uzan!'),
+    ],
   },
   {
     id: 'atletizm',
@@ -323,8 +467,13 @@ export const SPOR: Durak[] = [
     yer: 'Atletizm',
     simge: '🏃',
     bilgi: 'Atletizmde koşucular yarışırken engellerin üstünden atlar. Engeller bir çocuğun belinden bile yüksektir!',
-    ozel: { hikaye: 'Engelin üstünden atla!', baslik: 'Zıpla, dizlerini\nyukarı çek!', sesli: 'Engelin üstünden atlayalım! Zıpla ve dizlerini yukarı çek! Beş kere!', animasyon: 'engel', tur: 'sayi', adet: 5, tempoMs: 1600 },
-    ekler: [H.kollar, H.kos],
+    soru: 'Evde birine sor: En hızlı koşan hayvan hangisi?',
+    ozel: hikayeli(K.engel, 'Engelin üstünden atla!'),
+    ekler: [
+      hikayeli(K.kollar, 'Yarıştan önce kollarını hazırla!'),
+      hikayeli(K.basket, 'Uzun atlama!'),
+      hikayeli(K.kos, 'Bitiş çizgisine koş!', { saniye: 10 }),
+    ],
   },
 ];
 
@@ -337,8 +486,13 @@ export const DINOZOR: Durak[] = [
     yer: 'Yumurta',
     simge: '🥚',
     bilgi: 'Bütün dinozorlar yumurtadan çıkardı. Bazı dinozor yumurtaları bir futbol topu kadar büyüktü!',
-    ozel: { hikaye: 'Yumurta çatlıyor!', baslik: 'Çömel, küçül, sonra\nkalk ve kollarını aç!', sesli: 'Yumurta çatlıyor! Çömel ve küçül, sonra yavaşça kalk ve kollarını aç! Dört kere!', animasyon: 'yumurta', tur: 'sayi', adet: 4, tempoMs: 3000 },
-    ekler: [H.kollar, H.zipla],
+    soru: 'Evde birine sor: Yumurtadan çıkan başka hangi hayvanlar var?',
+    ozel: hikayeli(K.yumurta, 'Yumurta çatlıyor!'),
+    ekler: [
+      hikayeli(K.kollar, 'Yumurtadan yeni çıktın, gerin!', { ritim: 'yavas', adet: 4 }),
+      hikayeli(K.zipla, 'Yavru dinozor sevinçten zıplıyor!'),
+      hikayeli(K.comel, 'Annenin yanına sokul!'),
+    ],
   },
   {
     id: 'trex',
@@ -346,9 +500,14 @@ export const DINOZOR: Durak[] = [
     ad: 'T-Rex',
     yer: 'T-Rex',
     simge: '🦖',
-    bilgi: 'T-Rex’in dişleri bir muz kadar büyüktü ama kolları çok kısaydı!',
-    ozel: { hikaye: 'T-Rex yürüyor!', baslik: 'Dirseklerini bük,\nbüyük adımlarla yürü!', sesli: 'T-Rex yürüyor! Dirseklerini bük, kollarını göğsüne yaklaştır ve büyük adımlarla yürü!', animasyon: 'trex', tur: 'sayi', adet: 8, tempoMs: 1300 },
-    ekler: [H.comel, H.acKapa],
+    bilgi: 'T-Rex’in dişleri bir muz kadar büyüktü ama kolları çok kısaydı! Kısa kollarıyla yüzünü bile kaşıyamazdı.',
+    soru: 'Evde birine sor: T-Rex’in kolları neden kısaydı?',
+    ozel: hikayeli(K.trex, 'T-Rex yürüyor!'),
+    ekler: [
+      hikayeli(K.kocaman, 'T-Rex çok büyük!'),
+      hikayeli(K.kos, 'Sen T-Rex’ten hızlısın!'),
+      hikayeli(K.acKapa, 'Toprak titriyor!'),
+    ],
   },
   {
     id: 'brakiyozor',
@@ -356,9 +515,14 @@ export const DINOZOR: Durak[] = [
     ad: 'Brakiyozor',
     yer: 'Brakiyozor',
     simge: '🦕',
-    bilgi: 'Brakiyozorun boynu o kadar uzundu ki ağaçların en tepesindeki yaprakları yiyebilirdi!',
-    ozel: { hikaye: 'En tepedeki yapraklar!', baslik: 'Parmak ucunda yüksel,\nkollarını uzat!', sesli: 'En tepedeki yapraklara uzanalım! Parmak uçlarında yüksel, kollarını yukarı uzat! Dört kere!', animasyon: 'uzan', tur: 'sayi', adet: 4, tempoMs: 2200 },
-    ekler: [H.dizler, H.kollar],
+    bilgi: 'Brakiyozorun boynu o kadar uzundu ki ağaçların en tepesindeki yaprakları yiyebilirdi! Boyu dört katlı bir ev kadardı.',
+    soru: 'Evde birine sor: Bitki yiyen bir dinozor biliyor musun?',
+    ozel: hikayeli(K.uzan, 'En tepedeki yapraklara uzan!'),
+    ekler: [
+      hikayeli(K.yanaEgil, 'Uzun boynunla yan yapraklara uzan!'),
+      hikayeli(K.dizler, 'Brakiyozor ağır ağır yürüyor!', { ritim: 'yavas', adet: 8 }),
+      hikayeli(K.belDondur, 'Uzun kuyruğunu salla!'),
+    ],
   },
   {
     id: 'pterozor',
@@ -367,8 +531,13 @@ export const DINOZOR: Durak[] = [
     yer: 'Pterozor',
     simge: '🪶',
     bilgi: 'Pterozorlar dinozorların uçabilen akrabalarıydı. Bazılarının kanatları küçük bir uçak kadar genişti!',
-    ozel: { hikaye: 'Gökyüzünde süzül!', baslik: 'Kollarını yana aç,\nyukarı aşağı salla!', sesli: 'Gökyüzünde süzülelim! Kollarını yana aç, yukarı aşağı salla!', animasyon: 'kanat', tur: 'sure', saniye: 10 },
-    ekler: [H.comel, H.zipla],
+    soru: 'Evde birine sor: Uçabilen hangi hayvanları biliyorsun?',
+    ozel: hikayeli(K.kanat, 'Gökyüzünde süzül!', { saniye: 10 }),
+    ekler: [
+      hikayeli(K.tekAyak, 'Kayanın üstüne kon!', { saniye: 6 }),
+      hikayeli(K.balon, 'Sıcak rüzgârla yüksel!'),
+      hikayeli(K.comel, 'Balık yakalamak için alçal!', { ritim: 'hizli' }),
+    ],
   },
   {
     id: 'ayakizi',
@@ -377,8 +546,13 @@ export const DINOZOR: Durak[] = [
     yer: 'Ayak İzleri',
     simge: '👣',
     bilgi: 'Dinozorların ayak izleri taşa dönüşüp milyonlarca yıl kalmış. Bazı ayak izleri bir küvet kadar büyük!',
-    ozel: { hikaye: 'Dev ayak izleri bırakalım!', baslik: 'Ayaklarını sırayla\nyere vur!', sesli: 'Dev ayak izleri bırakalım! Ayaklarını sırayla güm güm yere vur! On kere!', animasyon: 'tepin', tur: 'sayi', adet: 10, tempoMs: 900 },
-    ekler: [H.kos, H.kollar],
+    soru: 'Evde birine sor: Senin ayağın kaç numara?',
+    ozel: hikayeli(K.tepin, 'Dev ayak izleri bırakalım!'),
+    ekler: [
+      hikayeli(K.yanAdim, 'Ayak izlerini takip et!'),
+      hikayeli(K.zipla, 'İzden ize zıpla!', { ritim: 'yavas' }),
+      hikayeli(K.kocaman, 'Bu iz ne kadar büyük!'),
+    ],
   },
   {
     id: 'raptor',
@@ -387,8 +561,13 @@ export const DINOZOR: Durak[] = [
     yer: 'Raptor',
     simge: '🌿',
     bilgi: 'Raptorlar küçük ama çok hızlı dinozorlardı. Bir hindi kadar büyüklerdi ve tüyleri vardı!',
-    ozel: { hikaye: 'Ormanda sessizce yürü!', baslik: 'Parmak uçlarında yürü!', sesli: 'Ormanda sessizce yürüyelim! Parmak uçlarında yürü!', animasyon: 'parmakUcu', tur: 'sure', saniye: 8 },
-    ekler: [H.acKapa, H.dizler],
+    soru: 'Evde birine sor: Tüylü dinozorlar var mıydı?',
+    ozel: hikayeli(K.parmakUcu, 'Ormanda sessizce yürü!'),
+    ekler: [
+      hikayeli(K.kos, 'Raptor çok hızlı!', { saniye: 6 }),
+      hikayeli(K.donus, 'Etrafına bak!'),
+      hikayeli(K.engel, 'Ağaç köklerinin üstünden atla!'),
+    ],
   },
   {
     id: 'fosil',
@@ -397,8 +576,13 @@ export const DINOZOR: Durak[] = [
     yer: 'Fosil Kazısı',
     simge: '🦴',
     bilgi: 'Dinozor kemiklerini bulan bilim insanlarına paleontolog denir. Kemikleri fırçayla yavaş yavaş temizlerler!',
-    ozel: { hikaye: 'Dinozor kemiği bulalım!', baslik: 'Çömel, ellerinle\nyeri sırayla kaz!', sesli: 'Dinozor kemiği bulalım! Çömel ve ellerinle yeri sırayla kaz!', animasyon: 'kazi', tur: 'sayi', adet: 8, tempoMs: 1000 },
-    ekler: [H.zipla, H.kollar],
+    soru: 'Evde birine sor: Dinozor kemiklerini nerede görebiliriz?',
+    ozel: hikayeli(K.kazi, 'Dinozor kemiği bulalım!'),
+    ekler: [
+      hikayeli(K.tasKaldir, 'Buldun! Hayali kemiği havaya kaldır!'),
+      hikayeli(K.kolSalla, 'Kemik müzeye gidiyor, el salla!'),
+      hikayeli(K.acKapa, 'Dinozor kâşifi oldun!', { ritim: 'hizli' }),
+    ],
   },
 ];
 
@@ -413,8 +597,12 @@ export const EVDE: Durak[] = [
     yer: 'Oyuncak',
     simge: '🧸',
     bilgi: 'En sevdiğin oyuncağı yanına al. Yumuşak bir oyuncak olursa daha iyi!',
-    ozel: { hikaye: 'Oyuncağını kurtar!', baslik: 'Çömel, oyuncağını al,\nyukarı kaldır!', sesli: 'Oyuncağını kurtaralım! Çömel, oyuncağını al ve başının üstüne kaldır! Beş kere!', animasyon: 'tasKaldir', tur: 'sayi', adet: 5, tempoMs: 2200 },
-    ekler: [H.zipla, H.kollar],
+    ozel: hikayeli(K.tasKaldir, 'Oyuncağını kurtar!', { baslik: 'Çömel, oyuncağını al,\nyukarı kaldır!' }),
+    ekler: [
+      hikayeli(K.yanaEgil, 'Oyuncağını başının üstünde tut!'),
+      hikayeli(K.zipla, 'Oyuncağın da zıplamak istiyor!'),
+      hikayeli(K.donus, 'Oyuncağına odayı göster!'),
+    ],
   },
   {
     id: 'yastik',
@@ -424,7 +612,11 @@ export const EVDE: Durak[] = [
     simge: '🛏️',
     bilgi: 'Bir yastık hazırla. Etrafında eşya olmayan, boş bir yer seç!',
     ozel: { hikaye: 'Yastık taşıyalım!', baslik: 'Yastığı başının üstünde\ntut, yerinde yürü!', sesli: 'Yastık taşıyalım! Yastığı başının üstünde tut ve dizlerini kaldırarak yerinde yürü!', animasyon: 'basUstu', tur: 'sayi', adet: 10, tempoMs: 1000 },
-    ekler: [H.comel, H.acKapa],
+    ekler: [
+      hikayeli(K.comel, 'Yastığı yere koy, sonra al!', { baslik: 'Çömel, yastığı yere koy,\nsonra al ve kalk!' }),
+      hikayeli(K.kocaman, 'Yastığı bırak, kocaman ol!'),
+      hikayeli(K.tekAyak, 'Yastığa sarıl, dengede dur!', { saniye: 6 }),
+    ],
   },
   {
     id: 'corap',
@@ -434,7 +626,11 @@ export const EVDE: Durak[] = [
     simge: '🧦',
     bilgi: 'Bir çift çorabı yuvarlayıp top yap. Çorap topu yumuşaktır, kimseyi acıtmaz!',
     ozel: { hikaye: 'Topu yakala!', baslik: 'Topu bir elinden\nöbür eline at!', sesli: 'Çorap topunu yakalayalım! Topu bir elinden öbür eline at! On kere!', animasyon: 'elden', tur: 'sayi', adet: 10, tempoMs: 1100 },
-    ekler: [H.dizler, H.kollar],
+    ekler: [
+      hikayeli(K.uzan, 'Topu tavana doğru tut!'),
+      hikayeli(K.basket, 'Topla smaç yap!', { baslik: 'Topu tut, çömel, zıpla,\nkollarını yukarı uzat!' }),
+      hikayeli(K.kollar, 'Topu yukarı kaldır, indir!', { ritim: 'hizli' }),
+    ],
   },
   {
     id: 'yastikada',
@@ -444,7 +640,11 @@ export const EVDE: Durak[] = [
     simge: '🏝️',
     bilgi: 'Yastığı yere koy. Üstüne basma, yanından atla. Kaygan yerde değil, halının üstünde oyna!',
     ozel: { hikaye: 'Adanın üstünden atla!', baslik: 'Yastığın üstünden\nyana zıpla!', sesli: 'Yastığı yere koy. Yastığın üstünden bir sağa, bir sola zıpla! Altı kere!', animasyon: 'yanaZipla', tur: 'sayi', adet: 6, tempoMs: 1600 },
-    ekler: [H.kos, H.comel],
+    ekler: [
+      hikayeli(K.kos, 'Ada kaçıyor, hızlan!'),
+      hikayeli(K.dizler, 'Adanın yanında dur!'),
+      hikayeli(K.acKapa, 'Adaya bayrak dik!'),
+    ],
   },
   {
     id: 'dans',
@@ -454,7 +654,11 @@ export const EVDE: Durak[] = [
     simge: '🎶',
     bilgi: 'Oyuncağın da dans etmek istiyor! Müzik yoksa bir şarkı mırıldanabilirsin.',
     ozel: { hikaye: 'Oyuncağınla dans et!', baslik: 'Oyuncağına sarıl,\nsağa sola sallan!', sesli: 'Oyuncağınla dans edelim! Oyuncağına sarıl ve sağa sola sallan!', animasyon: 'sallan', tur: 'sure', saniye: 10 },
-    ekler: [H.zipla, H.acKapa],
+    ekler: [
+      hikayeli(K.belDondur, 'Belini döndürerek dans et!'),
+      hikayeli(K.kolSalla, 'Herkes dansa!'),
+      hikayeli(K.horon, 'Ritim tut!', { saniye: 6 }),
+    ],
   },
   {
     id: 'kanguru',
@@ -464,7 +668,11 @@ export const EVDE: Durak[] = [
     simge: '🦘',
     bilgi: 'Çorap topunu yine hazırla. Kangurular zıplayarak ilerler ve yavrularını karınlarındaki cepte taşır!',
     ozel: { hikaye: 'Topu düşürmeden zıpla!', baslik: 'Topu dizlerinin\narasında tut, zıpla!', sesli: 'Çorap topunu dizlerinin arasında tut ve düşürmeden zıpla! Dört kere!', animasyon: 'zipla', tur: 'sayi', adet: 4, tempoMs: 1600 },
-    ekler: [H.kollar, H.dizler],
+    ekler: [
+      hikayeli(K.comel, 'Topu yerden al!'),
+      hikayeli(K.tirman, 'Ağaç kangurusu ağaca tırmanıyor, sen de tırman!'),
+      hikayeli(K.parmakUcu, 'Yavru kanguru uyuyor, sessiz ol!'),
+    ],
   },
   {
     id: 'toplama',
@@ -474,7 +682,11 @@ export const EVDE: Durak[] = [
     simge: '🧺',
     bilgi: 'Oyun bitince eşyaları toplamak da bir harekettir. Hadi her şeyi yerine koyalım!',
     ozel: { hikaye: 'Her şeyi yerine koy!', baslik: 'Çömel, eşyayı al,\nyerine koy!', sesli: 'Toplama zamanı! Çömel, eşyayı al ve yerine koy! Altı kere!', animasyon: 'topla', tur: 'sayi', adet: 6, tempoMs: 2000 },
-    ekler: [H.zipla, H.kollar],
+    ekler: [
+      hikayeli(K.yanaEgil, 'Raftaki yerine uzan!'),
+      { hikaye: 'Yastığı yerine götür!', baslik: 'Yastığı başının üstünde\ntut, yerinde yürü!', sesli: 'Yastığı yerine götür! Yastığı başının üstünde tut, yerinde yürü!', animasyon: 'basUstu', tur: 'sayi', adet: 8, tempoMs: 1000 },
+      hikayeli(K.kocaman, 'Oda tertemiz oldu!'),
+    ],
   },
 ];
 
@@ -513,7 +725,7 @@ export function durakBul(id: string): Durak {
 // Durağın bölümünün harita sahnesi ('Harita', 'Dunya', 'Uzay', ...).
 export const haritaSahnesi = (d: Durak) => BOLUMLER[d.bolum].sahne;
 
-// Bir duraktaki 5 hareketlik kısa antrenman.
+// Durağın kendi 4 hareketi (özel + 3). Isınma, sürpriz ve soğuma oturum.ts'de eklenir.
 export function oturum(durak: Durak): Hareket[] {
-  return [ISINMA, durak.ozel, ...durak.ekler, SOGUMA];
+  return [durak.ozel, ...durak.ekler];
 }

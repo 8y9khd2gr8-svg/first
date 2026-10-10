@@ -96,10 +96,25 @@ Teknoloji: Phaser 3 + TypeScript + Vite, GitHub Pages ile yayın. İleride Capac
 - Büyük Macera (MaceraScene): Oyna → bütün bölümler kıvrımlı yolda; açık bölümler ilerlemesiyle,
   gelecekler "Yakında" (ebeveyne "daha çok şey gelecek" vaadi). Bölüm haritalarının ⌂'si buraya döner.
   Vaat: tek ödemeyle gelecek bütün bölümler dahil.
-- Kostümler (src/kostumler.ts): her "Yaptım!" 1 yıldız; 9 kostüm yıldız eşiğiyle kendiliğinden
-  açılır (harcama/satın alma yok). Giyilen kostüm her ekrandaki Zıpzıp'ta görünür. Kostüm dolabı
+- Kostümler (src/kostumler.ts): her biri bir yerin hatırası, o durak/bölüm bitince açılır (Kapadokya → pilot
+  gözlüğü...); 13 adet, herkese uygun (fiyonk, kep gibi cinsiyet çağrıştıran yok). Satın alma yok; yıldız sayılır.
+  Yeni kostüm kutlamasında "Giy! 👕" düğmesi; Büyük Macera'da 👕 dolap düğmesi. Giyilen kostüm her ekrandaki Zıpzıp'ta görünür. Kostüm dolabı
   pasaporttan (👕). Durak sonunda yeni rozet ve kostümler sırayla kutlanır.
-- Durak simgeleri şimdilik emoji; ileride çizerin çizdiği özel görseller gelecek.
+- Durak simgeleri: Türkiye ve Dünya için çizili SVG (public/simge/<id>.svg, arayuz.durakSimgesi); diğerleri emoji.
+  İleride çizer hepsini Zıpzıp tarzında yeniden çizecek.
+- Hareket sistemi (Yağız/ebeveyn testi: "hep aynı hareket sıkıcı"): src/hareketler.ts'de K komut kütüphanesi
+  (~40 yerinde hareket) + hikayeli(komut, 'yere ait hikâye', { ritim: 'yavas'|'hizli', adet }) + birlesik (zıpla,
+  zıpla, çömel). Her durak: özel + 3 hikâyeli hareket; oturum.ts ekler: ısınma sadece oturumun ilk durağında
+  (15 dk aradan sonra yine), her durakta 1 sürpriz (donma / ayna oyunu), soğuma bölüm sonunda ya da Ödül
+  ekranındaki "🌙 Bitirelim" ile. Test: sıralı bölümde önceki 2 durağın hareket türü tekrar edilmez; yürü/koş
+  komutu "yerinde" der (kamera için çocuk yerinden ayrılmaz). Bilgi 2 cümle; durak sonunda "Evde birine sor: ..."
+- "Uzaktan oyna" (durak girişinde): açıksa "Yaptım!" beklemeden 3 sn sonra geçer (zipzip-uzaktan-v1).
+- Kamera isteğe bağlı kalır (izin velileri tedirgin eder); Ailece'de kamera kapalı (iki kişi güvenilir sayılmaz).
+- Doğruluk: Çin Seddi uzaydan gözle GÖRÜLMEZ (efsane); Truva Atı "efsaneye göre". Ürkütücü kelime yok
+  ("taş heykel başları" gibi); hayali nesne kaldırmada "hayali" denir (dışarıda gerçek taş kaldırma özentisi olmasın).
+- İleride konuşulacak (acele yok, 23 Nisan ya da sonrası): Zıpzıp'ın kendi dünyası haritası ve ek oyunlar
+  (eşleştirme 4-8-12 kart, boyama, resim; TRT Çocuk örneği); Zıpzıp şarkısı/jingle (marka kontrolünden sonra);
+  QR tanıtım (mağaza sonrası; çocuk reklamı kuralları); her durak için tematik arka plan (çizerle).
 - Animasyon kararı: "canlı ama sakin". Hareket bir işe yaramalı (giriş, sıradaki durak, kutlama);
   sürekli oynayan süs yok. Pasaport sakin, damga/rozet anı canlı. Telefonda "hareketi azalt" açıksa
   animasyonlar azalır. Yağız testinde dikkat dağıtan yer sadeleştirilir.

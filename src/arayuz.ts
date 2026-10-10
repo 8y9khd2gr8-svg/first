@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { RENK, YAZI_TIPI, HAREKETI_AZALT } from './ayarlar';
 import { bip } from './ses';
+import type { Durak } from './duraklar';
 
 // Çocuk parmağına uygun, büyük ve yuvarlak köşeli düğme.
 export function buyukDugme(
@@ -68,9 +69,11 @@ export function yildizliArkaPlan(sahne: Phaser.Scene) {
 
 // Sol üstte ana ekrana dönüş düğmesi.
 export function evDugmesi(sahne: Phaser.Scene, basinca: () => void) {
+  // Belirgin ev düğmesi: renkli daire, beyaz kenar ve ev resmi (okuma bilmeyen de tanır).
   const d = sahne.add.container(80, 80);
-  d.add(sahne.add.circle(0, 0, 48, 0xffffff, 0.15));
-  d.add(sahne.add.text(0, 0, '⌂', { fontFamily: 'Arial, sans-serif', fontSize: '56px', color: '#ffffff' }).setOrigin(0.5));
+  d.add(sahne.add.circle(0, 5, 48, 0x000000, 0.3));
+  d.add(sahne.add.circle(0, 0, 48, RENK.mavi).setStrokeStyle(5, RENK.beyaz));
+  d.add(sahne.add.text(0, 2, '🏠', { fontSize: '50px' }).setOrigin(0.5));
   d.setSize(96, 96).setInteractive({ useHandCursor: true });
   d.on('pointerdown', () => {
     bip(500, 0.08);
@@ -97,3 +100,14 @@ export function rozetCiz(sahne: Phaser.Scene, x: number, y: number, r: number, s
   );
   return rozet;
 }
+
+// Durak simgesi: çizilmiş görseli varsa (public/simge/<id>.svg) onu, yoksa emojiyi gösterir.
+// boy: simgenin ekrandaki yaklaşık boyu (piksel).
+export function durakSimgesi(sahne: Phaser.Scene, durak: Durak, x: number, y: number, boy: number): Phaser.GameObjects.Image | Phaser.GameObjects.Text {
+  const anahtar = `simge-${durak.id}`;
+  if (sahne.textures.exists(anahtar)) return sahne.add.image(x, y, anahtar).setDisplaySize(boy * 1.15, boy * 1.15);
+  return sahne.add.text(x, y, durak.simge, { fontSize: `${boy}px` }).setOrigin(0.5);
+}
+
+// Çizilmiş simgesi olan duraklar (açılışta yüklenir).
+export const CIZILI_SIMGELER = ['istanbul', 'truva', 'pamukkale', 'kapadokya', 'nemrut', 'gobeklitepe', 'karadeniz', 'efes', 'kolezyum', 'piramitler', 'petra', 'tacmahal', 'cinseddi', 'machupicchu'];
