@@ -164,7 +164,7 @@ export class HareketScene extends Phaser.Scene {
       bitti = true;
       this.kameraHedefe = null;
       sustur();
-      hareketKaydet(hareket);
+      hareketKaydet(hareket, this.kamera && hareket.tur === 'sayi' ? { gordu: this.kamera.sayi >= hareket.adet } : undefined);
       hareketYapildi();
       dugme.destroy();
       this.sonraki();

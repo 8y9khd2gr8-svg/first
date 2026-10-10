@@ -116,6 +116,14 @@ test('cihazdaki her kayıt gizlilik.html sayfasında yazılı', () => {
   for (const a of anahtarlar) assert.ok(gizlilik.includes(a), `gizlilik.html'de yok: ${a}`);
 });
 
+test('iPhone ve Android sürüm numarası package.json ile aynı (npm run magaza eşitler)', () => {
+  const surum = JSON.parse(fs.readFileSync('package.json', 'utf8')).version;
+  const ios = fs.readFileSync('ios/App/App.xcodeproj/project.pbxproj', 'utf8').match(/MARKETING_VERSION = ([^;]+);/g) ?? [];
+  assert.ok(ios.length > 0);
+  for (const satir of ios) assert.equal(satir, `MARKETING_VERSION = ${surum};`, 'node scripts/surum-esitle.mjs çalıştırın');
+  assert.match(fs.readFileSync('android/app/build.gradle', 'utf8'), /package\.json"\)\)\.version/);
+});
+
 test('oyun kodunda dış sunucu adresi yok', () => {
   for (const f of dosyalar('src')) {
     const kod = fs.readFileSync(f, 'utf8');
