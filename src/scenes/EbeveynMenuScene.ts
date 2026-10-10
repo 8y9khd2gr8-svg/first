@@ -5,6 +5,7 @@ import { tumVerileriSil } from '../guvenlik';
 import { geriBildirimAdresi, ILETISIM_EPOSTA } from '../iletisim';
 import { betaDunyaAc, betaDunyaAcikMi } from '../ilerleme';
 import { kameraAcikMi, kameraAyarla, kameraDesteklenir } from '../kamera';
+import { odemeKipi } from '../satinAlma';
 
 // Ebeveyn köşesi (kilidin arkasında): özet, pasaport, kurulum, güvenlik, gizlilik, veri silme.
 export class EbeveynMenuScene extends Phaser.Scene {
@@ -22,7 +23,9 @@ export class EbeveynMenuScene extends Phaser.Scene {
       buyukDugme(this, x, y, yazi, renk, () => this.scene.start(sahne, veri), { genislik: 560, yukseklik: 100, yaziBoyu: 44 });
     dugme(290, '📊 Hareket özeti', RENK.turuncu, 'EbeveynOzet');
     dugme(400, '✏️ Pasaportu düzenle', RENK.mavi, 'PasaportAyar');
-    dugme(510, '📲 Telefona yükle', RENK.yesil, 'Kurulum');
+    // Mağaza uygulamasında "Telefona yükle" gereksiz (zaten yüklü): yerinde tam sürüm (ödeme / geri yükleme) durur.
+    if (odemeKipi() === 'web') dugme(510, '📲 Telefona yükle', RENK.yesil, 'Kurulum');
+    else dugme(510, '⭐ Tam sürüm', RENK.yesil, 'TamSurum', { geri: 'EbeveynMenu' });
     dugme(620, '🛡️ Güvenlik notu', 0x7c5cd6, 'Guvenlik', { sonra: 'EbeveynMenu' });
 
     // Küçük görünen ayar düğmeleri: yazı sade kalır, dokunma alanı en az 88 nokta (parmak ıskalamasın).

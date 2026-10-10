@@ -35,7 +35,7 @@ Mağaza rehberi 4b'de neden önemli olduğu yazıyor (1 Kasım 2026 düzenlemesi
 | Kumar, şans oyunu | Hayır |
 | Kullanıcılar birbiriyle iletişim kurabiliyor ya da içerik paylaşabiliyor mu? | **Hayır** (sohbet, profil, skor tablosu yok) |
 | Kullanıcının konumu paylaşılıyor mu? | Hayır |
-| Dijital ürün satın alınabiliyor mu? | **Kapalı testte: Hayır** (ödeme henüz yok). Ödeme eklendiği sürümde anket yeniden doldurulur ve "Evet" seçilir. |
+| Dijital ürün satın alınabiliyor mu? | **Evet** (oyunda "Tam sürüm" ödeme ekranı var; ebeveyn kilidinin arkasında, tek seferlik ürün `tam_surum`). |
 | Sınırsız internet erişimi (tarayıcı) var mı? | Hayır |
 
 Beklenen sonuç: **PEGI 3 / Herkes (Everyone)**. Farklı çıkarsa göndermeden bana yaz.

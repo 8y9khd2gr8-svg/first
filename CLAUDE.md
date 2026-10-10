@@ -66,6 +66,12 @@ Teknoloji: Phaser 3 + TypeScript + Vite, GitHub Pages ile yayın. İleride Capac
   çizilir); Efes → Kolezyum → Piramitler → Petra → Tac Mahal → Çin Seddi → Machu Picchu.
   Türkiye Turu bitince açılır; beta için ebeveyn köşesinde geçici "Beta: Dünya bölümünü aç"
   (mağazadan önce kaldırılacak). Ödeme mağaza (Capacitor) aşamasında bağlanacak.
+- Ödeme (src/satinAlma.ts, TamSurumScene): @capgo/native-purchases (Play Billing / StoreKit, sunucusuz; RevenueCat gibi
+  dış servis yok). Tek tüketilmeyen ürün `tam_surum`; Türkiye dışındaki bütün bölümler (önceki bölüm bitince) bunu ister.
+  Ödeme ekranı sadece ebeveyn kilidinden sonra; kapalı bölüme dokunan çocuk kilide gider ("bir büyüğüne göster").
+  Cihazda sadece zipzip-tam-surum-v1; açılışta mağazaya sessizce sorulur (yeni telefon), "Satın alımı geri yükle" var.
+  Web (test sitesi) ödemesiz; `?odeme=deneme` sahte mağaza (testler). Mağaza dışı ödeme yolu eklenmez (hediye kartı/
+  operatör faturası mağazanın içinde zaten var). Android↔iPhone taşınmaz; Apple'da Aile Paylaşımı açık.
 - Yasal yol: bireysel geliştirici hesaplarıyla başlanır (GVK 20/B istisnası; mali müşavir doğrulayacak).
   Marka: "Zıp Zıp Dünya" için TÜRKPATENT araştırması + başvuru betadan önce (Ekim-Kasım; sınıf 9 ve 41).
   Şahıs şirketi okul lisansı satışı başlayınca (okullar fatura ister). Hesap/başvuruları kullanıcı yapar.

@@ -7,6 +7,7 @@ import { kameraAcikMi } from '../kamera';
 import { KOSTUMLER, seciliKostum } from '../kostumler';
 import { pasaportOku } from '../pasaport';
 import { kazanilanlar } from '../rozetler';
+import { odemeKipi, tamSurumVarMi } from '../satinAlma';
 
 // "Bu telefonda neler var?": oyunun bu telefonda sakladığı her şey, ebeveynin kendi gözüyle görmesi için.
 // "Bilgiler sadece bu telefonda" sözünü kanıta çevirir: liste + uçak moduyla kendin dene.
@@ -34,9 +35,10 @@ export class EbeveynVeriScene extends Phaser.Scene {
       ['Hareket kaydı', `${ozet.gunSayisi} gün, ${ozet.toplamHareket} hareket`],
       ['Kamerayla sayma', kameraAcikMi() ? 'açık (görüntü kaydedilmez)' : 'kapalı'],
       ['Uzaktan oyna', uzaktanAcikMi() ? 'açık' : 'kapalı'],
+      ...(odemeKipi() === 'web' ? [] : [['Tam sürüm', tamSurumVarMi() ? 'alındı' : 'alınmadı'] as [string, string]]),
     ];
     const kutuY = 250;
-    const satirBoyu = 62;
+    const satirBoyu = 58;
     this.add.rectangle(x, kutuY + (satirlar.length * satirBoyu) / 2, 640, satirlar.length * satirBoyu + 30, 0xffffff, 0.08).setStrokeStyle(2, 0xffffff, 0.2);
     satirlar.forEach(([ad, deger], i) => {
       const y = kutuY + 15 + satirBoyu * i + satirBoyu / 2;

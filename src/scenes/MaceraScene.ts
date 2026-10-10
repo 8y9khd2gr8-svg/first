@@ -2,9 +2,9 @@ import Phaser from 'phaser';
 import { RENK, YAZI_TIPI } from '../ayarlar';
 import { evDugmesi, yildizliArkaPlan } from '../arayuz';
 import { AILE_ID } from '../aile';
-import { BOLUMLER, BolumId, bolumuAcikMi } from '../duraklar';
+import { BOLUMLER, BolumId, bolumKilidi, bolumuAcikMi } from '../duraklar';
 import { tamamlananlar } from '../ilerleme';
-import { BOLUM_KISA } from './BolumScene';
+import { BOLUM_KISA, kilitliBolumeDokun } from './BolumScene';
 import { M } from '../metinler';
 import { bip, konus, sustur } from '../ses';
 import { Zipzip } from '../zipzip';
@@ -123,7 +123,7 @@ export class MaceraScene extends Phaser.Scene {
         );
         yazi.add(
           this.add
-            .text(0, 22, tamam ? `🏆 ${bitenSayisi}/${duraklar.length} tamam!` : acik ? `⭐ ${bitenSayisi}/${duraklar.length} durak` : `🔒 ${BOLUM_KISA[BOLUMLER[s.id].onceki!].kisa} bitince açılır`, {
+            .text(0, 22, tamam ? `🏆 ${bitenSayisi}/${duraklar.length} tamam!` : acik ? `⭐ ${bitenSayisi}/${duraklar.length} durak` : bolumKilidi(s.id) === 'odeme' ? '🔒 Tam sürümde' : `🔒 ${BOLUM_KISA[BOLUMLER[s.id].onceki!].kisa} bitince açılır`, {
               fontFamily: YAZI_TIPI,
               fontSize: '26px',
               color: tamam ? '#FFC93C' : '#cfe3ff',
@@ -134,9 +134,8 @@ export class MaceraScene extends Phaser.Scene {
         kap.setSize(120, 120).setInteractive({ useHandCursor: true });
         kap.on('pointerdown', () => {
           if (!acik) {
-            bip(220, 0.15, 'square', 0.12);
             this.tweens.add({ targets: kap, x: nx + 8, duration: 50, yoyo: true, repeat: 3 });
-            konus(BOLUM_KISA[s.id].kilitli);
+            kilitliBolumeDokun(this, s.id);
             return;
           }
           bip(880, 0.08, 'square', 0.12);

@@ -20,18 +20,9 @@ export function tamamla(durakId: string) {
   }
 }
 
-// Bir bölüm, önceki bölüm bitince açılır (mağazada ileride tek ödemeyle).
 // Beta testi için ebeveyn köşesinden bütün bölümler açılabilir (mağazaya çıkmadan kaldırılacak).
+// Bölüm kilidi duraklar.ts'de (bolumKilidi).
 const BETA_ANAHTAR = 'zipzip-beta-dunya';
-
-export function bolumAcik(oncekiBolumIdleri: string[]): boolean {
-  const biten = new Set(tamamlananlar());
-  if (oncekiBolumIdleri.every((id) => biten.has(id))) return true;
-  return betaDunyaAcikMi();
-}
-
-// Eski ad (Dünya bölümü = Türkiye bitince).
-export const dunyaAcik = bolumAcik;
 
 export function betaDunyaAc(acik: boolean) {
   try {

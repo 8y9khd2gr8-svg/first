@@ -1,5 +1,6 @@
 import { Hareket, K, birlesik, hikayeli } from './hareketler';
-import { bolumAcik } from './ilerleme';
+import { betaDunyaAcikMi, tamamlananlar } from './ilerleme';
+import { tamSurumVarMi } from './satinAlma';
 
 // Türkiye Turu durakları (batıdan doğuya). Kural: ibadet yeri olarak kullanılan yapılar yok.
 export type BolumId = 'turkiye' | 'dunya' | 'uzay' | 'spor' | 'dinozor' | 'evde';
@@ -712,11 +713,20 @@ export const BOLUMLER: Record<BolumId, Bolum> = {
 export const BOLUM_SIRASI = Object.keys(BOLUMLER) as BolumId[];
 export const TUM_DURAKLAR: Durak[] = BOLUM_SIRASI.flatMap((id) => BOLUMLER[id].duraklar);
 
-// Bölüm açık mı? (önceki bölüm bittiyse ya da beta için hepsi açıldıysa)
-export function bolumuAcikMi(id: BolumId): boolean {
+// Bölüm açık mı? Önceki bölüm bitmiş olmalı; Türkiye dışındaki bölümler ayrıca tam sürüm ister.
+// Beta düğmesi (ebeveyn köşesi) ikisini de atlar; mağazaya çıkmadan kaldırılacak.
+export type BolumKilidi = 'onceki' | 'odeme' | null;
+
+export function bolumKilidi(id: BolumId): BolumKilidi {
+  if (betaDunyaAcikMi()) return null;
   const onceki = BOLUMLER[id].onceki;
-  return !onceki || bolumAcik(BOLUMLER[onceki].duraklar.map((d) => d.id));
+  if (!onceki) return null;
+  const biten = new Set(tamamlananlar());
+  if (!BOLUMLER[onceki].duraklar.every((d) => biten.has(d.id))) return 'onceki';
+  return tamSurumVarMi() ? null : 'odeme';
 }
+
+export const bolumuAcikMi = (id: BolumId) => bolumKilidi(id) === null;
 
 export function durakBul(id: string): Durak {
   return TUM_DURAKLAR.find((d) => d.id === id) ?? TURKIYE[0];

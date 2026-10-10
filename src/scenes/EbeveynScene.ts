@@ -1,20 +1,25 @@
 import Phaser from 'phaser';
 import { RENK, YAZI_TIPI } from '../ayarlar';
 import { buyukDugme, evDugmesi, yildizliArkaPlan } from '../arayuz';
-import { bip, sustur } from '../ses';
+import { bip, konus, sustur } from '../ses';
 
 // Ebeveyn kilidi: çocuğun yanlışlıkla ayarlara girmemesi için basit bir çarpma sorusu.
 export class EbeveynScene extends Phaser.Scene {
   private hedef = 'PasaportAyar';
   private geri = 'Pasaport';
+  private hedefVeri: object = {};
+  private cocugaSoz?: string;
 
   constructor() {
     super('Ebeveyn');
   }
 
-  init(veri: { hedef?: string; geri?: string }) {
+  // cocugaSoz: kilide neden gelindiğini çocuğa söyleyen cümle (ör. "Bu macerayı açmak için bir büyüğüne göster!").
+  init(veri: { hedef?: string; geri?: string; hedefVeri?: object; cocugaSoz?: string }) {
     this.hedef = veri.hedef ?? 'PasaportAyar';
     this.geri = veri.geri ?? 'Pasaport';
+    this.hedefVeri = veri.hedefVeri ?? {};
+    this.cocugaSoz = veri.cocugaSoz;
   }
 
   create() {
@@ -34,6 +39,7 @@ export class EbeveynScene extends Phaser.Scene {
     this.add
       .text(x, 330, 'Devam etmek için soruyu cevaplayın.', { fontFamily: YAZI_TIPI, fontSize: '34px', color: '#cfe3ff' })
       .setOrigin(0.5);
+    if (this.cocugaSoz) konus(this.cocugaSoz);
     this.add
       .text(x, 470, `${a} × ${b} = ?`, { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '110px', color: '#ffffff' })
       .setOrigin(0.5);
@@ -42,7 +48,7 @@ export class EbeveynScene extends Phaser.Scene {
       const sx = x + (i % 2 === 0 ? -150 : 150);
       const sy = 700 + Math.floor(i / 2) * 190;
       buyukDugme(this, sx, sy, String(sayi), RENK.mavi, () => {
-        if (sayi === dogru) this.scene.start(this.hedef, {});
+        if (sayi === dogru) this.scene.start(this.hedef, this.hedefVeri);
         else {
           bip(200, 0.2, 'square', 0.15);
           this.scene.start(this.geri, {});

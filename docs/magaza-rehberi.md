@@ -16,7 +16,7 @@ Hesap açmak, para ödemek ve uygulamayı mağazaya göndermek sizde. Teknik haz
 | Kasım başı | Google Play ve Apple geliştirici hesapları | Siz |
 | Kasım başı | 20/B banka hesabı (mali müşavirle) | Siz |
 | Kasım | Kapalı beta: Google'da kapalı test, Apple'da TestFlight (~100 kişi) | Siz gönderirsiniz, paketi ben hazırlarım |
-| Aralık | Beta düzeltmeleri, ödeme ekranının bağlanması, insan sesi kaydı | Ben + seslendirmen |
+| Aralık | Beta düzeltmeleri, ödemenin mağazada denenmesi, insan sesi kaydı | Ben + seslendirmen |
 | Ocak sonu | Mağazaya çıkış; web sitesinden oyun kaldırılır, sadece gizlilik ve koşullar sayfaları kalır | Siz gönderirsiniz, hazırlığı ben yaparım |
 
 ---
@@ -81,6 +81,40 @@ kimseyle paylaşmayın**.
 
 Sürüm kodu her çalıştırmada kendiliğinden artar. Play aynı kodu ikinci kez kabul etmez, bu yüzden elle bir şey yapmanız gerekmez.
 
+## 3c. Tam sürüm ürünü (uygulama içi tek ödeme)
+
+Oyunda ödeme ekranı hazır: **Ebeveyn köşesi → ⭐ Tam sürüm** (çocuk kapalı bir bölüme dokunursa da önce ebeveyn
+kilidi açılır). Ödemeyi mağazanın kendi penceresi alır; kart bilgisi oyuna gelmez. Mağazada bir kez **ürün** tanımlamanız gerekir:
+
+**Google Play** (Play Console hesabı ve ödeme profili açıldıktan sonra; ödeme profili = Google'ın size para
+gönderdiği banka hesabı, 20/B hesabı olabilir):
+1. Uygulama → **Para kazanma → Ürünler → Uygulama içi ürünler** → **Ürün oluştur**.
+   (Bu menü, içinde ödeme eklentisi olan bir paket yüklendikten sonra açılır; yeni paketi yükleyince gelir.)
+2. Ürün kimliği: **`tam_surum`** (tam olarak böyle; sonradan değiştirilemez).
+3. Ad: **Tam sürüm**. Açıklama: "Bütün bölümler ve gelecek bölümler, tek ödeme."
+4. Fiyat: Türkiye için fiyatı siz seçin (ekranda deneme fiyatı ₺149,99 görünüyor; asıl fiyat mağazadan gelir).
+   Diğer ülkeler için Google'ın önerdiği çeviriyi kabul edin.
+5. **Etkinleştir**.
+6. Kendinizi **lisans test kullanıcısı** yapın: Play Console ana sayfası → **Ayarlar → Lisans testi** → Google hesabınızı ekleyin.
+   Böylece kapalı testte "test kartıyla" para ödemeden satın almayı deneyebilirsiniz.
+
+**Beta testçileri gerçek para ödemesin:** Beta rehberindeki gibi ebeveyn köşesindeki **"🧪 Beta: bütün bölümleri aç"** düğmesini
+kullansınlar (mağazadan önce kaldırılacak). Kapalı testte "Satın al"a dokunan, lisans testçisi değilse gerçek ödeme yapar.
+
+**Apple** (App Store Connect, gönderme günü birlikte):
+1. Uygulama → **Uygulama İçi Satın Alımlar** → **+** → tür: **Tüketilmeyen (Non-Consumable)**.
+2. Ürün kimliği: **`tam_surum`**, ad: Tam sürüm, fiyat kademesi seçin.
+3. **Aile Paylaşımı: Açık** (önerilir: ailedeki diğer Apple hesaplarında da açılır).
+4. İnceleme için bir ekran görüntüsü (Tam sürüm ekranı) eklenir. TestFlight'ta satın almalar her zaman ücretsizdir.
+
+**Yeni telefon / geri yükleme:** Satın alım velinin Google hesabına ya da Apple Kimliği'ne bağlıdır. Yeni telefonda aynı
+hesapla oyun açılınca kendiliğinden, açılmazsa **Tam sürüm → ↩️ Satın alımı geri yükle** ile gelir. Android ile iPhone
+arasında taşınmaz (iki mağaza ayrı). İlerleme (damgalar, pasaport) taşınmaz; sadece telefonda durur.
+
+**Kartı olmayan veliler için:** Mağazada kart dışında da ödenebilir: Google Play / App Store **hediye kartı**
+(marketlerde satılır) ve **operatör faturası** (Play'de Turkcell, Vodafone, Türk Telekom; Apple'da bazı operatörler).
+Oyuna ayrıca başka ödeme yolu eklenmez (mağaza kuralları ve "oyun hiçbir yere bağlanmaz" sözü).
+
 ## 4. Apple geliştirici hesabı
 
 1. [developer.apple.com/programs](https://developer.apple.com/programs) adresinden **Bireysel (Individual)** üyelik başlatın. Apple ID'nizde iki aşamalı doğrulama açık olmalı.
@@ -128,8 +162,9 @@ Mağaza hesabı açılmadan önce oyunu **gerçek bir Android uygulaması olarak
 ## 6. Mağazaya çıkmadan önce benim yapacaklarım (kontrol listesi)
 
 - [ ] Ebeveyn köşesindeki "Beta: bütün bölümleri aç" düğmesini kaldırmak
-- [ ] Tek seferlik ödemeyi (Dünya ve Uzay bölümleri) mağaza ödeme sistemine bağlamak, "satın alımı geri yükle" düğmesi
-- [ ] Ödeme ekranını ebeveyn kilidinin arkasına koymak
+- [x] Tek seferlik ödemeyi mağaza ödeme sistemine bağlamak, "satın alımı geri yükle" düğmesi (ürün kimliği `tam_surum`, bkz. 3c)
+- [x] Ödeme ekranını ebeveyn kilidinin arkasına koymak
+- [ ] Lisans testçisiyle kapalı testte gerçek satın alma ve geri yüklemeyi denemek (Android), TestFlight'ta aynısı (iPhone)
 - [ ] Web sitesinden oyunu kaldırmak; sadece gizlilik.html ve kosullar.html kalsın
 - [ ] Gizlilik ve koşullar sayfalarına iletişim adresi (avukat kontrolünden sonra)
 - [ ] Mağaza ekran görüntüleri ve tanıtım metinleri (Türkçe + İngilizce)

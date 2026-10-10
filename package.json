@@ -18,6 +18,7 @@
     "@capacitor/android": "^7.6.9",
     "@capacitor/core": "^7.6.9",
     "@capacitor/ios": "^7.6.9",
+    "@capgo/native-purchases": "7.19.3",
     "@fontsource/baloo-2": "^5.3.0",
     "@mediapipe/tasks-vision": "^0.10.14",
     "d3-geo": "^3.1.1",
