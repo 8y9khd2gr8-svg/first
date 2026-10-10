@@ -157,7 +157,12 @@ Teknoloji: Phaser 3 + TypeScript + Vite, GitHub Pages ile yayın. İleride Capac
   animasyonlar azalır. Telefon yavaşsa da aynısı olur (src/hiz.ts: oyun boyunca gerçek kare hızı ölçülür,
   40'ın altına düşerse süs animasyonları kapanır ve kare hızı 30'a sabitlenir; sonuç kaydedilmez). Yeni
   süs animasyonu `hareketiAzalt()` ile korunmalı. Yağız testinde dikkat dağıtan yer sadeleştirilir.
-- Zıpzıp'ın yüzü kodla çizilir (src/zipzipYuz.ts; govde.svg'de yüz yok): göz kırpar (süs, hareketiAzalt'ta kapalı),
+- Zıpzıp tasarımı (Ekim 2026, "B · Sevimli"): büyük parlak gözler (mavi iris, iki parıltı), kaşlar, hep pembe yanak,
+  açık gülen ağız (diş + dil), bulutlu küre, parmaklı eller, beyaz tabanlı kırmızı spor ayakkabı. Gövde kodla çizilir
+  (src/zipzipKure.ts, d3-geo; govde.svg yok): bölüme göre dünyanın o tarafı görünür (BOLUM_YONU; Dünya Harikaları'nda
+  her durak kendi ülkesi, Okyanus'ta Büyük Okyanus, Dinozorlar'da Kuzey Amerika, diğerleri Türkiye). Haritaya girince ve
+  Dünya'da sıradaki harikaya giderken küre yavaşça döner (hareketiAzalt'ta hemen). Türkiye hep altın sarısı (Zıpzıp'ın evi).
+- Zıpzıp'ın yüzü kodla çizilir (src/zipzipYuz.ts): göz kırpar (süs, hareketiAzalt'ta kapalı),
   konuşurken ağzı oynar (ses.ts konusmayiDinle), ifadeler: normal / mutlu ("Aferin!", varış, açılış) / uykulu (soğuma sonu).
   Zıplarken gövde hafifçe basılıp esner (süs). İleride çizer gelince Rive ile yeniden yapılması düşünülebilir.
 

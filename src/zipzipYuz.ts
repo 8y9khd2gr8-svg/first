@@ -3,7 +3,7 @@ import { hareketiAzalt } from './ayarlar';
 import { konusmayiDinle } from './ses';
 
 // Zıpzıp'ın yüzü (gözler + ağız) kodla çizilir: göz kırpar, konuşurken ağzı oynar, ifade değiştirir.
-// Ölçüler gövde çiziminin (govde.svg) birimleriyle; (0, 0) gövdenin ortası.
+// Ölçüler gövde küresinin (zipzipKure.ts) birimleriyle; (0, 0) gövdenin ortası.
 // Göz kırpma süs sayılır: "hareketi azalt" açıksa ya da telefon yavaşsa kırpmaz. Ağız ve ifade anlamlı olduğu için kalır.
 
 export type Ifade = 'normal' | 'mutlu' | 'uykulu';
@@ -11,7 +11,12 @@ export type Ifade = 'normal' | 'mutlu' | 'uykulu';
 const LACIVERT = 0x14213d;
 const AGIZ_ICI = 0x8e2433;
 const YANAK = 0xff8fa3;
-const GOZ_Y = -52;
+const IRIS = 0x1f5fa8;
+const DIL = 0xff6f86;
+const GOZ_X = 36;
+const GOZ_Y = -44;
+const GOZ_RX = 19;
+const GOZ_RY = 23;
 
 // İkinci dereceden eğri üzerindeki noktalar (ağız ve mutlu göz yayları için).
 function egri(x1: number, y1: number, kx: number, ky: number, x2: number, y2: number, b: number) {
@@ -85,43 +90,57 @@ export class ZipzipYuz extends Phaser.GameObjects.Container {
   private ciz() {
     const g = this.cizim.clear();
     const b = this.b;
-    for (const s of [-1, 1]) this.gozCiz(g, 35 * s);
+    for (const s of [-1, 1]) this.gozCiz(g, GOZ_X * s);
 
-    if (this.ifade === 'mutlu') g.fillStyle(YANAK, 0.8).fillCircle(-64 * b, -18 * b, 11 * b).fillCircle(64 * b, -18 * b, 11 * b);
+    // Pembe yanaklar hep var; mutluyken daha belirgin.
+    const yanakSaydam = this.ifade === 'mutlu' ? 0.85 : 0.6;
+    g.fillStyle(YANAK, yanakSaydam).fillEllipse(-66 * b, (GOZ_Y + 36) * b, 30 * b, 20 * b).fillEllipse(66 * b, (GOZ_Y + 36) * b, 30 * b, 20 * b);
 
     if (this.ifade === 'uykulu' && this.aciklik < 0.1) {
-      g.lineStyle(8 * b, LACIVERT).strokePoints(egri(-18, 54, 0, 66, 18, 54, b));
+      g.lineStyle(7 * b, LACIVERT).strokePoints(egri(-18, 46, 0, 58, 18, 46, b));
       return;
     }
-    // Ağız: üstte düz çizgi, altta eğri (D biçimi). Kapalıyken içi beyaz (gülümseme), açıkken koyu + üst dişler.
-    const derinlik = 86 + (this.ifade === 'mutlu' ? 12 : 0) + 22 * this.aciklik;
-    const sinir = egri(-32, 52, 0, derinlik, 32, 52, b);
-    if (this.aciklik > 0.1) {
-      g.fillStyle(AGIZ_ICI).fillPoints(sinir, true);
-      g.fillStyle(0xffffff).fillRect(-20 * b, 52 * b, 40 * b, 8 * b);
-    } else {
-      g.fillStyle(0xffffff).fillPoints(sinir, true);
-    }
-    g.lineStyle(6 * b, LACIVERT).strokePoints(sinir, true);
+    // Ağız: gülen, açık ağız (koyu iç, üstte dişler, altta dil). Konuşurken derinliği değişir.
+    const derinlik = 70 + (this.ifade === 'mutlu' ? 10 : 0) + 18 * this.aciklik - (this.ifade === 'uykulu' ? 26 : 0);
+    const dis = egri(-34, 26, 0, derinlik, 34, 26, b);
+    const ust = egri(34, 26, 0, 36, -34, 26, b);
+    const sinir = [...dis, ...ust];
+    g.fillStyle(AGIZ_ICI).fillPoints(sinir, true);
+    // Dil: ağzın altında pembe bir yay
+    const dilY = 26 + (derinlik - 26) * 0.5;
+    g.fillStyle(DIL).fillEllipse(0, (dilY + (derinlik - dilY) * 0.45) * b, 36 * b, Math.max(4, (derinlik - dilY) * 0.75) * b);
+    // Üst dişler
+    g.fillStyle(0xffffff).fillPoints([...egri(-28, 29, 0, 38, 28, 29, b), ...egri(26, 35, 0, 44, -26, 35, b)], true);
+    g.lineStyle(5 * b, LACIVERT).strokePoints(sinir, true);
   }
 
   private gozCiz(g: Phaser.GameObjects.Graphics, cx: number) {
     const b = this.b;
+    // Kaşlar: göz kapağı inse de yerinde durur
+    const kasY = GOZ_Y - GOZ_RY - 9 + (this.ifade === 'uykulu' ? 6 : 0);
+    g.lineStyle(5 * b, LACIVERT).strokePoints(egri(cx - 15, kasY, cx, kasY - 10, cx + 15, kasY, b));
     if (this.ifade === 'mutlu') {
       // Gülen gözler: ters "U" yay.
-      g.lineStyle(8 * b, LACIVERT).strokePoints(egri(cx - 14, GOZ_Y + 6, cx, GOZ_Y - 16, cx + 14, GOZ_Y + 6, b));
+      g.lineStyle(8 * b, LACIVERT).strokePoints(egri(cx - 16, GOZ_Y + 8, cx, GOZ_Y - 16, cx + 16, GOZ_Y + 8, b));
       return;
     }
     // Göz kapağı yukarıdan iner: kırpmada tamamen, uykuluyken yarıya kadar.
     const k = Math.max(this.kapanma.k, this.ifade === 'uykulu' ? 0.55 : 0);
     if (k > 0.85) {
-      g.lineStyle(6 * b, LACIVERT).lineBetween((cx - 14) * b, (GOZ_Y + 8) * b, (cx + 14) * b, (GOZ_Y + 8) * b);
+      g.lineStyle(6 * b, LACIVERT).strokePoints(egri(cx - 16, GOZ_Y + 6, cx, GOZ_Y + 14, cx + 16, GOZ_Y + 6, b));
       return;
     }
-    const ry = 19 * (1 - k);
-    const ey = GOZ_Y + 19 * k;
-    g.fillStyle(0xffffff).fillEllipse(cx * b, ey * b, 30 * b, 2 * ry * b);
-    g.fillStyle(LACIVERT).fillCircle((cx + 3) * b, (ey + 4 * (1 - k)) * b, 9 * (1 - k * 0.45) * b);
-    if (k < 0.3) g.fillStyle(0xffffff).fillCircle((cx + 6) * b, (ey) * b, 3 * b);
+    const ry = GOZ_RY * (1 - k);
+    const ey = GOZ_Y + GOZ_RY * k;
+    const a = 1 - k * 0.5;
+    g.fillStyle(0xffffff).fillEllipse(cx * b, ey * b, 2 * GOZ_RX * b, 2 * ry * b);
+    g.lineStyle(3 * b, LACIVERT).strokeEllipse(cx * b, ey * b, 2 * GOZ_RX * b, 2 * ry * b);
+    // Mavi iris + koyu göz bebeği + iki parıltı
+    g.fillStyle(IRIS).fillCircle((cx + 3) * b, (ey + 4 * a) * b, 13 * a * b);
+    g.fillStyle(LACIVERT).fillCircle((cx + 3) * b, (ey + 4 * a) * b, 8 * a * b);
+    if (k < 0.3) {
+      g.fillStyle(0xffffff).fillCircle((cx + 8) * b, (ey - 3) * b, 5 * b);
+      g.fillStyle(0xffffff).fillCircle((cx - 2) * b, (ey + 10) * b, 2.3 * b);
+    }
   }
 }

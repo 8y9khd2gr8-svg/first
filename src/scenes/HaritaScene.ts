@@ -8,6 +8,7 @@ import { tamamlananlar } from '../ilerleme';
 import { M } from '../metinler';
 import { bip, konus, sustur, zaferMuzigi } from '../ses';
 import { Zipzip } from '../zipzip';
+import { BOLUM_YONU } from '../zipzipKure';
 
 const HARITA_Y = 250; // haritanın üst kenarı
 const MERKEZ = { x: 360, y: HARITA_Y + 280 }; // uzaydan inişte yakınlaşılan nokta
@@ -71,6 +72,7 @@ export class HaritaScene extends Phaser.Scene {
 
     const zipzipDurak = yolculukVar ? TURKIYE[siradaki - 1] : TURKIYE[siradaki === -1 ? TURKIYE.length - 1 : siradaki];
     const zipzip = new Zipzip(this, 0, 0, 0.24);
+    zipzip.yoneDon(BOLUM_YONU.turkiye);
     const zipzipYeri = (d: Durak): Nokta => {
       const k = konum(d.id);
       // Zıpzıp durağın üstünde, yazıları kapatmadan durur.

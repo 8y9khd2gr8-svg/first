@@ -6,6 +6,7 @@ import { tamamlananlar } from '../ilerleme';
 import { M } from '../metinler';
 import { bip, konus, sustur, zaferMuzigi } from '../ses';
 import { Zipzip } from '../zipzip';
+import { BOLUM_YONU } from '../zipzipKure';
 
 // Yeni bölümlerin ortak harita ekranı (Spor Kampı, Dinozorlar Diyarı, Evde Macera, Okyanus).
 // Her bölüm kendi arka planını, durak yerlerini ve cümlelerini AYARLAR'da verir.
@@ -172,6 +173,8 @@ export class BolumScene extends Phaser.Scene {
       return { x: p.x + (p.x < 360 ? R + 45 : -(R + 45)), y: p.y - R + 10 };
     };
     const zipzip = new Zipzip(this, 0, 0, 0.3);
+    // Haritaya girince küre yavaşça bu bölümün tarafına döner (Okyanus'ta Büyük Okyanus...).
+    zipzip.yoneDon(BOLUM_YONU[this.bolum]);
     if (serbest) {
       const ev = ayar.zipzipEvi!;
       zipzip.yerlestir(ev.x, ev.y);

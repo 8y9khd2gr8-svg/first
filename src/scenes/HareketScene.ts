@@ -11,6 +11,7 @@ import { KAMERA_HAREKETLERI, KameraSayaci, kameraAcikMi, kameraDesteklenir } fro
 import { GERI_SAYIM, M, SAYILAR } from '../metinler';
 import { bip, konus, sustur, zaferMuzigi } from '../ses';
 import { Zipzip } from '../zipzip';
+import { durakYonu, zipzipYonunuAyarla } from '../zipzipKure';
 
 const MASKOT_Y = 640;
 
@@ -82,6 +83,8 @@ export class HareketScene extends Phaser.Scene {
     // Uzun komutlar ekrandan taşmasın.
     komut.setScale(Math.min(1, 660 / komut.width));
 
+    // Zıpzıp durağın olduğu tarafa bakar (Ailece ve soğumada son baktığı yerde kalır).
+    if (this.durakId !== AILE_ID && this.durakId !== SOGUMA_ID) zipzipYonunuAyarla(durakYonu(durakBul(this.durakId)));
     this.zipzip = new Zipzip(this, x, MASKOT_Y, 1.5);
     this.sayac = this.add
       .text(x, 1060, '', { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '150px', color: '#ffffff', stroke: '#0b1430', strokeThickness: 14 })
