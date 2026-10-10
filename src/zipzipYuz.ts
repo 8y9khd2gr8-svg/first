@@ -6,7 +6,9 @@ import { konusmayiDinle } from './ses';
 // Ölçüler gövde küresinin (zipzipKure.ts) birimleriyle; (0, 0) gövdenin ortası.
 // Göz kırpma süs sayılır: "hareketi azalt" açıksa ya da telefon yavaşsa kırpmaz. Ağız ve ifade anlamlı olduğu için kalır.
 
-export type Ifade = 'normal' | 'mutlu' | 'uykulu';
+// saskin: sürpriz hareketlerde; dusunen: "Yakında"ya dokununca; kirpan: göz kırpıp aferin der (teşvik).
+// Üzgün ya da kızgın ifade yok: oyunda kaybetmek yok.
+export type Ifade = 'normal' | 'mutlu' | 'uykulu' | 'saskin' | 'dusunen' | 'kirpan';
 
 const LACIVERT = 0x14213d;
 const AGIZ_ICI = 0x8e2433;
@@ -90,12 +92,23 @@ export class ZipzipYuz extends Phaser.GameObjects.Container {
   private ciz() {
     const g = this.cizim.clear();
     const b = this.b;
-    for (const s of [-1, 1]) this.gozCiz(g, GOZ_X * s);
+    for (const s of [-1, 1] as const) this.gozCiz(g, GOZ_X * s, s);
 
     // Pembe yanaklar hep var; mutluyken daha belirgin.
     const yanakSaydam = this.ifade === 'mutlu' ? 0.85 : 0.6;
     g.fillStyle(YANAK, yanakSaydam).fillEllipse(-66 * b, (GOZ_Y + 36) * b, 30 * b, 20 * b).fillEllipse(66 * b, (GOZ_Y + 36) * b, 30 * b, 20 * b);
 
+    if (this.ifade === 'saskin' && this.aciklik < 0.1) {
+      // Şaşkın: küçük yuvarlak "O" ağız
+      g.fillStyle(AGIZ_ICI).fillEllipse(0, 44 * b, 26 * b, 32 * b);
+      g.lineStyle(5 * b, LACIVERT).strokeEllipse(0, 44 * b, 26 * b, 32 * b);
+      return;
+    }
+    if (this.ifade === 'dusunen' && this.aciklik < 0.1) {
+      // Düşünen: yana kayık, kapalı küçük gülümseme
+      g.lineStyle(6 * b, LACIVERT).strokePoints(egri(-8, 40, 12, 52, 30, 34, b));
+      return;
+    }
     if (this.ifade === 'uykulu' && this.aciklik < 0.1) {
       g.lineStyle(7 * b, LACIVERT).strokePoints(egri(-18, 46, 0, 58, 18, 46, b));
       return;
@@ -114,12 +127,13 @@ export class ZipzipYuz extends Phaser.GameObjects.Container {
     g.lineStyle(5 * b, LACIVERT).strokePoints(sinir, true);
   }
 
-  private gozCiz(g: Phaser.GameObjects.Graphics, cx: number) {
+  private gozCiz(g: Phaser.GameObjects.Graphics, cx: number, yan: -1 | 1) {
     const b = this.b;
-    // Kaşlar: göz kapağı inse de yerinde durur
-    const kasY = GOZ_Y - GOZ_RY - 9 + (this.ifade === 'uykulu' ? 6 : 0);
+    // Kaşlar: göz kapağı inse de yerinde durur. Şaşkınken ikisi, düşünürken biri yukarı kalkar.
+    const kalkik = this.ifade === 'saskin' || (this.ifade === 'dusunen' && yan === -1);
+    const kasY = GOZ_Y - GOZ_RY - 9 + (this.ifade === 'uykulu' ? 6 : 0) - (kalkik ? 9 : 0);
     g.lineStyle(5 * b, LACIVERT).strokePoints(egri(cx - 15, kasY, cx, kasY - 10, cx + 15, kasY, b));
-    if (this.ifade === 'mutlu') {
+    if (this.ifade === 'mutlu' || (this.ifade === 'kirpan' && yan === 1)) {
       // Gülen gözler: ters "U" yay.
       g.lineStyle(8 * b, LACIVERT).strokePoints(egri(cx - 16, GOZ_Y + 8, cx, GOZ_Y - 16, cx + 16, GOZ_Y + 8, b));
       return;
@@ -132,15 +146,19 @@ export class ZipzipYuz extends Phaser.GameObjects.Container {
     }
     const ry = GOZ_RY * (1 - k);
     const ey = GOZ_Y + GOZ_RY * k;
-    const a = 1 - k * 0.5;
-    g.fillStyle(0xffffff).fillEllipse(cx * b, ey * b, 2 * GOZ_RX * b, 2 * ry * b);
-    g.lineStyle(3 * b, LACIVERT).strokeEllipse(cx * b, ey * b, 2 * GOZ_RX * b, 2 * ry * b);
+    const saskin = this.ifade === 'saskin';
+    const buyume = saskin ? 1.12 : 1;
+    // Göz bebeğinin yeri: normalde hafif sağ alta, düşünürken sol yukarı bakar, şaşkınken ortada.
+    const [bx, by] = this.ifade === 'dusunen' ? [-5, -7] : saskin ? [0, 0] : [3, 4];
+    const a = (1 - k * 0.5) * (saskin ? 0.8 : 1);
+    g.fillStyle(0xffffff).fillEllipse(cx * b, ey * b, 2 * GOZ_RX * buyume * b, 2 * ry * buyume * b);
+    g.lineStyle(3 * b, LACIVERT).strokeEllipse(cx * b, ey * b, 2 * GOZ_RX * buyume * b, 2 * ry * buyume * b);
     // Mavi iris + koyu göz bebeği + iki parıltı
-    g.fillStyle(IRIS).fillCircle((cx + 3) * b, (ey + 4 * a) * b, 13 * a * b);
-    g.fillStyle(LACIVERT).fillCircle((cx + 3) * b, (ey + 4 * a) * b, 8 * a * b);
+    g.fillStyle(IRIS).fillCircle((cx + bx) * b, (ey + by * a) * b, 13 * a * b);
+    g.fillStyle(LACIVERT).fillCircle((cx + bx) * b, (ey + by * a) * b, 8 * a * b);
     if (k < 0.3) {
-      g.fillStyle(0xffffff).fillCircle((cx + 8) * b, (ey - 3) * b, 5 * b);
-      g.fillStyle(0xffffff).fillCircle((cx - 2) * b, (ey + 10) * b, 2.3 * b);
+      g.fillStyle(0xffffff).fillCircle((cx + bx + 5) * b, (ey + by - 7) * b, 5 * b);
+      g.fillStyle(0xffffff).fillCircle((cx + bx - 5) * b, (ey + by + 6) * b, 2.3 * b);
     }
   }
 }

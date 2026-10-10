@@ -5,7 +5,7 @@ import { AILE_ID } from '../aile';
 import { durakBul, haritaSahnesi } from '../duraklar';
 import { SOGUMA_ID, hareketYapildi, oturumListesi } from '../oturum';
 import { uzaktanAcikMi } from '../ayarlar';
-import { Animasyon, Hareket } from '../hareketler';
+import { AYNA, Animasyon, DONMA, Hareket } from '../hareketler';
 import { hareketKaydet } from '../istatistik';
 import { KAMERA_HAREKETLERI, KameraSayaci, kameraAcikMi, kameraDesteklenir } from '../kamera';
 import { GERI_SAYIM, M, SAYILAR } from '../metinler';
@@ -95,6 +95,8 @@ export class HareketScene extends Phaser.Scene {
 
     konus(hareket.sesli);
     this.kameraKur(hareket);
+    // Sürpriz oyunlarda Zıpzıp da şaşırır.
+    if (hareket.hikaye === DONMA.hikaye || hareket.hikaye === AYNA.hikaye) this.zipzip.ifadeSec('saskin', 1800);
 
     // Gösterim: Zıpzıp hareketi bir iki kez yapar.
     const gosterimSuresi = 2600;
@@ -218,7 +220,8 @@ export class HareketScene extends Phaser.Scene {
       .setOrigin(0.5)
       .setScale(0);
     this.tweens.add({ targets: aferin, scale: 1, duration: 350, ease: 'Back.easeOut' });
-    this.zipzip.ifadeSec('mutlu');
+    // Aferin'de sırayla gülen gözler ve göz kırpma (hep aynı olmasın).
+    this.zipzip.ifadeSec(this.adim % 2 === 0 ? 'mutlu' : 'kirpan');
     this.zipzip.birKez('zipla', 900);
     this.time.delayedCall(1300, () => this.scene.restart({ durakId: this.durakId, adim: this.adim + 1 }));
   }

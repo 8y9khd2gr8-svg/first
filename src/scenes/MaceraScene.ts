@@ -166,6 +166,7 @@ export class MaceraScene extends Phaser.Scene {
           bip(500, 0.1, 'triangle', 0.15);
           this.tweens.add({ targets: kap, angle: { from: -6, to: 6 }, duration: 80, yoyo: true, repeat: 2, onComplete: () => kap.setAngle(0) });
           konus(M.yakinda);
+          zipzip.ifadeSec('dusunen', 2200);
         });
       }
     });
