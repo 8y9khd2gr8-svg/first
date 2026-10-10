@@ -1,6 +1,7 @@
 import { BOLUM_SIRASI, BOLUMLER } from '../../src/duraklar.ts';
 import { ISINMALAR, SOGUMALAR, DONMA, AYNA } from '../../src/hareketler.ts';
 import { AILE_OTURUMU } from '../../src/aile.ts';
+import { TEPELER } from '../../src/tepeler.ts';
 import fs from 'fs';
 type K = { baslik: string; sesli: string; hikaye?: string; animasyon: string; miktar: string; tempo: string; yerler: string[] };
 const harita = new Map<string, K>();
@@ -17,6 +18,7 @@ ekle(DONMA, 'Sürpriz an: donma oyunu');
 ekle(AYNA, 'Sürpriz an: ayna oyunu (Zıpzıp 4 farklı hareket yapar)');
 for (const id of BOLUM_SIRASI)
   for (const d of BOLUMLER[id].duraklar) { const bolum = BOLUMLER[id].ad; ekle(d.ozel, `${bolum}: ${d.ad} (özel)`); d.ekler.forEach((e) => ekle(e, `${bolum}: ${d.ad}`)); }
+for (const d of TEPELER) { ekle(d.ozel, `İstanbul’un 7 Tepesi (hazırlık): ${d.ad} (özel)`); d.ekler.forEach((e) => ekle(e, `İstanbul’un 7 Tepesi (hazırlık): ${d.ad}`)); }
 SOGUMALAR.forEach((h) => ekle(h, 'Soğuma (bölüm sonunda ya da bitirirken)'));
 AILE_OTURUMU.forEach((h) => ekle(h, 'Ailece (bir büyükle)'));
 fs.writeFileSync(process.argv[2], JSON.stringify([...harita.values()], null, 1));
