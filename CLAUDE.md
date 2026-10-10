@@ -18,7 +18,13 @@ Teknoloji: Phaser 3 + TypeScript + Vite, GitHub Pages ile yayın. İleride Capac
   Ödeme ekranı ebeveyn kilidinin arkasında. Kostüm/kıyafet satılmaz; hareketle kazanılan
   yıldızlarla açılır. İleride okullara/anaokullarına lisans düşünülebilir.
 - Önce web (PWA), oyun olgunlaşınca Capacitor ile Play Store ve App Store.
-- Kamera ile hareket algılama sonraya bırakıldı; şimdilik çocuk "Yaptım!" düğmesine basar.
+  Hedef sadece mağazalar: web adresi (GitHub Pages) beta sonuna kadar yalnızca test için kalır;
+  mağazaya çıkarken oyun siteden kaldırılır, sadece gizlilik.html ve kosullar.html kalır
+  (mağazalar gizlilik politikası adresi ister).
+- Hareket doğrulama kararı: "Yaptım!" düğmesi hareket süresi/sayımı bitince belirir (varsayılan).
+  Kamera modu isteğe bağlı, ebeveyn köşesinden açılır: MediaPipe Pose, model dosyası pakette, cihaz
+  içinde çalışır, görüntü kaydedilmez/gönderilmez (gizlilik.html'e eklenmeli). Önce basit hareketler
+  (zıpla, çömel, kollar). Sesli "Yaptım" komutu yok (ses dış sunucuya gidebilir, çocuk sesi zor tanınır).
 
 - Hareket komutları benzetme değil, vücut parçasını söyleyen tek ve net eylem olmalı
   ("Tek ayağını kaldır", "Dizlerini sırayla kaldır"). "Leylek gibi", "kuş gibi kanat çırp",
@@ -42,6 +48,8 @@ Teknoloji: Phaser 3 + TypeScript + Vite, GitHub Pages ile yayın. İleride Capac
   doğal sesle (Azure veya ElevenLabs anahtarıyla) public/ses/ altına kaydeder; kaydı olmayan
   cümle telefonun sesiyle okunur. Çocuğun adı sesli söylenmez ("Merhaba gezgin!"), sadece yazılır.
   Yeni bir konus() cümlesi eklenince metinler.ts'e de eklenmeli.
+  Ses kararı: beta için Azure doğal ses (ücretsiz katman; hesabı kullanıcı açar, anahtar ortam
+  ayarlarına gizli değişken). Cümleler oturunca (beta sonrası) seslendirmen/ajansla insan sesi.
 - Çıkış planı: Kasım'da ~100 kişilik beta (TestFlight / Google kapalı test), Ocak sonu yarıyıl
   tatilinde mağaza, 23 Nisan büyük güncelleme. Yorumlar organize ettirilmez (mağaza kuralı);
   çevre beta testçisi olarak kullanılır.
@@ -58,7 +66,14 @@ Teknoloji: Phaser 3 + TypeScript + Vite, GitHub Pages ile yayın. İleride Capac
   çizilir); Efes → Kolezyum → Piramitler → Petra → Tac Mahal → Çin Seddi → Machu Picchu.
   Türkiye Turu bitince açılır; beta için ebeveyn köşesinde geçici "Beta: Dünya bölümünü aç"
   (mağazadan önce kaldırılacak). Ödeme mağaza (Capacitor) aşamasında bağlanacak.
+- Yasal yol: bireysel geliştirici hesaplarıyla başlanır (GVK 20/B istisnası; mali müşavir doğrulayacak).
+  Marka: "Zıp Zıp Dünya" için TÜRKPATENT araştırması + başvuru betadan önce (Ekim-Kasım; sınıf 9 ve 41).
+  Şahıs şirketi okul lisansı satışı başlayınca (okullar fatura ister). Hesap/başvuruları kullanıcı yapar.
 - Para modeli kesinleşti: Türkiye ücretsiz + tek ödemeyle tam sürüm; sonra okul lisansı.
+  Uygulama içi reklam ve abonelik yok. İkinci gelir ayağı (okul lisansı / İngilizce sürüm)
+  mağazaya çıktıktan sonra satışlara bakılarak seçilecek.
+  Bağış: uygulama içinde bağış toplanmaz (Apple kuralı, Yardım Toplama Kanunu). Mağaza sonrası
+  değerlendirilecek: gelirden bağış sözü (ör. her satışa 1 fidan) ya da oyun içi sanal fidan teması.
 - Beta hazırlığı: ilk açılışta bir kez ebeveyn güvenlik notu; durak girişinde kısa hatırlatma;
   public/gizlilik.html ve kosullar.html (taslak, avukata gösterilecek; iletişim adresi eklenecek);
   ebeveyn köşesinde "Tüm verileri sil" (zipzip- ile başlayan bütün anahtarlar). Yeni bir cihaz
@@ -79,6 +94,9 @@ Teknoloji: Phaser 3 + TypeScript + Vite, GitHub Pages ile yayın. İleride Capac
   açılır (harcama/satın alma yok). Giyilen kostüm her ekrandaki Zıpzıp'ta görünür. Kostüm dolabı
   pasaporttan (👕). Durak sonunda yeni rozet ve kostümler sırayla kutlanır.
 - Durak simgeleri şimdilik emoji; ileride çizerin çizdiği özel görseller gelecek.
+- Animasyon kararı: "canlı ama sakin". Hareket bir işe yaramalı (giriş, sıradaki durak, kutlama);
+  sürekli oynayan süs yok. Pasaport sakin, damga/rozet anı canlı. Telefonda "hareketi azalt" açıksa
+  animasyonlar azalır. Yağız testinde dikkat dağıtan yer sadeleştirilir.
 
 ## Kod düzeni
 - `src/zipzip.ts`: maskot; duruşlar (uzuv açıları) ve her hareketin adımları burada.
@@ -97,3 +115,5 @@ Teknoloji: Phaser 3 + TypeScript + Vite, GitHub Pages ile yayın. İleride Capac
 - Her aşama küçük ve telefonda test edilebilir olsun; sonunda Yağız (6 yaş) test eder.
 - Değişiklikler PR olarak açılır; testleri geçince PR'ı Claude birleştirir (kullanıcı onayladı).
 - Kodda isimler ve yorumlar Türkçe.
+- Kota: plan yükseltilmeden tasarruflu çalışılır (yarıyıl öncesi belki yükseltilir). Uzun sohbet
+  yerine iş listesi bitince yeni sohbet; istekler toplu; uygun olunca sabah otomatik başlangıç.

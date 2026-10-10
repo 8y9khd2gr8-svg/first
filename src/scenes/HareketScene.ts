@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { RENK, YAZI_TIPI } from '../ayarlar';
 import { buyukDugme, evDugmesi, yildizliArkaPlan } from '../arayuz';
+import { AILE_ID, AILE_OTURUMU } from '../aile';
 import { durakBul, haritaSahnesi, oturum } from '../duraklar';
 import { Hareket } from '../hareketler';
 import { hareketKaydet } from '../istatistik';
@@ -31,12 +32,12 @@ export class HareketScene extends Phaser.Scene {
   create() {
     yildizliArkaPlan(this);
     const x = this.scale.gameSize.width / 2;
-    const liste = oturum(durakBul(this.durakId));
+    const liste = this.liste();
     const hareket = liste[this.adim];
 
     evDugmesi(this, () => {
       sustur();
-      this.scene.start(haritaSahnesi(durakBul(this.durakId)), {});
+      this.scene.start(this.durakId === AILE_ID ? 'Macera' : haritaSahnesi(durakBul(this.durakId)), {});
     });
 
     // İlerleme noktaları: kaçıncı hareketteyiz?
@@ -148,7 +149,7 @@ export class HareketScene extends Phaser.Scene {
 
   // Kısa bir "Aferin!" kutlaması, sonra sıradaki hareket ya da ödül ekranı.
   private sonraki() {
-    const sonAdim = this.adim >= oturum(durakBul(this.durakId)).length - 1;
+    const sonAdim = this.adim >= this.liste().length - 1;
     if (sonAdim) {
       this.scene.start('Odul', { durakId: this.durakId });
       return;
@@ -163,6 +164,11 @@ export class HareketScene extends Phaser.Scene {
     this.tweens.add({ targets: aferin, scale: 1, duration: 350, ease: 'Back.easeOut' });
     this.zipzip.birKez('zipla', 900);
     this.time.delayedCall(1300, () => this.scene.restart({ durakId: this.durakId, adim: this.adim + 1 }));
+  }
+
+  // Aile oturumu ya da durağın kendi oturumu.
+  private liste(): Hareket[] {
+    return this.durakId === AILE_ID ? AILE_OTURUMU : oturum(durakBul(this.durakId));
   }
 
   private sayacGoster(metin: string, renk = '#ffffff') {
