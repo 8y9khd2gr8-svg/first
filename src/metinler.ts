@@ -72,6 +72,7 @@ export const M = {
   rozetDolabi: 'Burası rozetlerin! Hareket ettikçe yeni rozetler kazanırsın. Bir rozete dokun, nasıl kazanılır söyleyeyim.',
   rozetAdi: (ad: string) => `${ad} rozeti!`,
   rozetNasil: (nasil: string) => `Bu rozeti kazanmak için: ${nasil}.`,
+  sesDeneme: 'Merhaba! Ben Zıpzıp. Beni duyuyorsan, hadi birlikte hareket edelim!',
 };
 
 // Seslendirme aracı için: oyunda söylenebilecek her cümlenin tam listesi.
@@ -94,6 +95,7 @@ export function tumMetinler(): string[] {
     M.rozetDolabi,
     M.aileBitti,
     M.kameraGordu,
+    M.sesDeneme,
     ...AILE_OTURUMU.map((h) => h.sesli),
     ...KOSTUMLER.flatMap((k) => [M.kostumSecildi(k.ad), M.yeniKostum(k.ad), M.kostumKilitli(kostumNasil(k))]),
   ]);

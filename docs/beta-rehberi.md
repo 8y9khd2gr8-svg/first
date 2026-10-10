@@ -38,7 +38,9 @@ Pasaport ekranının sağ üstündeki ✏️ düğmesinden girilir. Basit bir ç
 - **📊 Hareket özeti:** bu hafta kaç dakika hareket edildi. Sayılar çocuğun "Yaptım!" dediği hareketlerdir.
   Oyun, hareketin gerçekten yapıldığını (kamera kapalıyken) anlayamaz.
 - **✏️ Pasaportu düzenle:** çocuğun adı ve isteğe bağlı fotoğrafı. Hepsi sadece telefonda kalır.
-- **📷 Kamerayla sayma (deneme):** isterseniz açın. Zıplama, çömelme ve kol hareketlerini telefon kamerası sayar.
+- **🔊 Sesi dene:** Zıpzıp'ın sesini telefonunuzda bir kez dinleyin. Telefonda Türkçe ses yoksa ekran nasıl
+  yükleneceğini adım adım yazar. Okuma bilmeyen çocuk yönlendirmeyi sesten anlar; lütfen ilk gün deneyin.
+- **📷 Kamerayla sayma (deneme):** isterseniz açın. Zıplama, çömelme, kol, diz, ayak aç-kapa ve yana adım hareketlerini telefon kamerası sayar.
   Görüntü telefonun içinde işlenir, kaydedilmez, hiçbir yere gönderilmez. Açmak tamamen isteğe bağlıdır.
 - **🧪 Beta: bütün bölümleri aç:** bütün bölümleri (Dünya, Uzay, Spor...) ödemesiz ve sırayı beklemeden açar.
   Betada **bunu kullanın**; "⭐ Tam sürüm" ekranındaki **Satın al**'a dokunmayın (Android'de gerçek ödeme alınabilir).

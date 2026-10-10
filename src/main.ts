@@ -14,6 +14,7 @@ import { HareketScene } from './scenes/HareketScene';
 import { OdulScene } from './scenes/OdulScene';
 import { AvatarScene } from './scenes/AvatarScene';
 import { EbeveynMenuScene } from './scenes/EbeveynMenuScene';
+import { EbeveynSesScene } from './scenes/EbeveynSesScene';
 import { EbeveynVeriScene } from './scenes/EbeveynVeriScene';
 import { EbeveynOzetScene } from './scenes/EbeveynOzetScene';
 import { SertifikaScene } from './scenes/SertifikaScene';
@@ -48,7 +49,7 @@ function oyunuBaslat() {
     },
     // Ad yazma kutusu ve fotoğraf düğmesi gibi HTML öğeleri için.
     dom: { createContainer: true },
-    scene: [AcilisScene, HaritaScene, DurakScene, HareketScene, OdulScene, PasaportScene, PasaportAyarScene, EbeveynScene, AvatarScene, EbeveynMenuScene, EbeveynVeriScene, EbeveynOzetScene, SertifikaScene, KurulumScene, DunyaScene, GuvenlikScene, RozetScene, UzayScene, MaceraScene, KostumScene, TamSurumScene, new BolumScene('spor'), new BolumScene('dinozor'), new BolumScene('evde'), new BolumScene('okyanus')],
+    scene: [AcilisScene, HaritaScene, DurakScene, HareketScene, OdulScene, PasaportScene, PasaportAyarScene, EbeveynScene, AvatarScene, EbeveynMenuScene, EbeveynVeriScene, EbeveynSesScene, EbeveynOzetScene, SertifikaScene, KurulumScene, DunyaScene, GuvenlikScene, RozetScene, UzayScene, MaceraScene, KostumScene, TamSurumScene, new BolumScene('spor'), new BolumScene('dinozor'), new BolumScene('evde'), new BolumScene('okyanus')],
   });
   hiziIzle(oyun);
   // Geliştirme sırasında otomatik testlerin oyuna erişebilmesi için.

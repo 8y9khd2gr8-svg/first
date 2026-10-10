@@ -57,6 +57,9 @@ Teknoloji: Phaser 3 + TypeScript + Vite, GitHub Pages ile yayın. İleride Capac
 - Ebeveyn köşesi (kilitli): haftalık hareket özeti + paylaş, pasaport düzenleme. Özet dürüst:
   sayılar çocuğun "Yaptım!" dediği hareketler; oyun gerçekten yapıldığını algılayamaz. Kamera ile
   algılama (cihaz içinde, görüntü gönderilmeden) bu yüzden önemli bir sonraki adım.
+- "🔊 Sesi dene" (ebeveyn köşesi, EbeveynSesScene): örnek cümleyi okur, doğal kayıt / telefonun Türkçe sesi var mı
+  gösterir; Türkçe ses yoksa telefona göre yükleme adımlarını yazar (Android uygulamada yükleme ekranını açar).
+  Beta kontrol listesi: docs/beta-hazir-mi.md.
 - Türkiye Turu bitince Gezgin Sertifikası (resim olarak kaydet/paylaş).
 - PWA: ana ekrana yüklenir, internetsiz çalışır (vite-plugin-pwa). Yazı tipi pakette
   (@fontsource/baloo-2); oyun hiçbir dış sunucuya bağlanmaz, öyle kalmalı.

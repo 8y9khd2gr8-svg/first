@@ -19,14 +19,16 @@ export class EbeveynMenuScene extends Phaser.Scene {
     evDugmesi(this, () => this.scene.start('Pasaport', {}));
     this.add.text(x, 170, 'Ebeveyn köşesi', { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '68px', color: '#FFC93C' }).setOrigin(0.5);
 
-    const dugme = (y: number, yazi: string, renk: number, sahne: string, veri?: object) =>
-      buyukDugme(this, x, y, yazi, renk, () => this.scene.start(sahne, veri), { genislik: 560, yukseklik: 100, yaziBoyu: 44 });
+    const dugme = (y: number, yazi: string, renk: number, sahne: string, veri: object = {}, dx = 0, genislik = 560) =>
+      buyukDugme(this, x + dx, y, yazi, renk, () => this.scene.start(sahne, veri), { genislik, yukseklik: 100, yaziBoyu: genislik < 560 ? 38 : 44 });
     dugme(290, '📊 Hareket özeti', RENK.turuncu, 'EbeveynOzet');
     dugme(400, '✏️ Pasaportu düzenle', RENK.mavi, 'PasaportAyar');
     // Mağaza uygulamasında "Telefona yükle" gereksiz (zaten yüklü): yerinde tam sürüm (ödeme / geri yükleme) durur.
     if (odemeKipi() === 'web') dugme(510, '📲 Telefona yükle', RENK.yesil, 'Kurulum');
     else dugme(510, '⭐ Tam sürüm', RENK.yesil, 'TamSurum', { geri: 'EbeveynMenu' });
-    dugme(620, '🛡️ Güvenlik notu', 0x7c5cd6, 'Guvenlik', { sonra: 'EbeveynMenu' });
+    // Yan yana iki yarım düğme: güvenlik notu ve ses denemesi (telefonda Türkçe ses var mı?).
+    dugme(620, '🛡️ Güvenlik', 0x7c5cd6, 'Guvenlik', { sonra: 'EbeveynMenu' }, -142, 276);
+    dugme(620, '🔊 Sesi dene', RENK.mavi, 'EbeveynSes', {}, 142, 276);
 
     // Küçük görünen ayar düğmeleri: yazı sade kalır, dokunma alanı en az 88 nokta (parmak ıskalamasın).
     const baglanti = (y: number, yazi: string) =>
