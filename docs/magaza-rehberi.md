@@ -49,6 +49,8 @@ Hesap açmak, para ödemek ve uygulamayı mağazaya göndermek sizde. Teknik haz
    - **Veri güvenliği formu:** "Hiçbir veri toplanmıyor ve paylaşılmıyor". Kamera görüntüsü telefonda işlenir, gönderilmez.
    - **Gizlilik politikası adresi:** `https://8y9khd2gr8-svg.github.io/first/gizlilik.html`
 
+**Uygulama içeriği formlarının hazır cevapları:** `docs/play-formlari.md` (veri güvenliği, hedef kitle, içerik derecelendirmesi, mağaza sayfası).
+
 ## 3b. Play kapalı test paketi (yükleme anahtarı + AAB)
 
 Play'e **AAB** denen imzalı paket yüklenir (APK sadece elden kurulum içindir). Paketi imzalayan
