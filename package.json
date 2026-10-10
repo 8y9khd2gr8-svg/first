@@ -12,8 +12,9 @@
   },
   "dependencies": {
     "@fontsource/baloo-2": "^5.3.0",
-    "phaser": "3.90.0",
+    "@mediapipe/tasks-vision": "^0.10.14",
     "d3-geo": "^3.1.1",
+    "phaser": "3.90.0",
     "topojson-client": "^3.1.0",
     "world-atlas": "^2.0.2"
   },

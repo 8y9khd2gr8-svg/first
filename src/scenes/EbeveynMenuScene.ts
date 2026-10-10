@@ -3,6 +3,7 @@ import { RENK, YAZI_TIPI } from '../ayarlar';
 import { buyukDugme, evDugmesi, yildizliArkaPlan } from '../arayuz';
 import { tumVerileriSil } from '../guvenlik';
 import { betaDunyaAc, betaDunyaAcikMi } from '../ilerleme';
+import { kameraAcikMi, kameraAyarla, kameraDesteklenir } from '../kamera';
 
 // Ebeveyn köşesi (kilidin arkasında): özet, pasaport, kurulum, güvenlik, gizlilik, veri silme.
 export class EbeveynMenuScene extends Phaser.Scene {
@@ -17,17 +18,27 @@ export class EbeveynMenuScene extends Phaser.Scene {
     this.add.text(x, 170, 'Ebeveyn köşesi', { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '68px', color: '#FFC93C' }).setOrigin(0.5);
 
     const dugme = (y: number, yazi: string, renk: number, sahne: string, veri?: object) =>
-      buyukDugme(this, x, y, yazi, renk, () => this.scene.start(sahne, veri), { genislik: 560, yukseklik: 115, yaziBoyu: 46 });
-    dugme(320, '📊 Hareket özeti', RENK.turuncu, 'EbeveynOzet');
-    dugme(460, '✏️ Pasaportu düzenle', RENK.mavi, 'PasaportAyar');
-    dugme(600, '📲 Telefona yükle', RENK.yesil, 'Kurulum');
-    dugme(740, '🛡️ Güvenlik notu', 0x7c5cd6, 'Guvenlik', { sonra: 'EbeveynMenu' });
+      buyukDugme(this, x, y, yazi, renk, () => this.scene.start(sahne, veri), { genislik: 560, yukseklik: 100, yaziBoyu: 44 });
+    dugme(300, '📊 Hareket özeti', RENK.turuncu, 'EbeveynOzet');
+    dugme(420, '✏️ Pasaportu düzenle', RENK.mavi, 'PasaportAyar');
+    dugme(540, '📲 Telefona yükle', RENK.yesil, 'Kurulum');
+    dugme(660, '🛡️ Güvenlik notu', 0x7c5cd6, 'Guvenlik', { sonra: 'EbeveynMenu' });
 
     const baglanti = (y: number, yazi: string) =>
       this.add
         .text(x, y, yazi, { fontFamily: YAZI_TIPI, fontSize: '32px', color: '#cfe3ff', backgroundColor: '#ffffff1f', padding: { x: 20, y: 10 } })
         .setOrigin(0.5)
         .setInteractive({ useHandCursor: true });
+
+    // Kamerayla sayma (deneme): açıkken zıplama, çömelme ve kol hareketlerini kamera sayar.
+    // Görüntü telefonun içinde işlenir; kaydedilmez, gönderilmez.
+    if (kameraDesteklenir()) {
+      const acik = kameraAcikMi();
+      baglanti(775, acik ? '📷 Kamerayla sayma: AÇIK (deneme)' : '📷 Kamerayla sayma: kapalı (deneme)').on('pointerdown', () => {
+        kameraAyarla(!acik);
+        this.scene.restart();
+      });
+    }
 
     // Gizlilik ve koşullar ayrı web sayfaları; gerçek bağlantı (yeni sekmede açılır).
     const sayfalar = this.add.dom(x, 870, 'div', 'display:flex;gap:14px;justify-content:center;width:640px;', '');
