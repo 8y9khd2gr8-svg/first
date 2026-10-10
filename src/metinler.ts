@@ -9,7 +9,8 @@ import { KOSTUMLER } from './kostumler';
 // (npm run seslendir); listede olmayan bir cümle telefonun kendi sesiyle okunur.
 // Kural: çocuğun adı sesli söylenmez (önceden kaydedilemez), sadece ekranda yazar.
 
-export const SAYILAR = ['bir', 'iki', 'üç', 'dört', 'beş', 'altı', 'yedi', 'sekiz', 'dokuz', 'on'].map((s) => s[0].toLocaleUpperCase('tr') + s.slice(1) + '!');
+// 20'ye kadar: bir hareket bundan fazla tekrar sayarsa test uyarır (sayı söylenemezse oyun takılırdı).
+export const SAYILAR = ['bir', 'iki', 'üç', 'dört', 'beş', 'altı', 'yedi', 'sekiz', 'dokuz', 'on', 'on bir', 'on iki', 'on üç', 'on dört', 'on beş', 'on altı', 'on yedi', 'on sekiz', 'on dokuz', 'yirmi'].map((s) => s[0].toLocaleUpperCase('tr') + s.slice(1) + '!');
 // Bölüm sertifikalarındaki unvanlar (SertifikaScene ile aynı sırada).
 export const SERTIFIKA_UNVANLARI = ['Türkiye Gezgini', 'Dünya Kâşifi', 'Uzay Yolcusu', 'Spor Yıldızı', 'Dinozor Kâşifi', 'Ev Kahramanı'];
 export const GERI_SAYIM = ['Üç!', 'İki!', 'Bir!', 'Başla!'];

@@ -78,6 +78,14 @@ test('durak bitince harita kutlar (sıralı ve serbest bölüm)', async ({ page 
   expect(kayit.hatalar).toEqual([]);
 });
 
+test('en uzun sayılı hareket sonuna kadar gider ("Yaptım!" çıkar)', async ({ page }) => {
+  const kayit = await oyunuAc(page);
+  // Çin Seddi: 12 tekrar (eskiden 11'de takılıyordu).
+  await sahneAc(page, 'Hareket', { durakId: 'cinseddi', adim: 1 });
+  await page.waitForFunction(() => (window as any).oyun.scene.getScene('Hareket').children.list.some((c: any) => c.list?.some?.((t: any) => t.text === 'Yaptım!')), null, { timeout: 30_000 });
+  expect(kayit.hatalar).toEqual([]);
+});
+
 test('Zıpzıp her hareketi hatasız yapar', async ({ page }) => {
   const kayit = await oyunuAc(page);
   await sahneAc(page, 'Kostum');

@@ -7,7 +7,7 @@ import { AILE_OTURUMU } from '../src/aile';
 import { BOLUM_SIRASI, BOLUMLER, TUM_DURAKLAR, oturum } from '../src/duraklar';
 import { H, Hareket } from '../src/hareketler';
 import { KOSTUMLER } from '../src/kostumler';
-import { M, SERTIFIKA_UNVANLARI, tumMetinler } from '../src/metinler';
+import { M, SAYILAR, SERTIFIKA_UNVANLARI, tumMetinler } from '../src/metinler';
 import { ROZETLER } from '../src/rozetler';
 
 const tumHareketler: Hareket[] = [...Object.values(H), ...AILE_OTURUMU, ...TUM_DURAKLAR.flatMap(oturum)];
@@ -42,7 +42,7 @@ test('komutlar benzetme değil, net eylem ("gibi" yok); sesli komut boş değil'
     assert.ok(!/\bgibi\b/i.test(h.baslik), `benzetme: ${h.baslik}`);
     assert.ok(!/\bgibi\b/i.test(h.sesli), `benzetme: ${h.sesli}`);
     assert.ok(h.baslik.trim() && h.sesli.trim());
-    assert.ok(h.tur === 'sayi' ? h.adet > 0 && h.adet <= 12 && h.tempoMs >= 600 : h.saniye > 0 && h.saniye <= 15, h.baslik);
+    assert.ok(h.tur === 'sayi' ? h.adet > 0 && h.adet <= SAYILAR.length && h.tempoMs >= 600 : h.saniye > 0 && h.saniye <= 15, h.baslik);
   }
 });
 

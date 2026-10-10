@@ -117,7 +117,7 @@ export class HareketScene extends Phaser.Scene {
           this.zipzip.birKez(hareket.animasyon, hareket.tempoMs, k);
           this.sayacGoster(String(k));
           bip(560 + k * 40, 0.12);
-          konus(SAYILAR[k - 1]);
+          konus(SAYILAR[k - 1] ?? '');
         });
       }
       this.time.delayedCall(hareket.adet * hareket.tempoMs, () => this.bitir(hareket));
