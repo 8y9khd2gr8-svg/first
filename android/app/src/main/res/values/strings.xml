@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Zıp Zıp Dünya</string>
+    <string name="title_activity_main">Zıp Zıp Dünya</string>
+    <string name="package_name">com.zipzipdunya.oyun</string>
+    <string name="custom_url_scheme">com.zipzipdunya.oyun</string>
+</resources>
