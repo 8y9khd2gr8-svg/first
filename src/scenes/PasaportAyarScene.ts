@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { RENK, YAZI_TIPI } from '../ayarlar';
-import { buyukDugme, evDugmesi, yildizliArkaPlan } from '../arayuz';
+import { buyukDugme, evDugmesi, yildizliArkaPlan, genisDokunma } from '../arayuz';
 import { fotoDokusuYukle, fotoyuHazirla, pasaportOku, pasaportYaz } from '../pasaport';
 
 // Ebeveyn için: çocuğun adını yazma ve fotoğrafını çekme. Telefonun kendi kamera
@@ -74,8 +74,8 @@ export class PasaportAyarScene extends Phaser.Scene {
     }, { genislik: 420, yukseklik: 140, yaziBoyu: 64 });
 
     if (this.foto || pasaport.ad) {
-      const sil = this.add.text(x, 1190, 'Fotoğrafı ve adı sil', { fontFamily: YAZI_TIPI, fontSize: '30px', color: '#ff9b9b' }).setOrigin(0.5);
-      sil.setInteractive({ useHandCursor: true }).on('pointerdown', () => {
+      const sil = this.add.text(x, 1190, 'Fotoğrafı ve adı sil', { fontFamily: YAZI_TIPI, fontSize: '30px', color: '#ff9b9b', backgroundColor: '#ffffff1f', padding: { x: 20, y: 10 } }).setOrigin(0.5);
+      genisDokunma(sil, 72).on('pointerdown', () => {
         pasaportYaz({ ad: '', foto: undefined, soruldu: true });
         this.scene.restart();
       });

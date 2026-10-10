@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { RENK, YAZI_TIPI, hareketiAzalt } from '../ayarlar';
-import { buyukDugme, evDugmesi, durakSimgesi } from '../arayuz';
+import { buyukDugme, evDugmesi, durakSimgesi, genisDokunma } from '../arayuz';
 import { BOLUM_SIRASI, BOLUMLER, BolumId, Durak, bolumuAcikMi } from '../duraklar';
 import { tamamlananlar } from '../ilerleme';
 import { M } from '../metinler';
@@ -320,8 +320,8 @@ export function bolumGecisDugmesi(sahne: Phaser.Scene, x: number, y: number, hed
       backgroundColor: parla ? '#FFC93C' : '#ffffff1f',
       padding: { x: 16, y: 8 },
     })
-    .setOrigin(yon === 'geri' ? 0 : 1, 0.5)
-    .setInteractive({ useHandCursor: true });
+    .setOrigin(yon === 'geri' ? 0 : 1, 0.5);
+  genisDokunma(d);
   d.on('pointerdown', () => {
     if (!acik) {
       bip(220, 0.15, 'square', 0.12);

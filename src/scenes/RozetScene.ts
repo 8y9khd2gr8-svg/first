@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { YAZI_TIPI, hareketiAzalt } from '../ayarlar';
-import { evDugmesi, rozetCiz, yildizliArkaPlan } from '../arayuz';
+import { evDugmesi, rozetCiz, yildizliArkaPlan, genisDokunma } from '../arayuz';
 import { kazanilanlar, ROZETLER } from '../rozetler';
 import { bip, konus } from '../ses';
 import { M } from '../metinler';
@@ -40,7 +40,7 @@ export class RozetScene extends Phaser.Scene {
         .text(rx, ry + 80, r.ad, { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '26px', color: var_ ? '#ffffff' : '#9fb6d9' })
         .setOrigin(0.5);
       this.add
-        .text(rx, ry + 110, r.nasil, { fontFamily: YAZI_TIPI, fontSize: '20px', color: '#9fb6d9', align: 'center', wordWrap: { width: 200 } })
+        .text(rx, ry + 110, r.nasil, { fontFamily: YAZI_TIPI, fontSize: '22px', color: '#9fb6d9', align: 'center', wordWrap: { width: 200 } })
         .setOrigin(0.5, 0);
       rozet.setSize(110, 110).setInteractive({ useHandCursor: true });
       rozet.on('pointerdown', () => {
@@ -54,11 +54,11 @@ export class RozetScene extends Phaser.Scene {
     if (sayfaSayisi > 1) {
       this.add.text(x, 1230, `${this.sayfa + 1} / ${sayfaSayisi}`, { fontFamily: YAZI_TIPI, fontSize: '32px', color: '#cfe3ff' }).setOrigin(0.5);
       const ok = (ox: number, yazi: string, hedef: number) =>
-        this.add
-          .text(ox, 1230, yazi, { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '44px', color: '#14213D', backgroundColor: '#FFC93C', padding: { x: 26, y: 4 } })
-          .setOrigin(0.5)
-          .setInteractive({ useHandCursor: true })
-          .on('pointerdown', () => {
+        genisDokunma(
+          this.add
+            .text(ox, 1230, yazi, { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '44px', color: '#14213D', backgroundColor: '#FFC93C', padding: { x: 26, y: 4 } })
+            .setOrigin(0.5),
+        ).on('pointerdown', () => {
             bip(700, 0.08);
             this.scene.restart({ sayfa: hedef });
           });

@@ -29,8 +29,9 @@ export class AvatarScene extends Phaser.Scene {
       const g = this.add.graphics();
       g.fillStyle(avatar.simge === secili ? RENK.sari : 0xffffff, avatar.simge === secili ? 1 : 0.12).fillRoundedRect(-130, -95, 260, 190, 36);
       kart.add(g);
-      kart.add(this.add.text(-55, 0, avatar.simge, { fontSize: '100px' }).setOrigin(0.5));
-      kart.add(this.add.text(55, 0, avatar.ad, { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '38px', color: avatar.simge === secili ? '#14213D' : '#ffffff' }).setOrigin(0.5));
+      // Resim üstte, adı altta (yan yana uzun adlar resme biniyordu).
+      kart.add(this.add.text(0, -24, avatar.simge, { fontSize: '96px' }).setOrigin(0.5));
+      kart.add(this.add.text(0, 62, avatar.ad, { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '34px', color: avatar.simge === secili ? '#14213D' : '#ffffff' }).setOrigin(0.5));
       kart.setSize(260, 190).setInteractive({ useHandCursor: true });
       kart.on('pointerdown', () => {
         bip(880, 0.1, 'triangle', 0.2);

@@ -3,7 +3,7 @@ import { writeFileSync, mkdirSync } from 'node:fs';
 
 // GEÇİCİ deneme turu: her ekranı farklı durumlarla açar, taşma/çakışma/küçük düğme ölçer, ekran görüntüsü alır.
 
-const DIZIN = 'test-results/tur';
+const DIZIN = process.env.TUR_DIZIN ?? 'test-results/tur';
 
 async function oyunuAc(page: Page, depo: Record<string, string>) {
   const hatalar: string[] = [];
@@ -60,11 +60,9 @@ async function olc(page: Page) {
 }
 
 async function sahneAc(page: Page, ad: string, veri: object, bekle = 900) {
-  await page.evaluate(([ad, veri]) => {
-    const oyun = (window as any).oyun;
-    oyun.scene.getScenes(true).forEach((s: any) => s.scene.stop());
-    oyun.scene.start(ad, veri);
-  }, [ad, veri] as const);
+  await page.evaluate(() => (window as any).oyun.scene.getScenes(true).forEach((s: any) => s.scene.stop()));
+  await page.waitForTimeout(100);
+  await page.evaluate(([ad, veri]) => (window as any).oyun.scene.start(ad, veri), [ad, veri] as const);
   await page.waitForTimeout(bekle);
 }
 
@@ -78,11 +76,11 @@ test('deneme turu', async ({ page }) => {
     return Object.fromEntries(Object.entries(BOLUMLER).map(([k, b]: any) => [k, b.duraklar.map((d: any) => d.id)]));
   });
   const hepsi = Object.values(ids).flat();
-  const durumlar: [string, Record<string, string>][] = [
+  const durumlar: [string, Record<string, string>][] = ([
     ['yeni', {}],
     ['yarim', { 'zipzip-beta-dunya': '1', 'zipzip-ilerleme-v1': JSON.stringify([...ids.turkiye, ...ids.dunya.slice(0, 3)]), 'zipzip-pasaport-v1': JSON.stringify({ ad: 'Yağız', avatar: '🦊', soruldu: true }) }],
     ['bitti', { 'zipzip-beta-dunya': '1', 'zipzip-ilerleme-v1': JSON.stringify(hepsi), 'zipzip-pasaport-v1': JSON.stringify({ ad: 'Muhammed Mustafa', avatar: '🐼', soruldu: true }) }],
-  ];
+  ] as [string, Record<string, string>][]).filter(([d]) => !process.env.TUR || d === 'yarim');
   for (const [durum, depo] of durumlar) {
     const hatalar = await oyunuAc(page, depo);
     const sahneler: [string, object][] = [
@@ -92,7 +90,7 @@ test('deneme turu', async ({ page }) => {
       ['Ebeveyn', { hedef: 'EbeveynMenu' }], ['EbeveynMenu', {}], ['EbeveynOzet', {}], ['PasaportAyar', {}],
       ...Object.keys(ids).map((b) => ['Sertifika', { bolum: b }] as [string, object]),
     ];
-    for (const [ad, veri] of sahneler) {
+    for (const [ad, veri] of process.env.TUR ? [] : sahneler) {
       await sahneAc(page, ad, veri, ['Macera', 'Harita', 'Dunya', 'Uzay'].includes(ad) ? 2500 : 900);
       const ek = JSON.stringify(veri).replace(/[^a-z0-9]/gi, '');
       await page.screenshot({ path: `${DIZIN}/${durum}-${ad}${ek}.png` });
@@ -100,8 +98,8 @@ test('deneme turu', async ({ page }) => {
     }
     if (durum === 'yarim') {
       for (const id of hepsi) {
-        for (const [ad, veri] of [['Durak', { durakId: id }], ['Odul', { durakId: id }]] as [string, object][]) {
-          await sahneAc(page, ad, veri, 1200);
+        for (const [ad, veri] of (process.env.TUR ? [] : [['Durak', { durakId: id }], ['Odul', { durakId: id }]]) as [string, object][]) {
+          await sahneAc(page, ad, veri, ad === 'Odul' ? 3200 : 1200);
           await page.screenshot({ path: `${DIZIN}/durak-${id}-${ad}.png` });
           for (const s of await olc(page)) rapor.push(`${id} ${ad}: ${s}`);
         }
