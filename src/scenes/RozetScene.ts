@@ -23,6 +23,8 @@ export class RozetScene extends Phaser.Scene {
     yildizliArkaPlan(this);
     const x = this.scale.gameSize.width / 2;
     const kazanilan = kazanilanlar();
+    // Okuma bilmeyen çocuk için ekranın ne olduğu sesle anlatılır (sayfa çevirince tekrar edilmez).
+    if (this.sayfa === 0) konus(M.rozetDolabi);
     evDugmesi(this, () => this.scene.start('Pasaport', {}));
     this.add.text(x, 150, 'Rozetlerim', { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '76px', color: '#FFC93C' }).setOrigin(0.5);
     this.add

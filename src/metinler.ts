@@ -64,6 +64,7 @@ export const M = {
   kostumKilitli: (nasil: string) => `Bu kostümü açmak için ${nasil}!`,
   yeniKostum: (ad: string) => `Yeni kostüm açıldı: ${ad}!`,
   yeniRozet: (ad: string) => `Yeni rozet kazandın: ${ad}!`,
+  rozetDolabi: 'Burası rozetlerin! Hareket ettikçe yeni rozetler kazanırsın. Bir rozete dokun, nasıl kazanılır söyleyeyim.',
   rozetAdi: (ad: string) => `${ad} rozeti!`,
   rozetNasil: (nasil: string) => `Bu rozeti kazanmak için: ${nasil}.`,
 };
@@ -84,6 +85,7 @@ export function tumMetinler(): string[] {
     ...AVATARLAR.map((a) => M.karakterSecildi(a.ad)),
     ...ROZETLER.flatMap((r) => [M.yeniRozet(r.ad), M.rozetAdi(r.ad), M.rozetNasil(r.nasil)]),
     M.kostumDolabi,
+    M.rozetDolabi,
     M.aileBitti,
     M.kameraGordu,
     ...AILE_OTURUMU.map((h) => h.sesli),
