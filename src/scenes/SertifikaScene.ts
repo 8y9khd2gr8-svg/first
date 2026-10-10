@@ -48,10 +48,10 @@ export class SertifikaScene extends Phaser.Scene {
     g.lineStyle(10, ALTIN).strokeRoundedRect(ALAN.x + 16, ALAN.y + 16, ALAN.g - 32, ALAN.y2 - 32, 20);
     g.lineStyle(3, ALTIN).strokeRoundedRect(ALAN.x + 32, ALAN.y + 32, ALAN.g - 64, ALAN.y2 - 64, 14);
 
-    this.add.text(x, 185, 'S E R T İ F İ K A', { fontFamily: YAZI_TIPI, fontSize: '30px', color: '#B07D00' }).setOrigin(0.5);
+    this.add.text(x, 185, 'S E R T İ F İ K A', { fontFamily: YAZI_TIPI, fontSize: '30px', color: '#8A6100' }).setOrigin(0.5);
     const { unvan, metin, birim } = UNVAN[this.bolum];
     const duraklar = BOLUMLER[this.bolum].duraklar;
-    this.add.text(x, 250, unvan, { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '76px', color: '#FF8A3D' }).setOrigin(0.5);
+    this.add.text(x, 250, unvan, { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '76px', color: '#C2410C' }).setOrigin(0.5);
 
     // Görünüm: fotoğraf, yoksa seçilen karakter, o da yoksa Zıpzıp.
     g.fillStyle(0xdde7f5).fillCircle(x, 410, 95);
@@ -87,7 +87,7 @@ export class SertifikaScene extends Phaser.Scene {
         fontFamily: YAZI_TIPI,
         fontStyle: 'bold',
         fontSize: '30px',
-        color: '#B07D00',
+        color: '#8A6100',
       })
       .setOrigin(0.5);
 
@@ -135,4 +135,4 @@ export class SertifikaScene extends Phaser.Scene {
 }
 
 const DUGME_STILI =
-  "font: 700 40px 'Baloo 2', Arial, sans-serif; padding: 16px 44px; border-radius: 40px; border: 6px solid #fff; background: #FF8A3D; color: #fff;";
+  "font: 700 40px 'Baloo 2', Arial, sans-serif; padding: 16px 44px; border-radius: 40px; border: 6px solid #fff; background: #EE6A1F; color: #fff;";

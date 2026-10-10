@@ -316,8 +316,8 @@ export function bolumGecisDugmesi(sahne: Phaser.Scene, x: number, y: number, hed
       fontFamily: YAZI_TIPI,
       fontStyle: 'bold',
       fontSize: '30px',
-      color: parla ? '#14213D' : '#cfe3ff',
-      backgroundColor: parla ? '#FFC93C' : '#ffffff1f',
+      color: parla ? '#14213D' : '#ffffff',
+      backgroundColor: parla ? '#FFC93C' : '#14213D99',
       padding: { x: 16, y: 8 },
     })
     .setOrigin(yon === 'geri' ? 0 : 1, 0.5);

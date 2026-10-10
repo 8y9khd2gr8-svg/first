@@ -42,4 +42,4 @@ export class KurulumScene extends Phaser.Scene {
 }
 
 const DUGME_STILI =
-  "font: 700 48px 'Baloo 2', Arial, sans-serif; padding: 18px 56px; border-radius: 44px; border: 6px solid #fff; background: #3FBF5F; color: #fff;";
+  "font: 700 48px 'Baloo 2', Arial, sans-serif; padding: 18px 56px; border-radius: 44px; border: 6px solid #fff; background: #2FA84F; color: #fff;";

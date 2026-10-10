@@ -8,8 +8,8 @@ export const YAZI_TIPI = "'Baloo 2', 'Arial Rounded MT Bold', Arial, sans-serif"
 export const RENK = {
   uzay: 0x14213d,
   sari: 0xffc93c,
-  turuncu: 0xff8a3d,
-  yesil: 0x3fbf5f,
+  turuncu: 0xee6a1f, // beyaz yazıyla en az 3:1 zıtlık (eski 0xff8a3d okunmuyordu)
+  yesil: 0x2fa84f, // beyaz yazıyla en az 3:1 zıtlık (eski 0x3fbf5f)
   mavi: 0x2f80ed,
   beyaz: 0xffffff,
 };

@@ -90,4 +90,4 @@ export class EbeveynOzetScene extends Phaser.Scene {
 }
 
 const PAYLAS_STILI =
-  "font: 700 40px 'Baloo 2', Arial, sans-serif; padding: 16px 48px; border-radius: 40px; border: 6px solid #fff; background: #3FBF5F; color: #fff;";
+  "font: 700 40px 'Baloo 2', Arial, sans-serif; padding: 16px 48px; border-radius: 40px; border: 6px solid #fff; background: #2FA84F; color: #fff;";

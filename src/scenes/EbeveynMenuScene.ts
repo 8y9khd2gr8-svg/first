@@ -81,7 +81,7 @@ export class EbeveynMenuScene extends Phaser.Scene {
     this.add
       .text(x, 1198, 'Reklam yok. Hesap yok.\nBütün bilgiler sadece bu telefonda saklanır.', { fontFamily: YAZI_TIPI, fontSize: '26px', color: '#9fb6d9', align: 'center' })
       .setOrigin(0.5);
-    this.add.text(x, 1256, `Sürüm ${__SURUM__}`, { fontFamily: YAZI_TIPI, fontSize: '24px', color: '#6f86ad' }).setOrigin(0.5);
+    this.add.text(x, 1256, `Sürüm ${__SURUM__}`, { fontFamily: YAZI_TIPI, fontSize: '24px', color: '#8299bf' }).setOrigin(0.5);
   }
 }
 

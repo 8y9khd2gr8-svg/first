@@ -40,7 +40,7 @@ export class PasaportScene extends Phaser.Scene {
     kagit.fillStyle(KAGIT).fillRoundedRect(36, 120, 648, 960, 36);
     kagit.fillStyle(RENK.turuncu).fillRoundedRect(36, 120, 648, 110, { tl: 36, tr: 36, bl: 0, br: 0 });
     sayfa.add(kagit);
-    sayfa.add(this.add.text(x, 155, 'ZIP ZIP DÜNYA', { fontFamily: YAZI_TIPI, fontSize: '28px', color: '#ffffff' }).setOrigin(0.5));
+    sayfa.add(this.add.text(x, 155, 'ZIP ZIP DÜNYA', { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '28px', color: '#14213D' }).setOrigin(0.5));
     sayfa.add(this.add.text(x, 198, 'PASAPORT', { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '52px', color: '#ffffff' }).setOrigin(0.5));
 
     // Fotoğraf çerçevesi (fotoğraf yoksa Zıpzıp durur).
@@ -59,7 +59,7 @@ export class PasaportScene extends Phaser.Scene {
       sayfa.add(this.add.text(191, 395, pasaport.avatar, { fontSize: '150px' }).setOrigin(0.5));
     } else {
       sayfa.add(new Zipzip(this, 191, 380, 0.5));
-      const ipucu = this.add.text(191, 512, 'Karakterini seç!', { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '26px', color: '#FF8A3D' }).setOrigin(0.5);
+      const ipucu = this.add.text(191, 512, 'Karakterini seç!', { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '26px', color: '#C2410C' }).setOrigin(0.5);
       sayfa.add(ipucu);
       this.tweens.add({ targets: ipucu, scale: 1.12, duration: 500, yoyo: true, repeat: -1 });
     }
@@ -85,7 +85,7 @@ export class PasaportScene extends Phaser.Scene {
     adYazi.setScale(Math.min(1, 320 / adYazi.width));
     sayfa.add(adYazi);
     // Ada dokununca ad yazma ekranı açılır (ebeveyn kilidiyle).
-    if (!pasaport.ad) sayfa.add(this.add.text(340, 318, '✏️ Adını yazdır', { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '32px', color: '#FF8A3D', backgroundColor: '#FF8A3D1f', padding: { x: 10, y: 4 } }));
+    if (!pasaport.ad) sayfa.add(this.add.text(340, 318, '✏️ Adını yazdır', { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '32px', color: '#A8380A', backgroundColor: '#FF8A3D1f', padding: { x: 10, y: 4 } }));
     const adAlani = this.add.zone(500, 330, 330, 110).setInteractive({ useHandCursor: true });
     adAlani.on('pointerdown', () => {
       bip(500, 0.08);
@@ -113,7 +113,7 @@ export class PasaportScene extends Phaser.Scene {
         sayfa.add(g);
         const simge = durakSimgesi(this, durak, dx, dy - 8, 54).setAngle(-8);
         sayfa.add(simge);
-        sayfa.add(this.add.text(dx, dy + 82, durak.yer, { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '22px', color: '#FF8A3D' }).setOrigin(0.5));
+        sayfa.add(this.add.text(dx, dy + 82, durak.yer, { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '22px', color: '#C2410C' }).setOrigin(0.5));
       } else {
         g.lineStyle(4, 0x14213d, 0.25);
         for (let a = 0; a < 360; a += 20) {
@@ -132,7 +132,7 @@ export class PasaportScene extends Phaser.Scene {
       const sekme = this.add
         .text(x + (i - (BOLUM_SIRASI.length - 1) / 2) * 100, 1040, BOLUM_KISA[id].simge, {
           fontSize: '44px',
-          backgroundColor: secili ? '#FF8A3D' : '#14213D1a',
+          backgroundColor: secili ? '#EE6A1F' : '#14213D1a',
           padding: { x: 14, y: 6 },
         })
         .setOrigin(0.5)
