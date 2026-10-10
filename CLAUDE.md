@@ -152,7 +152,12 @@ Teknoloji: Phaser 3 + TypeScript + Vite, GitHub Pages ile yayın. İleride Capac
   Play kapalı test (imzalı AAB): Actions → "Play kapalı test paketi" (yükleme anahtarı android/yukleme-anahtari.jks.enc içinde kilitli, parolası tek gizli değer PLAY_ANAHTAR_PAROLASI; sürüm kodu = çalıştırma numarası).
   Kullanıcı rehberi: docs/magaza-rehberi.md.
 - `npm run harita`: harita SVG'sini ve durak konumlarını yeniden üretir (scripts/harita-uret.mjs).
-- `src/hareketler.ts`: hareket listesi. `src/ses.ts`: sesler. `src/arayuz.ts`: düğmeler, arka plan.
+- `src/hareketler.ts`: hareket listesi. `src/ses.ts`: sesler. Kaydı olmayan cümle: uygulamada telefonun konuşma
+  motoru (@capacitor-community/text-to-speech; Android uygulama içi tarayıcısında tarayıcı konuşması çalışmaz),
+  tarayıcıda speechSynthesis. Ses seçimi src/sesSecimi.ts (önce internetsiz çalışan Türkçe ses).
+- Açılış hızı: derlemede Phaser'ın hafif hâli (src/phaserHafif.cjs: fizik motorları ve karo haritası yok; geliştirmede
+  tam Phaser). Yeni bir Phaser özelliği (ör. fizik) gerekirse oraya eklenir. Durak simgeleri açılış ekranı çizildikten
+  sonra arkada yüklenir. Ölçüm: `node scripts/acilis-olc.mjs` (6 kat yavaş: ~2,9 sn; önce ~4,5 sn). `src/arayuz.ts`: düğmeler, arka plan.
 - Sahne geçişi: `init` alan bir sahneye geçerken HER ZAMAN veri nesnesi ver (`scene.start('X', {})`);
   Phaser veri verilmezse önceki geçişin verisini yeniden kullanır.
 - Test: `npm run dev` ile açınca `window.oyun` üzerinden sahneler başlatılabilir (sadece geliştirmede).

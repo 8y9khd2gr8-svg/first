@@ -24,6 +24,8 @@ Oyunu ilk kez açıyorsanız ebeveyn köşesinden **🗑️ Tüm verileri sil** 
 | 10 | Nerede sıkıldı ya da durdu? (Durak + hareket adı) | |
 | 11 | Yorulduğu hareket? Güvensiz gelen hareket? | |
 | 12 | Bitince ne dedi? Tekrar oynamak istedi mi? | |
+| 13 | Zıpzıp'ın sesini her ekranda duydu mu? Ses anlaşılır mıydı, çok hızlı/yavaş mıydı? (Telefon modeli: ...) | |
+| 14 | Oyun açılırken bekledi mi, sabrı kaçtı mı? (Açılış kaç saniye sürdü, kabaca) | |
 
 ## Sonra Yağız'a sorun (oyun gibi, kısa)
 

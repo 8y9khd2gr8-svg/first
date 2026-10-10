@@ -11,6 +11,7 @@ import { kostumNasil } from '../src/kostumler';
 import { KOSTUMLER } from '../src/kostumler';
 import { M, SAYILAR, SERTIFIKA_UNVANLARI, tumMetinler } from '../src/metinler';
 import { ROZETLER } from '../src/rozetler';
+import { enIyiSes } from '../src/sesSecimi';
 
 const tumHareketler: Hareket[] = [...Object.values(H), ...AILE_OTURUMU, ...ISINMALAR, ...SOGUMALAR, DONMA, AYNA, ...TUM_DURAKLAR.flatMap(oturum)];
 
@@ -128,3 +129,11 @@ function dosyalar(klasor: string): string[] {
     return e.isDirectory() ? dosyalar(yol) : /\.ts$/.test(e.name) ? [yol] : [];
   });
 }
+
+test('telefon sesi: internetsiz çalışan Türkçe ses seçilir, Türkçe yoksa hiçbiri', () => {
+  const ses = (lang: string, name: string, localService: boolean) => ({ lang, name, voiceURI: name, localService, default: false });
+  const sesler = [ses('en-US', 'Samantha', true), ses('tr-TR', 'Google Türkçe', false), ses('tr-TR', 'Yelda (Kompakt)', true), ses('tr-TR', 'Yelda (Gelişmiş)', true)];
+  assert.equal(enIyiSes(sesler), 3);
+  assert.equal(enIyiSes([ses('tr_TR', 'tr-tr-x-cfs-local', true), ses('tr-TR', 'tr-tr-x-cfs-network', false)]), 0);
+  assert.equal(enIyiSes([ses('en-US', 'Samantha', true)]), -1);
+});

@@ -1,7 +1,12 @@
 // Sesler: kısa "bip" efektleri (Web Audio) ve seslendirme.
 // konus(): cümlenin doğal ses kaydı varsa (public/ses/, npm run seslendir ile üretilir) onu çalar;
 // yoksa telefonun kendi Türkçe konuşma motoruyla okur. Böylece oyun hiç sessiz kalmaz.
+// Mağaza uygulamasında telefonun konuşma motoruna eklentiyle ulaşılır (Android'in uygulama içi tarayıcısında
+// tarayıcı konuşması çalışmaz); tarayıcıda (test sitesi) tarayıcının konuşması kullanılır.
+import { Capacitor } from '@capacitor/core';
+import { TextToSpeech } from '@capacitor-community/text-to-speech';
 import { sesAnahtari } from './sesAnahtari';
+import { enIyiSes } from './sesSecimi';
 import { SES_DOSYALARI } from './sesDosyalari';
 
 let baglam: AudioContext | null = null;
@@ -19,7 +24,7 @@ function sesBaglami(): AudioContext | null {
 // Telefonlar sesi ancak bir dokunuştan sonra açar; "Oyna" düğmesinde çağrılır.
 export function sesiAc() {
   sesBaglami();
-  if ('speechSynthesis' in window) speechSynthesis.speak(new SpeechSynthesisUtterance(''));
+  if (!uygulamada && 'speechSynthesis' in window) speechSynthesis.speak(new SpeechSynthesisUtterance(''));
 }
 
 export function bip(frekans = 660, sure = 0.15, dalga: OscillatorType = 'sine', yukseklik = 0.25) {
@@ -40,13 +45,23 @@ export function zaferMuzigi() {
   [523, 659, 784, 1047].forEach((f, i) => setTimeout(() => bip(f, 0.22, 'triangle', 0.3), i * 130));
 }
 
+const uygulamada = Capacitor.isNativePlatform();
 let turkceSes: SpeechSynthesisVoice | undefined;
+let uygulamaSesi: number | undefined; // eklentideki ses sırası
 
 function turkceSesiBul() {
-  turkceSes = speechSynthesis.getVoices().find((v) => v.lang.toLowerCase().startsWith('tr'));
+  const sesler = speechSynthesis.getVoices();
+  turkceSes = sesler[enIyiSes(sesler)];
 }
 
-if ('speechSynthesis' in window) {
+if (uygulamada) {
+  TextToSpeech.getSupportedVoices()
+    .then(({ voices }) => {
+      const i = enIyiSes(voices);
+      if (i >= 0) uygulamaSesi = i;
+    })
+    .catch(() => undefined);
+} else if ('speechSynthesis' in window) {
   turkceSesiBul();
   speechSynthesis.addEventListener('voiceschanged', turkceSesiBul);
 }
@@ -110,15 +125,27 @@ export function konus(metin: string) {
   telefonSesi(metin);
 }
 
+// Çocuk için biraz yavaş ve neşeli (biraz ince) okunur.
+const HIZ = 0.95;
+const TON = 1.15;
+
 function telefonSesi(metin: string) {
+  if (uygulamada) {
+    const no = konusmaNo;
+    TextToSpeech.speak({ text: metin, lang: 'tr-TR', rate: HIZ, pitch: TON, voice: uygulamaSesi })
+      .catch(() => undefined)
+      .finally(() => no === konusmaNo && konusmaDurumu(false));
+    konusmaDurumu(true, metin.length * 90 + 1500);
+    return;
+  }
   if (!('speechSynthesis' in window)) return;
   if (!turkceSes) turkceSesiBul();
   speechSynthesis.cancel();
   const s = new SpeechSynthesisUtterance(metin);
   s.lang = 'tr-TR';
   if (turkceSes) s.voice = turkceSes;
-  s.rate = 0.95;
-  s.pitch = 1.15;
+  s.rate = HIZ;
+  s.pitch = TON;
   const no = konusmaNo;
   s.onend = s.onerror = () => no === konusmaNo && konusmaDurumu(false);
   speechSynthesis.speak(s);
@@ -135,5 +162,6 @@ export function sustur() {
   }
   calan = null;
   konusmaDurumu(false);
-  if ('speechSynthesis' in window) speechSynthesis.cancel();
+  if (uygulamada) void TextToSpeech.stop().catch(() => undefined);
+  else if ('speechSynthesis' in window) speechSynthesis.cancel();
 }

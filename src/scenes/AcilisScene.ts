@@ -6,8 +6,12 @@ import { Zipzip } from '../zipzip';
 import { pasaportOku, pasaportYaz } from '../pasaport';
 import { guvenlikNotuGoruldu } from '../guvenlik';
 
+let simgelerIstendi = false;
+
 // Açılış ekranı: oyunun adı, zıplayan Zıpzıp ve büyük "Oyna" düğmesi.
 export class AcilisScene extends Phaser.Scene {
+  private gidiyor = false;
+
   constructor() {
     super('Acilis');
   }
@@ -15,7 +19,6 @@ export class AcilisScene extends Phaser.Scene {
   preload() {
     Zipzip.yukle(this);
     this.load.image('ikon', 'ikon/ikon-192.png');
-    CIZILI_SIMGELER.forEach((id) => this.load.svg(`simge-${id}`, `simge/${id}.svg`, { width: 256, height: 256 }));
   }
 
   create() {
@@ -39,14 +42,33 @@ export class AcilisScene extends Phaser.Scene {
       RENK.turuncu,
       () => {
         sesiAc();
-        const ilkSefer = !pasaportOku().soruldu;
-        if (ilkSefer) pasaportYaz({ soruldu: true });
-        const sonra = ilkSefer ? 'Pasaport' : 'Macera';
-        // İlk açılışta önce ebeveyn güvenlik notu (bir kez).
-        if (!guvenlikNotuGoruldu()) this.scene.start('Guvenlik', { sonra, sonraVeri: { giris: 'uzay' } });
-        else this.scene.start(sonra, { giris: 'uzay' });
+        // Durak simgeleri arkada yükleniyorsa bitmesini bekle (haritalar onları kullanır).
+        if (this.load.isLoading()) this.load.once(Phaser.Loader.Events.COMPLETE, () => this.devamEt());
+        else this.devamEt();
       },
       { genislik: 480, yukseklik: 160, yaziBoyu: 80 },
     );
+    // Açılış hızı ölçümü için (scripts/acilis-olc.mjs): "Oyna" düğmesi ekranda.
+    performance.mark('acilis-hazir');
+
+    // Durak simgeleri açılış ekranında görünmez: ekran çizildikten sonra arkada yüklenir
+    // (yavaş telefonda "Oyna" düğmesi daha erken görünür).
+    // Uygulama açık kaldıkça bir kez istenir (açılışa geri dönülünce yeniden yüklenmez).
+    if (!simgelerIstendi) {
+      simgelerIstendi = true;
+      CIZILI_SIMGELER.forEach((id) => this.load.svg(`simge-${id}`, `simge/${id}.svg`, { width: 256, height: 256 }));
+      this.load.start();
+    }
+  }
+
+  private devamEt() {
+    if (this.gidiyor) return; // bekleme sırasında iki kez dokunulduysa
+    this.gidiyor = true;
+    const ilkSefer = !pasaportOku().soruldu;
+    if (ilkSefer) pasaportYaz({ soruldu: true });
+    const sonra = ilkSefer ? 'Pasaport' : 'Macera';
+    // İlk açılışta önce ebeveyn güvenlik notu (bir kez).
+    if (!guvenlikNotuGoruldu()) this.scene.start('Guvenlik', { sonra, sonraVeri: { giris: 'uzay' } });
+    else this.scene.start(sonra, { giris: 'uzay' });
   }
 }
