@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { YAZI_TIPI, HAREKETI_AZALT } from '../ayarlar';
+import { YAZI_TIPI, hareketiAzalt } from '../ayarlar';
 import { evDugmesi, rozetCiz, yildizliArkaPlan } from '../arayuz';
 import { kazanilanlar, ROZETLER } from '../rozetler';
 import { bip, konus } from '../ses';
@@ -35,7 +35,7 @@ export class RozetScene extends Phaser.Scene {
       const ry = 340 + Math.floor(i / 3) * 228;
       const var_ = kazanilan.has(r.id);
       const rozet = rozetCiz(this, rx, ry, 50, r.simge, var_);
-      if (var_ && !HAREKETI_AZALT) this.tweens.add({ targets: rozet, angle: { from: -4, to: 4 }, duration: 1400 + i * 90, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
+      if (var_ && !hareketiAzalt()) this.tweens.add({ targets: rozet, angle: { from: -4, to: 4 }, duration: 1400 + i * 90, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
       this.add
         .text(rx, ry + 80, r.ad, { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '26px', color: var_ ? '#ffffff' : '#9fb6d9' })
         .setOrigin(0.5);

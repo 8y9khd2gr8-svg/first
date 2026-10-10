@@ -122,7 +122,9 @@ Teknoloji: Phaser 3 + TypeScript + Vite, GitHub Pages ile yayın. İleride Capac
   QR tanıtım (mağaza sonrası; çocuk reklamı kuralları); her durak için tematik arka plan (çizerle).
 - Animasyon kararı: "canlı ama sakin". Hareket bir işe yaramalı (giriş, sıradaki durak, kutlama);
   sürekli oynayan süs yok. Pasaport sakin, damga/rozet anı canlı. Telefonda "hareketi azalt" açıksa
-  animasyonlar azalır. Yağız testinde dikkat dağıtan yer sadeleştirilir.
+  animasyonlar azalır. Telefon yavaşsa da aynısı olur (src/hiz.ts: oyun boyunca gerçek kare hızı ölçülür,
+  40'ın altına düşerse süs animasyonları kapanır ve kare hızı 30'a sabitlenir; sonuç kaydedilmez). Yeni
+  süs animasyonu `hareketiAzalt()` ile korunmalı. Yağız testinde dikkat dağıtan yer sadeleştirilir.
 
 ## Kod düzeni
 - `src/zipzip.ts`: maskot; duruşlar (uzuv açıları) ve her hareketin adımları burada.

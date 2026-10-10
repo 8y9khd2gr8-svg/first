@@ -4,7 +4,7 @@ import { feature } from 'topojson-client';
 import type { Topology } from 'topojson-specification';
 import karaVerisi from 'world-atlas/land-110m.json';
 import ulkeVerisi from 'world-atlas/countries-110m.json';
-import { HAREKETI_AZALT, RENK, YAZI_TIPI } from '../ayarlar';
+import { hareketiAzalt, RENK, YAZI_TIPI } from '../ayarlar';
 import { buyukDugme, evDugmesi, yildizliArkaPlan, durakSimgesi } from '../arayuz';
 import { DUNYA, Durak } from '../duraklar';
 import { bolumAcik, tamamlananlar } from '../ilerleme';
@@ -187,8 +187,8 @@ export class DunyaScene extends Phaser.Scene {
         // Uzaydan geliş: küre uzaktan belirir, büyürken neredeyse tam bir tur döner ve
         // yavaşlayarak sıradaki harikanın üstünde durur (yavaş ama etkileyici).
         const hedef = this.merkez;
-        const tur = HAREKETI_AZALT ? 0 : 300;
-        const sure = HAREKETI_AZALT ? 800 : 3200;
+        const tur = hareketiAzalt() ? 0 : 300;
+        const sure = hareketiAzalt() ? 800 : 3200;
         this.kureResmi.setScale(0.12).setAlpha(0);
         this.tweens.add({ targets: this.kureResmi, alpha: 1, duration: 600 });
         this.tweens.add({ targets: this.kureResmi, scale: 1, duration: sure * 0.8, ease: 'Cubic.easeOut' });

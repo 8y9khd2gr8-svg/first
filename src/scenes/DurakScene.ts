@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { RENK, YAZI_TIPI, HAREKETI_AZALT, uzaktanAcikMi, uzaktanAyarla } from '../ayarlar';
+import { RENK, YAZI_TIPI, hareketiAzalt, uzaktanAcikMi, uzaktanAyarla } from '../ayarlar';
 import { buyukDugme, evDugmesi, yildizliArkaPlan, durakSimgesi } from '../arayuz';
 import { BOLUMLER, durakBul, haritaSahnesi } from '../duraklar';
 import { M } from '../metinler';
@@ -35,7 +35,7 @@ export class DurakScene extends Phaser.Scene {
       .setOrigin(0.5);
 
     const simge = durakSimgesi(this, durak, x, 470, 200);
-    if (!HAREKETI_AZALT) this.tweens.add({ targets: simge, y: 445, duration: 1400, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
+    if (!hareketiAzalt()) this.tweens.add({ targets: simge, y: 445, duration: 1400, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
 
     const kutu = this.add.graphics();
     kutu.fillStyle(0xffffff, 0.1).fillRoundedRect(50, 640, 620, 320, 36);

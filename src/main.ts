@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { hiziIzle } from './hiz';
 // Yazı tipi oyunun içinde: internetsiz çalışır ve açılışta Google'a bağlanılmaz.
 import '@fontsource/baloo-2/latin-ext-700.css';
 import '@fontsource/baloo-2/latin-ext-800.css';
@@ -44,6 +45,7 @@ function oyunuBaslat() {
     dom: { createContainer: true },
     scene: [AcilisScene, HaritaScene, DurakScene, HareketScene, OdulScene, PasaportScene, PasaportAyarScene, EbeveynScene, AvatarScene, EbeveynMenuScene, EbeveynOzetScene, SertifikaScene, KurulumScene, DunyaScene, GuvenlikScene, RozetScene, UzayScene, MaceraScene, KostumScene, new BolumScene('spor'), new BolumScene('dinozor'), new BolumScene('evde')],
   });
+  hiziIzle(oyun);
   // Geliştirme sırasında otomatik testlerin oyuna erişebilmesi için.
   if (import.meta.env.DEV) (window as unknown as { oyun: Phaser.Game }).oyun = oyun;
 }
