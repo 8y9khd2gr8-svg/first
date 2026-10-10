@@ -89,6 +89,9 @@ Teknoloji: Phaser 3 + TypeScript + Vite, GitHub Pages ile yayın. İleride Capac
   açılır (harcama/satın alma yok). Giyilen kostüm her ekrandaki Zıpzıp'ta görünür. Kostüm dolabı
   pasaporttan (👕). Durak sonunda yeni rozet ve kostümler sırayla kutlanır.
 - Durak simgeleri şimdilik emoji; ileride çizerin çizdiği özel görseller gelecek.
+- Animasyon kararı: "canlı ama sakin". Hareket bir işe yaramalı (giriş, sıradaki durak, kutlama);
+  sürekli oynayan süs yok. Pasaport sakin, damga/rozet anı canlı. Telefonda "hareketi azalt" açıksa
+  animasyonlar azalır. Yağız testinde dikkat dağıtan yer sadeleştirilir.
 
 ## Kod düzeni
 - `src/zipzip.ts`: maskot; duruşlar (uzuv açıları) ve her hareketin adımları burada.
