@@ -49,6 +49,8 @@ Hesap açmak, para ödemek ve uygulamayı mağazaya göndermek sizde. Teknik haz
    - **Veri güvenliği formu:** "Hiçbir veri toplanmıyor ve paylaşılmıyor". Kamera görüntüsü telefonda işlenir, gönderilmez.
    - **Gizlilik politikası adresi:** `https://8y9khd2gr8-svg.github.io/first/gizlilik.html`
 
+**Uygulama içeriği formlarının hazır cevapları:** `docs/play-formlari.md` (veri güvenliği, hedef kitle, içerik derecelendirmesi, mağaza sayfası).
+
 ## 3b. Play kapalı test paketi (yükleme anahtarı + AAB)
 
 Play'e **AAB** denen imzalı paket yüklenir (APK sadece elden kurulum içindir). Paketi imzalayan
@@ -62,6 +64,11 @@ yenisi istenebilir. Yine de **güvenli saklayın, kimseyle paylaşmayın**.
    `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEYSTORE_BASE64`. Değerler eklendikten sonra GitHub da göstermez, kimse göremez.
 3. İki dosyayı da güvenli bir yerde saklayın (şifre yöneticisi ya da sadece sizin erişebildiğiniz bulut klasörü).
    Sonra telefonunuzdaki indirilmiş kopyaları silebilirsiniz.
+
+**Mağaza sayfası görselleri** (kapalı test için de gerekir): `docs/magaza-gorselleri/` klasöründe.
+`ekran-1..7.png` telefon ekran görüntüleri (1080×1920), `tanitim-1024x500.png` "Öne çıkan grafik",
+`ikon-512.png` uygulama simgesi. Oyun değişince yeniden üretmek için: `npx vite --port 5173` açıkken
+`node scripts/magaza-gorselleri.mjs`.
 
 **Her yeni test sürümünde:**
 1. GitHub → **Actions** → **Play kapalı test paketi** → **Run workflow**.
