@@ -73,7 +73,7 @@ Neden doğru:
 | Devlet uygulaması (Government apps) | Hayır |
 | Finansal özellikler (Financial features) | Uygulamamda finansal özellik yok |
 | Sağlık uygulamaları (Health apps) | **"Etkinlik ve fitness"** (Activity and fitness) işaretlenir: oyun hareket ettirir ve hareket özetini telefonda tutar. Tıbbi bir iddiamız yok; "tıbbi" seçenekleri seçme. |
-| Hassas izinler | Gerekmez. Kamera izni hassas izin beyanı istemiyor; izin sadece ebeveyn kamerayla saymayı açarsa soruluyor. |
+| Hassas izinler | Gerekmez. Kamera izni hassas izin beyanı istemiyor; izin sadece ebeveyn kamerayla saymayı açarsa ya da pasaport fotoğrafı çekerse soruluyor (gizlilik.html, 4. madde). |
 
 ## 8. Mağaza ayarları ve sayfası (Store settings / Main store listing)
 | Alan | Değer |

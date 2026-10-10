@@ -9,7 +9,7 @@
 <body>
 <main>
   <header><img src="ikon/ikon-192.png" alt="" /><h1>Zıp Zıp Dünya<br />Gizlilik Politikası</h1></header>
-  <p class="tarih">Yürürlük tarihi: 10 Ekim 2026 · Sürüm 3 (beta)</p>
+  <p class="tarih">Yürürlük tarihi: 10 Ekim 2026 · Sürüm 4 (beta)</p>
 
   <div class="ozet">
     <strong>Kısaca:</strong>
@@ -17,7 +17,7 @@
       <li>Hiçbir kişisel veri <strong>toplamıyoruz</strong>, hiçbir sunucuya <strong>göndermiyoruz</strong>.</li>
       <li>Reklam yok, hesap/üyelik yok, analiz ya da takip aracı yok.</li>
       <li>Zıp Zıp Dünya bir <strong>sosyal ağ değildir</strong>: profil, sohbet, yorum ya da başka kullanıcılarla iletişim yoktur.</li>
-      <li>Girdiğiniz her şey (ad, isteğe bağlı fotoğraf, ilerleme) <strong>sadece kendi cihazınızda</strong> saklanır ve istediğiniz an silinebilir.</li>
+      <li>Girdiğiniz her şey (ad, isteğe bağlı fotoğraf, ilerleme) <strong>sadece kendi cihazınızda</strong> saklanır ve istediğiniz an silinebilir. Ebeveyn köşesindeki <strong>“Bu telefonda neler var?”</strong> ekranında bunların hepsini kendiniz görebilirsiniz.</li>
     </ul>
   </div>
 
@@ -32,7 +32,7 @@
     <tr><td>Pasaport fotoğrafı</td><td>Pasaportta göstermek (yerine karakter seçilebilir)</td><td>Hayır</td></tr>
     <tr><td>Seçilen karakter</td><td>Pasaportta göstermek</td><td>Hayır</td></tr>
     <tr><td>Tamamlanan duraklar ve damgalar</td><td>Kaldığı yerden devam etmek</td><td>Oyun için gerekli</td></tr>
-    <tr><td>Hareket özeti (günlük süre, hareket ve zıplama sayısı)</td><td>Ebeveyn köşesindeki haftalık özet</td><td>Oyun için gerekli</td></tr>
+    <tr><td>Hareket özeti (günlük süre, hareket ve zıplama sayısı, hangi hareketten kaç tekrar)</td><td>Ebeveyn köşesindeki haftalık özet</td><td>Oyun için gerekli</td></tr>
     <tr><td>Giyilen kostüm ve kutlaması yapılan kostümler</td><td>Kostümü hatırlamak, yeni kostümü bir kez kutlamak</td><td>Oyun için gerekli</td></tr>
     <tr><td>Kutlaması yapılan rozetler</td><td>Yeni rozeti bir kez kutlamak</td><td>Oyun için gerekli</td></tr>
     <tr><td>Kamerayla sayma açık mı (deneme ayarı)</td><td>Ebeveynin seçimini hatırlamak</td><td>Hayır</td></tr>
@@ -41,32 +41,40 @@
     <tr><td>Ayarlar (ör. güvenlik notunun görüldüğü)</td><td>Aynı şeyi tekrar göstermemek</td><td>Oyun için gerekli</td></tr>
   </table></div>
   <p class="kucuk">Teknik ayrıntı: bu bilgiler cihazda şu adlarla tutulur: zipzip-pasaport-v1, zipzip-ilerleme-v1, zipzip-istatistik-v1, zipzip-kostum-v1, zipzip-rozetler-v1, zipzip-kamera-v1, zipzip-uzaktan-v1, zipzip-beta-dunya, zipzip-guvenlik-notu-v1. Ayrıca oyunun internetsiz çalışabilmesi için oyun dosyaları (resimler, sesler, kamera modeli) cihaza kaydedilir; bunlar kişisel bilgi içermez.</p>
+  <p><strong>Kendiniz görün:</strong> Ebeveyn köşesinin altındaki “Bu telefonda neler var?” bağlantısı, oyunun bu cihazda sakladığı her şeyi (ad, fotoğraf var mı, karakter, biten duraklar, rozetler, kostüm, hareket kaydı, kamera ve “Uzaktan oyna” ayarı) ve kayıtların toplam boyutunu gösterir. Uçak modunu açtığınızda oyunun aynen çalıştığını da deneyebilirsiniz.</p>
   <p>Ad ve fotoğraf yalnızca ebeveyn kilidinin arkasındaki ekrandan girilebilir. Fotoğraf, cihazın kendi kamera/galeri ekranı ile seçilir, küçültülür ve cihazda saklanır.</p>
 
   <p><strong>Kamerayla sayma (isteğe bağlı, deneme):</strong> Ebeveyn köşesinden açılırsa, hareket ekranında ön kamera açılır ve zıplama, çömelme, kol hareketlerini sayar. Vücut noktalarını bulan model (Google MediaPipe) oyunun içindedir ve telefonda çalışır. Kamera görüntüsü <strong>kaydedilmez, saklanmaz ve hiçbir yere gönderilmez</strong>; yalnızca o anda ekranda küçük bir önizleme olarak gösterilir. Kamera, hareket ekranından çıkınca kapanır. Ayar varsayılan olarak kapalıdır.</p>
 
   <h2>3. Toplamadığımız ve yapmadığımız şeyler</h2>
   <ul>
-    <li>Reklam göstermiyoruz; reklam ya da analiz şirketlerinin yazılımlarını kullanmıyoruz.</li>
+    <li>Reklam göstermiyoruz; reklam, analiz, çökme raporu ya da bulut yedekleme yazılımı (üçüncü taraf SDK) kullanmıyoruz. Bu yüzden mağaza sayfalarındaki veri güvenliği / gizlilik etiketlerinde “Veri toplanmıyor” ve “Üçüncü taraflarla veri paylaşılmıyor” yazar.</li>
     <li>Konum, rehber, mikrofon, cihaz kimliği gibi bilgilere erişmiyoruz.</li>
     <li>Oyun açılırken ya da oynanırken hiçbir dış sunucuya bağlanmıyoruz (yazı tipleri ve sesler oyunun içindedir). Web sürümünü ilk kez açtığınızda dosyalar sitenin barındırıldığı sunucudan (GitHub Pages) indirilir; bu sunucunun standart erişim kayıtları için GitHub’ın gizlilik politikası geçerlidir.</li>
     <li>Çocuğun yazdığı ya da söylediği hiçbir şey kaydedilmez; oyunda sohbet ya da başka kullanıcılarla iletişim yoktur.</li>
     <li>Oyun bir sosyal ağ değildir: kullanıcı profili, içerik paylaşımı, takip etme ya da mesajlaşma yoktur. Bu nedenle kimlik, e-Devlet ya da yaş doğrulaması istemeyiz.</li>
   </ul>
 
-  <h2>4. Paylaşma</h2>
+  <h2>4. Uygulama izinleri</h2>
+  <ul>
+    <li><strong>Kamera</strong> (isteğe bağlı): Yalnızca ebeveyn kamerayla saymayı açarsa ya da pasaport için fotoğraf çekerse sorulur. İzin vermezseniz oyun aynen çalışır; hareketler “Yaptım!” düğmesiyle ilerler.</li>
+    <li><strong>İnternet</strong> (Android): Android uygulamalarında bulunan standart bir izindir. Oyun bu izinle hiçbir sunucuya bağlanmaz; oyunun dış sunucuya istek göndermediği her sürümde otomatik testlerle denetlenir.</li>
+    <li>Konum, mikrofon, rehber, takvim, bildirim ya da galerinin tamamına erişim izni istenmez. Fotoğraf seçerken yalnızca sizin seçtiğiniz tek resim alınır.</li>
+  </ul>
+
+  <h2>5. Paylaşma</h2>
   <p>Ebeveyn köşesindeki “Paylaş” ve sertifikadaki “Kaydet / Paylaş” düğmeleri yalnızca sizin dokunmanızla, cihazınızın kendi paylaşma menüsünü açar. Neyi, kiminle paylaşacağınıza siz karar verirsiniz; biz bu paylaşımları görmeyiz. Pasaportta ad ya da fotoğraf girdiyseniz, haftalık özet metninde çocuğun adı, sertifika resminde adı ve fotoğrafı yer alır; paylaşmadan önce lütfen kontrol edin.</p>
 
-  <h2>5. Satın almalar</h2>
-  <p>Tam sürüm mağaza uygulamasında tek seferlik bir ödemeyle açılacaktır. Ödeme Apple App Store ya da Google Play tarafından, onların kurallarına göre yapılır; ödeme bilgilerinizi biz görmeyiz. Satın alma ekranı ebeveyn kilidinin arkasındadır.</p>
+  <h2>6. Satın almalar</h2>
+  <p>Tam sürüm mağaza uygulamasında tek seferlik bir ödemeyle açılacaktır. Ödeme Apple App Store ya da Google Play tarafından, onların kurallarına göre yapılır; ödeme bilgilerinizi biz görmeyiz. Beta (kapalı test) sürümünde ödeme yoktur. Satın alma ekranı ebeveyn kilidinin arkasındadır.</p>
 
-  <h2>6. Bilgileri silme</h2>
+  <h2>7. Bilgileri silme</h2>
   <p>Ebeveyn köşesindeki <strong>“Tüm verileri sil”</strong> düğmesi cihazdaki bütün oyun bilgilerini siler. Uygulamayı kaldırmak ya da tarayıcının site verilerini temizlemek de aynı sonucu verir. Bilgiler bizde bulunmadığı için ayrıca bir silme talebine gerek yoktur.</p>
 
-  <h2>7. Değişiklikler</h2>
-  <p>Bu politikayı değiştirirsek güncel sürümü bu sayfada, yeni yürürlük tarihiyle yayınlarız. Kişisel veri toplamaya başlamamız gerekirse, bunu önceden açıkça bildirir ve gerektiğinde ebeveyn onayı alırız.</p>
+  <h2>8. Değişiklikler</h2>
+  <p>Bu politikayı değiştirirsek güncel sürümü bu sayfada, yeni yürürlük tarihiyle yayınlarız. Kişisel veri toplamaya başlamamız gerekirse, bunu önceden açıkça bildirir ve gerektiğinde ebeveyn onayı alırız; mağazalardaki veri güvenliği beyanlarını da buna göre güncelleriz.</p>
 
-  <h2>8. İletişim</h2>
+  <h2>9. İletişim</h2>
   <p>Sorularınız için iletişim adresi, oyun mağazalarda yayınlanmadan önce bu sayfaya eklenecektir.</p>
   <p>Bize e-posta ile yazarsanız, e-posta adresiniz ve yazdıklarınız yalnızca size cevap vermek ve oyunu düzeltmek için kullanılır, başkasıyla paylaşılmaz. Lütfen e-postada çocuğunuza ait kişisel bilgi (ad, fotoğraf) göndermeyin.</p>
 </main>
