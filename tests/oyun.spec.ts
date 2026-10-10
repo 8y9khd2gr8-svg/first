@@ -294,3 +294,18 @@ test('yazılar okunur (renk zıtlığı)', async ({ page }) => {
   expect(sorunlar).toEqual([]);
   expect(kayit.hatalar).toEqual([]);
 });
+
+// Durak sonunda çocuk kutlamadan önce "Haritaya dön"e basarsa yeni kostüm/rozet kaybolmaz; sonraki seferde kutlanır.
+test('kutlama görülmeden çıkılırsa yeni kostüm sonra yine kutlanır', async ({ page }) => {
+  const kayit = await oyunuAc(page, { 'zipzip-ilerleme-v1': JSON.stringify(['istanbul', 'truva', 'pamukkale']) });
+  // İlk kutlama rozet ya da kostüm olabilir; ikisinin kutlanan kayıtları birlikte sayılır.
+  const kutlanan = () =>
+    page.evaluate(() => [...(JSON.parse(localStorage.getItem('zipzip-kostum-v1') ?? '{}').kutlanan ?? []), ...JSON.parse(localStorage.getItem('zipzip-rozetler-v1') ?? '[]')]);
+  await sahneAc(page, 'Odul', { durakId: 'kapadokya' });
+  await sahneAc(page, 'Harita', {}); // kutlamadan önce çıktı
+  expect(await kutlanan()).toEqual([]);
+  await sahneAc(page, 'Odul', { durakId: 'kapadokya' });
+  // Kutlama damgadan ve merak sorusundan sonra gelir (~7 sn; yavaş bilgisayarda daha uzun).
+  await expect.poll(async () => (await kutlanan()).length, { timeout: 30_000 }).toBeGreaterThan(0);
+  expect(kayit.hatalar).toEqual([]);
+});

@@ -63,11 +63,16 @@ export const seciliKostum = (): string | undefined => {
 
 export const kostumSec = (id: string | undefined) => yaz({ ...oku(), secili: id });
 
-// Henüz kutlanmamış yeni açılan kostümler (bir kez kutlanır).
-export function yeniKostumleriAl(): Kostum[] {
+// Henüz kutlanmamış yeni açılan kostümler. Kutlama ekranda görününce kostumuKutla() ile işaretlenir
+// (çocuk kutlamadan önce çıkarsa kostüm bir sonraki durak sonunda kutlanır).
+export function yeniKostumler(): Kostum[] {
+  const once = new Set(oku().kutlanan ?? []);
+  return acikKostumler().filter((k) => !once.has(k.id));
+}
+
+export function kostumuKutla(k: Kostum) {
   const kayit = oku();
   const once = new Set(kayit.kutlanan ?? []);
-  const yeni = acikKostumler().filter((k) => !once.has(k.id));
-  if (yeni.length) yaz({ ...kayit, kutlanan: [...once, ...yeni.map((k) => k.id)] });
-  return yeni;
+  once.add(k.id);
+  yaz({ ...kayit, kutlanan: [...once] });
 }
