@@ -95,7 +95,7 @@ Teknoloji: Phaser 3 + TypeScript + Vite, GitHub Pages ile yayın. İleride Capac
   Okyanus → Evde Macera → mevsim/bayram bölümleri. Bölüm bitince rozet (pasaport + sertifika).
 - Rozetler (src/rozetler.ts, 25 adet): kayıtlardan hesaplanır; cihazda sadece kutlananlar
   tutulur (kutlanan rozet, koşulu sonradan zorlaşsa da kaybolmaz). "Üst üste gün" gibi baskı yaratan rozet yok. Durak sonunda yeni rozet kutlanır.
-- Uzay Yolculuğu (3. bölüm, UzayScene): dikey Güneş Sistemi; Ay → Venüs → Merkür → Mars →
+- Uzay Yolculuğu (3. bölüm, UzayScene): dikey Güneş Sistemi; Merkür → Venüs → Ay → Mars →
   Jüpiter → Satürn → Uranüs → Neptün. Dünya Harikaları bitince açılır. Rozet: Uzay Yolcusu.
 - Spor Kampı, Dinozorlar Diyarı, Evde Macera (4-6. bölümler): ortak harita BolumScene (src/scenes/BolumScene.ts;
   bölüm ayarı AYARLAR'da). Zincir: Uzay → Spor → Dinozor → Evde (her biri öncekini bitirince açılır).
