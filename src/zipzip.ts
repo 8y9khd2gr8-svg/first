@@ -31,6 +31,9 @@ const D = {
   kollarYukari: { solKol: u(262), sagKol: u(-82), solBacak: u(100), sagBacak: u(80) },
   acik: { solKol: u(232), sagKol: u(-52), solBacak: u(135), sagBacak: u(45) },
   kapali: { solKol: u(100), sagKol: u(80), solBacak: u(97), sagBacak: u(83) },
+  acikHava: { solKol: u(250), sagKol: u(-70), solBacak: u(138), sagBacak: u(42) },
+  acikIn: { solKol: u(235, 15), sagKol: u(-55, -15), solBacak: u(130, -25), sagBacak: u(50, 25) },
+  kapaliIn: { solKol: u(110, 10), sagKol: u(70, -10), solBacak: u(110, -25), sagBacak: u(70, 25) },
   kosA: { solKol: u(215, -70), sagKol: u(-60, 40), solBacak: u(190, -90), sagBacak: u(88) },
   kosB: { solKol: u(240, -40), sagKol: u(-35, 70), solBacak: u(92), sagBacak: u(-10, 90) },
   uzan: { solKol: u(265), sagKol: u(-85), solBacak: u(97), sagBacak: u(83) },
@@ -100,11 +103,13 @@ const ADIMLAR: Record<Animasyon, Adim[]> = {
     { durus: D.kollarYukari, y: -15, oran: 0.45 },
     { durus: D.kollarAsagi, y: 0, oran: 0.45 },
   ],
+  // Zıpla-aç-kapa: havada kollar yukarıda ve bacaklar açık; inerken dizler yumuşakça bükülür.
   acKapa: [
-    { durus: D.acik, y: -60, oran: 0.22, yumusama: 'Quad.easeOut' },
-    { durus: D.acik, y: 0, oran: 0.18, yumusama: 'Quad.easeIn' },
-    { durus: D.kapali, y: -60, oran: 0.22, yumusama: 'Quad.easeOut' },
-    { durus: D.kapali, y: 0, oran: 0.18, yumusama: 'Quad.easeIn' },
+    { durus: D.acikHava, y: -70, oran: 0.2, yumusama: 'Quad.easeOut' },
+    { durus: D.acikIn, y: 14, oran: 0.2, yumusama: 'Quad.easeIn' },
+    { durus: D.kapali, y: -70, oran: 0.2, yumusama: 'Quad.easeOut' },
+    { durus: D.kapaliIn, y: 14, oran: 0.2, yumusama: 'Quad.easeIn' },
+    { durus: D.kapali, y: 0, oran: 0.1 },
   ],
   uzan: [
     { durus: D.uzan, y: -45, oran: 0.45 },
@@ -149,6 +154,7 @@ const ADIMLAR: Record<Animasyon, Adim[]> = {
     { durus: D.kollarYukari, y: 0, oran: 0.5, aci: 10 },
   ],
   piramit: [{ durus: D.piramit, y: 0, oran: 0.3 }],
+  tHarfi: [{ durus: D.yanKapali, y: -10, oran: 0.3 }],
   yanAdim: [
     { durus: D.yanAcik, y: -8, oran: 0.4 },
     { durus: D.yanKapali, y: 0, oran: 0.4 },
@@ -259,7 +265,7 @@ const CIFT: Partial<Record<Animasyon, Adim[]>> = {
 };
 
 // Süreli hareketlerde bir tekrarın süresi (ms).
-const SUREKLI_TEMPO: Partial<Record<Animasyon, number>> = { kos: 520, horon: 380, heykel: 2000, sutun: 2000, piramit: 2000, parmakUcu: 700, kocaman: 2000, belDondur: 1600, tekAyak: 4000, kulac: 1400, sallan: 1600, kanat: 900 };
+const SUREKLI_TEMPO: Partial<Record<Animasyon, number>> = { kos: 520, horon: 380, heykel: 2000, sutun: 2000, piramit: 2000, parmakUcu: 700, kocaman: 2000, belDondur: 1600, tekAyak: 4000, tHarfi: 2000, kulac: 1400, sallan: 1600, kanat: 900 };
 
 type UzuvParcasi = { kok: Phaser.GameObjects.Container; dirsek: Phaser.GameObjects.Container; durum: Uzuv };
 
@@ -268,7 +274,7 @@ export class Zipzip extends Phaser.GameObjects.Container {
   private tabanX: number;
   private tabanY: number;
   private readonly uzuvlar: Record<keyof Durus, UzuvParcasi>;
-  private readonly golge: Phaser.GameObjects.Ellipse;
+  private readonly golge: Phaser.GameObjects.Container;
   private dongu?: Phaser.Time.TimerEvent;
   private bekleyenler: Phaser.Time.TimerEvent[] = [];
 
@@ -282,8 +288,13 @@ export class Zipzip extends Phaser.GameObjects.Container {
     this.tabanX = x;
     this.tabanY = y;
 
-    // Gölge ayrı durur: Zıpzıp zıplarken yerde kalır ve küçülür.
-    this.golge = sahne.add.ellipse(x, y + 160 * birim, 150 * birim, 24 * birim, 0x000000, 0.35);
+    // Gölge ayrı durur: Zıpzıp zıplarken yerde kalır, küçülür ve soluklaşır.
+    // İki katman: geniş ve çok hafif bir hale + ortada koyu bir çekirdek (yumuşak kenarlı görünür).
+    this.golge = sahne.add.container(x, y + 160 * birim, [
+      sahne.add.ellipse(0, 0, 175 * birim, 34 * birim, 0x000000, 0.12),
+      sahne.add.ellipse(0, 0, 135 * birim, 22 * birim, 0x000000, 0.18),
+      sahne.add.ellipse(0, 0, 90 * birim, 13 * birim, 0x000000, 0.22),
+    ]);
 
     this.uzuvlar = {
       solBacak: this.uzuv(-30, 92, BACAK, true),
@@ -340,8 +351,10 @@ export class Zipzip extends Phaser.GameObjects.Container {
   private kay(yBirim: number, sure: number, yumusama = 'Sine.easeInOut') {
     const y = this.tabanY + yBirim * this.birim;
     const yukseklik = Math.min(1, Math.max(0, -yBirim / 130));
+    // Çömelince (aşağı) gölge biraz genişler; zıplayınca küçülür ve soluklaşır.
+    const comelme = Math.min(1, Math.max(0, yBirim / 50));
     this.scene.tweens.add({ targets: this, y, duration: sure, ease: yumusama });
-    this.scene.tweens.add({ targets: this.golge, scale: 1 - yukseklik * 0.45, alpha: 0.35 - yukseklik * 0.15, duration: sure, ease: yumusama });
+    this.scene.tweens.add({ targets: this.golge, scaleX: 1 - yukseklik * 0.5 + comelme * 0.12, scaleY: 1 - yukseklik * 0.4, alpha: 1 - yukseklik * 0.55, duration: sure, ease: yumusama });
   }
 
   // Hareketi bir kez yapar. sure: bir tekrarın süresi (ms). tekrarNo: kaçıncı tekrar (1'den başlar).
@@ -380,19 +393,52 @@ export class Zipzip extends Phaser.GameObjects.Container {
     this.kostumParcalari = [];
     if (!id) return;
     const b = this.birim;
+    const cizim = (ciz: (g: Phaser.GameObjects.Graphics) => void) => {
+      const g = this.scene.add.graphics();
+      ciz(g);
+      this.add(g);
+      this.kostumParcalari.push(g);
+    };
     const emoji = (simge: string, x: number, y: number, boy: number, aci = 0) => {
       const t = this.scene.add.text(x * b, y * b, simge, { fontSize: `${Math.round(boy * b)}px` }).setOrigin(0.5).setAngle(aci);
       this.add(t);
       this.kostumParcalari.push(t);
     };
     switch (id) {
-      case 'kep': return emoji('🧢', 0, -112, 92, -12);
       case 'gozluk': return emoji('🕶️', 0, -48, 100);
-      case 'fiyonk': return emoji('🎀', 62, -92, 62, 18);
+      case 'pilot': return emoji('🥽', 0, -96, 96);
       case 'atki': return emoji('🧣', 0, 80, 74);
       case 'tac': return emoji('👑', 0, -128, 82);
-      case 'sihirbaz': return emoji('🎩', 0, -138, 96, -6);
       case 'kasif': return emoji('🤠', 0, -126, 104);
+      case 'madalya': return emoji('🏅', 0, 70, 70);
+      // Çizilen kostümler (emojisi olmayanlar)
+      case 'kaptan': return cizim((g) => {
+        g.fillStyle(0xffffff).fillEllipse(0, -122 * b, 150 * b, 46 * b);
+        g.fillStyle(0x1d3557).fillRect(-62 * b, -116 * b, 124 * b, 22 * b);
+        g.fillStyle(0x14213d).fillEllipse(0, -92 * b, 140 * b, 18 * b);
+        g.fillStyle(0xffc93c).fillCircle(0, -106 * b, 9 * b);
+      });
+      case 'terBandi': return cizim((g) => {
+        g.fillStyle(0xe63946).fillRoundedRect(-92 * b, -98 * b, 184 * b, 26 * b, 12 * b);
+        g.fillStyle(0xffffff).fillRect(-92 * b, -88 * b, 184 * b, 5 * b);
+      });
+      case 'kabuk': return cizim((g) => {
+        g.fillStyle(0xfff3d6).fillEllipse(0, -108 * b, 150 * b, 70 * b);
+        g.fillStyle(0xfff3d6).fillTriangle(-75 * b, -100 * b, -45 * b, -70 * b, -20 * b, -100 * b).fillTriangle(-20 * b, -100 * b, 10 * b, -70 * b, 40 * b, -100 * b).fillTriangle(40 * b, -100 * b, 60 * b, -74 * b, 75 * b, -100 * b);
+        g.lineStyle(3 * b, 0xd9c49a).strokeEllipse(0, -112 * b, 150 * b, 62 * b);
+        g.fillStyle(0xe8b4b8).fillCircle(-30 * b, -122 * b, 7 * b).fillCircle(25 * b, -128 * b, 5 * b);
+      });
+      case 'dinoSapka': return cizim((g) => {
+        g.fillStyle(0x3fbf5f).fillEllipse(0, -106 * b, 170 * b, 60 * b);
+        g.fillStyle(0x2c8a44);
+        for (const sx of [-50, -17, 17, 50]) g.fillTriangle((sx - 16) * b, -122 * b, sx * b, -160 * b, (sx + 16) * b, -122 * b);
+        g.fillStyle(0xffffff).fillCircle(-40 * b, -100 * b, 9 * b).fillCircle(40 * b, -100 * b, 9 * b);
+      });
+      case 'uykuSapka': return cizim((g) => {
+        g.fillStyle(0x7c5cd6).fillTriangle(-70 * b, -100 * b, 70 * b, -100 * b, 95 * b, -190 * b);
+        g.fillStyle(0xffffff).fillRoundedRect(-78 * b, -110 * b, 156 * b, 22 * b, 10 * b).fillCircle(95 * b, -192 * b, 16 * b);
+        g.fillStyle(0xffc93c).fillCircle(-10 * b, -130 * b, 5 * b).fillCircle(30 * b, -150 * b, 4 * b);
+      });
       case 'pelerin': {
         const g = this.scene.add.graphics();
         g.fillStyle(0xe63946).fillPoints([{ x: -80 * b, y: -30 * b }, { x: 80 * b, y: -30 * b }, { x: 130 * b, y: 150 * b }, { x: -130 * b, y: 150 * b }], true);

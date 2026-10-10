@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { RENK, YAZI_TIPI } from '../ayarlar';
-import { evDugmesi, yildizliArkaPlan } from '../arayuz';
+import { evDugmesi, yildizliArkaPlan, durakSimgesi } from '../arayuz';
 import { BOLUMLER, BolumId } from '../duraklar';
 import { haftalikOzet } from '../istatistik';
 import { M } from '../metinler';
@@ -79,7 +79,7 @@ export class SertifikaScene extends Phaser.Scene {
     duraklar.forEach((d, i) => {
       const dx = x + (i - (duraklar.length - 1) / 2) * aralik;
       g.lineStyle(4, RENK.turuncu).strokeCircle(dx, 770, aralik === 68 ? 28 : 31);
-      this.add.text(dx, 770, d.simge, { fontSize: '32px' }).setOrigin(0.5);
+      durakSimgesi(this, d, dx, 770, 32);
     });
     const ozet = haftalikOzet();
     this.add

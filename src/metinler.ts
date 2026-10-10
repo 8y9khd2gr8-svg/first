@@ -1,9 +1,9 @@
 import { AILE_OTURUMU } from './aile';
-import { BOLUM_SIRASI, BOLUMLER, TUM_DURAKLAR } from './duraklar';
-import { H, ISINMA, SOGUMA } from './hareketler';
+import { BOLUM_SIRASI, BOLUMLER, TUM_DURAKLAR, oturum } from './duraklar';
+import { AYNA, DONMA, H, ISINMALAR, SOGUMALAR } from './hareketler';
 import { AVATARLAR } from './pasaport';
 import { ROZETLER } from './rozetler';
-import { KOSTUMLER } from './kostumler';
+import { KOSTUMLER, kostumNasil } from './kostumler';
 
 // Oyunda seslendirilen bütün cümleler. Doğal ses kayıtları bu listeden üretilir
 // (npm run seslendir); listede olmayan bir cümle telefonun kendi sesiyle okunur.
@@ -17,6 +17,11 @@ export const GERI_SAYIM = ['Üç!', 'İki!', 'Bir!', 'Başla!'];
 
 export const M = {
   yaptinMi: 'Süper! Yaptıysan, Yaptım düğmesine bas!',
+  devamEdiyoruz: 'Süper! Devam ediyoruz!',
+  dur: 'Dur!',
+  devam: 'Devam!',
+  uzaktanAcik: 'Uzaktan oyna açık! Hareketler kendiliğinden ilerleyecek.',
+  bugunlukBitti: 'Bugün çok güzel hareket ettin! Yine bekleriz!',
   aferin: 'Aferin!',
   kameraGordu: 'Kamera gördü, harikasın!',
   aileBitti: 'Ailece süpersiniz! Birlikte çok güzel hareket ettiniz!',
@@ -54,9 +59,9 @@ export const M = {
   evdeKilitli: 'Evde Macera, Dinozorlar Diyarı’nı bitirince açılacak!',
   maceraHosgeldin: 'Büyük maceraya hoş geldin! Bir bölüm seç!',
   yakinda: 'Bu bölüm çok yakında geliyor!',
-  kostumDolabi: 'Burası kostüm dolabın! Hareket ettikçe yıldız kazanırsın, yıldızlarla yeni kostümler açılır.',
+  kostumDolabi: 'Burası kostüm dolabın! Gezdiğin her yerden bir hatıra kostüm açılır. Birine dokun ve giy!',
   kostumSecildi: (ad: string) => `${ad} çok yakıştı!`,
-  kostumKilitli: (kalan: number) => `Bu kostüm için ${kalan} yıldız daha lazım. Hareket ettikçe yıldız kazanırsın!`,
+  kostumKilitli: (nasil: string) => `Bu kostümü açmak için ${nasil}!`,
   yeniKostum: (ad: string) => `Yeni kostüm açıldı: ${ad}!`,
   yeniRozet: (ad: string) => `Yeni rozet kazandın: ${ad}!`,
   rozetAdi: (ad: string) => `${ad} rozeti!`,
@@ -73,22 +78,24 @@ export function tumMetinler(): string[] {
     M.sporHosgeldin, M.sporSec, M.sporBitti, M.sporKilitli, M.dinozorHosgeldin, M.dinozorBitti, M.dinozorKilitli, M.evdeHosgeldin, M.evdeBitti, M.evdeKilitli,
     ...SERTIFIKA_UNVANLARI.map((u) => M.sertifikaBolum(u)),
     ...Object.values(H).map((h) => h.sesli),
-    ISINMA.sesli,
-    SOGUMA.sesli,
+    ...ISINMALAR.map((h) => h.sesli),
+    ...SOGUMALAR.map((h) => h.sesli),
+    DONMA.sesli, AYNA.sesli, M.devamEdiyoruz, M.dur, M.devam, M.uzaktanAcik, M.bugunlukBitti,
     ...AVATARLAR.map((a) => M.karakterSecildi(a.ad)),
     ...ROZETLER.flatMap((r) => [M.yeniRozet(r.ad), M.rozetAdi(r.ad), M.rozetNasil(r.nasil)]),
     M.kostumDolabi,
     M.aileBitti,
     M.kameraGordu,
     ...AILE_OTURUMU.map((h) => h.sesli),
-    ...KOSTUMLER.flatMap((k) => [M.kostumSecildi(k.ad), M.yeniKostum(k.ad)]),
+    ...KOSTUMLER.flatMap((k) => [M.kostumSecildi(k.ad), M.yeniKostum(k.ad), M.kostumKilitli(kostumNasil(k))]),
   ]);
   BOLUM_SIRASI.forEach((id) => {
     const { duraklar, serbest, kutuBaslik } = BOLUMLER[id];
     duraklar.forEach((d, i) => {
       liste.add(M.durakGiris(d.yer, d.ad, d.bilgi, kutuBaslik));
       liste.add(M.damgaKazandin(d.yer));
-      liste.add(d.ozel.sesli);
+      oturum(d).forEach((h) => liste.add(h.sesli));
+      if (d.soru) liste.add(d.soru);
       if (i > 0 && !serbest) liste.add(M.siradaki(d.yer));
     });
   });

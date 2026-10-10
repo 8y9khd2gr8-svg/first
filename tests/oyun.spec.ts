@@ -109,3 +109,11 @@ test('Zıpzıp her hareketi hatasız yapar', async ({ page }) => {
   await page.waitForTimeout(800);
   expect(kayit.hatalar).toEqual([]);
 });
+
+test('"Uzaktan oyna" açıkken bir durak baştan sona kendiliğinden oynanır (ısınma + sürpriz dahil)', async ({ page }) => {
+  test.setTimeout(300_000);
+  const kayit = await oyunuAc(page, { 'zipzip-uzaktan-v1': '1' });
+  await sahneAc(page, 'Hareket', { durakId: 'istanbul', adim: 0 });
+  await page.waitForFunction(() => (window as any).oyun.scene.isActive('Odul'), null, { timeout: 280_000, polling: 1000 });
+  expect(kayit.hatalar).toEqual([]);
+});

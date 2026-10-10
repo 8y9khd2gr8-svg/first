@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { RENK, YAZI_TIPI } from '../ayarlar';
-import { buyukDugme, rozetCiz, yildizliArkaPlan } from '../arayuz';
+import { buyukDugme, rozetCiz, yildizliArkaPlan, durakSimgesi } from '../arayuz';
 import { kazanilanlar, ROZETLER } from '../rozetler';
 import { BOLUM_SIRASI, BOLUMLER, BolumId, TUM_DURAKLAR, bolumuAcikMi } from '../duraklar';
 import { tamamlananlar } from '../ilerleme';
@@ -80,10 +80,19 @@ export class PasaportScene extends Phaser.Scene {
       sayfa.add(this.add.text(340, y, yazi, { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: `${boy}px`, color: MUREKKEP }));
 
     etiket(280, 'Adı');
-    const ad = pasaport.ad ? pasaport.ad.toLocaleUpperCase('tr') : '. . . . . . .';
+    const ad = pasaport.ad ? pasaport.ad.toLocaleUpperCase('tr') : '';
     const adYazi = this.add.text(340, 310, ad, { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '52px', color: MUREKKEP });
     adYazi.setScale(Math.min(1, 320 / adYazi.width));
     sayfa.add(adYazi);
+    // Ada dokununca ad yazma ekranı açılır (ebeveyn kilidiyle).
+    if (!pasaport.ad) sayfa.add(this.add.text(340, 318, '✏️ Adını yazdır', { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '32px', color: '#FF8A3D', backgroundColor: '#FF8A3D1f', padding: { x: 10, y: 4 } }));
+    const adAlani = this.add.zone(500, 330, 330, 110).setInteractive({ useHandCursor: true });
+    adAlani.on('pointerdown', () => {
+      bip(500, 0.08);
+      sustur();
+      this.scene.start('Ebeveyn', { hedef: 'PasaportAyar', geri: 'Pasaport' });
+    });
+    sayfa.add(adAlani);
     etiket(390, 'Görevi');
     deger(418, 'Dünya Gezgini', 36);
     etiket(475, 'Damgalar');
@@ -102,7 +111,7 @@ export class PasaportScene extends Phaser.Scene {
         g.lineStyle(6, RENK.turuncu).strokeCircle(dx, dy, 62);
         g.lineStyle(2, RENK.turuncu).strokeCircle(dx, dy, 52);
         sayfa.add(g);
-        const simge = this.add.text(dx, dy - 8, durak.simge, { fontSize: '54px' }).setOrigin(0.5).setAngle(-8);
+        const simge = durakSimgesi(this, durak, dx, dy - 8, 54).setAngle(-8);
         sayfa.add(simge);
         sayfa.add(this.add.text(dx, dy + 82, durak.yer, { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '22px', color: '#FF8A3D' }).setOrigin(0.5));
       } else {

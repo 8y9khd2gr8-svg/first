@@ -21,7 +21,7 @@ export class EbeveynScene extends Phaser.Scene {
     sustur();
     yildizliArkaPlan(this);
     const x = this.scale.gameSize.width / 2;
-    evDugmesi(this, () => this.scene.start(this.geri));
+    evDugmesi(this, () => this.scene.start(this.geri, {}));
 
     const a = Phaser.Math.Between(3, 9);
     const b = Phaser.Math.Between(3, 9);
@@ -42,10 +42,10 @@ export class EbeveynScene extends Phaser.Scene {
       const sx = x + (i % 2 === 0 ? -150 : 150);
       const sy = 700 + Math.floor(i / 2) * 190;
       buyukDugme(this, sx, sy, String(sayi), RENK.mavi, () => {
-        if (sayi === dogru) this.scene.start(this.hedef);
+        if (sayi === dogru) this.scene.start(this.hedef, {});
         else {
           bip(200, 0.2, 'square', 0.15);
-          this.scene.start(this.geri);
+          this.scene.start(this.geri, {});
         }
       }, { genislik: 250, yukseklik: 150, yaziBoyu: 70 });
     });

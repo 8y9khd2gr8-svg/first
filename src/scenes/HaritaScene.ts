@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { RENK, YAZI_TIPI } from '../ayarlar';
-import { buyukDugme, evDugmesi, yildizliArkaPlan } from '../arayuz';
+import { buyukDugme, evDugmesi, yildizliArkaPlan, durakSimgesi } from '../arayuz';
 import { Durak, TURKIYE } from '../duraklar';
 import { DURAK_KONUMLARI, HARITA_BOYUTU } from '../haritaKonumlar';
 import { dunyaAcik, tamamlananlar } from '../ilerleme';
@@ -69,10 +69,11 @@ export class HaritaScene extends Phaser.Scene {
     });
 
     const zipzipDurak = yolculukVar ? TURKIYE[siradaki - 1] : TURKIYE[siradaki === -1 ? TURKIYE.length - 1 : siradaki];
-    const zipzip = new Zipzip(this, 0, 0, 0.3);
+    const zipzip = new Zipzip(this, 0, 0, 0.24);
     const zipzipYeri = (d: Durak): Nokta => {
       const k = konum(d.id);
-      return { x: k.x + (ZIPZIP_SAGDA.has(d.id) ? 58 : -58), y: k.y - 60 };
+      // Zıpzıp durağın üstünde, yazıları kapatmadan durur.
+      return { x: k.x + (ZIPZIP_SAGDA.has(d.id) ? 30 : -30), y: k.y - 72 };
     };
     const ilkYer = zipzipYeri(zipzipDurak);
     zipzip.yerlestir(ilkYer.x, ilkYer.y);
@@ -189,7 +190,7 @@ export class HaritaScene extends Phaser.Scene {
     const { x: dx, y: dy } = konum(durak.id);
     const isaret = this.add.container(dx, dy);
     isaret.add(this.add.circle(0, 0, 34, bitti ? RENK.sari : acik ? RENK.turuncu : 0x6b7280).setStrokeStyle(5, RENK.beyaz));
-    isaret.add(this.add.text(0, 2, acik ? durak.simge : '🔒', { fontSize: '36px' }).setOrigin(0.5));
+    isaret.add(acik ? durakSimgesi(this, durak, 0, 2, 36) : this.add.text(0, 2, '🔒', { fontSize: '36px' }).setOrigin(0.5));
     const ad = this.add
       .text(0, AD_USTTE.has(durak.id) ? -52 : 52, durak.yer, { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '24px', color: '#ffffff', stroke: '#0b1430', strokeThickness: 6 })
       .setOrigin(0.5);

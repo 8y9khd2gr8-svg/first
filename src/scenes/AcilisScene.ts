@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { RENK, YAZI_TIPI } from '../ayarlar';
-import { buyukDugme, yildizliArkaPlan } from '../arayuz';
+import { buyukDugme, yildizliArkaPlan, CIZILI_SIMGELER } from '../arayuz';
 import { sesiAc } from '../ses';
 import { Zipzip } from '../zipzip';
 import { pasaportOku, pasaportYaz } from '../pasaport';
@@ -15,6 +15,7 @@ export class AcilisScene extends Phaser.Scene {
   preload() {
     Zipzip.yukle(this);
     this.load.image('ikon', 'ikon/ikon-192.png');
+    CIZILI_SIMGELER.forEach((id) => this.load.svg(`simge-${id}`, `simge/${id}.svg`, { width: 256, height: 256 }));
   }
 
   create() {

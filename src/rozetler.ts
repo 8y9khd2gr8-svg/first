@@ -1,6 +1,6 @@
 import { DINOZOR, DUNYA, EVDE, SPOR, TUM_DURAKLAR, TURKIYE, UZAY } from './duraklar';
 import { tamamlananlar } from './ilerleme';
-import { H, ISINMA, SOGUMA } from './hareketler';
+import { H, ISINMALAR, SOGUMALAR } from './hareketler';
 import { haftalikOzet } from './istatistik';
 
 // Rozetler: kazanılıp kazanılmadığı her seferinde mevcut kayıtlardan hesaplanır.
@@ -22,7 +22,7 @@ type Durum = {
 const toplam = (d: Durum, ...animasyonlar: string[]) => animasyonlar.reduce((t, a) => t + (d.sayac[a] ?? 0), 0);
 // "Hareket Kâşifi" için oyundaki bütün hareket türleri.
 // Yeni bölüm gelince liste uzar; daha önce kazanılmış rozet yine de kaybolmaz (kazanilanlar'a bakın).
-const TUM_ANIMASYONLAR = [...new Set([...Object.values(H), ISINMA, SOGUMA, ...TUM_DURAKLAR.map((x) => x.ozel)].map((h) => h.animasyon))];
+const TUM_ANIMASYONLAR = [...new Set([...Object.values(H), ...ISINMALAR, ...SOGUMALAR, ...TUM_DURAKLAR.map((x) => x.ozel)].map((h) => h.animasyon))];
 
 const KOSULLAR: (Rozet & { kazanildi: (d: Durum) => boolean })[] = [
   { id: 'ilkAdim', simge: '🌱', ad: 'İlk Adım', nasil: 'İlk hareketini tamamla', kazanildi: (d) => d.hareket >= 1 },

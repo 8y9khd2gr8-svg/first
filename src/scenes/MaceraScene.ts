@@ -44,6 +44,15 @@ export class MaceraScene extends Phaser.Scene {
       sustur();
       this.scene.start('Acilis', {});
     });
+    // Kostüm dolabı: kazanılan hatıralara tek dokunuşla ulaşılır.
+    const dolap = this.add.container(640, 190);
+    dolap.add(this.add.circle(0, 0, 46, 0xffffff, 0.15).setStrokeStyle(4, RENK.sari));
+    dolap.add(this.add.text(0, 2, '👕', { fontSize: '46px' }).setOrigin(0.5));
+    dolap.setSize(92, 92).setInteractive({ useHandCursor: true });
+    dolap.on('pointerdown', () => {
+      sustur();
+      this.scene.start('Kostum', { geri: 'Macera' });
+    });
     const pasaport = this.add.container(640, 80);
     pasaport.add(this.add.circle(0, 0, 50, RENK.turuncu).setStrokeStyle(5, RENK.beyaz));
     pasaport.add(this.add.text(0, 2, '🛂', { fontSize: '50px' }).setOrigin(0.5));
@@ -114,7 +123,7 @@ export class MaceraScene extends Phaser.Scene {
         );
         yazi.add(
           this.add
-            .text(0, 22, tamam ? `🏆 ${bitenSayisi}/${duraklar.length} tamam!` : acik ? `⭐ ${bitenSayisi}/${duraklar.length} durak` : 'Önceki bölümden sonra', {
+            .text(0, 22, tamam ? `🏆 ${bitenSayisi}/${duraklar.length} tamam!` : acik ? `⭐ ${bitenSayisi}/${duraklar.length} durak` : `🔒 ${BOLUM_KISA[BOLUMLER[s.id].onceki!].kisa} bitince açılır`, {
               fontFamily: YAZI_TIPI,
               fontSize: '26px',
               color: tamam ? '#FFC93C' : '#cfe3ff',

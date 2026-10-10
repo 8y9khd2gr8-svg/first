@@ -5,17 +5,44 @@ import path from 'node:path';
 import { test } from 'node:test';
 import { AILE_OTURUMU } from '../src/aile';
 import { BOLUM_SIRASI, BOLUMLER, TUM_DURAKLAR, oturum } from '../src/duraklar';
+import { AYNA, DONMA, ISINMALAR, SOGUMALAR } from '../src/hareketler';
 import { H, Hareket } from '../src/hareketler';
+import { kostumNasil } from '../src/kostumler';
 import { KOSTUMLER } from '../src/kostumler';
 import { M, SAYILAR, SERTIFIKA_UNVANLARI, tumMetinler } from '../src/metinler';
 import { ROZETLER } from '../src/rozetler';
 
-const tumHareketler: Hareket[] = [...Object.values(H), ...AILE_OTURUMU, ...TUM_DURAKLAR.flatMap(oturum)];
+const tumHareketler: Hareket[] = [...Object.values(H), ...AILE_OTURUMU, ...ISINMALAR, ...SOGUMALAR, DONMA, AYNA, ...TUM_DURAKLAR.flatMap(oturum)];
 
 test('durak, rozet ve kostüm kimlikleri tekil', () => {
   for (const liste of [TUM_DURAKLAR.map((d) => d.id), ROZETLER.map((r) => r.id), KOSTUMLER.map((k) => k.id)]) {
     assert.deepEqual(liste.filter((id, i) => liste.indexOf(id) !== i), []);
   }
+});
+
+test('hareketler tekrara düşmez: sıralı bölümde önceki iki durağın hareket türü tekrar kullanılmaz', () => {
+  for (const id of BOLUM_SIRASI) {
+    const { duraklar, serbest } = BOLUMLER[id];
+    duraklar.forEach((d, i) => {
+      const turler = oturum(d).map((h) => h.dizi?.join('+') ?? h.animasyon);
+      assert.equal(new Set(turler).size, turler.length, `${d.id}: aynı durakta tekrar`);
+      if (serbest) return;
+      const onceki = new Set(duraklar.slice(Math.max(0, i - 2), i).flatMap((o) => oturum(o).map((h) => h.dizi?.join('+') ?? h.animasyon)));
+      for (const t of turler) assert.ok(!onceki.has(t), `${d.id}: "${t}" önceki iki durakta da var`);
+    });
+  }
+});
+
+test('hareketler yerinde yapılır (kamera için): yürü/koş komutu "yerinde" der', () => {
+  for (const h of tumHareketler) {
+    const k = h.baslik.replace(/\n/g, ' ');
+    if (/\b(yürü|koş)\b/i.test(k)) assert.ok(/yerinde|olduğun yerde/i.test(k), `yerinde değil: ${k}`);
+  }
+});
+
+test('her durağın bir merak sorusu var (Evde Macera hariç); kostümlerin açılma yeri tanımlı', () => {
+  for (const d of TUM_DURAKLAR) if (d.bolum !== 'evde') assert.ok(d.soru?.startsWith('Evde birine sor:'), d.id);
+  for (const k of KOSTUMLER) assert.ok(kostumNasil(k).length > 0, k.id);
 });
 
 test('her bölümde 7 durak; her durak 5 hareketlik antrenman', () => {
@@ -24,7 +51,7 @@ test('her bölümde 7 durak; her durak 5 hareketlik antrenman', () => {
     if (id !== 'uzay') assert.equal(b.duraklar.length, 7, b.ad);
     for (const d of b.duraklar) {
       assert.equal(d.bolum, id, d.id);
-      assert.equal(oturum(d).length, 5, d.id);
+      assert.equal(oturum(d).length, 4, d.id); // + sürpriz = 5 (ısınma/soğuma ayrıca)
     }
   }
 });

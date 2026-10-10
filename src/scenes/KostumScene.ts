@@ -1,15 +1,22 @@
 import Phaser from 'phaser';
 import { RENK, YAZI_TIPI } from '../ayarlar';
 import { evDugmesi, yildizliArkaPlan } from '../arayuz';
-import { KOSTUMLER, kostumSec, seciliKostum, yildizSayisi } from '../kostumler';
+import { KOSTUMLER, Kostum, acikKostumler, kostumNasil, kostumSec, seciliKostum, yildizSayisi } from '../kostumler';
+import { durakBul } from '../duraklar';
 import { M } from '../metinler';
 import { bip, konus } from '../ses';
 import { Zipzip } from '../zipzip';
 
-// Kostüm dolabı: açılan kostümlerden biri giyilir; kilitlilerde kaç yıldız gerektiği yazar.
+// Kostüm dolabı: açılan kostümlerden biri giyilir; kilitlilerde hangi yerden açılacağı yazar.
 export class KostumScene extends Phaser.Scene {
   constructor() {
     super('Kostum');
+  }
+
+  private geri = 'Pasaport';
+
+  init(veri: { geri?: string }) {
+    this.geri = veri?.geri ?? 'Pasaport';
   }
 
   create() {
@@ -17,7 +24,7 @@ export class KostumScene extends Phaser.Scene {
     const x = this.scale.gameSize.width / 2;
     const yildiz = yildizSayisi();
     const secili = seciliKostum();
-    evDugmesi(this, () => this.scene.start('Pasaport', {}));
+    evDugmesi(this, () => this.scene.start(this.geri, {}));
 
     this.add.text(x, 90, 'Kostüm Dolabı', { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '62px', color: '#FFC93C' }).setOrigin(0.5);
     this.add
@@ -27,46 +34,44 @@ export class KostumScene extends Phaser.Scene {
     // Kostüm net görünsün diye zıplamak yerine kollarını kaldırıp indirir.
     const zipzip = new Zipzip(this, x, 370, 0.95);
     zipzip.surekli('kollar', 1600);
-    this.add.text(x, 530, 'Her “Yaptım!” = 1 yıldız', { fontFamily: YAZI_TIPI, fontSize: '26px', color: '#9fb6d9' }).setOrigin(0.5);
+    this.add.text(x, 530, 'Gezdiğin her yerden bir hatıra!', { fontFamily: YAZI_TIPI, fontSize: '26px', color: '#9fb6d9' }).setOrigin(0.5);
 
-    // "Kostümsüz" + 9 kostüm: 5 sütun × 2 satır
-    const secenekler = [{ id: undefined as string | undefined, simge: '🚫', ad: 'Kostümsüz', yildiz: 0 }, ...KOSTUMLER];
+    // "Kostümsüz" + 13 kostüm: 5 sütun × 3 satır. Kilitlide nereden açılacağı yazar.
+    const aciklar = new Set(acikKostumler().map((k) => k.id));
+    const secenekler: (Kostum | { id: undefined; simge: string; ad: string })[] = [{ id: undefined, simge: '🚫', ad: 'Kostümsüz' }, ...KOSTUMLER];
     secenekler.forEach((k, i) => {
       const kx = x + ((i % 5) - 2) * 132;
-      const ky = 680 + Math.floor(i / 5) * 230;
-      const acik = yildiz >= k.yildiz;
+      const ky = 660 + Math.floor(i / 5) * 205;
+      const acik = !k.id || aciklar.has(k.id);
       const giyili = k.id === secili;
       const kart = this.add.container(kx, ky);
       const g = this.add.graphics();
-      g.fillStyle(giyili ? RENK.sari : 0xffffff, giyili ? 1 : acik ? 0.14 : 0.06).fillRoundedRect(-60, -80, 120, 190, 24);
+      g.fillStyle(giyili ? RENK.sari : 0xffffff, giyili ? 1 : acik ? 0.14 : 0.06).fillRoundedRect(-60, -80, 120, 180, 24);
       kart.add(g);
-      kart.add(this.add.text(0, -18, k.simge, { fontSize: '62px' }).setOrigin(0.5).setAlpha(acik ? 1 : 0.3));
+      kart.add(this.add.text(0, -24, k.simge, { fontSize: '58px' }).setOrigin(0.5).setAlpha(acik ? 1 : 0.3));
       kart.add(
         this.add
-          .text(0, 50, k.ad, { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '20px', color: giyili ? '#14213D' : '#ffffff', align: 'center', wordWrap: { width: 110 } })
+          .text(0, 42, k.ad, { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '19px', color: giyili ? '#14213D' : '#ffffff', align: 'center', wordWrap: { width: 110 } })
           .setOrigin(0.5)
           .setAlpha(acik ? 1 : 0.6),
       );
       if (!acik) {
-        kart.add(this.add.text(0, -18, '🔒', { fontSize: '34px' }).setOrigin(0.5));
-        // Ne kadar kaldı: küçük ilerleme çubuğu
-        const oran = Math.min(1, yildiz / k.yildiz);
-        g.fillStyle(0xffffff, 0.15).fillRoundedRect(-46, 88, 92, 10, 5);
-        g.fillStyle(RENK.sari).fillRoundedRect(-46, 88, Math.max(6, 92 * oran), 10, 5);
-        kart.add(this.add.text(0, 75, `${k.yildiz} ⭐`, { fontFamily: YAZI_TIPI, fontSize: '20px', color: '#cfe3ff' }).setOrigin(0.5));
+        kart.add(this.add.text(0, -24, '🔒', { fontSize: '32px' }).setOrigin(0.5));
+        const yer = 'durak' in k && k.durak ? durakBul(k.durak) : undefined;
+        kart.add(this.add.text(0, 80, yer ? `${yer.simge} ${yer.yer}` : '🏆 Bölüm', { fontFamily: YAZI_TIPI, fontSize: '17px', color: '#cfe3ff' }).setOrigin(0.5));
       }
-      kart.setSize(120, 190).setInteractive({ useHandCursor: true });
+      kart.setSize(120, 180).setInteractive({ useHandCursor: true });
       kart.on('pointerdown', () => {
-        if (!acik) {
+        if (!acik && k.id) {
           bip(260, 0.12, 'square', 0.12);
           this.tweens.add({ targets: kart, angle: { from: -5, to: 5 }, duration: 70, yoyo: true, repeat: 2, onComplete: () => kart.setAngle(0) });
-          konus(M.kostumKilitli(k.yildiz - yildiz));
+          konus(M.kostumKilitli(kostumNasil(k as Kostum)));
           return;
         }
         bip(880, 0.1, 'triangle', 0.2);
         kostumSec(k.id);
         if (k.id) konus(M.kostumSecildi(k.ad));
-        this.scene.restart();
+        this.scene.restart({ geri: this.geri });
       });
     });
 
