@@ -1,11 +1,10 @@
-# Her PR'da (ve main dışındaki dallara her gönderimde) oyunu derler ve testleri çalıştırır.
+# Her PR'da oyunu derler ve testleri çalıştırır (Actions sekmesinden elle de başlatılabilir).
 # Testler geçmeden PR birleştirilmez.
 name: Testler
 
 on:
   pull_request:
-  push:
-    branches-ignore: [main]
+  workflow_dispatch:
 
 permissions:
   contents: read
