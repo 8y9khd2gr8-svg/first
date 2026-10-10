@@ -175,3 +175,6 @@ Teknoloji: Phaser 3 + TypeScript + Vite, GitHub Pages ile yayın. İleride Capac
 - Kodda isimler ve yorumlar Türkçe.
 - Kota: plan yükseltilmeden tasarruflu çalışılır (yarıyıl öncesi belki yükseltilir). Uzun sohbet
   yerine iş listesi bitince yeni sohbet; istekler toplu; uygun olunca sabah otomatik başlangıç.
+- "Yeni sohbet aç" denildiğinde, cevabın sonunda yeni sohbete aynen yapıştırılacak hazır bir başlangıç mesajı
+  (kod bloğu içinde) verilir: "CLAUDE.md'yi oku", son birleşen PR'lar, kullanıcıda bekleyenler, sıradaki iş
+  seçenekleri (önerilen başta). Kullanıcı kopyalayıp yapıştırır, başka bir şey yazmasına gerek kalmaz.
