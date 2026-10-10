@@ -3,7 +3,8 @@ import { chromium } from 'playwright';
 import fs from 'fs';
 const [anims, out] = [process.argv[2].split(','), process.argv[3]];
 const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' });
-const p = await b.newPage({ viewport: { width: 360, height: 640 } });
+// "Hareketi azalt": göz kırpma gibi süsler kapalı (resimde Zıpzıp gözü kapalı yakalanmasın).
+const p = await b.newPage({ viewport: { width: 360, height: 640 }, reducedMotion: 'reduce' });
 const errs = []; p.on('pageerror', e => errs.push(e.message));
 await p.goto('http://localhost:5173/'); await p.evaluate(() => { localStorage.clear(); localStorage.setItem('zipzip-guvenlik-notu-v1', '1'); });
 await p.reload(); await p.waitForTimeout(2500);
