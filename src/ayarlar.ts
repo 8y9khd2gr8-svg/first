@@ -1,3 +1,4 @@
+import { telefonYavas } from './hiz';
 // Oyunun her yerinde kullanılan ortak ayarlar: boyutlar, renkler, yazı tipi.
 export const GENISLIK = 720;
 export const YUKSEKLIK = 1280;
@@ -13,9 +14,10 @@ export const RENK = {
   beyaz: 0xffffff,
 };
 
-// Telefonda "hareketi azalt" (erişilebilirlik) açıksa süs animasyonları çalışmaz;
-// anlamlı hareketler (Zıpzıp'ın gösterimi, sıradaki durağın parlaması, kutlamalar) kalır.
-export const HAREKETI_AZALT = typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
+// Telefonda "hareketi azalt" (erişilebilirlik) açıksa ya da telefon yavaşsa (hiz.ts) süs animasyonları
+// çalışmaz; anlamlı hareketler (Zıpzıp'ın gösterimi, sıradaki durağın parlaması, kutlamalar) kalır.
+const AZALT_ISTENDI = typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
+export const hareketiAzalt = () => AZALT_ISTENDI || telefonYavas();
 
 // "Uzaktan oyna": telefon uzaktayken hareketler "Yaptım!" beklemeden kendiliğinden ilerler.
 // Seçim sadece bu cihazda saklanır.

@@ -117,3 +117,19 @@ test('"Uzaktan oyna" açıkken bir durak baştan sona kendiliğinden oynanır (�
   await page.waitForFunction(() => (window as any).oyun.scene.isActive('Odul'), null, { timeout: 280_000, polling: 1000 });
   expect(kayit.hatalar).toEqual([]);
 });
+
+test('yavaş telefonda oyun kendiliğinden sadeleşir (süs animasyonu yok, 30 kare)', async ({ page }) => {
+  const kayit = await oyunuAc(page, BETA);
+  const cdp = await page.context().newCDPSession(page);
+  await cdp.send('Emulation.setCPUThrottlingRate', { rate: 8 });
+  await sahneAc(page, 'Harita');
+  await expect.poll(() => page.evaluate(async () => (await import('/src/hiz.ts')).telefonYavas()), { timeout: 40_000, intervals: [500] }).toBe(true);
+  await cdp.send('Emulation.setCPUThrottlingRate', { rate: 1 });
+  expect(await page.evaluate(() => (window as any).oyun.loop.fpsLimit)).toBe(30);
+  for (const ad of ['Macera', 'Harita', 'Uzay', 'Durak']) await sahneAc(page, ad, ad === 'Durak' ? { durakId: 'istanbul' } : {});
+  // Sürekli dönen süs animasyonu kalmamalı (sıradaki durağın parlaması gibi anlamlı olanlar hariç ekranlarda).
+  await sahneAc(page, 'Pasaport');
+  const sonsuz = await page.evaluate(() => (window as any).oyun.scene.getScene('Pasaport').tweens.getTweens().filter((t: any) => t.repeat === -1 && t.targets?.[0]?.type === 'Arc').length);
+  expect(sonsuz).toBe(0);
+  expect(kayit.hatalar).toEqual([]);
+});

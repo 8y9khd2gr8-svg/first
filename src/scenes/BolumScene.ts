@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { RENK, YAZI_TIPI, HAREKETI_AZALT } from '../ayarlar';
+import { RENK, YAZI_TIPI, hareketiAzalt } from '../ayarlar';
 import { buyukDugme, evDugmesi, durakSimgesi } from '../arayuz';
 import { BOLUM_SIRASI, BOLUMLER, BolumId, Durak, bolumuAcikMi } from '../duraklar';
 import { tamamlananlar } from '../ilerleme';
@@ -332,7 +332,7 @@ export function bolumGecisDugmesi(sahne: Phaser.Scene, x: number, y: number, hed
     sustur();
     sahne.scene.start(BOLUMLER[hedef].sahne, { giris: 'uzay' });
   });
-  if (parla && !HAREKETI_AZALT) sahne.tweens.add({ targets: d, scale: 1.06, duration: 700, yoyo: true, repeat: -1 });
+  if (parla && !hareketiAzalt()) sahne.tweens.add({ targets: d, scale: 1.06, duration: 700, yoyo: true, repeat: -1 });
   return d;
 }
 

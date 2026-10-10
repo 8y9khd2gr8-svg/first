@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { RENK, YAZI_TIPI, HAREKETI_AZALT } from '../ayarlar';
+import { RENK, YAZI_TIPI, hareketiAzalt } from '../ayarlar';
 import { buyukDugme, evDugmesi, yildizliArkaPlan } from '../arayuz';
 import { Durak, UZAY } from '../duraklar';
 import { tamamlananlar } from '../ilerleme';
@@ -76,14 +76,14 @@ export class UzayScene extends Phaser.Scene {
         onComplete: () => iz.destroy(),
       });
     };
-    if (!HAREKETI_AZALT) this.time.addEvent({ delay: 2200, loop: true, callback: () => (kayanYildiz(), Math.random() < 0.35 && this.time.delayedCall(350, kayanYildiz)), startAt: 1800 });
+    if (!hareketiAzalt()) this.time.addEvent({ delay: 2200, loop: true, callback: () => (kayanYildiz(), Math.random() < 0.35 && this.time.delayedCall(350, kayanYildiz)), startAt: 1800 });
 
     // Güneş: sol altta, ekrandan taşan kocaman ve parlayan bir daire.
     const gunes = this.add.container(30, 1170);
     gunes.add(this.add.circle(0, 0, 200, 0xffb627, 0.15));
     gunes.add(this.add.circle(0, 0, 160, 0xffc93c, 0.3));
     gunes.add(this.add.circle(0, 0, 125, 0xffd25a));
-    if (!HAREKETI_AZALT) this.tweens.add({ targets: gunes, scale: 1.05, duration: 1600, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
+    if (!hareketiAzalt()) this.tweens.add({ targets: gunes, scale: 1.05, duration: 1600, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
     this.add.text(70, 1240, 'Güneş', { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '26px', color: '#14213D' }).setOrigin(0.5);
 
     // Rota: Dünya'dan başlayıp gezegenleri sırayla dolaşan kesikli çizgi.
@@ -251,11 +251,11 @@ export class UzayScene extends Phaser.Scene {
       const on = halka(true);
       kap.add(on);
       // Halka hafifçe sallanır ve parıldar.
-      if (!HAREKETI_AZALT) this.tweens.add({ targets: [on, kap.list[0]], angle: -10, duration: 2600, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
-      if (!HAREKETI_AZALT) this.tweens.add({ targets: on, alpha: 0.75, duration: 1300, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
+      if (!hareketiAzalt()) this.tweens.add({ targets: [on, kap.list[0]], angle: -10, duration: 2600, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
+      if (!hareketiAzalt()) this.tweens.add({ targets: on, alpha: 0.75, duration: 1300, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
     }
     // Gezegen kendi etrafında yavaşça "döner" (şeritler hafifçe kayar gibi) ve süzülür.
-    if (!HAREKETI_AZALT) this.tweens.add({ targets: g, scaleX: 0.94, duration: 1800 + r * 20, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
+    if (!hareketiAzalt()) this.tweens.add({ targets: g, scaleX: 0.94, duration: 1800 + r * 20, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
     this.suzul(kap);
     if (!acik) {
       kap.add(this.add.circle(0, 0, r + 4, 0x14213d, 0.55));
@@ -281,7 +281,7 @@ export class UzayScene extends Phaser.Scene {
 
   // Gezegen yerinde hafifçe yukarı aşağı süzülür.
   private suzul(kap: Phaser.GameObjects.Container) {
-    if (HAREKETI_AZALT) return;
+    if (hareketiAzalt()) return;
     this.tweens.add({ targets: kap, y: kap.y - 6, duration: 1600 + (kap.x % 7) * 180, yoyo: true, repeat: -1, ease: 'Sine.easeInOut', delay: (kap.y % 5) * 200 });
   }
 
