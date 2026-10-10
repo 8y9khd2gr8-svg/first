@@ -22,8 +22,8 @@ const SATIRLAR: Satir[] = [
   { tur: 'bolum', id: 'spor', renk: RENK.yesil },
   { tur: 'bolum', id: 'dinozor', renk: 0x2c7a47 },
   { tur: 'bolum', id: 'evde', renk: 0xd9534f },
+  { tur: 'bolum', id: 'okyanus', renk: 0x1f7a99 },
   { tur: 'yakinda', ad: 'İstanbul’un 7 Tepesi', simge: '🏙️' },
-  { tur: 'yakinda', ad: 'Okyanus', simge: '🐠' },
 ];
 
 const ILK_Y = 300;

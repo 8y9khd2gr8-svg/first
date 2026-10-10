@@ -12,7 +12,7 @@ import { KOSTUMLER, kostumNasil } from './kostumler';
 // 20'ye kadar: bir hareket bundan fazla tekrar sayarsa test uyarır (sayı söylenemezse oyun takılırdı).
 export const SAYILAR = ['bir', 'iki', 'üç', 'dört', 'beş', 'altı', 'yedi', 'sekiz', 'dokuz', 'on', 'on bir', 'on iki', 'on üç', 'on dört', 'on beş', 'on altı', 'on yedi', 'on sekiz', 'on dokuz', 'yirmi'].map((s) => s[0].toLocaleUpperCase('tr') + s.slice(1) + '!');
 // Bölüm sertifikalarındaki unvanlar (SertifikaScene ile aynı sırada).
-export const SERTIFIKA_UNVANLARI = ['Türkiye Gezgini', 'Dünya Kâşifi', 'Uzay Yolcusu', 'Spor Yıldızı', 'Dinozor Kâşifi', 'Ev Kahramanı'];
+export const SERTIFIKA_UNVANLARI = ['Türkiye Gezgini', 'Dünya Kâşifi', 'Uzay Yolcusu', 'Spor Yıldızı', 'Dinozor Kâşifi', 'Ev Kahramanı', 'Okyanus Kâşifi'];
 export const GERI_SAYIM = ['Üç!', 'İki!', 'Bir!', 'Başla!'];
 
 export const M = {
@@ -57,6 +57,9 @@ export const M = {
   evdeHosgeldin: 'Evde Macera’ya hoş geldin! En sevdiğin oyuncağı, bir yastığı ve çoraplarını hazırla. Dokun ve başla!',
   evdeBitti: 'Süpersin! Evde de çok güzel hareket ettin, her şeyi de topladın!',
   evdeKilitli: 'Evde Macera, Dinozorlar Diyarı’nı bitirince açılacak!',
+  okyanusHosgeldin: 'Okyanusa hoş geldin! İlk durağımız deniz kaplumbağaları. Dokun ve başla!',
+  okyanusBitti: 'Harikasın! Okyanusun bütün dostlarıyla tanıştın!',
+  okyanusKilitli: 'Okyanus, Evde Macera’yı bitirince açılacak!',
   tamSurumKilitli: 'Bu macerayı açmak için bir büyüğüne göster!',
   tamSurumAcildi: 'Yaşasın! Bütün maceralar açıldı!',
   maceraHosgeldin: 'Büyük maceraya hoş geldin! Bir bölüm seç!',
@@ -79,6 +82,7 @@ export function tumMetinler(): string[] {
     M.yaptinMi, M.aferin, M.yolaCikiyoruz, M.oncekiniBitir, M.turBitti, M.turaHosgeldin,
     M.karakterSec, M.pasaportIlk, M.pasaportHazir, M.pasaportSifir, M.sertifika, M.dunyaHosgeldin, M.dunyaBitti, M.dunyaKilitli, M.uzayHosgeldin, M.uzayBitti, M.uzayKilitli, M.maceraHosgeldin, M.yakinda, M.tamSurumKilitli, M.tamSurumAcildi,
     M.sporHosgeldin, M.sporSec, M.sporBitti, M.sporKilitli, M.dinozorHosgeldin, M.dinozorBitti, M.dinozorKilitli, M.evdeHosgeldin, M.evdeBitti, M.evdeKilitli,
+    M.okyanusHosgeldin, M.okyanusBitti, M.okyanusKilitli,
     ...SERTIFIKA_UNVANLARI.map((u) => M.sertifikaBolum(u)),
     ...Object.values(H).map((h) => h.sesli),
     ...ISINMALAR.map((h) => h.sesli),

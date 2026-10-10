@@ -7,7 +7,7 @@ import { M } from '../metinler';
 import { bip, konus, sustur, zaferMuzigi } from '../ses';
 import { Zipzip } from '../zipzip';
 
-// Yeni bölümlerin ortak harita ekranı (Spor Kampı, Dinozorlar Diyarı, Evde Macera).
+// Yeni bölümlerin ortak harita ekranı (Spor Kampı, Dinozorlar Diyarı, Evde Macera, Okyanus).
 // Her bölüm kendi arka planını, durak yerlerini ve cümlelerini AYARLAR'da verir.
 // Sıralı bölümde Zıpzıp duraktan durağa zıplayarak gider (arkasında altın iz);
 // serbest bölümde (Spor Kampı) çocuk istediği durakla başlar.
@@ -36,6 +36,7 @@ export const BOLUM_KISA: Record<BolumId, { kisa: string; simge: string; kilitli:
   spor: { kisa: 'Spor', simge: '⚽', kilitli: M.sporKilitli },
   dinozor: { kisa: 'Dinozor', simge: '🦕', kilitli: M.dinozorKilitli },
   evde: { kisa: 'Evde', simge: '🧸', kilitli: M.evdeKilitli },
+  okyanus: { kisa: 'Okyanus', simge: '🐠', kilitli: M.okyanusKilitli },
 };
 
 const AYARLAR: Partial<Record<BolumId, BolumAyari>> = {
@@ -92,6 +93,26 @@ const AYARLAR: Partial<Record<BolumId, BolumAyari>> = {
     bitti: M.evdeBitti,
     ilkYazi: 'Oyuncağa dokun ve başla!',
     kilitli: M.evdeKilitli,
+  },
+  okyanus: {
+    baslik: 'Okyanus',
+    simge: '🐠',
+    zemin: 0x0d3b66,
+    arkaPlan: denizAlti,
+    // Kumsaldan (aşağıda) başlayıp mercanlara (yukarıda) kıvrılan yol.
+    yerler: [
+      { x: 150, y: 1060 },
+      { x: 410, y: 1000 },
+      { x: 590, y: 860 },
+      { x: 380, y: 740 },
+      { x: 150, y: 620 },
+      { x: 360, y: 480 },
+      { x: 580, y: 360 },
+    ],
+    hosgeldin: M.okyanusHosgeldin,
+    bitti: M.okyanusBitti,
+    ilkYazi: 'Kaplumbağaya dokun ve başla!',
+    kilitli: M.okyanusKilitli,
   },
 };
 
@@ -389,6 +410,23 @@ function evIci(sahne: Phaser.Scene) {
   g.fillStyle(0xb07d4f).fillRect(440, 300, 220, 14);
   sahne.add.text(470, 270, '📚', { fontSize: '40px' }).setOrigin(0.5);
   sahne.add.text(610, 270, '🪴', { fontSize: '40px' }).setOrigin(0.5);
+}
+
+// Deniz altı: yukarısı açık mavi (yüzey), aşağısı kumsal; yosunlar ve sabit baloncuklar (hareketsiz süs).
+function denizAlti(sahne: Phaser.Scene) {
+  const g = sahne.add.graphics();
+  g.fillStyle(0x1f6f9f).fillRect(0, 0, 720, 300);
+  g.fillStyle(0x175a88).fillRect(0, 300, 720, 400);
+  g.lineStyle(4, 0xffffff, 0.25);
+  for (let x = 0; x < 720; x += 90) g.strokeEllipse(x + 45, 250, 90, 24);
+  g.fillStyle(0xe9c98b).fillEllipse(360, 1230, 1000, 300);
+  g.fillStyle(0xd9b56f).fillEllipse(120, 1180, 300, 90).fillEllipse(620, 1200, 320, 90);
+  g.fillStyle(0x2f9e6b);
+  for (const [px, boy] of [[40, 260], [90, 200], [660, 300], [700, 220], [250, 160]] as const) {
+    g.fillEllipse(px, 1120 - boy / 2, 34, boy);
+  }
+  g.lineStyle(3, 0xffffff, 0.35);
+  for (const [bx, by, r] of [[620, 560, 14], [640, 520, 9], [100, 420, 12], [80, 380, 7], [300, 330, 8]] as const) g.strokeCircle(bx, by, r);
 }
 
 function yolNoktasi(a: Nokta, b: Nokta, t: number): Nokta {
