@@ -1,0 +1,55 @@
+# Play kapalı test paketi (AAB): GitHub'da "Actions → Play kapalı test paketi → Run workflow" ile
+# elle çalıştırılır. Bitince sayfanın altındaki "zip-zip-dunya-play" dosyası indirilir ve
+# Play Console'da kapalı teste yüklenir (adımlar: docs/magaza-rehberi.md, 3b).
+# Yükleme anahtarı GitHub'daki gizli değerlerden gelir; anahtar hiçbir zaman depoya konmaz.
+name: Play kapalı test paketi
+
+on:
+  workflow_dispatch:
+
+jobs:
+  aab:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - name: Gizli değerler tamam mı?
+        env:
+          ANAHTAR: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          SIFRE: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          TAKMA_AD: ${{ secrets.ANDROID_KEY_ALIAS }}
+        run: |
+          if [ -z "$ANAHTAR" ] || [ -z "$SIFRE" ] || [ -z "$TAKMA_AD" ]; then
+            echo "::error::Yükleme anahtarı eksik. Settings → Secrets and variables → Actions'a üç gizli değeri ekleyin (docs/magaza-rehberi.md, 3b)."
+            exit 1
+          fi
+      - run: npm ci
+      - run: npm run magaza
+      - name: Anahtarı geçici dosyaya aç
+        env:
+          ANAHTAR: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+        run: echo "$ANAHTAR" | base64 -d > "$RUNNER_TEMP/yukleme.jks"
+      - name: İmzalı paket (AAB)
+        env:
+          ANDROID_KEYSTORE_PATH: ${{ runner.temp }}/yukleme.jks
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          # Her çalıştırmada artar (Play aynı sürüm kodunu ikinci kez kabul etmez).
+          ANDROID_VERSION_CODE: ${{ github.run_number }}
+        run: |
+          export ANDROID_VERSION_NAME=$(node -p "require('./package.json').version")
+          cd android && ./gradlew bundleRelease
+      - name: Anahtarı sil
+        if: always()
+        run: rm -f "$RUNNER_TEMP/yukleme.jks"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: zip-zip-dunya-play
+          path: android/app/build/outputs/bundle/release/app-release.aab

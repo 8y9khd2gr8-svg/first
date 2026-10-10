@@ -1,5 +1,9 @@
 apply plugin: 'com.android.application'
 
+// Play her yüklemede daha büyük bir sürüm kodu ister: otomatik iş (android-play.yml) verir; yoksa 1 / "1.0".
+def surumKodu = Integer.parseInt(System.getenv("ANDROID_VERSION_CODE") ?: "1")
+def surumAdi = System.getenv("ANDROID_VERSION_NAME") ?: "1.0"
+
 android {
     namespace "com.zipzipdunya.oyun"
     compileSdk rootProject.ext.compileSdkVersion
@@ -7,8 +11,8 @@ android {
         applicationId "com.zipzipdunya.oyun"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
-        versionName "1.0"
+        versionCode surumKodu
+        versionName surumAdi
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
@@ -16,8 +20,22 @@ android {
             ignoreAssetsPattern '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
+    // Play'e yükleme anahtarı: GitHub'daki gizli değerlerden gelir (docs/magaza-rehberi.md, 3b).
+    // Anahtar yoksa paket imzasız çıkar (deneme APK'sı bundan etkilenmez).
+    def anahtarDosyasi = System.getenv("ANDROID_KEYSTORE_PATH")
+    signingConfigs {
+        if (anahtarDosyasi) {
+            release {
+                storeFile file(anahtarDosyasi)
+                storePassword System.getenv("ANDROID_KEYSTORE_PASSWORD")
+                keyAlias System.getenv("ANDROID_KEY_ALIAS")
+                keyPassword System.getenv("ANDROID_KEYSTORE_PASSWORD")
+            }
+        }
+    }
     buildTypes {
         release {
+            if (anahtarDosyasi) signingConfig signingConfigs.release
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
