@@ -1,0 +1,28 @@
+# Android deneme paketi (APK): GitHub'da "Actions → Android deneme paketi → Run workflow" ile
+# elle çalıştırılır. Bitince sayfanın altındaki "zip-zip-dunya-apk" dosyası indirilip
+# Android telefona kurulabilir (mağazaya gönderilmez; sadece deneme içindir).
+name: Android deneme paketi
+
+on:
+  workflow_dispatch:
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - run: npm ci
+      - run: npm run magaza
+      - run: cd android && ./gradlew assembleDebug
+      - uses: actions/upload-artifact@v4
+        with:
+          name: zip-zip-dunya-apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk

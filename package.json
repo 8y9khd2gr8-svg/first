@@ -8,9 +8,13 @@
     "build": "tsc && vite build",
     "preview": "vite preview --host",
     "harita": "node scripts/harita-uret.mjs",
-    "seslendir": "tsx scripts/seslendir.ts"
+    "seslendir": "tsx scripts/seslendir.ts",
+    "magaza": "npm run build && npx cap sync"
   },
   "dependencies": {
+    "@capacitor/android": "^7.6.9",
+    "@capacitor/core": "^7.6.9",
+    "@capacitor/ios": "^7.6.9",
     "@fontsource/baloo-2": "^5.3.0",
     "@mediapipe/tasks-vision": "^0.10.14",
     "d3-geo": "^3.1.1",
@@ -19,6 +23,7 @@
     "world-atlas": "^2.0.2"
   },
   "devDependencies": {
+    "@capacitor/cli": "^7.6.9",
     "@types/d3-geo": "^3.1.1",
     "@types/topojson-client": "^3.1.5",
     "tsx": "^4.23.15",

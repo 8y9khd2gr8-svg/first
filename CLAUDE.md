@@ -101,6 +101,9 @@ Teknoloji: Phaser 3 + TypeScript + Vite, GitHub Pages ile yayın. İleride Capac
 ## Kod düzeni
 - `src/zipzip.ts`: maskot; duruşlar (uzuv açıları) ve her hareketin adımları burada.
 - `src/duraklar.ts`: duraklar, bilgiler, özel hareketler. `src/ilerleme.ts`: cihazdaki kayıt.
+- Mağaza paketi: Capacitor 7 (`android/`, `ios/`, `capacitor.config.ts`, kimlik com.zipzipdunya.oyun).
+  `npm run magaza` = derle + cap sync. Android deneme APK'sı: Actions → "Android deneme paketi".
+  Kullanıcı rehberi: docs/magaza-rehberi.md.
 - `npm run harita`: harita SVG'sini ve durak konumlarını yeniden üretir (scripts/harita-uret.mjs).
 - `src/hareketler.ts`: hareket listesi. `src/ses.ts`: sesler. `src/arayuz.ts`: düğmeler, arka plan.
 - Sahne geçişi: `init` alan bir sahneye geçerken HER ZAMAN veri nesnesi ver (`scene.start('X', {})`);
