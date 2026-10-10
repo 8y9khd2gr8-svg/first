@@ -5,7 +5,7 @@ import type { Topology } from 'topojson-specification';
 import karaVerisi from 'world-atlas/land-110m.json';
 import ulkeVerisi from 'world-atlas/countries-110m.json';
 import { hareketiAzalt, RENK, YAZI_TIPI } from '../ayarlar';
-import { buyukDugme, evDugmesi, yildizliArkaPlan, durakSimgesi } from '../arayuz';
+import { buyukDugme, evDugmesi, yildizliArkaPlan, durakSimgesi, genisDokunma } from '../arayuz';
 import { DUNYA, Durak } from '../duraklar';
 import { bolumAcik, tamamlananlar } from '../ilerleme';
 import { M } from '../metinler';
@@ -83,8 +83,8 @@ export class DunyaScene extends Phaser.Scene {
     });
     const geri = this.add
       .text(80, 160, '◀ Türkiye', { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '30px', color: '#cfe3ff', backgroundColor: '#ffffff1f', padding: { x: 16, y: 8 } })
-      .setOrigin(0, 0.5)
-      .setInteractive({ useHandCursor: true });
+      .setOrigin(0, 0.5);
+    genisDokunma(geri);
     geri.on('pointerdown', () => {
       bip(700, 0.08);
       sustur();
@@ -100,8 +100,8 @@ export class DunyaScene extends Phaser.Scene {
         backgroundColor: uzayAcik ? '#FFC93C' : '#ffffff1f',
         padding: { x: 16, y: 8 },
       })
-      .setOrigin(1, 0.5)
-      .setInteractive({ useHandCursor: true });
+      .setOrigin(1, 0.5);
+    genisDokunma(uzay);
     uzay.on('pointerdown', () => {
       if (!uzayAcik) {
         bip(220, 0.15, 'square', 0.12);

@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { RENK, YAZI_TIPI, hareketiAzalt } from '../ayarlar';
-import { buyukDugme, evDugmesi, yildizliArkaPlan } from '../arayuz';
+import { buyukDugme, evDugmesi, yildizliArkaPlan, genisDokunma } from '../arayuz';
 import { Durak, UZAY } from '../duraklar';
 import { tamamlananlar } from '../ilerleme';
 import { M } from '../metinler';
@@ -124,11 +124,11 @@ export class UzayScene extends Phaser.Scene {
       sustur();
       this.scene.start('Macera', {});
     });
-    this.add
-      .text(80, 160, '◀ Dünya', { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '30px', color: '#cfe3ff', backgroundColor: '#ffffff1f', padding: { x: 16, y: 8 } })
-      .setOrigin(0, 0.5)
-      .setInteractive({ useHandCursor: true })
-      .on('pointerdown', () => {
+    genisDokunma(
+      this.add
+        .text(80, 160, '◀ Dünya', { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '30px', color: '#cfe3ff', backgroundColor: '#ffffff1f', padding: { x: 16, y: 8 } })
+        .setOrigin(0, 0.5),
+    ).on('pointerdown', () => {
         bip(700, 0.08);
         sustur();
         this.scene.start('Dunya', {});

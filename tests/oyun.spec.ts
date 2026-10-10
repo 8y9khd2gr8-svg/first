@@ -155,5 +155,48 @@ test('Zıpzıp konuşurken ağzı oynar, susunca kapanır', async ({ page }) => 
   });
   expect(sonuc.enCok).toBeGreaterThan(0.3);
   expect(sonuc.sonra).toBe(0);
+// Beta öncesi deneme turundan: yazı ekrandan taşmasın, çocuk ekranlarında düğmeler parmağa yetecek kadar büyük olsun
+// (88 oyun noktası ≈ telefonda 48 piksel). Ebeveyn köşesi kilitli olduğu için düğme ölçüsüne katılmaz.
+test('yazılar ekrana sığar, çocuk düğmeleri yeterince büyük', async ({ page }) => {
+  test.setTimeout(120_000);
+  const hepsi: string[] = await (async () => {
+    await oyunuAc(page);
+    return page.evaluate(async () => (await import('/src/duraklar.ts')).TUM_DURAKLAR.map((d) => d.id));
+  })();
+  const kayit = await oyunuAc(page, { ...BETA, 'zipzip-ilerleme-v1': JSON.stringify(hepsi.slice(0, 20)), 'zipzip-pasaport-v1': JSON.stringify({ ad: 'Muhammed Mustafa', avatar: '🐼', soruldu: true }) });
+  const sahneler: [string, object, boolean][] = [
+    ['Macera', {}, true], ['Harita', {}, true], ['Dunya', {}, true], ['Uzay', {}, true], ['Spor', {}, true], ['Dinozor', {}, true], ['Evde', {}, true],
+    ['Durak', { durakId: 'efes' }, true], ['Durak', { durakId: 'nemrut' }, true], ['Hareket', { durakId: 'istanbul', adim: 1 }, true],
+    ['Pasaport', {}, true], ['Rozet', { sayfa: 1 }, true], ['Kostum', {}, false], ['Avatar', {}, true],
+    ['EbeveynMenu', {}, false], ['EbeveynOzet', {}, false], ['Sertifika', { bolum: 'turkiye' }, false],
+  ];
+  const sorunlar: string[] = [];
+  for (const [ad, veri, dugmeOlc] of sahneler) {
+    await sahneAc(page, ad, veri);
+    await page.waitForTimeout(500);
+    sorunlar.push(
+      ...(await page.evaluate((dugmeOlc) => {
+        const bulunan: string[] = [];
+        for (const s of (window as any).oyun.scene.getScenes(true)) {
+          const gez = (o: any) => {
+            if (o.visible === false || o.alpha === 0) return;
+            if (o.type === 'Container') return o.list.forEach(gez);
+            if (o.type === 'Text' && o.text?.trim()) {
+              const r = o.getBounds();
+              if (r.left < -1 || r.right > 721 || r.top < -1 || r.bottom > 1281) bulunan.push(`[${s.scene.key}] taşan yazı: "${o.text.slice(0, 30)}"`);
+            }
+            const ha = o.input?.enabled && o.input.hitArea;
+            if (dugmeOlc && ha && o.type === 'Text') {
+              const boy = Math.min(ha.width * Math.abs(o.scaleX), ha.height * Math.abs(o.scaleY));
+              if (boy < 72) bulunan.push(`[${s.scene.key}] küçük düğme: "${o.text.slice(0, 30)}" (${boy | 0})`);
+            }
+          };
+          s.children.list.forEach(gez);
+        }
+        return bulunan;
+      }, dugmeOlc)),
+    );
+  }
+  expect(sorunlar).toEqual([]);
   expect(kayit.hatalar).toEqual([]);
 });
