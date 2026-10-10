@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { RENK, YAZI_TIPI, hareketiAzalt, uzaktanAcikMi, uzaktanAyarla } from '../ayarlar';
-import { buyukDugme, evDugmesi, yildizliArkaPlan, durakSimgesi } from '../arayuz';
+import { buyukDugme, evDugmesi, yildizliArkaPlan, durakSimgesi, genisDokunma } from '../arayuz';
 import { BOLUMLER, durakBul, haritaSahnesi } from '../duraklar';
 import { M } from '../metinler';
 import { bip, konus, sustur } from '../ses';
@@ -64,14 +64,14 @@ export class DurakScene extends Phaser.Scene {
     let uzaktan = uzaktanAcikMi();
     const uzaktanDugme = this.add
       .text(x, 1170, '', { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '32px', padding: { x: 22, y: 8 } })
-      .setOrigin(0.5)
-      .setInteractive({ useHandCursor: true });
+      .setOrigin(0.5);
     const goster = () =>
       uzaktanDugme
         .setText(uzaktan ? '📱 Uzaktan oyna: AÇIK' : '📱 Uzaktan oyna: kapalı')
         .setColor(uzaktan ? '#14213D' : '#cfe3ff')
         .setBackgroundColor(uzaktan ? '#FFC93C' : '#ffffff1f');
     goster();
+    genisDokunma(uzaktanDugme, 80);
     uzaktanDugme.on('pointerdown', () => {
       uzaktan = !uzaktan;
       uzaktanAyarla(uzaktan);

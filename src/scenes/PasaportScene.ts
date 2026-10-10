@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { RENK, YAZI_TIPI } from '../ayarlar';
-import { buyukDugme, rozetCiz, yildizliArkaPlan, durakSimgesi } from '../arayuz';
+import { buyukDugme, rozetCiz, yildizliArkaPlan, durakSimgesi, genisDokunma } from '../arayuz';
 import { kazanilanlar, ROZETLER } from '../rozetler';
 import { BOLUM_SIRASI, BOLUMLER, BolumId, TUM_DURAKLAR, bolumuAcikMi } from '../duraklar';
 import { tamamlananlar } from '../ilerleme';
@@ -138,7 +138,7 @@ export class PasaportScene extends Phaser.Scene {
         .setOrigin(0.5)
         .setAlpha(secili || bolumuAcikMi(id) ? 1 : 0.4);
       if (!secili)
-        sekme.setInteractive({ useHandCursor: true }).on('pointerdown', () => {
+        genisDokunma(sekme).on('pointerdown', () => {
           bip(700, 0.08);
           this.scene.restart({ sayfa: id });
         });
@@ -189,7 +189,7 @@ export class PasaportScene extends Phaser.Scene {
       buyukDugme(this, x, 1180, 'Maceraya başla ▶', RENK.turuncu, () => {
         sustur();
         this.scene.start('Macera', {});
-      }, { genislik: 420, yukseklik: 120, yaziBoyu: 52 });
+      }, { genislik: 500, yukseklik: 120, yaziBoyu: 52 });
       konus(pasaport.avatar ? M.pasaportHazir : M.pasaportIlk);
     } else {
       buyukDugme(this, x, 1180, 'Haritaya dön ▶', RENK.turuncu, () => {

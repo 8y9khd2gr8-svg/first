@@ -67,6 +67,18 @@ export function yildizliArkaPlan(sahne: Phaser.Scene) {
   }
 }
 
+// Yazı düğmesinin görünüşü küçük kalsa da dokunma alanı en az `enAz` boyunda olur (çocuk parmağı ıskalamasın).
+// 88 oyun noktası telefonda yaklaşık 48 piksel eder (Android/iOS önerisi).
+export function genisDokunma(yazi: Phaser.GameObjects.Text, enAz = 88) {
+  const ex = Math.max(0, (enAz - yazi.width) / 2);
+  const ey = Math.max(0, (enAz - yazi.height) / 2);
+  return yazi.setInteractive({
+    hitArea: new Phaser.Geom.Rectangle(-ex, -ey, yazi.width + 2 * ex, yazi.height + 2 * ey),
+    hitAreaCallback: Phaser.Geom.Rectangle.Contains,
+    useHandCursor: true,
+  });
+}
+
 // Sol üstte ana ekrana dönüş düğmesi.
 export function evDugmesi(sahne: Phaser.Scene, basinca: () => void) {
   // Belirgin ev düğmesi: renkli daire, beyaz kenar ve ev resmi (okuma bilmeyen de tanır).

@@ -51,14 +51,14 @@ export class KostumScene extends Phaser.Scene {
       kart.add(this.add.text(0, -24, k.simge, { fontSize: '58px' }).setOrigin(0.5).setAlpha(acik ? 1 : 0.3));
       kart.add(
         this.add
-          .text(0, 42, k.ad, { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '19px', color: giyili ? '#14213D' : '#ffffff', align: 'center', wordWrap: { width: 110 } })
+          .text(0, 42, k.ad, { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '21px', color: giyili ? '#14213D' : '#ffffff', align: 'center', wordWrap: { width: 110 } })
           .setOrigin(0.5)
           .setAlpha(acik ? 1 : 0.6),
       );
       if (!acik) {
         kart.add(this.add.text(0, -24, '🔒', { fontSize: '32px' }).setOrigin(0.5));
         const yer = 'durak' in k && k.durak ? durakBul(k.durak) : undefined;
-        kart.add(this.add.text(0, 80, yer ? `${yer.simge} ${yer.yer}` : '🏆 Bölüm', { fontFamily: YAZI_TIPI, fontSize: '17px', color: '#cfe3ff' }).setOrigin(0.5));
+        kart.add(this.add.text(0, 84, yer ? `${yer.simge} ${yer.yer}` : '🏆 Bölüm', { fontFamily: YAZI_TIPI, fontSize: '18px', color: '#cfe3ff' }).setOrigin(0.5));
       }
       kart.setSize(120, 180).setInteractive({ useHandCursor: true });
       kart.on('pointerdown', () => {
