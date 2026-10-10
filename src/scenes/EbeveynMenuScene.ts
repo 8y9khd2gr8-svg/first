@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { RENK, YAZI_TIPI } from '../ayarlar';
 import { buyukDugme, evDugmesi, yildizliArkaPlan } from '../arayuz';
 import { tumVerileriSil } from '../guvenlik';
+import { geriBildirimAdresi, ILETISIM_EPOSTA } from '../iletisim';
 import { betaDunyaAc, betaDunyaAcikMi } from '../ilerleme';
 import { kameraAcikMi, kameraAyarla, kameraDesteklenir } from '../kamera';
 
@@ -62,14 +63,21 @@ export class EbeveynMenuScene extends Phaser.Scene {
 
     // Beta testi için: Dünya bölümünü Türkiye Turu bitmeden açar. Mağazaya çıkmadan kaldırılacak.
     const beta = betaDunyaAcikMi();
-    baglanti(1070, beta ? '🧪 Beta: bütün bölümler açık (kapat)' : '🧪 Beta: bütün bölümleri aç').on('pointerdown', () => {
+    baglanti(1030, beta ? '🧪 Beta: bütün bölümler açık (kapat)' : '🧪 Beta: bütün bölümleri aç').on('pointerdown', () => {
       betaDunyaAc(!beta);
       this.scene.restart();
     });
 
+    // Geri bildirim: adres varsa e-posta uygulamasını açan bağlantı, yoksa beta notu.
+    const geri = this.add.dom(x, 1100, 'div', 'width:640px;text-align:center;', '');
+    (geri.node as HTMLDivElement).innerHTML = ILETISIM_EPOSTA
+      ? `<a href="${geriBildirimAdresi()}" style="${BAGLANTI_STILI}">✉️ Geri bildirim yaz</a>`
+      : `<span style="font: 400 26px 'Baloo 2', Arial, sans-serif; color: #cfe3ff;">✉️ Görüşlerinizi beta grubuna yazabilirsiniz.</span>`;
+
     this.add
-      .text(x, 1190, 'Reklam yok. Hesap yok.\nBütün bilgiler sadece bu telefonda saklanır.', { fontFamily: YAZI_TIPI, fontSize: '28px', color: '#9fb6d9', align: 'center' })
+      .text(x, 1185, 'Reklam yok. Hesap yok.\nBütün bilgiler sadece bu telefonda saklanır.', { fontFamily: YAZI_TIPI, fontSize: '28px', color: '#9fb6d9', align: 'center' })
       .setOrigin(0.5);
+    this.add.text(x, 1252, `Sürüm ${__SURUM__}`, { fontFamily: YAZI_TIPI, fontSize: '24px', color: '#6f86ad' }).setOrigin(0.5);
   }
 }
 

@@ -78,6 +78,10 @@ Teknoloji: Phaser 3 + TypeScript + Vite, GitHub Pages ile yayın. İleride Capac
   public/gizlilik.html ve kosullar.html (taslak, avukata gösterilecek; iletişim adresi eklenecek);
   ebeveyn köşesinde "Tüm verileri sil" (zipzip- ile başlayan bütün anahtarlar). Yeni bir cihaz
   kaydı eklenirse anahtarı zipzip- ile başlamalı ve gizlilik.html'deki tabloya eklenmeli.
+- İletişim/geri bildirim: adres alan adı alınınca (ör. merhaba@zipzipdunya.com) `src/iletisim.ts`'e yazılır;
+  boşken ebeveyn köşesinde "beta grubuna yazın" notu görünür, doluysa "✉️ Geri bildirim yaz" telefonun e-posta
+  uygulamasını açar (sadece sürüm numarası eklenir). Adres gelince gizlilik.html ve kosullar.html de güncellenir.
+  Sürüm numarası package.json'da (beta: 0.9.x), ebeveyn köşesinin altında görünür.
 - Cinsiyet sorulmaz (veri azaltma, kalıp yargı). "Herkes kendini bulsun" ihtiyacı cinsiyetle
   değil, çocuğun seçtiği ilgi alanıyla karşılanır (ör. Spor Kampı'nda sporunu seçer).
 - Bölüm yol haritası: Türkiye (ücretsiz) → Dünya Harikaları → Uzay Yolculuğu (sıradaki büyük
