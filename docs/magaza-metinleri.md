@@ -23,7 +23,7 @@ Hareket et, dünyayı keşfet!
 **Uzun açıklama** (4000)
 
 Zıp Zıp Dünya, 4-9 yaş çocuklar için Türkçe bir hareket ve keşif oyunu.
-Neşeli maskotumuz Zıpzıp ile çocuğunuz Türkiye'yi, dünyanın harikalarını ve uzayı gezerken zıplıyor, çömeliyor, koşuyor ve esniyor.
+Neşeli maskotumuz Zıpzıp ile çocuğunuz Türkiye'yi, dünyanın harikalarını, uzayı ve dinozorların dünyasını gezerken zıplıyor, çömeliyor, koşuyor ve esniyor.
 
 HAREKET EDEREK GEZ
 • Her durakta 5 hareketlik kısa bir antrenman: ısınma, durağa özel hareket, iki hareket ve soğuma.
@@ -35,6 +35,9 @@ KEŞFET VE ÖĞREN
 • Türkiye Turu: İstanbul, Truva, Pamukkale, Kapadokya, Nemrut, Göbeklitepe, Karadeniz
 • Dünya Harikaları: Efes, Kolezyum, Piramitler, Petra, Tac Mahal, Çin Seddi, Machu Picchu
 • Uzay Yolculuğu: Merkür'den Neptün'e bütün gezegenler
+• Spor Kampı: futbol, basketbol, yüzme, jimnastik, tenis, voleybol, atletizm; çocuk istediği sporla başlar
+• Dinozorlar Diyarı: yumurtadan çıkıştan fosil kazısına
+• Evde Macera: en sevdiği oyuncak, bir yastık ve çorap topuyla evde hareket; sonunda da birlikte toplama
 • Her durakta kısa ve ilginç bir "Biliyor muydun?" bilgisi
 
 ÖDÜLLER, BASKI YOK
@@ -53,10 +56,10 @@ EBEVEYNLER İÇİN
 • İsteğe bağlı kamera ile sayma (deneme): görüntü telefonda işlenir, kaydedilmez ve gönderilmez.
 
 FİYAT
-Türkiye Turu tamamen ücretsiz. Tek seferlik ödemeyle Dünya Harikaları, Uzay Yolculuğu ve gelecek bütün bölümler açılır. Abonelik yok.
+Türkiye Turu tamamen ücretsiz. Tek seferlik ödemeyle Dünya Harikaları, Uzay Yolculuğu, Spor Kampı, Dinozorlar Diyarı, Evde Macera ve gelecek bütün bölümler açılır. Abonelik yok.
 
 **Yenilikler (ilk sürüm)**
-Zıp Zıp Dünya yayında! Türkiye Turu, Dünya Harikaları ve Uzay Yolculuğu'nda hareket ederek gezmeye başlayın.
+Zıp Zıp Dünya yayında! Türkiye'yi, dünyanın harikalarını, uzayı, spor kampını, dinozorları ve evdeki macerayı hareket ederek keşfedin.
 
 ---
 
@@ -91,6 +94,9 @@ EXPLORE AND LEARN
 • Türkiye Tour: Istanbul, Troy, Pamukkale, Cappadocia, Nemrut, Göbeklitepe, the Black Sea
 • Wonders of the World: Ephesus, the Colosseum, the Pyramids, Petra, the Taj Mahal, the Great Wall, Machu Picchu
 • Space Journey: every planet from Mercury to Neptune
+• Sports Camp: football, basketball, swimming, gymnastics, tennis, volleyball and athletics; kids start with the sport they like
+• Dinosaur Land: from hatching out of an egg to a fossil dig
+• Adventure at Home: moving with a favourite toy, a pillow and a sock ball, then tidying up together
 • A short "Did you know?" fact at every stop
 
 REWARDS WITHOUT PRESSURE
@@ -109,6 +115,6 @@ FOR PARENTS
 • Optional camera counting (beta): images are processed on the device and never recorded or sent.
 
 PRICE
-The Türkiye Tour is completely free. A single one-time purchase unlocks Wonders of the World, Space Journey and all future chapters. No subscription.
+The Türkiye Tour is completely free. A single one-time purchase unlocks Wonders of the World, Space Journey, Sports Camp, Dinosaur Land, Adventure at Home and all future chapters. No subscription.
 
 > Not: İngilizce mağaza sayfası, oyunun kendisi İngilizce olunca açılmalı. O zamana kadar bu metin hazırda bekler.

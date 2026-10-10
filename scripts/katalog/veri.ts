@@ -1,4 +1,4 @@
-import { TURKIYE, DUNYA, UZAY } from '../../src/duraklar.ts';
+import { BOLUM_SIRASI, BOLUMLER } from '../../src/duraklar.ts';
 import { ISINMA, SOGUMA } from '../../src/hareketler.ts';
 import { AILE_OTURUMU } from '../../src/aile.ts';
 import fs from 'fs';
@@ -13,8 +13,8 @@ const ekle = (h: any, yer: string) => {
   harita.set(anahtar, k);
 };
 ekle(ISINMA, 'Her durağın başı (ısınma)');
-for (const [bolum, liste] of [['Türkiye', TURKIYE], ['Dünya', DUNYA], ['Uzay', UZAY]] as const)
-  for (const d of liste) { ekle(d.ozel, `${bolum}: ${d.ad} (özel)`); d.ekler.forEach((e) => ekle(e, `${bolum}: ${d.ad}`)); }
+for (const id of BOLUM_SIRASI)
+  for (const d of BOLUMLER[id].duraklar) { const bolum = BOLUMLER[id].ad; ekle(d.ozel, `${bolum}: ${d.ad} (özel)`); d.ekler.forEach((e) => ekle(e, `${bolum}: ${d.ad}`)); }
 ekle(SOGUMA, 'Her durağın sonu (soğuma)');
 AILE_OTURUMU.forEach((h) => ekle(h, 'Ailece (bir büyükle)'));
 fs.writeFileSync(process.argv[2], JSON.stringify([...harita.values()], null, 1));

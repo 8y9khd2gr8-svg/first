@@ -2,8 +2,9 @@ import Phaser from 'phaser';
 import { RENK, YAZI_TIPI } from '../ayarlar';
 import { buyukDugme, rozetCiz, yildizliArkaPlan } from '../arayuz';
 import { kazanilanlar, ROZETLER } from '../rozetler';
-import { BOLUMLER, BolumId, DUNYA, TURKIYE, UZAY } from '../duraklar';
-import { dunyaAcik, tamamlananlar } from '../ilerleme';
+import { BOLUM_SIRASI, BOLUMLER, BolumId, TUM_DURAKLAR, bolumuAcikMi } from '../duraklar';
+import { tamamlananlar } from '../ilerleme';
+import { BOLUM_KISA } from './BolumScene';
 import { fotoDokusuYukle, pasaportOku } from '../pasaport';
 import { M } from '../metinler';
 import { bip, konus, sustur } from '../ses';
@@ -29,7 +30,7 @@ export class PasaportScene extends Phaser.Scene {
     const x = this.scale.gameSize.width / 2;
     const pasaport = pasaportOku();
     const biten = new Set(tamamlananlar());
-    const damgaSayisi = [...TURKIYE, ...DUNYA, ...UZAY].filter((d) => biten.has(d.id)).length;
+    const damgaSayisi = TUM_DURAKLAR.filter((d) => biten.has(d.id)).length;
     const bolum = BOLUMLER[this.sayfaNo];
 
     // Pasaport sayfası ekrana aşağıdan kayarak gelir.
@@ -86,7 +87,7 @@ export class PasaportScene extends Phaser.Scene {
     etiket(390, 'Görevi');
     deger(418, 'Dünya Gezgini', 36);
     etiket(475, 'Damgalar');
-    deger(500, `${damgaSayisi} / ${TURKIYE.length + DUNYA.length + UZAY.length}`, 40);
+    deger(500, `${damgaSayisi} / ${TUM_DURAKLAR.length}`, 40);
 
     // Damga yuvaları: 4 + 3.
     sayfa.add(this.add.text(x, 590, `${bolum.ad} Damgalarım`, { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '36px', color: MUREKKEP }).setOrigin(0.5));
@@ -116,20 +117,17 @@ export class PasaportScene extends Phaser.Scene {
       }
     });
 
-    // Sayfa çevir: Türkiye / Dünya damgaları.
-    const SEKMELER: [BolumId, string][] = [['turkiye', '🇹🇷 Türkiye'], ['dunya', '🌍 Dünya'], ['uzay', '🪐 Uzay']];
-    SEKMELER.forEach(([id, ad], i) => {
+    // Sayfa çevir: her bölümün damga sayfası (sekmede bölümün simgesi; okuma bilmeyen de bulur).
+    BOLUM_SIRASI.forEach((id, i) => {
       const secili = id === this.sayfaNo;
       const sekme = this.add
-        .text(x + (i - 1) * 200, 1052, ad, {
-          fontFamily: YAZI_TIPI,
-          fontStyle: 'bold',
-          fontSize: '30px',
-          color: secili ? '#ffffff' : MUREKKEP,
+        .text(x + (i - (BOLUM_SIRASI.length - 1) / 2) * 100, 1040, BOLUM_KISA[id].simge, {
+          fontSize: '44px',
           backgroundColor: secili ? '#FF8A3D' : '#14213D1a',
-          padding: { x: 22, y: 8 },
+          padding: { x: 14, y: 6 },
         })
-        .setOrigin(0.5);
+        .setOrigin(0.5)
+        .setAlpha(secili || bolumuAcikMi(id) ? 1 : 0.4);
       if (!secili)
         sekme.setInteractive({ useHandCursor: true }).on('pointerdown', () => {
           bip(700, 0.08);
@@ -140,7 +138,7 @@ export class PasaportScene extends Phaser.Scene {
 
     // Bölüm rozetleri: kazanıldıysa fotoğraf çerçevesinin köşesinde parlar.
     const kazanilan = kazanilanlar();
-    ROZETLER.filter((r) => r.bolum && kazanilan.has(r.id)).forEach((r, i) => sayfa.add(rozetCiz(this, 290 - i * 70, 525, 30, r.simge, true)));
+    ROZETLER.filter((r) => r.bolum && kazanilan.has(r.id)).forEach((r, i) => sayfa.add(rozetCiz(this, 285 - i * 44, 525, 22, r.simge, true)));
 
     sayfa.y = 1300;
 
@@ -187,7 +185,7 @@ export class PasaportScene extends Phaser.Scene {
     } else {
       buyukDugme(this, x, 1180, 'Haritaya dön ▶', RENK.turuncu, () => {
         sustur();
-        this.scene.start(this.sayfaNo === 'uzay' && dunyaAcik(DUNYA.map((d) => d.id)) ? 'Uzay' : this.sayfaNo === 'dunya' && dunyaAcik(TURKIYE.map((d) => d.id)) ? 'Dunya' : 'Harita', { giris: 'uzay' });
+        this.scene.start(bolumuAcikMi(this.sayfaNo) ? BOLUMLER[this.sayfaNo].sahne : 'Harita', { giris: 'uzay' });
       }, { genislik: 420, yukseklik: 120, yaziBoyu: 52 });
       konus(damgaSayisi === 0 ? M.pasaportSifir : M.pasaportDamga(damgaSayisi));
     }

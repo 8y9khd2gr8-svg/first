@@ -1,5 +1,5 @@
 import { AILE_OTURUMU } from './aile';
-import { DUNYA, TURKIYE, UZAY } from './duraklar';
+import { BOLUM_SIRASI, BOLUMLER, TUM_DURAKLAR } from './duraklar';
 import { H, ISINMA, SOGUMA } from './hareketler';
 import { AVATARLAR } from './pasaport';
 import { ROZETLER } from './rozetler';
@@ -10,6 +10,8 @@ import { KOSTUMLER } from './kostumler';
 // Kural: çocuğun adı sesli söylenmez (önceden kaydedilemez), sadece ekranda yazar.
 
 export const SAYILAR = ['bir', 'iki', 'üç', 'dört', 'beş', 'altı', 'yedi', 'sekiz', 'dokuz', 'on'].map((s) => s[0].toLocaleUpperCase('tr') + s.slice(1) + '!');
+// Bölüm sertifikalarındaki unvanlar (SertifikaScene ile aynı sırada).
+export const SERTIFIKA_UNVANLARI = ['Türkiye Gezgini', 'Dünya Kâşifi', 'Uzay Yolcusu', 'Spor Yıldızı', 'Dinozor Kâşifi', 'Ev Kahramanı'];
 export const GERI_SAYIM = ['Üç!', 'İki!', 'Bir!', 'Başla!'];
 
 export const M = {
@@ -22,7 +24,8 @@ export const M = {
   turBitti: 'Tebrikler! Türkiye turunu bitirdin!',
   turaHosgeldin: 'Türkiye turuna hoş geldin! İlk durağımız İstanbul. Dokun ve başla!',
   siradaki: (yer: string) => `Sıradaki durağımız ${yer}!`,
-  durakGiris: (yer: string, ad: string, bilgi: string) => `${yer}! ${ad}. Biliyor muydun? ${bilgi}`,
+  // Yer ve ad aynıysa (ör. "Satürn", "Futbol") bir kez söylenir.
+  durakGiris: (yer: string, ad: string, bilgi: string, baslik = 'Biliyor muydun?') => `${yer}! ${yer === ad ? '' : `${ad}. `}${baslik} ${bilgi}`,
   damgaKazandin: (yer: string) => `Süpersin! ${yer} damgasını kazandın!`,
   karakterSec: 'Pasaportun için bir karakter seç!',
   karakterSecildi: (ad: string) => `${ad}! Harika seçim!`,
@@ -38,6 +41,16 @@ export const M = {
   uzayHosgeldin: 'Uzay yolculuğuna hoş geldin! İlk durağımız, Güneş’e en yakın gezegen Merkür. Dokun ve başla!',
   uzayBitti: 'Muhteşem! Bütün gezegenleri gezdin, gerçek bir uzay yolcususun!',
   uzayKilitli: 'Uzay yolculuğu, dünya turunu bitirince açılacak!',
+  sporHosgeldin: 'Spor Kampı’na hoş geldin! Hangi sporu seviyorsun? İstediğin spora dokun ve başla!',
+  sporSec: 'İstediğin spora dokun!',
+  sporBitti: 'Harikasın! Bütün sporları denedin, gerçek bir spor yıldızısın!',
+  sporKilitli: 'Spor Kampı, uzay yolculuğunu bitirince açılacak!',
+  dinozorHosgeldin: 'Dinozorlar Diyarı’na hoş geldin! İlk durağımız dinozor yumurtası. Dokun ve başla!',
+  dinozorBitti: 'Muhteşem! Bütün dinozorlarla tanıştın!',
+  dinozorKilitli: 'Dinozorlar Diyarı, Spor Kampı’nı bitirince açılacak!',
+  evdeHosgeldin: 'Evde Macera’ya hoş geldin! En sevdiğin oyuncağı, bir yastığı ve çoraplarını hazırla. Dokun ve başla!',
+  evdeBitti: 'Süpersin! Evde de çok güzel hareket ettin, her şeyi de topladın!',
+  evdeKilitli: 'Evde Macera, Dinozorlar Diyarı’nı bitirince açılacak!',
   maceraHosgeldin: 'Büyük maceraya hoş geldin! Bir bölüm seç!',
   yakinda: 'Bu bölüm çok yakında geliyor!',
   kostumDolabi: 'Burası kostüm dolabın! Hareket ettikçe yıldız kazanırsın, yıldızlarla yeni kostümler açılır.',
@@ -55,7 +68,9 @@ export function tumMetinler(): string[] {
     ...SAYILAR,
     ...GERI_SAYIM,
     M.yaptinMi, M.aferin, M.yolaCikiyoruz, M.oncekiniBitir, M.turBitti, M.turaHosgeldin,
-    M.karakterSec, M.pasaportIlk, M.pasaportHazir, M.pasaportSifir, M.sertifika, M.dunyaHosgeldin, M.dunyaBitti, M.dunyaKilitli, M.uzayHosgeldin, M.uzayBitti, M.uzayKilitli, M.maceraHosgeldin, M.yakinda, ...['Türkiye Gezgini', 'Dünya Kâşifi', 'Uzay Yolcusu'].map((u) => M.sertifikaBolum(u)),
+    M.karakterSec, M.pasaportIlk, M.pasaportHazir, M.pasaportSifir, M.sertifika, M.dunyaHosgeldin, M.dunyaBitti, M.dunyaKilitli, M.uzayHosgeldin, M.uzayBitti, M.uzayKilitli, M.maceraHosgeldin, M.yakinda,
+    M.sporHosgeldin, M.sporSec, M.sporBitti, M.sporKilitli, M.dinozorHosgeldin, M.dinozorBitti, M.dinozorKilitli, M.evdeHosgeldin, M.evdeBitti, M.evdeKilitli,
+    ...SERTIFIKA_UNVANLARI.map((u) => M.sertifikaBolum(u)),
     ...Object.values(H).map((h) => h.sesli),
     ISINMA.sesli,
     SOGUMA.sesli,
@@ -67,14 +82,15 @@ export function tumMetinler(): string[] {
     ...AILE_OTURUMU.map((h) => h.sesli),
     ...KOSTUMLER.flatMap((k) => [M.kostumSecildi(k.ad), M.yeniKostum(k.ad)]),
   ]);
-  [TURKIYE, DUNYA, UZAY].forEach((bolum) =>
-    bolum.forEach((d, i) => {
-      liste.add(M.durakGiris(d.yer, d.ad, d.bilgi));
+  BOLUM_SIRASI.forEach((id) => {
+    const { duraklar, serbest, kutuBaslik } = BOLUMLER[id];
+    duraklar.forEach((d, i) => {
+      liste.add(M.durakGiris(d.yer, d.ad, d.bilgi, kutuBaslik));
       liste.add(M.damgaKazandin(d.yer));
       liste.add(d.ozel.sesli);
-      if (i > 0) liste.add(M.siradaki(d.yer));
-    }),
-  );
-  for (let i = 1; i <= TURKIYE.length + DUNYA.length + UZAY.length; i++) liste.add(M.pasaportDamga(i));
+      if (i > 0 && !serbest) liste.add(M.siradaki(d.yer));
+    });
+  });
+  for (let i = 1; i <= TUM_DURAKLAR.length; i++) liste.add(M.pasaportDamga(i));
   return [...liste];
 }

@@ -1,4 +1,4 @@
-import { DUNYA, TURKIYE, UZAY } from './duraklar';
+import { DINOZOR, DUNYA, EVDE, SPOR, TUM_DURAKLAR, TURKIYE, UZAY } from './duraklar';
 import { tamamlananlar } from './ilerleme';
 import { H, ISINMA, SOGUMA } from './hareketler';
 import { haftalikOzet } from './istatistik';
@@ -21,7 +21,8 @@ type Durum = {
 
 const toplam = (d: Durum, ...animasyonlar: string[]) => animasyonlar.reduce((t, a) => t + (d.sayac[a] ?? 0), 0);
 // "Hareket Kâşifi" için oyundaki bütün hareket türleri.
-const TUM_ANIMASYONLAR = [...new Set([...Object.values(H), ISINMA, SOGUMA, ...TURKIYE.map((x) => x.ozel), ...DUNYA.map((x) => x.ozel), ...UZAY.map((x) => x.ozel)].map((h) => h.animasyon))];
+// Yeni bölüm gelince liste uzar; daha önce kazanılmış rozet yine de kaybolmaz (kazanilanlar'a bakın).
+const TUM_ANIMASYONLAR = [...new Set([...Object.values(H), ISINMA, SOGUMA, ...TUM_DURAKLAR.map((x) => x.ozel)].map((h) => h.animasyon))];
 
 const KOSULLAR: (Rozet & { kazanildi: (d: Durum) => boolean })[] = [
   { id: 'ilkAdim', simge: '🌱', ad: 'İlk Adım', nasil: 'İlk hareketini tamamla', kazanildi: (d) => d.hareket >= 1 },
@@ -37,15 +38,18 @@ const KOSULLAR: (Rozet & { kazanildi: (d: Durum) => boolean })[] = [
   { id: 'ucGun', simge: '📅', ad: '3 Gün', nasil: '3 farklı günde oyna', kazanildi: (d) => d.gun >= 3 },
   { id: 'yediGun', simge: '🗓️', ad: '7 Gün', nasil: '7 farklı günde oyna', kazanildi: (d) => d.gun >= 7 },
   { id: 'otuzGun', simge: '🌟', ad: '30 Gün', nasil: '30 farklı günde oyna', kazanildi: (d) => d.gun >= 30 },
-  { id: 'comelme', simge: '🏋️', ad: 'Çömelme Ustası', nasil: '100 kez çömel', kazanildi: (d) => toplam(d, 'comel', 'balon', 'tasKaldir') >= 100 },
-  { id: 'diz', simge: '🦵', ad: 'Diz Ustası', nasil: '100 kez dizini kaldır', kazanildi: (d) => toplam(d, 'dizler', 'tirman') >= 100 },
-  { id: 'kol', simge: '🙌', ad: 'Kol Ustası', nasil: '100 kez kollarını kaldır', kazanildi: (d) => toplam(d, 'kollar', 'uzan') >= 100 },
+  { id: 'comelme', simge: '🏋️', ad: 'Çömelme Ustası', nasil: '100 kez çömel', kazanildi: (d) => toplam(d, 'comel', 'balon', 'tasKaldir', 'basket', 'yumurta', 'topla') >= 100 },
+  { id: 'diz', simge: '🦵', ad: 'Diz Ustası', nasil: '100 kez dizini kaldır', kazanildi: (d) => toplam(d, 'dizler', 'tirman', 'basUstu', 'engel') >= 100 },
+  { id: 'kol', simge: '🙌', ad: 'Kol Ustası', nasil: '100 kez kollarını kaldır', kazanildi: (d) => toplam(d, 'kollar', 'uzan', 'voleybol') >= 100 },
   { id: 'kasif', simge: '🎨', ad: 'Hareket Kâşifi', nasil: 'Her hareketi en az bir kez dene', kazanildi: (d) => TUM_ANIMASYONLAR.every((a) => (d.sayac[a] ?? 0) > 0) },
   { id: 'haftaSonu', simge: '🎉', ad: 'Hafta Sonu Sporcusu', nasil: 'Bir hafta sonu oyna', kazanildi: (d) => d.haftaSonu },
   { id: 'onDamga', simge: '📚', ad: '10 Damga', nasil: '10 damga topla', kazanildi: (d) => d.biten.size >= 10 },
   { id: 'turkiyeGezgini', simge: '🇹🇷', ad: 'Türkiye Gezgini', nasil: 'Türkiye Turu’nu bitir', bolum: true, kazanildi: (d) => TURKIYE.every((x) => d.biten.has(x.id)) },
   { id: 'dunyaKasifi', simge: '🌍', ad: 'Dünya Kâşifi', nasil: 'Dünya Harikaları’nı bitir', bolum: true, kazanildi: (d) => DUNYA.every((x) => d.biten.has(x.id)) },
   { id: 'uzayYolcusu', simge: '🪐', ad: 'Uzay Yolcusu', nasil: 'Uzay Yolculuğu’nu bitir', bolum: true, kazanildi: (d) => UZAY.every((x) => d.biten.has(x.id)) },
+  { id: 'sporYildizi', simge: '⚽', ad: 'Spor Yıldızı', nasil: 'Spor Kampı’ndaki bütün sporları dene', bolum: true, kazanildi: (d) => SPOR.every((x) => d.biten.has(x.id)) },
+  { id: 'dinozorKasifi', simge: '🦕', ad: 'Dinozor Kâşifi', nasil: 'Dinozorlar Diyarı’nı bitir', bolum: true, kazanildi: (d) => DINOZOR.every((x) => d.biten.has(x.id)) },
+  { id: 'evKahramani', simge: '🧸', ad: 'Ev Kahramanı', nasil: 'Evde Macera’yı bitir', bolum: true, kazanildi: (d) => EVDE.every((x) => d.biten.has(x.id)) },
 ];
 
 export const ROZETLER: Rozet[] = KOSULLAR.map(({ kazanildi: _k, ...r }) => r);
@@ -61,7 +65,8 @@ export function kazanilanlar(): Set<string> {
     sayac: o.animasyonSayac,
     haftaSonu: o.haftaSonuOynadi,
   };
-  return new Set(KOSULLAR.filter((k) => k.kazanildi(durum)).map((k) => k.id));
+  // Kutlaması yapılmış rozet kazanılmış sayılır: koşul sonradan zorlaşsa da (yeni hareketler) geri alınmaz.
+  return new Set([...kutlananlar(), ...KOSULLAR.filter((k) => k.kazanildi(durum)).map((k) => k.id)]);
 }
 
 const KUTLANAN_ANAHTAR = 'zipzip-rozetler-v1';
@@ -78,7 +83,8 @@ function kutlananlar(): Set<string> {
 // Henüz kutlaması yapılmamış yeni rozetleri döndürür ve kutlandı olarak işaretler.
 export function yeniRozetleriAl(): Rozet[] {
   const once = kutlananlar();
-  const yeni = ROZETLER.filter((r) => kazanilanlar().has(r.id) && !once.has(r.id));
+  const kazanilan = kazanilanlar();
+  const yeni = ROZETLER.filter((r) => kazanilan.has(r.id) && !once.has(r.id));
   if (yeni.length) {
     yeni.forEach((r) => once.add(r.id));
     try {

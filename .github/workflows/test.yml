@@ -1,0 +1,32 @@
+# Her PR'da (ve main dışındaki dallara her gönderimde) oyunu derler ve testleri çalıştırır.
+# Testler geçmeden PR birleştirilmez.
+name: Testler
+
+on:
+  pull_request:
+  push:
+    branches-ignore: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Derle (TypeScript + Vite)
+        run: npm run build
+      - name: Veri ve kural testleri
+        run: npm test
+      - name: Tarayıcı kur
+        run: npx playwright install --with-deps chromium
+      - name: Oyun testleri (gerçek tarayıcıda)
+        run: npm run test:oyun
+        env:
+          CI: '1'

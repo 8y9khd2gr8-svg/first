@@ -18,6 +18,9 @@ const UNVAN: Record<BolumId, { unvan: string; metin: string; birim: string }> = 
   turkiye: { unvan: 'Türkiye Gezgini', metin: 'Zıp Zıp Dünya Türkiye Turu’nu\nhareket ederek tamamladı!', birim: 'şehir' },
   dunya: { unvan: 'Dünya Kâşifi', metin: 'Dünyanın harikalarını\nhareket ederek gezdi!', birim: 'harika' },
   uzay: { unvan: 'Uzay Yolcusu', metin: 'Güneş Sistemi’ni\nhareket ederek dolaştı!', birim: 'durak' },
+  spor: { unvan: 'Spor Yıldızı', metin: 'Spor Kampı’nda yedi sporu\nhareket ederek denedi!', birim: 'spor' },
+  dinozor: { unvan: 'Dinozor Kâşifi', metin: 'Dinozorlar Diyarı’nı\nhareket ederek keşfetti!', birim: 'durak' },
+  evde: { unvan: 'Ev Kahramanı', metin: 'Evde Macera’yı hareket ederek\ntamamladı, her şeyi de topladı!', birim: 'oyun' },
 };
 
 export class SertifikaScene extends Phaser.Scene {

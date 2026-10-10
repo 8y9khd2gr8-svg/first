@@ -6,6 +6,7 @@ import { tamamlananlar } from '../ilerleme';
 import { M } from '../metinler';
 import { bip, konus, sustur, zaferMuzigi } from '../ses';
 import { Zipzip } from '../zipzip';
+import { bolumGecisDugmesi } from './BolumScene';
 
 type Nokta = { x: number; y: number };
 type Veri = { giris?: 'uzay'; yolculukDen?: string };
@@ -132,6 +133,7 @@ export class UzayScene extends Phaser.Scene {
         sustur();
         this.scene.start('Dunya', {});
       });
+    bolumGecisDugmesi(this, 640, 160, 'spor', 'ileri');
     const pasaport = this.add.container(640, 80);
     pasaport.add(this.add.circle(0, 0, 50, RENK.turuncu).setStrokeStyle(5, RENK.beyaz));
     pasaport.add(this.add.text(0, 2, '🛂', { fontSize: '50px' }).setOrigin(0.5));

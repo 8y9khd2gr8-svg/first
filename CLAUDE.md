@@ -83,10 +83,16 @@ Teknoloji: Phaser 3 + TypeScript + Vite, GitHub Pages ile yayın. İleride Capac
 - Bölüm yol haritası: Türkiye (ücretsiz) → Dünya Harikaları → Uzay Yolculuğu (sıradaki büyük
   bölüm) → İstanbul'un 7 Tepesi (Şehir Turları; çizer gelince) → Spor Kampı → Dinozorlar →
   Okyanus → Evde Macera → mevsim/bayram bölümleri. Bölüm bitince rozet (pasaport + sertifika).
-- Rozetler (src/rozetler.ts, 21 adet): kayıtlardan hesaplanır; cihazda sadece kutlananlar
-  tutulur. "Üst üste gün" gibi baskı yaratan rozet yok. Durak sonunda yeni rozet kutlanır.
+- Rozetler (src/rozetler.ts, 25 adet): kayıtlardan hesaplanır; cihazda sadece kutlananlar
+  tutulur (kutlanan rozet, koşulu sonradan zorlaşsa da kaybolmaz). "Üst üste gün" gibi baskı yaratan rozet yok. Durak sonunda yeni rozet kutlanır.
 - Uzay Yolculuğu (3. bölüm, UzayScene): dikey Güneş Sistemi; Ay → Venüs → Merkür → Mars →
   Jüpiter → Satürn → Uranüs → Neptün. Dünya Harikaları bitince açılır. Rozet: Uzay Yolcusu.
+- Spor Kampı, Dinozorlar Diyarı, Evde Macera (4-6. bölümler): ortak harita BolumScene (src/scenes/BolumScene.ts;
+  bölüm ayarı AYARLAR'da). Zincir: Uzay → Spor → Dinozor → Evde (her biri öncekini bitirince açılır).
+  Spor Kampı serbest sıralı: 7 spor istasyonu, çocuk istediğiyle başlar. Evde Macera'da bilgi kutusu
+  "Hazırla!" der (ne hazırlanacağı + güvenlik); sadece yumuşak eşyalar, balon yok (boğulma tehlikesi).
+  Hikâyede bile "… gibi olalım" yok; test (`npm test`) baslik/sesli içinde "gibi" yakalar.
+  İstanbul'un 7 Tepesi (çizer gelince) ve Okyanus "Yakında".
 - Büyük Macera (MaceraScene): Oyna → bütün bölümler kıvrımlı yolda; açık bölümler ilerlemesiyle,
   gelecekler "Yakında" (ebeveyne "daha çok şey gelecek" vaadi). Bölüm haritalarının ⌂'si buraya döner.
   Vaat: tek ödemeyle gelecek bütün bölümler dahil.
@@ -109,6 +115,12 @@ Teknoloji: Phaser 3 + TypeScript + Vite, GitHub Pages ile yayın. İleride Capac
 - Sahne geçişi: `init` alan bir sahneye geçerken HER ZAMAN veri nesnesi ver (`scene.start('X', {})`);
   Phaser veri verilmezse önceki geçişin verisini yeniden kullanır.
 - Test: `npm run dev` ile açınca `window.oyun` üzerinden sahneler başlatılabilir (sadece geliştirmede).
+  `npm test`: veri/kural testleri (tests/veri.test.ts: tekil kimlikler, zincir, "gibi" yok, her cümle
+  seslendirme listesinde, kayıt anahtarı zipzip-, kodda dış adres yok). `npm run test:oyun`: Playwright ile
+  bütün ekranlar, her hareket, dış sunucu isteği yok, internetsiz açılış. PR'larda Actions → "Testler" çalışır.
+- Yeni bölüm eklemek: duraklar.ts'e durak listesi + BOLUMLER satırı, BolumScene AYARLAR'a ayar,
+  main.ts'e `new BolumScene('id')`, metinler.ts'e cümleler, rozet ve SertifikaScene UNVAN.
+  Sonra `npm run seslendirme-metni` ve katalog (scripts/katalog/README.md).
 
 ## Proje sahibiyle çalışma şekli
 - Proje sahibi yazılım bilmiyor: her şeyi sade Türkçeyle anlat, teknik terimleri açıkla.

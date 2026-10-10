@@ -8,7 +8,13 @@ export type Animasyon =
   | 'zipla' | 'comel' | 'kos' | 'dizler' | 'kollar' | 'acKapa' | 'uzan'
   | 'balon' | 'heykel' | 'horon' | 'tasKaldir'
   | 'sutun' | 'piramit' | 'yanAdim' | 'parmakUcu' | 'tirman'
-  | 'donus' | 'kocaman' | 'belDondur' | 'yanaEgil' | 'kolSalla';
+  | 'donus' | 'kocaman' | 'belDondur' | 'yanaEgil' | 'kolSalla'
+  // Spor Kampı
+  | 'sut' | 'basket' | 'kulac' | 'tekAyak' | 'raket' | 'voleybol' | 'engel'
+  // Dinozorlar Diyarı
+  | 'trex' | 'kanat' | 'tepin' | 'yumurta' | 'kazi'
+  // Evde Macera
+  | 'basUstu' | 'elden' | 'yanaZipla' | 'sallan' | 'topla';
 
 export type Hareket = {
   baslik: string; // ekranda büyük yazan komut
