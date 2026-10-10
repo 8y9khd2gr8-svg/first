@@ -434,6 +434,7 @@ export class Zipzip extends Phaser.GameObjects.Container {
       case 'tac': return emoji('👑', 0, -128, 82);
       case 'kasif': return emoji('🤠', 0, -126, 104);
       case 'madalya': return emoji('🏅', 0, 70, 70);
+      case 'dalis': return emoji('🤿', 0, -52, 100);
       // Çizilen kostümler (emojisi olmayanlar)
       case 'kaptan': return cizim((g) => {
         g.fillStyle(0xffffff).fillEllipse(0, -122 * b, 150 * b, 46 * b);

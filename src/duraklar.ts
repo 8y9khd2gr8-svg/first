@@ -3,7 +3,7 @@ import { betaDunyaAcikMi, tamamlananlar } from './ilerleme';
 import { tamSurumVarMi } from './satinAlma';
 
 // Türkiye Turu durakları (batıdan doğuya). Kural: ibadet yeri olarak kullanılan yapılar yok.
-export type BolumId = 'turkiye' | 'dunya' | 'uzay' | 'spor' | 'dinozor' | 'evde';
+export type BolumId = 'turkiye' | 'dunya' | 'uzay' | 'spor' | 'dinozor' | 'evde' | 'okyanus';
 
 export type Durak = {
   id: string;
@@ -691,6 +691,115 @@ export const EVDE: Durak[] = [
   },
 ];
 
+// Okyanus (7. bölüm): deniz canlıları. Türkiye'den de bir durak var (Dalyan'daki Caretta caretta).
+export const OKYANUS: Durak[] = [
+  {
+    id: 'kaplumbaga',
+    bolum: 'okyanus',
+    ad: 'Deniz Kaplumbağası',
+    yer: 'Deniz Kaplumbağası',
+    simge: '🐢',
+    bilgi: 'Caretta caretta kaplumbağaları Dalyan’daki kumsala yumurta bırakır. Yavrular yumurtadan çıkınca hemen denize doğru yürür!',
+    soru: 'Evde birine sor: Denizde yaşayan başka hangi hayvanları biliyorsun?',
+    ozel: hikayeli(K.yuru, 'Yavru kaplumbağalar denize yürüyor!'),
+    ekler: [
+      hikayeli(K.yumurta, 'Kumdaki yumurtadan çık!'),
+      hikayeli(K.kanat, 'Yüzgeçlerinle yüz!', { saniye: 8 }),
+      hikayeli(K.zipla, 'Dalgaların üstünden zıpla!'),
+    ],
+  },
+  {
+    id: 'yunus',
+    bolum: 'okyanus',
+    ad: 'Yunus',
+    yer: 'Yunus',
+    simge: '🐬',
+    bilgi: 'Yunuslar balık değildir, akciğerleriyle nefes alırlar. Nefes almak için suyun üstüne çıkarlar!',
+    soru: 'Evde birine sor: Yunuslar neden suyun üstüne çıkar?',
+    ozel: hikayeli(K.basket, 'Yunus sudan zıplıyor!'),
+    ekler: [
+      hikayeli(K.kolSalla, 'Yunuslara selam ver!'),
+      hikayeli(K.donus, 'Yunus suda dönüyor!'),
+      hikayeli(K.acKapa, 'Yunuslarla oyna!', { ritim: 'hizli' }),
+    ],
+  },
+  {
+    id: 'ahtapot',
+    bolum: 'okyanus',
+    ad: 'Ahtapot',
+    yer: 'Ahtapot',
+    simge: '🐙',
+    bilgi: 'Ahtapotun sekiz kolu ve üç kalbi vardır! Renk değiştirerek kayaların arasına saklanabilir.',
+    soru: 'Evde birine sor: Ahtapotun kaç kolu var?',
+    ozel: hikayeli(K.kollar, 'Ahtapot kollarıyla yüzüyor!'),
+    ekler: [
+      hikayeli(K.balon, 'Ahtapot yukarı yükseliyor!', { ritim: 'yavas', adet: 3 }),
+      hikayeli(K.yanaEgil, 'Kayaların arasından bak!'),
+      hikayeli(K.sallan, 'Ahtapot dostuna sarıl!'),
+    ],
+  },
+  {
+    id: 'yengec',
+    bolum: 'okyanus',
+    ad: 'Yengeç',
+    yer: 'Yengeç',
+    simge: '🦀',
+    bilgi: 'Yengeçler genellikle yan yan yürür. Büyüdükçe eski kabuklarını çıkarır, yeni ve daha büyük bir kabuk yaparlar!',
+    soru: 'Evde birine sor: Kumsalda hangi hayvanları gördün?',
+    ozel: hikayeli(K.yanAdim, 'Yengeç yan yan yürüyor!'),
+    ekler: [
+      hikayeli(K.kazi, 'Kumu kaz, yuva yap!'),
+      hikayeli(K.tHarfi, 'Yengeç kıskaçlarını açıyor!'),
+      hikayeli(K.tepin, 'Kumda ayak izi bırak!'),
+    ],
+  },
+  {
+    id: 'denizati',
+    bolum: 'okyanus',
+    ad: 'Denizatı',
+    yer: 'Denizatı',
+    simge: '🌊',
+    bilgi: 'Denizatında yavruları babası taşır! Denizatı kuyruğunu yosunlara dolayıp tutunur.',
+    soru: 'Evde birine sor: Denizatı yosunlara nasıl tutunur?',
+    ozel: hikayeli(K.sutun, 'Denizatı dimdik yüzüyor!'),
+    ekler: [
+      hikayeli(K.tekAyak, 'Yosuna tutun, dengede dur!', { saniye: 6 }),
+      hikayeli(K.parmakUcu, 'Denizatıyla minik minik yüz!'),
+      hikayeli(K.zipla, 'Baloncukların arasında zıpla!', { ritim: 'yavas' }),
+    ],
+  },
+  {
+    id: 'balina',
+    bolum: 'okyanus',
+    ad: 'Mavi Balina',
+    yer: 'Mavi Balina',
+    simge: '🐋',
+    bilgi: 'Mavi balina dünyada yaşamış en büyük hayvandır, dinozorlardan bile büyüktür! Kalbi küçük bir araba kadar büyüktür.',
+    soru: 'Evde birine sor: Bildiğin en büyük hayvan hangisi?',
+    ozel: hikayeli(K.kocaman, 'Mavi balina çok büyük!'),
+    ekler: [
+      hikayeli(K.kulac, 'Balinayla yan yana yüz!'),
+      hikayeli(K.uzan, 'Balina su fışkırtıyor!'),
+      hikayeli(K.comel, 'Balinayla derine dal!', { ritim: 'yavas' }),
+    ],
+  },
+  {
+    id: 'mercan',
+    bolum: 'okyanus',
+    ad: 'Mercanlar',
+    yer: 'Mercanlar',
+    simge: '🐠',
+    bilgi: 'Mercanlar bitkiye benzer ama aslında minik hayvanlardır. Mercanların arasında binlerce balık yaşar!',
+    soru: 'Evde birine sor: Denizleri temiz tutmak için ne yapabiliriz?',
+    ozel: hikayeli(K.kolSalla, 'Mercanlar akıntıda sallanıyor!', { ritim: 'yavas' }),
+    ekler: [
+      hikayeli(K.donus, 'Renkli balıklarla dön!'),
+      hikayeli(K.acKapa, 'Balık sürüsüyle zıpla!'),
+      hikayeli(K.belDondur, 'Akıntıyla belini döndür!'),
+    ],
+  },
+];
+
 type Bolum = {
   ad: string;
   duraklar: Durak[];
@@ -707,6 +816,7 @@ export const BOLUMLER: Record<BolumId, Bolum> = {
   spor: { ad: 'Spor Kampı', duraklar: SPOR, sahne: 'Spor', onceki: 'uzay', serbest: true },
   dinozor: { ad: 'Dinozorlar Diyarı', duraklar: DINOZOR, sahne: 'Dinozor', onceki: 'spor' },
   evde: { ad: 'Evde Macera', duraklar: EVDE, sahne: 'Evde', onceki: 'dinozor', kutuBaslik: 'Hazırla!' },
+  okyanus: { ad: 'Okyanus', duraklar: OKYANUS, sahne: 'Okyanus', onceki: 'evde' },
 };
 
 // Bölümlerin oyundaki sırası.

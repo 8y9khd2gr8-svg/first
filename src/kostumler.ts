@@ -23,6 +23,7 @@ export const KOSTUMLER: Kostum[] = [
   { id: 'dinoSapka', simge: '🦖', ad: 'Dinozor Şapkası', durak: 'fosil' },
   { id: 'uykuSapka', simge: '🌙', ad: 'Uyku Şapkası', durak: 'yastik' },
   { id: 'tac', simge: '👑', ad: 'Toplama Tacı', durak: 'toplama' },
+  { id: 'dalis', simge: '🤿', ad: 'Dalış Maskesi', bolum: 'okyanus' },
 ];
 
 // Kostüm nasıl açılır: "Kapadokya’yı bitir" gibi (dolapta yazar, sesli de söylenir).
