@@ -1,11 +1,12 @@
 import type { Hareket } from './hareketler';
 
 // Ebeveyn özeti için hareket kayıtları. Sadece bu cihazda saklanır; hiçbir yere gönderilmez.
-// Sadece çocuğun "Yaptım!" dediği hareketler sayılır.
+// Sadece çocuğun "Yaptım!" dediği (ya da kameranın gördüğü) hareketler sayılır.
 const ANAHTAR = 'zipzip-istatistik-v1';
 
 // sayac: hangi animasyondan kaç tekrar yapıldı (süreli hareketlerde 1 sayılır).
-type Gun = { saniye: number; hareket: number; ziplama: number; sayac?: Record<string, number> };
+// kameraAcik: kamera açıkken yapılan hareket sayısı; kameraGordu: bunlardan kameranın hedef sayıyı gördükleri.
+type Gun = { saniye: number; hareket: number; ziplama: number; sayac?: Record<string, number>; kameraAcik?: number; kameraGordu?: number };
 type Kayit = { gunler: Record<string, Gun>; ilkGun?: string };
 
 function oku(): Kayit {
@@ -26,7 +27,8 @@ export function gunAnahtari(tarih = new Date()): string {
 // Zıplama sayısına (ve zıplama rozetlerine) eklenen hareketler.
 const ZIPLAMALAR: string[] = ['zipla', 'acKapa', 'basket', 'engel', 'yanaZipla'];
 
-export function hareketKaydet(h: Hareket) {
+// kamera: o hareket kamerayla sayıldıysa, kameranın hedef sayıyı görüp görmediği.
+export function hareketKaydet(h: Hareket, kamera?: { gordu: boolean }) {
   const kayit = oku();
   const bugun = gunAnahtari();
   const gun = kayit.gunler[bugun] ?? { saniye: 0, hareket: 0, ziplama: 0 };
@@ -35,6 +37,10 @@ export function hareketKaydet(h: Hareket) {
   if (h.tur === 'sayi' && ZIPLAMALAR.includes(h.animasyon)) gun.ziplama += h.adet;
   gun.sayac ??= {};
   gun.sayac[h.animasyon] = (gun.sayac[h.animasyon] ?? 0) + (h.tur === 'sayi' ? h.adet : 1);
+  if (kamera) {
+    gun.kameraAcik = (gun.kameraAcik ?? 0) + 1;
+    if (kamera.gordu) gun.kameraGordu = (gun.kameraGordu ?? 0) + 1;
+  }
   kayit.gunler[bugun] = gun;
   kayit.ilkGun ??= bugun;
   try {
@@ -44,7 +50,7 @@ export function hareketKaydet(h: Hareket) {
   }
 }
 
-export type Ozet = { gunler: { gun: string; saniye: number }[]; saniye: number; hareket: number; ziplama: number; toplamSaniye: number; toplamHareket: number; toplamZiplama: number; gunSayisi: number; animasyonSayac: Record<string, number>; haftaSonuOynadi: boolean };
+export type Ozet = { gunler: { gun: string; saniye: number }[]; saniye: number; hareket: number; ziplama: number; kameraAcik: number; kameraGordu: number; toplamSaniye: number; toplamHareket: number; toplamZiplama: number; gunSayisi: number; animasyonSayac: Record<string, number>; haftaSonuOynadi: boolean };
 
 // Son 7 gün (bugün dahil) ve başlangıçtan beri toplam.
 export function haftalikOzet(): Ozet {
@@ -62,6 +68,8 @@ export function haftalikOzet(): Ozet {
     saniye: hafta.reduce((t, g) => t + g.saniye, 0),
     hareket: hafta.reduce((t, g) => t + g.hareket, 0),
     ziplama: hafta.reduce((t, g) => t + g.ziplama, 0),
+    kameraAcik: hafta.reduce((t, g) => t + (g.kameraAcik ?? 0), 0),
+    kameraGordu: hafta.reduce((t, g) => t + (g.kameraGordu ?? 0), 0),
     toplamSaniye: tum.reduce((t, g) => t + g.saniye, 0),
     toplamHareket: tum.reduce((t, g) => t + g.hareket, 0),
     toplamZiplama: tum.reduce((t, g) => t + g.ziplama, 0),

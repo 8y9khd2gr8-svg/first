@@ -60,11 +60,16 @@ export class EbeveynOzetScene extends Phaser.Scene {
     });
     this.add.text(x, tabanY - yukseklik - 50, 'Günlük dakika', { fontFamily: YAZI_TIPI, fontSize: '28px', color: '#cfe3ff' }).setOrigin(0.5);
 
+    // Dürüst özet: kamera açıkken kaç hareketi gerçekten gördüğü ayrıca yazılır.
+    const kameraNotu =
+      ozet.kameraAcik > 0
+        ? `Kamera açıkken yapılan ${ozet.kameraAcik} hareketin ${ozet.kameraGordu} tanesini\nkamera gördü; diğerleri çocuğun "Yaptım!" dedikleridir.`
+        : 'Sayılar, çocuğun "Yaptım!" dediği hareketlerdir; oyun\nhareketin gerçekten yapıldığını şimdilik algılayamaz.';
     this.add
       .text(
         x,
         1010,
-        'Sayılar, çocuğun "Yaptım!" dediği hareketlerdir; oyun\nhareketin gerçekten yapıldığını şimdilik algılayamaz.\nDünya Sağlık Örgütü 5-17 yaş için günde ortalama\n60 dakika orta-yüksek tempolu hareket önerir.',
+        `${kameraNotu}\nDünya Sağlık Örgütü 5-17 yaş için günde ortalama\n60 dakika orta-yüksek tempolu hareket önerir.`,
         { fontFamily: YAZI_TIPI, fontSize: '25px', color: '#9fb6d9', align: 'center' },
       )
       .setOrigin(0.5);

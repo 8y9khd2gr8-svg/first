@@ -1,8 +1,9 @@
 apply plugin: 'com.android.application'
 
-// Play her yüklemede daha büyük bir sürüm kodu ister: otomatik iş (android-play.yml) verir; yoksa 1 / "1.0".
+// Play her yüklemede daha büyük bir sürüm kodu ister: otomatik iş (android-play.yml) verir; yoksa 1.
+// Sürüm adı (ör. 0.9.0) package.json'dan gelir; oyunun ebeveyn köşesinde görünen numarayla aynı.
 def surumKodu = Integer.parseInt(System.getenv("ANDROID_VERSION_CODE") ?: "1")
-def surumAdi = System.getenv("ANDROID_VERSION_NAME") ?: "1.0"
+def surumAdi = System.getenv("ANDROID_VERSION_NAME") ?: new groovy.json.JsonSlurper().parse(file("../../package.json")).version
 
 android {
     namespace "com.zipzipdunya.oyun"

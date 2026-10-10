@@ -55,7 +55,8 @@ Teknoloji: Phaser 3 + TypeScript + Vite, GitHub Pages ile yayın. İleride Capac
   çevre beta testçisi olarak kullanılır.
 - Hareketler futbol takımının fizyoterapistlerine danışılacak (hareket kataloğu sayfası; ertelendi).
 - Ebeveyn köşesi (kilitli): haftalık hareket özeti + paylaş, pasaport düzenleme. Özet dürüst:
-  sayılar çocuğun "Yaptım!" dediği hareketler; oyun gerçekten yapıldığını algılayamaz. Kamera ile
+  sayılar çocuğun "Yaptım!" dediği hareketler; oyun gerçekten yapıldığını algılayamaz. Kamera açıkken yapılan hareketlerden
+  kaçını kameranın gördüğü ayrıca yazılır (zipzip-istatistik-v1: kameraAcik / kameraGordu). Kamera ile
   algılama (cihaz içinde, görüntü gönderilmeden) bu yüzden önemli bir sonraki adım.
 - "🔊 Sesi dene" (ebeveyn köşesi, EbeveynSesScene): örnek cümleyi okur, doğal kayıt / telefonun Türkçe sesi var mı
   gösterir; Türkçe ses yoksa telefona göre yükleme adımlarını yazar (Android uygulamada yükleme ekranını açar).
@@ -157,7 +158,8 @@ Teknoloji: Phaser 3 + TypeScript + Vite, GitHub Pages ile yayın. İleride Capac
 - `src/zipzip.ts`: maskot; duruşlar (uzuv açıları) ve her hareketin adımları burada.
 - `src/duraklar.ts`: duraklar, bilgiler, özel hareketler. `src/ilerleme.ts`: cihazdaki kayıt.
 - Mağaza paketi: Capacitor 7 (`android/`, `ios/`, `capacitor.config.ts`, kimlik com.zipzipdunya.oyun).
-  `npm run magaza` = derle + cap sync. Android deneme APK'sı: Actions → "Android deneme paketi".
+  `npm run magaza` = sürüm eşitle + derle + cap sync. Sürüm numarası tek yerde: package.json (iPhone'a
+  scripts/surum-esitle.mjs yazar, Android build.gradle kendisi okur; `npm test` denetler). Android deneme APK'sı: Actions → "Android deneme paketi".
   Play kapalı test (imzalı AAB): Actions → "Play kapalı test paketi" (yükleme anahtarı android/yukleme-anahtari.jks.enc içinde kilitli, parolası tek gizli değer PLAY_ANAHTAR_PAROLASI; sürüm kodu = çalıştırma numarası).
   Kullanıcı rehberi: docs/magaza-rehberi.md.
 - `npm run harita`: harita SVG'sini ve durak konumlarını yeniden üretir (scripts/harita-uret.mjs).

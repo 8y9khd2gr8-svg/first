@@ -9,7 +9,7 @@
     "preview": "vite preview --host",
     "harita": "node scripts/harita-uret.mjs",
     "seslendir": "tsx scripts/seslendir.ts",
-    "magaza": "npm run build && npx cap sync",
+    "magaza": "node scripts/surum-esitle.mjs && npm run build && npx cap sync",
     "seslendirme-metni": "tsx scripts/seslendirme-metni.ts",
     "test": "node --import tsx --test tests/*.test.ts",
     "test:oyun": "vite build && playwright test"
