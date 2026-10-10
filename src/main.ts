@@ -48,7 +48,7 @@ function oyunuBaslat() {
     },
     // Ad yazma kutusu ve fotoğraf düğmesi gibi HTML öğeleri için.
     dom: { createContainer: true },
-    scene: [AcilisScene, HaritaScene, DurakScene, HareketScene, OdulScene, PasaportScene, PasaportAyarScene, EbeveynScene, AvatarScene, EbeveynMenuScene, EbeveynVeriScene, EbeveynOzetScene, SertifikaScene, KurulumScene, DunyaScene, GuvenlikScene, RozetScene, UzayScene, MaceraScene, KostumScene, TamSurumScene, new BolumScene('spor'), new BolumScene('dinozor'), new BolumScene('evde')],
+    scene: [AcilisScene, HaritaScene, DurakScene, HareketScene, OdulScene, PasaportScene, PasaportAyarScene, EbeveynScene, AvatarScene, EbeveynMenuScene, EbeveynVeriScene, EbeveynOzetScene, SertifikaScene, KurulumScene, DunyaScene, GuvenlikScene, RozetScene, UzayScene, MaceraScene, KostumScene, TamSurumScene, new BolumScene('spor'), new BolumScene('dinozor'), new BolumScene('evde'), new BolumScene('okyanus')],
   });
   hiziIzle(oyun);
   // Geliştirme sırasında otomatik testlerin oyuna erişebilmesi için.

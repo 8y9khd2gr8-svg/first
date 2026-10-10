@@ -43,10 +43,10 @@ test('bütün ekranlar hatasız açılır ve dış sunucuya bağlanılmaz', asyn
   const kayit = await oyunuAc(page, BETA);
   const sahneler: [string, object][] = [
     ['Acilis', {}], ['Macera', {}], ['Harita', { giris: 'uzay' }], ['Dunya', {}], ['Uzay', {}],
-    ['Spor', { giris: 'uzay' }], ['Dinozor', { giris: 'uzay' }], ['Evde', { giris: 'uzay' }],
-    ['Durak', { durakId: 'futbol' }], ['Durak', { durakId: 'oyuncak' }], ['Hareket', { durakId: 'trex', adim: 1 }],
-    ['Odul', { durakId: 'fosil' }], ['Pasaport', { sayfa: 'evde' }], ['Rozet', {}], ['Kostum', {}],
-    ['Sertifika', { bolum: 'spor' }], ['EbeveynMenu', {}], ['EbeveynVeri', {}], ['EbeveynOzet', {}],
+    ['Spor', { giris: 'uzay' }], ['Dinozor', { giris: 'uzay' }], ['Evde', { giris: 'uzay' }], ['Okyanus', { giris: 'uzay' }],
+    ['Durak', { durakId: 'futbol' }], ['Durak', { durakId: 'oyuncak' }], ['Durak', { durakId: 'yengec' }], ['Hareket', { durakId: 'trex', adim: 1 }],
+    ['Odul', { durakId: 'fosil' }], ['Pasaport', { sayfa: 'evde' }], ['Pasaport', { sayfa: 'okyanus' }], ['Rozet', {}], ['Kostum', {}],
+    ['Sertifika', { bolum: 'spor' }], ['Sertifika', { bolum: 'okyanus' }], ['EbeveynMenu', {}], ['EbeveynVeri', {}], ['EbeveynOzet', {}],
   ];
   for (const [ad, veri] of sahneler) await sahneAc(page, ad, veri);
   expect(kayit.hatalar).toEqual([]);
@@ -58,14 +58,20 @@ test('yeni bölümler zincirle açılır', async ({ page }) => {
   const acik = () =>
     page.evaluate(async () => {
       const { bolumuAcikMi } = await import('/src/duraklar.ts');
-      return ['spor', 'dinozor', 'evde'].map((b) => bolumuAcikMi(b as any));
+      return ['spor', 'dinozor', 'evde', 'okyanus'].map((b) => bolumuAcikMi(b as any));
     });
-  expect(await acik()).toEqual([false, false, false]);
+  expect(await acik()).toEqual([false, false, false, false]);
   await page.evaluate(async () => {
     const { UZAY, SPOR } = await import('/src/duraklar.ts');
     localStorage.setItem('zipzip-ilerleme-v1', JSON.stringify([...UZAY, ...SPOR].map((d) => d.id)));
   });
-  expect(await acik()).toEqual([true, true, false]);
+  expect(await acik()).toEqual([true, true, false, false]);
+  await page.evaluate(async () => {
+    const { BOLUM_SIRASI, BOLUMLER } = await import('/src/duraklar.ts');
+    const evdeyeKadar = BOLUM_SIRASI.slice(0, BOLUM_SIRASI.indexOf('okyanus')).flatMap((b) => BOLUMLER[b].duraklar.map((d) => d.id));
+    localStorage.setItem('zipzip-ilerleme-v1', JSON.stringify(evdeyeKadar));
+  });
+  expect(await acik()).toEqual([true, true, true, true]);
 });
 
 test('tam sürüm: ödeme kilidi ebeveyn kilidine götürür, satın alınca bölümler açılır', async ({ page }) => {
@@ -201,7 +207,7 @@ test('yazılar ekrana sığar, çocuk düğmeleri yeterince büyük', async ({ p
   })();
   const kayit = await oyunuAc(page, { ...BETA, 'zipzip-ilerleme-v1': JSON.stringify(hepsi.slice(0, 20)), 'zipzip-pasaport-v1': JSON.stringify({ ad: 'Muhammed Mustafa', avatar: '🐼', soruldu: true }) }, '/?odeme=deneme');
   const sahneler: [string, object, boolean][] = [
-    ['Macera', {}, true], ['Harita', {}, true], ['Dunya', {}, true], ['Uzay', {}, true], ['Spor', {}, true], ['Dinozor', {}, true], ['Evde', {}, true],
+    ['Macera', {}, true], ['Harita', {}, true], ['Dunya', {}, true], ['Uzay', {}, true], ['Spor', {}, true], ['Dinozor', {}, true], ['Evde', {}, true], ['Okyanus', {}, true],
     ['Durak', { durakId: 'efes' }, true], ['Durak', { durakId: 'nemrut' }, true], ['Hareket', { durakId: 'istanbul', adim: 1 }, true],
     ['Pasaport', {}, true], ['Rozet', { sayfa: 1 }, true], ['Kostum', {}, false], ['Avatar', {}, true],
     ['Ebeveyn', { hedef: 'EbeveynMenu', geri: 'Pasaport' }, true], ['EbeveynMenu', {}, true], ['EbeveynVeri', {}, true], ['EbeveynOzet', {}, true], ['PasaportAyar', {}, true],
@@ -254,7 +260,7 @@ test('yazılar okunur (renk zıtlığı)', async ({ page }) => {
   test.setTimeout(120_000);
   const kayit = await oyunuAc(page, { ...BETA, 'zipzip-ilerleme-v1': JSON.stringify(['istanbul', 'truva']), 'zipzip-pasaport-v1': JSON.stringify({ ad: '', avatar: '🐼', soruldu: true }) }, '/?odeme=deneme');
   const sahneler: [string, object][] = [
-    ['Acilis', {}], ['Macera', {}], ['Harita', {}], ['Dunya', {}], ['Uzay', {}], ['Spor', {}], ['Durak', { durakId: 'efes' }], ['Hareket', { durakId: 'istanbul', adim: 1 }],
+    ['Acilis', {}], ['Macera', {}], ['Harita', {}], ['Dunya', {}], ['Uzay', {}], ['Spor', {}], ['Okyanus', {}], ['Durak', { durakId: 'efes' }], ['Hareket', { durakId: 'istanbul', adim: 1 }],
     ['Pasaport', {}], ['Rozet', { sayfa: 1 }], ['Kostum', {}], ['Avatar', {}], ['Guvenlik', {}], ['Ebeveyn', { hedef: 'EbeveynMenu', geri: 'Pasaport' }],
     ['EbeveynMenu', {}], ['EbeveynVeri', {}], ['EbeveynOzet', {}], ['PasaportAyar', {}], ['TamSurum', {}], ['Sertifika', { bolum: 'turkiye' }],
   ];
@@ -353,7 +359,7 @@ test('her çocuk ekranında Zıpzıp konuşur (sesli yönlendirme)', async ({ pa
   });
   const kayit = await oyunuAc(page, { ...BETA, 'zipzip-ilerleme-v1': JSON.stringify(['istanbul', 'truva']), 'zipzip-pasaport-v1': JSON.stringify({ ad: '', avatar: '🐼', soruldu: true }) }, '/?odeme=deneme');
   const sahneler: [string, object][] = [
-    ['Macera', {}], ['Harita', {}], ['Dunya', {}], ['Uzay', {}], ['Spor', {}], ['Dinozor', {}], ['Evde', {}],
+    ['Macera', {}], ['Harita', {}], ['Dunya', {}], ['Uzay', {}], ['Spor', {}], ['Dinozor', {}], ['Evde', {}], ['Okyanus', {}],
     ['Durak', { durakId: 'pamukkale' }], ['Hareket', { durakId: 'pamukkale', adim: 1 }], ['Odul', { durakId: 'truva' }],
     ['Pasaport', {}], ['Rozet', {}], ['Kostum', {}], ['Avatar', {}], ['Sertifika', { bolum: 'turkiye' }],
   ];

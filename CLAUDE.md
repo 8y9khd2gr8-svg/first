@@ -98,8 +98,8 @@ Teknoloji: Phaser 3 + TypeScript + Vite, GitHub Pages ile yayın. İleride Capac
   değil, çocuğun seçtiği ilgi alanıyla karşılanır (ör. Spor Kampı'nda sporunu seçer).
 - Bölüm yol haritası: Türkiye (ücretsiz) → Dünya Harikaları → Uzay Yolculuğu (sıradaki büyük
   bölüm) → İstanbul'un 7 Tepesi (Şehir Turları; çizer gelince) → Spor Kampı → Dinozorlar →
-  Okyanus → Evde Macera → mevsim/bayram bölümleri. Bölüm bitince rozet (pasaport + sertifika).
-- Rozetler (src/rozetler.ts, 25 adet): kayıtlardan hesaplanır; cihazda sadece kutlananlar
+  Evde Macera → Okyanus → mevsim/bayram bölümleri. Bölüm bitince rozet (pasaport + sertifika).
+- Rozetler (src/rozetler.ts, 26 adet): kayıtlardan hesaplanır; cihazda sadece kutlananlar
   tutulur (kutlanan rozet, koşulu sonradan zorlaşsa da kaybolmaz). "Üst üste gün" gibi baskı yaratan rozet yok. Durak sonunda yeni rozet kutlanır.
 - Uzay Yolculuğu (3. bölüm, UzayScene): dikey Güneş Sistemi; Merkür → Venüs → Ay → Mars →
   Jüpiter → Satürn → Uranüs → Neptün. Dünya Harikaları bitince açılır. Rozet: Uzay Yolcusu.
@@ -108,12 +108,15 @@ Teknoloji: Phaser 3 + TypeScript + Vite, GitHub Pages ile yayın. İleride Capac
   Spor Kampı serbest sıralı: 7 spor istasyonu, çocuk istediğiyle başlar. Evde Macera'da bilgi kutusu
   "Hazırla!" der (ne hazırlanacağı + güvenlik); sadece yumuşak eşyalar, balon yok (boğulma tehlikesi).
   Hikâyede bile "… gibi olalım" yok; test (`npm test`) baslik/sesli içinde "gibi" yakalar.
-  İstanbul'un 7 Tepesi (çizer gelince) ve Okyanus "Yakında".
+  İstanbul'un 7 Tepesi (çizer gelince) "Yakında".
+- Okyanus (7. bölüm, BolumScene; Evde Macera bitince açılır): deniz canlıları; Deniz Kaplumbağası (Caretta, Dalyan) →
+  Yunus → Ahtapot → Yengeç → Denizatı → Mavi Balina → Mercan Resifi. Köpekbalığı yok (ürkütücü). Rozet/sertifika:
+  Okyanus Kâşifi; kostüm: Dalış Maskesi (bölüm sonu).
 - Büyük Macera (MaceraScene): Oyna → bütün bölümler kıvrımlı yolda; açık bölümler ilerlemesiyle,
   gelecekler "Yakında" (ebeveyne "daha çok şey gelecek" vaadi). Bölüm haritalarının ⌂'si buraya döner.
   Vaat: tek ödemeyle gelecek bütün bölümler dahil.
 - Kostümler (src/kostumler.ts): her biri bir yerin hatırası, o durak/bölüm bitince açılır (Kapadokya → pilot
-  gözlüğü...); 13 adet, herkese uygun (fiyonk, kep gibi cinsiyet çağrıştıran yok). Satın alma yok; yıldız sayılır.
+  gözlüğü...); 14 adet, herkese uygun (fiyonk, kep gibi cinsiyet çağrıştıran yok). Satın alma yok; yıldız sayılır.
   Yeni kostüm kutlamasında "Giy! 👕" düğmesi; Büyük Macera'da 👕 dolap düğmesi. Giyilen kostüm her ekrandaki Zıpzıp'ta görünür. Kostüm dolabı
   pasaporttan (👕). Durak sonunda yeni rozet ve kostümler sırayla kutlanır.
 - Durak simgeleri: Türkiye ve Dünya için çizili SVG (public/simge/<id>.svg, arayuz.durakSimgesi); diğerleri emoji.

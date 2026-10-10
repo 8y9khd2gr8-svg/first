@@ -1,4 +1,4 @@
-import { DINOZOR, DUNYA, EVDE, SPOR, TUM_DURAKLAR, TURKIYE, UZAY } from './duraklar';
+import { DINOZOR, DUNYA, EVDE, OKYANUS, SPOR, TUM_DURAKLAR, TURKIYE, UZAY } from './duraklar';
 import { tamamlananlar } from './ilerleme';
 import { H, ISINMALAR, SOGUMALAR } from './hareketler';
 import { haftalikOzet } from './istatistik';
@@ -50,6 +50,7 @@ const KOSULLAR: (Rozet & { kazanildi: (d: Durum) => boolean })[] = [
   { id: 'sporYildizi', simge: '⚽', ad: 'Spor Yıldızı', nasil: 'Spor Kampı’ndaki bütün sporları dene', bolum: true, kazanildi: (d) => SPOR.every((x) => d.biten.has(x.id)) },
   { id: 'dinozorKasifi', simge: '🦕', ad: 'Dinozor Kâşifi', nasil: 'Dinozorlar Diyarı’nı bitir', bolum: true, kazanildi: (d) => DINOZOR.every((x) => d.biten.has(x.id)) },
   { id: 'evKahramani', simge: '🧸', ad: 'Ev Kahramanı', nasil: 'Evde Macera’yı bitir', bolum: true, kazanildi: (d) => EVDE.every((x) => d.biten.has(x.id)) },
+  { id: 'okyanusKasifi', simge: '🐠', ad: 'Okyanus Kâşifi', nasil: 'Okyanus bölümünü bitir', bolum: true, kazanildi: (d) => OKYANUS.every((x) => d.biten.has(x.id)) },
 ];
 
 export const ROZETLER: Rozet[] = KOSULLAR.map(({ kazanildi: _k, ...r }) => r);

@@ -38,6 +38,7 @@ KEŞFET VE ÖĞREN
 • Spor Kampı: futbol, basketbol, yüzme, jimnastik, tenis, voleybol, atletizm; çocuk istediği sporla başlar
 • Dinozorlar Diyarı: yumurtadan çıkıştan fosil kazısına
 • Evde Macera: en sevdiği oyuncak, bir yastık ve çorap topuyla evde hareket; sonunda da birlikte toplama
+• Okyanus: deniz kaplumbağası, yunus, ahtapot, yengeç, denizatı, mavi balina ve mercan resifi
 • Her durakta kısa ve ilginç bir "Biliyor muydun?" bilgisi
 
 ÖDÜLLER, BASKI YOK
@@ -57,13 +58,13 @@ EBEVEYNLER İÇİN
 • İsteğe bağlı kamera ile sayma (deneme): görüntü telefonda işlenir, kaydedilmez ve gönderilmez.
 
 FİYAT
-Türkiye Turu tamamen ücretsiz. Tek seferlik ödemeyle Dünya Harikaları, Uzay Yolculuğu, Spor Kampı, Dinozorlar Diyarı, Evde Macera ve gelecek bütün bölümler açılır. Abonelik yok.
+Türkiye Turu tamamen ücretsiz. Tek seferlik ödemeyle Dünya Harikaları, Uzay Yolculuğu, Spor Kampı, Dinozorlar Diyarı, Evde Macera, Okyanus ve gelecek bütün bölümler açılır. Abonelik yok.
 
 **Tanıtım metni – Apple** (170; sürüm göndermeden değiştirilebilir)
 Reklamsız, Türkçe, internetsiz çalışan hareket oyunu. Türkiye Turu ücretsiz; zıpla, çömel, damgaları topla!
 
 **Yenilikler (ilk sürüm)**
-Zıp Zıp Dünya yayında! Türkiye'yi, dünyanın harikalarını, uzayı, spor kampını, dinozorları ve evdeki macerayı hareket ederek keşfedin.
+Zıp Zıp Dünya yayında! Türkiye'yi, dünyanın harikalarını, uzayı, spor kampını, dinozorları, evdeki macerayı ve okyanusu hareket ederek keşfedin.
 
 ---
 
@@ -101,6 +102,7 @@ EXPLORE AND LEARN
 • Sports Camp: football, basketball, swimming, gymnastics, tennis, volleyball and athletics; kids start with the sport they like
 • Dinosaur Land: from hatching out of an egg to a fossil dig
 • Adventure at Home: moving with a favourite toy, a pillow and a sock ball, then tidying up together
+• Ocean: sea turtles, dolphins, an octopus, a crab, a seahorse, the blue whale and a coral reef
 • A short "Did you know?" fact at every stop
 
 REWARDS WITHOUT PRESSURE
@@ -120,12 +122,12 @@ FOR PARENTS
 • Optional camera counting (beta): images are processed on the device and never recorded or sent.
 
 PRICE
-The Türkiye Tour is completely free. A single one-time purchase unlocks Wonders of the World, Space Journey, Sports Camp, Dinosaur Land, Adventure at Home and all future chapters. No subscription.
+The Türkiye Tour is completely free. A single one-time purchase unlocks Wonders of the World, Space Journey, Sports Camp, Dinosaur Land, Adventure at Home, Ocean and all future chapters. No subscription.
 
 **Promotional text – Apple** (170)
 An ad-free movement game that works offline. The Türkiye Tour is free: jump, squat and collect passport stamps!
 
 **What's new (first release)**
-Zip Zip World is here! Explore Türkiye, the wonders of the world, space, sports camp, dinosaurs and an adventure at home, all by moving.
+Zip Zip World is here! Explore Türkiye, the wonders of the world, space, sports camp, dinosaurs, an adventure at home and the ocean, all by moving.
 
 > Not: İngilizce mağaza sayfası, oyunun kendisi İngilizce olunca açılmalı. O zamana kadar bu metin hazırda bekler.
