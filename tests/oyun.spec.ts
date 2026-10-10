@@ -294,3 +294,29 @@ test('yazılar okunur (renk zıtlığı)', async ({ page }) => {
   expect(sorunlar).toEqual([]);
   expect(kayit.hatalar).toEqual([]);
 });
+
+// Okuma bilmeyen çocuk için: her çocuk ekranı açılınca Zıpzıp bir şey söyler (ne yapılacağını sesle anlatır).
+// Telefonun konuşma motoru taklit edilir; söylenen cümleler kaydedilir.
+test('her çocuk ekranında Zıpzıp konuşur (sesli yönlendirme)', async ({ page }) => {
+  test.setTimeout(120_000);
+  await page.addInitScript(() => {
+    const soylenen: string[] = ((window as any).__soylenen = []);
+    const sahte = { speak: (s: SpeechSynthesisUtterance) => soylenen.push(s.text), cancel: () => {}, getVoices: () => [], addEventListener: () => {}, onvoiceschanged: null };
+    Object.defineProperty(window, 'speechSynthesis', { value: sahte, configurable: true });
+  });
+  const kayit = await oyunuAc(page, { ...BETA, 'zipzip-ilerleme-v1': JSON.stringify(['istanbul', 'truva']), 'zipzip-pasaport-v1': JSON.stringify({ ad: '', avatar: '🐼', soruldu: true }) });
+  const sahneler: [string, object][] = [
+    ['Macera', {}], ['Harita', {}], ['Dunya', {}], ['Uzay', {}], ['Spor', {}], ['Dinozor', {}], ['Evde', {}],
+    ['Durak', { durakId: 'pamukkale' }], ['Hareket', { durakId: 'pamukkale', adim: 1 }], ['Odul', { durakId: 'truva' }],
+    ['Pasaport', {}], ['Rozet', {}], ['Kostum', {}], ['Avatar', {}], ['Sertifika', { bolum: 'turkiye' }],
+  ];
+  const sessiz: string[] = [];
+  for (const [ad, veri] of sahneler) {
+    await page.evaluate(() => ((window as any).__soylenen.length = 0));
+    await sahneAc(page, ad, veri);
+    await page.waitForTimeout(3500);
+    if (!(await page.evaluate(() => (window as any).__soylenen.length))) sessiz.push(ad);
+  }
+  expect(sessiz).toEqual([]);
+  expect(kayit.hatalar).toEqual([]);
+});
