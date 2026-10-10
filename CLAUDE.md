@@ -83,6 +83,11 @@ Teknoloji: Phaser 3 + TypeScript + Vite, GitHub Pages ile yayın. İleride Capac
   boşken ebeveyn köşesinde "beta grubuna yazın" notu görünür, doluysa "✉️ Geri bildirim yaz" telefonun e-posta
   uygulamasını açar (sadece sürüm numarası eklenir). Adres gelince gizlilik.html ve kosullar.html de güncellenir.
   Sürüm numarası package.json'da (beta: 0.9.x), ebeveyn köşesinin altında görünür.
+- Yasal düzenleme (Ekim 2026): sosyal ağlara 15 yaş sınırı + e-Devlet yaş doğrulaması (yönetmelik 10 Ekim 2026,
+  yürürlük 1 Kasım 2026) bizi kapsamaz; oyun sosyal ağ değildir ve öyle kalmalı (sohbet, profil, skor tablosu, arkadaş
+  ekleme yok). 5651 Ek Madde 5 (oyunlar, 1 Kasım 2026): platformlar derecelendirilmemiş oyun sunamaz → mağaza yaş
+  derecelendirmesi (IARC/Apple; beklenen PEGI 3 / 4+) eksiksiz yapılır; ayrıntı yönetmeliği takip edilir.
+  Ayrıntı ve avukata sorulacaklar: docs/magaza-rehberi.md (4b ve 7). "Sosyal ağ değildir" vurgusu mağaza ve gizlilik metninde.
 - Cinsiyet sorulmaz (veri azaltma, kalıp yargı). "Herkes kendini bulsun" ihtiyacı cinsiyetle
   değil, çocuğun seçtiği ilgi alanıyla karşılanır (ör. Spor Kampı'nda sporunu seçer).
 - Bölüm yol haritası: Türkiye (ücretsiz) → Dünya Harikaları → Uzay Yolculuğu (sıradaki büyük

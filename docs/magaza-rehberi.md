@@ -62,6 +62,25 @@ Hesap açmak, para ödemek ve uygulamayı mağazaya göndermek sizde. Teknik haz
 6. **TestFlight** ile beta: Kasım'da test linki oluşturulur, beta testçileri TestFlight uygulamasıyla oyunu kurar.
    Dışarıdan testçi davet etmeden önce Apple kısa bir inceleme yapar (genelde 1-2 gün).
 
+## 4b. Yaş derecelendirmesi (iki mağazada da zorunlu)
+
+**Neden önemli:** 5651 sayılı Kanun'a eklenen oyun maddesine (Ek Madde 5) göre 1 Kasım 2026'dan itibaren oyun platformları
+(Play Store, App Store gibi) yaşa göre derecelendirilmemiş oyunları sunamıyor ya da en yüksek yaş sınıfında sunabiliyor.
+Derecelendirmenin ayrıntıları ileride çıkacak bir yönetmelikle belirlenecek; çıkınca bu bölümü güncelleriz.
+Formu eksiksiz ve doğru doldurmak bu yüzden önemli.
+
+- **Google Play – İçerik derecelendirmesi (IARC anketi):** Uygulama → Politika → İçerik derecelendirmesi. Kategori: **Oyun**.
+  Cevaplar: şiddet yok, korku yok, kaba dil yok, kumar yok, **kullanıcılar arası iletişim yok**, içerik paylaşımı yok,
+  konum paylaşımı yok, **uygulama içi satın alma var** (tek seferlik tam sürüm). Beklenen sonuç: **PEGI 3 / Herkes**.
+- **Apple – Yaş derecelendirmesi:** App Store Connect → Uygulama Bilgileri → Yaş Derecelendirmesi. Bütün içerik sorularına "Yok".
+  Beklenen sonuç: **4+**. (Çocuklar kategorisi ayrıca seçilir, bkz. 4. bölüm.)
+- Sonuç farklı çıkarsa göndermeden bana yazın; hangi cevabın değiştirdiğine birlikte bakarız.
+
+**Sosyal medyaya 15 yaş sınırı (10 Ekim 2026 yönetmeliği) bizi kapsamıyor:** Yönetmelik sosyal ağ sağlayıcıları içindir
+(hesap açılıp içerik paylaşılan platformlar). Oyunumuzda hesap, profil, sohbet ya da kullanıcılar arası paylaşım yok;
+yaş doğrulaması (e-Devlet belirteci) gerekmez. Bu yapı korunmalı: oyuna sohbet, skor tablosu, arkadaş ekleme gibi
+özellikler eklenmez (eklenirse bu değerlendirme yeniden yapılır).
+
 ## 5. Android'de hemen deneme (hesap gerekmeden)
 
 Mağaza hesabı açılmadan önce oyunu **gerçek bir Android uygulaması olarak** deneyebilirsiniz:
@@ -83,6 +102,19 @@ Mağaza hesabı açılmadan önce oyunu **gerçek bir Android uygulaması olarak
 - [ ] Gizlilik ve koşullar sayfalarına iletişim adresi (avukat kontrolünden sonra)
 - [ ] Mağaza ekran görüntüleri ve tanıtım metinleri (Türkçe + İngilizce)
 - [ ] Sürüm numarası ve imzalama anahtarı (Android imzalama anahtarı **sizde güvenli saklanmalı**; kaybolursa güncelleme yapılamaz)
+
+## 7. Avukata sorulacaklar (beta öncesi görüşme)
+
+1. Gizlilik politikası ve kullanım koşulları taslakları (public/gizlilik.html, kosullar.html) KVKK'ya uygun mu? Aydınlatma metni ayrıca gerekir mi?
+   (Hiçbir veri toplanmıyor; her şey cihazda.)
+2. 5651 Ek Madde 5 (oyunlar): Bireysel **oyun geliştirici** olarak bize düşen bir yükümlülük var mı (yaş derecelendirmesi bilgisi, ebeveyn kontrolü)?
+   Mağazaların kendi derecelendirmesi (IARC / Apple) yeterli mi, yoksa Türkiye'ye özel bir derecelendirme beklenmeli mi?
+3. Beta süresince oyunun web adresinde (GitHub Pages) açık durması, oyunu "derecelendirilmemiş" olarak sunmak sayılır mı?
+   (Plan: web sürümü sadece test için, mağazaya çıkarken kaldırılacak.)
+4. Sosyal ağ yönetmeliği (10 Ekim 2026, 15 yaş sınırı): Oyunun sosyal ağ sayılmadığı görüşümüz doğru mu?
+   Ebeveynin cihazın paylaşma menüsüyle sertifika/özet paylaşması bunu değiştirir mi?
+5. Kamera ile sayma (cihazda, görüntü kaydedilmeden/gönderilmeden): Gizlilik metnindeki açıklama yeterli mi?
+6. Bireysel geliştirici olarak (20/B) mağazada satıcı adı ve iletişim adresi zorunlulukları.
 
 ## Teknik not (geliştirici için)
 

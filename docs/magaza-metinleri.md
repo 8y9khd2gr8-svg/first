@@ -50,6 +50,7 @@ AİLECE HAREKET
 
 EBEVEYNLER İÇİN
 • Reklam yok. Hesap ya da kayıt yok.
+• Sosyal ağ değildir: sohbet, profil ya da başka kullanıcılarla iletişim yok.
 • Çocuktan veri toplanmaz. İlerleme yalnızca telefonda saklanır.
 • İnternetsiz çalışır.
 • Kilitli ebeveyn köşesi: haftalık hareket özeti, pasaport ayarları, tüm verileri silme.
@@ -109,6 +110,7 @@ MOVE AS A FAMILY
 
 FOR PARENTS
 • No ads. No accounts or sign-up.
+• Not a social network: no chat, no profiles, no contact with other users.
 • No data is collected from children. Progress is stored only on the device.
 • Works offline.
 • Locked parent corner: weekly activity summary, passport settings and a "delete all data" option.
