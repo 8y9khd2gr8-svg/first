@@ -189,7 +189,7 @@ export class PasaportScene extends Phaser.Scene {
       buyukDugme(this, x, 1180, 'Maceraya başla ▶', RENK.turuncu, () => {
         sustur();
         this.scene.start('Macera', {});
-      }, { genislik: 420, yukseklik: 120, yaziBoyu: 52 });
+      }, { genislik: 500, yukseklik: 120, yaziBoyu: 52 });
       konus(pasaport.avatar ? M.pasaportHazir : M.pasaportIlk);
     } else {
       buyukDugme(this, x, 1180, 'Haritaya dön ▶', RENK.turuncu, () => {

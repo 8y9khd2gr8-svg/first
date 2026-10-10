@@ -36,9 +36,11 @@ export class RozetScene extends Phaser.Scene {
       const var_ = kazanilan.has(r.id);
       const rozet = rozetCiz(this, rx, ry, 50, r.simge, var_);
       if (var_ && !hareketiAzalt()) this.tweens.add({ targets: rozet, angle: { from: -4, to: 4 }, duration: 1400 + i * 90, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
-      this.add
+      const ad = this.add
         .text(rx, ry + 80, r.ad, { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '26px', color: var_ ? '#ffffff' : '#9fb6d9' })
         .setOrigin(0.5);
+      // Uzun ad ("Hafta Sonu Sporcusu") yan sütundakine değmesin.
+      ad.setScale(Math.min(1, 200 / ad.width));
       this.add
         .text(rx, ry + 110, r.nasil, { fontFamily: YAZI_TIPI, fontSize: '22px', color: '#9fb6d9', align: 'center', wordWrap: { width: 200 } })
         .setOrigin(0.5, 0);

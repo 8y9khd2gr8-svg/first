@@ -1,5 +1,5 @@
 import { Page, test } from '@playwright/test';
-import { writeFileSync, mkdirSync } from 'node:fs';
+import { appendFileSync, mkdirSync, writeFileSync } from 'node:fs';
 
 // GEÇİCİ deneme turu: her ekranı farklı durumlarla açar, taşma/çakışma/küçük düğme ölçer, ekran görüntüsü alır.
 
@@ -67,9 +67,10 @@ async function sahneAc(page: Page, ad: string, veri: object, bekle = 900) {
 }
 
 test('deneme turu', async ({ page }) => {
-  test.setTimeout(1_200_000);
+  test.setTimeout(2_400_000);
   mkdirSync(DIZIN, { recursive: true });
-  const rapor: string[] = [];
+  writeFileSync(`${DIZIN}/rapor.txt`, '');
+  const rapor = { push: (...s: string[]) => s.length && appendFileSync(`${DIZIN}/rapor.txt`, s.join('\n') + '\n') };
   await oyunuAc(page, {});
   const ids: Record<string, string[]> = await page.evaluate(async () => {
     const { BOLUMLER } = await import('/src/duraklar.ts');
@@ -113,5 +114,4 @@ test('deneme turu', async ({ page }) => {
     }
     for (const h of hatalar) rapor.push(`${durum}: HATA ${h}`);
   }
-  writeFileSync(`${DIZIN}/rapor.txt`, [...new Set(rapor)].join('\n'));
 });
