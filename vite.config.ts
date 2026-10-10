@@ -1,9 +1,12 @@
 import { defineConfig } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
+import paket from './package.json' with { type: 'json' };
 
 export default defineConfig({
   // './' sayesinde oyun GitHub Pages'te alt klasörde (/first/) de çalışır.
   base: './',
+  // Sürüm numarası (package.json'dan) ebeveyn köşesinde görünür; geri bildirimde hangi sürüm olduğu anlaşılır.
+  define: { __SURUM__: JSON.stringify(paket.version) },
   // Oyun motoru (Phaser) tek başına büyük bir dosya; bu uyarı beklenen bir durum.
   build: { chunkSizeWarningLimit: 2000 },
   plugins: [
