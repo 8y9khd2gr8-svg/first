@@ -5,6 +5,11 @@ name: Android deneme paketi
 
 on:
   workflow_dispatch:
+    inputs:
+      internetsiz:
+        description: 'İnternet izni olmadan üret (gizlilik denemesi: oyun izinsiz de açılıyor mu?)'
+        type: boolean
+        default: false
 
 jobs:
   apk:
@@ -21,8 +26,13 @@ jobs:
           java-version: 21
       - run: npm ci
       - run: npm run magaza
+      # Deneme: internet izni kaldırılır. Oyun böyle de açılıyorsa Play sayfasında "internet erişimi yok" görünebilir.
+      - if: inputs.internetsiz
+        run: |
+          sed -i '/android.permission.INTERNET/d' android/app/src/main/AndroidManifest.xml
+          ! grep -q 'android.permission.INTERNET' android/app/src/main/AndroidManifest.xml
       - run: cd android && ./gradlew assembleDebug
       - uses: actions/upload-artifact@v4
         with:
-          name: zip-zip-dunya-apk
+          name: ${{ inputs.internetsiz && 'zip-zip-dunya-apk-internetsiz' || 'zip-zip-dunya-apk' }}
           path: android/app/build/outputs/apk/debug/app-debug.apk
