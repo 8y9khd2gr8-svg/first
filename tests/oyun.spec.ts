@@ -134,6 +134,30 @@ test('yavaş telefonda oyun kendiliğinden sadeleşir (süs animasyonu yok, 30 k
   expect(kayit.hatalar).toEqual([]);
 });
 
+test('Zıpzıp konuşurken ağzı oynar, susunca kapanır', async ({ page }) => {
+  const kayit = await oyunuAc(page);
+  await sahneAc(page, 'Kostum');
+  const sonuc = await page.evaluate(async () => {
+    // Test tarayıcısında Türkçe ses yok; konuşma "hata" ile hemen biter. Telefondaki gibi sürsün diye susturulur.
+    (speechSynthesis as any).speak = () => {};
+    const { konus, sustur } = await import('/src/ses.ts');
+    const { Zipzip } = await import('/src/zipzip.ts');
+    const z: any = new Zipzip((window as any).oyun.scene.getScene('Kostum'), 360, 640, 1);
+    konus('Merhaba gezgin!');
+    let enCok = 0;
+    for (let i = 0; i < 12; i++) {
+      await new Promise((r) => setTimeout(r, 60));
+      enCok = Math.max(enCok, z.yuz.aciklik);
+    }
+    sustur();
+    await new Promise((r) => setTimeout(r, 100));
+    return { enCok, sonra: z.yuz.aciklik };
+  });
+  expect(sonuc.enCok).toBeGreaterThan(0.3);
+  expect(sonuc.sonra).toBe(0);
+  expect(kayit.hatalar).toEqual([]);
+});
+
 // Beta öncesi deneme turundan: yazı ekrandan taşmasın, çocuk ekranlarında düğmeler parmağa yetecek kadar büyük olsun
 // (88 oyun noktası ≈ telefonda 48 piksel). Ebeveyn köşesi kilitli olduğu için düğme ölçüsüne katılmaz.
 test('yazılar ekrana sığar, çocuk düğmeleri yeterince büyük', async ({ page }) => {

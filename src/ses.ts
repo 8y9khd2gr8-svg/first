@@ -67,6 +67,27 @@ function kaydiYukle(anahtar: string): Promise<AudioBuffer | null> {
   return kayit;
 }
 
+// Zıpzıp konuşurken ağzını oynatsın diye: konuşma başlayınca/bitince dinleyicilere haber verilir.
+type KonusmaDinleyici = (konusuyor: boolean) => void;
+const dinleyiciler = new Set<KonusmaDinleyici>();
+let konusuyor = false;
+let konusmaBitisi: ReturnType<typeof setTimeout> | undefined;
+
+function konusmaDurumu(durum: boolean, enFazlaMs = 0) {
+  clearTimeout(konusmaBitisi);
+  // Telefonun sesi bazen "bitti" demez; ağız sonsuza dek oynamasın diye cümle uzunluğuna göre üst sınır.
+  if (durum) konusmaBitisi = setTimeout(() => konusmaDurumu(false), enFazlaMs);
+  if (durum === konusuyor) return;
+  konusuyor = durum;
+  dinleyiciler.forEach((f) => f(durum));
+}
+
+export function konusmayiDinle(f: KonusmaDinleyici): () => void {
+  dinleyiciler.add(f);
+  if (konusuyor) f(true);
+  return () => dinleyiciler.delete(f);
+}
+
 export function konus(metin: string) {
   sustur();
   if (!metin) return; // söylenecek cümle yoksa sessiz geç (oyun asla takılmasın)
@@ -80,7 +101,9 @@ export function konus(metin: string) {
       calan = b.createBufferSource();
       calan.buffer = kayit;
       calan.connect(b.destination);
+      calan.onended = () => no === konusmaNo && konusmaDurumu(false);
       calan.start();
+      konusmaDurumu(true, kayit.duration * 1000 + 500);
     });
     return;
   }
@@ -96,7 +119,11 @@ function telefonSesi(metin: string) {
   if (turkceSes) s.voice = turkceSes;
   s.rate = 0.95;
   s.pitch = 1.15;
+  const no = konusmaNo;
+  s.onend = s.onerror = () => no === konusmaNo && konusmaDurumu(false);
   speechSynthesis.speak(s);
+  // "Başladı" haberi bazı telefonlarda gecikir ya da hiç gelmez; ağız hemen oynamaya başlar.
+  konusmaDurumu(true, metin.length * 90 + 1500);
 }
 
 export function sustur() {
@@ -107,5 +134,6 @@ export function sustur() {
     // zaten bitmiş
   }
   calan = null;
+  konusmaDurumu(false);
   if ('speechSynthesis' in window) speechSynthesis.cancel();
 }

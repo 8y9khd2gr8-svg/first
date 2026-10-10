@@ -125,6 +125,9 @@ Teknoloji: Phaser 3 + TypeScript + Vite, GitHub Pages ile yayın. İleride Capac
   animasyonlar azalır. Telefon yavaşsa da aynısı olur (src/hiz.ts: oyun boyunca gerçek kare hızı ölçülür,
   40'ın altına düşerse süs animasyonları kapanır ve kare hızı 30'a sabitlenir; sonuç kaydedilmez). Yeni
   süs animasyonu `hareketiAzalt()` ile korunmalı. Yağız testinde dikkat dağıtan yer sadeleştirilir.
+- Zıpzıp'ın yüzü kodla çizilir (src/zipzipYuz.ts; govde.svg'de yüz yok): göz kırpar (süs, hareketiAzalt'ta kapalı),
+  konuşurken ağzı oynar (ses.ts konusmayiDinle), ifadeler: normal / mutlu ("Aferin!", varış, açılış) / uykulu (soğuma sonu).
+  Zıplarken gövde hafifçe basılıp esner (süs). İleride çizer gelince Rive ile yeniden yapılması düşünülebilir.
 
 ## Kod düzeni
 - `src/zipzip.ts`: maskot; duruşlar (uzuv açıları) ve her hareketin adımları burada.

@@ -199,6 +199,7 @@ export class HareketScene extends Phaser.Scene {
     const sonAdim = this.adim >= this.liste().length - 1;
     if (sonAdim) {
       if (this.durakId === SOGUMA_ID) {
+        this.zipzip.ifadeSec('uykulu');
         konus(M.bugunlukBitti);
         this.time.delayedCall(2500, () => this.scene.start('Macera', {}));
         return;
@@ -214,6 +215,7 @@ export class HareketScene extends Phaser.Scene {
       .setOrigin(0.5)
       .setScale(0);
     this.tweens.add({ targets: aferin, scale: 1, duration: 350, ease: 'Back.easeOut' });
+    this.zipzip.ifadeSec('mutlu');
     this.zipzip.birKez('zipla', 900);
     this.time.delayedCall(1300, () => this.scene.restart({ durakId: this.durakId, adim: this.adim + 1 }));
   }
