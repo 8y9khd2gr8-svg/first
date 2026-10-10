@@ -125,6 +125,9 @@ Mağaza hesabı açılmadan önce oyunu **gerçek bir Android uygulaması olarak
 - [ ] Web sitesinden oyunu kaldırmak; sadece gizlilik.html ve kosullar.html kalsın
 - [ ] Gizlilik ve koşullar sayfalarına iletişim adresi (avukat kontrolünden sonra)
 - [ ] Mağaza ekran görüntüleri ve tanıtım metinleri (Türkçe + İngilizce)
+- [ ] İnternetsiz paket denemesi: Actions → "Android deneme paketi" → Run workflow → **"İnternet izni olmadan üret"**
+      kutusunu işaretle. `zip-zip-dunya-apk-internetsiz` dosyasını kurup bak: oyun açılıyor mu, sesler, haritalar,
+      kamera ile sayma çalışıyor mu? Hepsi çalışıyorsa izni kalıcı olarak kaldırırız.
 - [ ] "Bilgiler sadece bu telefonda" sözünü mağazada da kanıtlamak: Android paketinden internet iznini
       (`android.permission.INTERNET`) kaldırıp APK'yla denemek. Oyun hâlâ açılıyorsa Play Store sayfasında
       "internet erişimi yok" görünür; açılmıyorsa izin kalır (ebeveyn köşesindeki "Bu telefonda neler var?" ekranı yeter)

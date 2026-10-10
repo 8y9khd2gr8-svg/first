@@ -18,3 +18,20 @@ test('oyun internetsiz açılır', async ({ page, context }) => {
   expect(hatalar).toEqual([]);
   await context.setOffline(false);
 });
+
+// Yavaş internet ve ucuz telefon için: ilk açılışta indirilen dosyalar (PWA önbelleği) küçük kalsın.
+// Kamera modeli (~24 MB) önbelleğe girmez; sadece ebeveyn kamerayı açınca iner.
+// Ölçüm (10 Ekim 2026): önbellek ~2.5 MB, ana dosya ~460 KB (sıkıştırılmış); 4 kat yavaş işlemci + yavaş
+// internette oyun ~2.6 sn'de açılıyor.
+test('ilk açılışta indirilenler küçük kalır (kamera modeli hariç)', async () => {
+  const fs = await import('fs');
+  const zlib = await import('zlib');
+  const sw = fs.readFileSync('dist/sw.js', 'utf8');
+  const adresler = [...sw.matchAll(/url:"([^"]+)"/g)].map((m) => m[1]);
+  expect(adresler.length).toBeGreaterThan(5);
+  expect(adresler.filter((a) => a.includes('mediapipe'))).toEqual([]);
+  const toplam = adresler.reduce((t, a) => t + fs.statSync(`dist/${a}`).size, 0);
+  expect(toplam).toBeLessThan(3.5 * 1024 * 1024);
+  const ana = adresler.find((a) => /assets\/index-.*\.js$/.test(a))!;
+  expect(zlib.gzipSync(fs.readFileSync(`dist/${ana}`)).length).toBeLessThan(600 * 1024);
+});
