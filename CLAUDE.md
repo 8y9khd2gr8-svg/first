@@ -54,6 +54,8 @@ Teknoloji: Phaser 3 + TypeScript + Vite, GitHub Pages ile yayın. İleride Capac
   tatilinde mağaza, 23 Nisan büyük güncelleme. Yorumlar organize ettirilmez (mağaza kuralı);
   çevre beta testçisi olarak kullanılır.
 - Hareketler futbol takımının fizyoterapistlerine danışılacak (hareket kataloğu sayfası; ertelendi).
+- Test: ücretli yapay zekâ test hizmeti (Nunu.ai gibi) şimdilik yok; Play ön lansman raporu (ücretsiz, gerçek telefonlarda
+  çökme/ekran görüntüsü) + kendi otomatik testlerimiz + Yağız testi. Beta sonrası gerekirse yeniden bakılır.
 - Ebeveyn köşesi (kilitli): haftalık hareket özeti + paylaş, pasaport düzenleme. Özet dürüst:
   sayılar çocuğun "Yaptım!" dediği hareketler; oyun gerçekten yapıldığını algılayamaz. Kamera açıkken yapılan hareketlerden
   kaçını kameranın gördüğü ayrıca yazılır (zipzip-istatistik-v1: kameraAcik / kameraGordu). Kamera ile
@@ -142,6 +144,9 @@ Teknoloji: Phaser 3 + TypeScript + Vite, GitHub Pages ile yayın. İleride Capac
   Eşikler gerçek çocukla denenmedi; Yağız testinde ayarlanacak.
   Pakette MediaPipe'in sadece hızlı (SIMD) hâli var (~15 MB; yavaş kopya 9 MB'tı, çıkarıldı): SIMD'siz eski telefonda
   (iOS 16.4 öncesi) kamera seçeneği görünmez (kamera.ts kameraDesteklenir), oyun aynen çalışır.
+  Kamera denemesi (EbeveynKameraScene, ebeveyn köşesinde kamera ayarının yanında "🔍 Dene"): canlı görüntü + vücut noktaları,
+  6 sayma yolundan biri seçilir, sayı ve "görüyorum/geri git" durumu görünür; kamera dokununca açılır, sayılar özete eklenmez.
+  Yağız testinde eşik ayarı için kullanılır.
 - Doğruluk: Çin Seddi uzaydan gözle GÖRÜLMEZ (efsane); Truva Atı "efsaneye göre". Ürkütücü kelime yok
   ("taş heykel başları" gibi); hayali nesne kaldırmada "hayali" denir (dışarıda gerçek taş kaldırma özentisi olmasın).
 - İleride konuşulacak (acele yok, 23 Nisan ya da sonrası): Zıpzıp'ın kendi dünyası haritası ve ek oyunlar

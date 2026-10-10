@@ -158,7 +158,12 @@ export class KameraSayaci {
   private kare = 0;
   private bitti = false;
 
-  constructor(animasyon: Animasyon, private degisince: (sayi: number, durum: KameraDurumu) => void) {
+  // noktalarGelince: her karede bulunan vücut noktaları (kamera denemesi ekranı çizer); kimse yoksa undefined.
+  constructor(
+    animasyon: Animasyon,
+    private degisince: (sayi: number, durum: KameraDurumu) => void,
+    private noktalarGelince?: (n: NormalizedLandmark[] | undefined) => void,
+  ) {
     this.sayici = new Sayici(animasyon);
     this.video.muted = true;
     this.video.playsInline = true;
@@ -195,6 +200,7 @@ export class KameraSayaci {
           sonZaman = this.video.currentTime;
           const sonuc = model.detectForVideo(this.video, performance.now());
           const n = sonuc.landmarks[0];
+          this.noktalarGelince?.(n);
           // Tüm vücut (omuzlar ve topuklar) görünüyor mu?
           const tamGorunuyor = !!n && [SOL_OMUZ, SAG_OMUZ, SOL_TOPUK, SAG_TOPUK].every((i) => (n[i]?.visibility ?? 0) > 0.5);
           if (tamGorunuyor) {
@@ -209,6 +215,12 @@ export class KameraSayaci {
     } catch {
       this.bildir('hata');
     }
+  }
+
+  // Kamera denemesi: başka bir hareketi saymaya baştan başlar (kamera kapanmadan).
+  yolDegistir(animasyon: Animasyon) {
+    this.sayici = new Sayici(animasyon);
+    this.bildir(this.durum);
   }
 
   durdur() {
