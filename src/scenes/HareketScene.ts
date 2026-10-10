@@ -7,7 +7,7 @@ import { SOGUMA_ID, hareketYapildi, oturumListesi } from '../oturum';
 import { uzaktanAcikMi } from '../ayarlar';
 import { Animasyon, Hareket } from '../hareketler';
 import { hareketKaydet } from '../istatistik';
-import { KAMERA_HAREKETLERI, KameraSayaci, kameraAcikMi } from '../kamera';
+import { KAMERA_HAREKETLERI, KameraSayaci, kameraAcikMi, kameraDesteklenir } from '../kamera';
 import { GERI_SAYIM, M, SAYILAR } from '../metinler';
 import { bip, konus, sustur, zaferMuzigi } from '../ses';
 import { Zipzip } from '../zipzip';
@@ -222,7 +222,7 @@ export class HareketScene extends Phaser.Scene {
 
   // Sağ üstte küçük kamera önizlemesi ve sayı. Görüntü sadece ekranda gösterilir.
   private kameraKur(hareket: Hareket) {
-    if (!kameraAcikMi() || hareket.tur !== 'sayi' || hareket.dizi || !KAMERA_HAREKETLERI.includes(hareket.animasyon)) return;
+    if (!kameraAcikMi() || !kameraDesteklenir() || hareket.tur !== 'sayi' || hareket.dizi || !KAMERA_HAREKETLERI.includes(hareket.animasyon)) return;
     const kutu = document.createElement('div');
     kutu.style.cssText = 'width:150px;height:140px;border-radius:16px;overflow:hidden;background:#0b1430;border:4px solid #FFC93C;position:relative;font-family:"Baloo 2",sans-serif;';
     const yazi = document.createElement('div');

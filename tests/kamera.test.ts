@@ -1,9 +1,10 @@
 // Kamerayla sayma: yapay vücut noktalarıyla (gerçek kamera olmadan) her sayma yolunu dener.
 // Değerler MediaPipe'ın verdiği gibi 0-1 arası; y aşağı doğru büyür.
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
 import { test } from 'node:test';
 import type { NormalizedLandmark } from '@mediapipe/tasks-vision';
-import { BURUN, KAMERA_HAREKETLERI, SAG_BILEK, SAG_DIZ, SAG_KALCA, SAG_OMUZ, SAG_TOPUK, SOL_BILEK, SOL_DIZ, SOL_KALCA, SOL_OMUZ, SOL_TOPUK, Sayici } from '../src/kamera';
+import { BURUN, KAMERA_HAREKETLERI, SAG_BILEK, SAG_DIZ, SAG_KALCA, SAG_OMUZ, SAG_TOPUK, SOL_BILEK, SOL_DIZ, SOL_KALCA, SOL_OMUZ, SOL_TOPUK, Sayici, simdVarMi } from '../src/kamera';
 import { K } from '../src/hareketler';
 
 type Durus = { x?: number; omuzY?: number; kalcaY?: number; bilekY?: number; solDizY?: number; sagDizY?: number; ayakAciklik?: number; topukY?: number };
@@ -64,4 +65,9 @@ test('kamera: görüntüdeki küçük titreme tekrar sayılmaz', () => {
     for (let k = 0; k < 300; k++) s.besle(nokta({}).map((p) => ({ ...p, x: p.x + rastgele(), y: p.y + rastgele() })));
     assert.equal(s.sayi, 0, a);
   }
+});
+
+test('pakette MediaPipe sadece SIMD hâliyle durur; SIMD denetimi çalışır', () => {
+  assert.equal(simdVarMi(), true);
+  assert.deepEqual(fs.readdirSync('public/mediapipe').filter((d) => d.includes('nosimd')), []);
 });
