@@ -11,12 +11,12 @@ jobs:
   aab:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
           node-version: 22
           cache: npm
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v6
         with:
           distribution: temurin
           java-version: 21
@@ -49,7 +49,7 @@ jobs:
       - name: Anahtarı sil
         if: always()
         run: rm -f "$RUNNER_TEMP/yukleme.jks"
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: zip-zip-dunya-play
           path: android/app/build/outputs/bundle/release/app-release.aab

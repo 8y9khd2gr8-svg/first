@@ -27,7 +27,7 @@
   },
   "devDependencies": {
     "@capacitor/cli": "^7.6.9",
-    "@playwright/test": "^1.56.1",
+    "@playwright/test": "^1.64.0",
     "@types/d3-geo": "^3.1.1",
     "@types/topojson-client": "^3.1.5",
     "tsx": "^4.23.15",
