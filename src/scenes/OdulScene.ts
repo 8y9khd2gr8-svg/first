@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { RENK, YAZI_TIPI } from '../ayarlar';
 import { buyukDugme, rozetCiz, yildizliArkaPlan } from '../arayuz';
+import { AILE_ID, AILE_OTURUMU } from '../aile';
 import { durakBul, haritaSahnesi, oturum } from '../duraklar';
 import { tamamla, tamamlananlar } from '../ilerleme';
 import { M } from '../metinler';
@@ -11,6 +12,7 @@ import { bip, konus, sustur, zaferMuzigi } from '../ses';
 const KONFETI_RENKLERI = [0xffc93c, 0xff8a3d, 0x3fbf5f, 0x2f80ed, 0xff6b6b, 0xffffff];
 
 // Durak bitti: konfeti, üç yıldız ve pasaport damgası.
+// Aile oturumu bitince damga yerine "Aile Takımı" mührü çıkar (ilerleme kaydı değişmez).
 export class OdulScene extends Phaser.Scene {
   private durakId = '';
   private kutlamaKatmani!: Phaser.GameObjects.Container;
@@ -27,9 +29,10 @@ export class OdulScene extends Phaser.Scene {
     yildizliArkaPlan(this);
     const { width, height } = this.scale.gameSize;
     const x = width / 2;
-    const durak = durakBul(this.durakId);
-    const yeniBitti = !tamamlananlar().includes(durak.id);
-    tamamla(durak.id);
+    const aile = this.durakId === AILE_ID;
+    const durak = aile ? undefined : durakBul(this.durakId);
+    const yeniBitti = !!durak && !tamamlananlar().includes(durak.id);
+    if (durak) tamamla(durak.id);
 
     for (let i = 0; i < 90; i++) {
       const parca = this.add.rectangle(
@@ -71,7 +74,7 @@ export class OdulScene extends Phaser.Scene {
 
     // Kazanılan yıldızlar (her "Yaptım!" 1 yıldız): kostümler bu yıldızlarla açılır.
     this.add
-      .text(x, 425, `+${oturum(durak).length} ⭐ yıldız`, { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '34px', color: '#FFC93C' })
+      .text(x, 425, `+${durak ? oturum(durak).length : AILE_OTURUMU.length} ⭐ yıldız`, { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '34px', color: '#FFC93C' })
       .setOrigin(0.5);
 
     // Pasaport damgası: yukarıdan "pat" diye basılır.
@@ -80,8 +83,8 @@ export class OdulScene extends Phaser.Scene {
     cember.lineStyle(10, RENK.turuncu).strokeCircle(0, 0, 170);
     cember.lineStyle(4, RENK.turuncu).strokeCircle(0, 0, 145);
     damga.add(cember);
-    damga.add(this.add.text(0, -40, durak.simge, { fontSize: '120px' }).setOrigin(0.5));
-    damga.add(this.add.text(0, 70, durak.yer.toLocaleUpperCase('tr'), { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '46px', color: '#FF8A3D' }).setOrigin(0.5));
+    damga.add(this.add.text(0, -40, durak ? durak.simge : '👪', { fontSize: '120px' }).setOrigin(0.5));
+    damga.add(this.add.text(0, 70, durak ? durak.yer.toLocaleUpperCase('tr') : 'AİLE TAKIMI', { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '46px', color: '#FF8A3D' }).setOrigin(0.5));
     damga.add(this.add.text(0, 115, 'ZIP ZIP DÜNYA', { fontFamily: YAZI_TIPI, fontSize: '24px', color: '#FF8A3D' }).setOrigin(0.5));
     damga.setScale(2.5).setAlpha(0);
     this.tweens.add({
@@ -98,7 +101,7 @@ export class OdulScene extends Phaser.Scene {
     });
 
     zaferMuzigi();
-    this.time.delayedCall(500, () => konus(M.damgaKazandin(durak.yer)));
+    this.time.delayedCall(500, () => konus(durak ? M.damgaKazandin(durak.yer) : M.aileBitti));
 
     // Yeni rozet ve kostümler damgadan sonra sırayla kutlanır (rozetlerden en fazla ilki, "+2" yazar).
     const rozetler = yeniRozetleriAl();
@@ -111,14 +114,15 @@ export class OdulScene extends Phaser.Scene {
 
     this.kutlamaKatmani = this.add.container(0, 0).setDepth(10);
 
-    buyukDugme(this, x, 1010, 'Haritaya dön ▶', RENK.turuncu, () => {
+    buyukDugme(this, x, 1010, durak ? 'Haritaya dön ▶' : 'Maceraya dön ▶', RENK.turuncu, () => {
       sustur();
-      this.scene.start(haritaSahnesi(durak), yeniBitti ? { yolculukDen: durak.id } : {});
+      if (!durak) this.scene.start('Macera', {});
+      else this.scene.start(haritaSahnesi(durak), yeniBitti ? { yolculukDen: durak.id } : {});
     }, { genislik: 540, yukseklik: 150, yaziBoyu: 64 });
 
     buyukDugme(this, x, 1170, 'Bir daha ↻', RENK.mavi, () => {
       sustur();
-      this.scene.start('Hareket', { durakId: durak.id, adim: 0 });
+      this.scene.start('Hareket', { durakId: this.durakId, adim: 0 });
     }, { genislik: 400, yukseklik: 110, yaziBoyu: 52 });
   }
 

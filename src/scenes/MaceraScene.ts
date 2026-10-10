@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { RENK, YAZI_TIPI } from '../ayarlar';
 import { evDugmesi, yildizliArkaPlan } from '../arayuz';
+import { AILE_ID } from '../aile';
 import { BOLUMLER, BolumId, DUNYA, TURKIYE } from '../duraklar';
 import { bolumAcik, tamamlananlar } from '../ilerleme';
 import { M } from '../metinler';
@@ -49,6 +50,16 @@ export class MaceraScene extends Phaser.Scene {
     pasaport.on('pointerdown', () => {
       sustur();
       this.scene.start('Pasaport', {});
+    });
+    // Aileyle hareketler: bir büyüğüyle birlikte yapılan 5 hareket (damga vermez).
+    const aile = this.add.container(95, 1180);
+    aile.add(this.add.circle(0, 0, 54, RENK.yesil).setStrokeStyle(5, RENK.beyaz));
+    aile.add(this.add.text(0, 0, '👪', { fontSize: '50px' }).setOrigin(0.5));
+    aile.add(this.add.text(0, 66, 'Ailece', { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '26px', color: '#ffffff' }).setOrigin(0.5));
+    aile.setSize(110, 110).setInteractive({ useHandCursor: true });
+    aile.on('pointerdown', () => {
+      sustur();
+      this.scene.start('Hareket', { durakId: AILE_ID, adim: 0 });
     });
     this.add
       .text(x, 85, 'Büyük Macera', { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '58px', color: '#FFC93C', stroke: '#0b1430', strokeThickness: 12 })

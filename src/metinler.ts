@@ -1,3 +1,4 @@
+import { AILE_OTURUMU } from './aile';
 import { DUNYA, TURKIYE, UZAY } from './duraklar';
 import { H, ISINMA, SOGUMA } from './hareketler';
 import { AVATARLAR } from './pasaport';
@@ -14,6 +15,7 @@ export const GERI_SAYIM = ['Üç!', 'İki!', 'Bir!', 'Başla!'];
 export const M = {
   yaptinMi: 'Süper! Yaptıysan, Yaptım düğmesine bas!',
   aferin: 'Aferin!',
+  aileBitti: 'Ailece süpersiniz! Birlikte çok güzel hareket ettiniz!',
   yolaCikiyoruz: 'Yola çıkıyoruz!',
   oncekiniBitir: 'Önce sıradaki durağı bitirelim!',
   turBitti: 'Tebrikler! Türkiye turunu bitirdin!',
@@ -59,6 +61,8 @@ export function tumMetinler(): string[] {
     ...AVATARLAR.map((a) => M.karakterSecildi(a.ad)),
     ...ROZETLER.flatMap((r) => [M.yeniRozet(r.ad), M.rozetAdi(r.ad), M.rozetNasil(r.nasil)]),
     M.kostumDolabi,
+    M.aileBitti,
+    ...AILE_OTURUMU.map((h) => h.sesli),
     ...KOSTUMLER.flatMap((k) => [M.kostumSecildi(k.ad), M.yeniKostum(k.ad)]),
   ]);
   [TURKIYE, DUNYA, UZAY].forEach((bolum) =>
