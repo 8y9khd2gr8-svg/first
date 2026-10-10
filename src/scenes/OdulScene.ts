@@ -6,8 +6,8 @@ import { oturumListesi } from '../oturum';
 import { durakBul, haritaSahnesi } from '../duraklar';
 import { tamamla, tamamlananlar } from '../ilerleme';
 import { M } from '../metinler';
-import { yeniRozetleriAl } from '../rozetler';
-import { kostumSec, yeniKostumleriAl } from '../kostumler';
+import { rozetleriKutla, yeniRozetler } from '../rozetler';
+import { kostumSec, kostumuKutla, yeniKostumler } from '../kostumler';
 import { SOGUMA_ID } from '../oturum';
 import { bip, konus, sustur, zaferMuzigi } from '../ses';
 
@@ -117,11 +117,21 @@ export class OdulScene extends Phaser.Scene {
     }
 
     // Yeni rozet ve kostümler damgadan sonra sırayla kutlanır (rozetlerden en fazla ilki, "+2" yazar).
-    const rozetler = yeniRozetleriAl();
-    const kostumler = yeniKostumleriAl();
+    // Kutlandı kaydı, kutlama ekranda göründüğü anda yapılır (önce çıkılırsa sonraki durakta kutlanır).
+    const rozetler = yeniRozetler();
+    const kostumler = yeniKostumler();
     const kutlamalar: (() => void)[] = [];
-    if (rozetler.length) kutlamalar.push(() => this.rozetKutla(rozetler[0].simge, rozetler[0].ad, rozetler.length - 1, 'Yeni rozet!', M.yeniRozet(rozetler[0].ad), sonraki));
-    kostumler.forEach((k) => kutlamalar.push(() => this.rozetKutla(k.simge, k.ad, 0, 'Yeni kostüm!', M.yeniKostum(k.ad), sonraki, 'Hemen giymek ister misin?', () => kostumSec(k.id))));
+    if (rozetler.length)
+      kutlamalar.push(() => {
+        rozetleriKutla(rozetler);
+        this.rozetKutla(rozetler[0].simge, rozetler[0].ad, rozetler.length - 1, 'Yeni rozet!', M.yeniRozet(rozetler[0].ad), sonraki);
+      });
+    kostumler.forEach((k) =>
+      kutlamalar.push(() => {
+        kostumuKutla(k);
+        this.rozetKutla(k.simge, k.ad, 0, 'Yeni kostüm!', M.yeniKostum(k.ad), sonraki, 'Hemen giymek ister misin?', () => kostumSec(k.id));
+      }),
+    );
     const sonraki = () => kutlamalar.shift()?.();
     if (kutlamalar.length) this.time.delayedCall(soru ? 6800 : 3400, sonraki);
 

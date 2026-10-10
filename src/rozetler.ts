@@ -80,18 +80,20 @@ function kutlananlar(): Set<string> {
   }
 }
 
-// Henüz kutlaması yapılmamış yeni rozetleri döndürür ve kutlandı olarak işaretler.
-export function yeniRozetleriAl(): Rozet[] {
+// Henüz kutlaması yapılmamış yeni rozetler. Kutlama ekranda görününce rozetleriKutla() ile işaretlenir;
+// çocuk kutlamadan önce ekrandan çıkarsa rozet bir sonraki durak sonunda kutlanır (kaybolmaz).
+export function yeniRozetler(): Rozet[] {
   const once = kutlananlar();
   const kazanilan = kazanilanlar();
-  const yeni = ROZETLER.filter((r) => kazanilan.has(r.id) && !once.has(r.id));
-  if (yeni.length) {
-    yeni.forEach((r) => once.add(r.id));
-    try {
-      localStorage.setItem(KUTLANAN_ANAHTAR, JSON.stringify([...once]));
-    } catch {
-      // kayıt olmazsa rozet bir dahaki sefere yine kutlanır; sorun değil
-    }
+  return ROZETLER.filter((r) => kazanilan.has(r.id) && !once.has(r.id));
+}
+
+export function rozetleriKutla(rozetler: Rozet[]) {
+  const once = kutlananlar();
+  rozetler.forEach((r) => once.add(r.id));
+  try {
+    localStorage.setItem(KUTLANAN_ANAHTAR, JSON.stringify([...once]));
+  } catch {
+    // kayıt olmazsa rozet bir dahaki sefere yine kutlanır; sorun değil
   }
-  return yeni;
 }
