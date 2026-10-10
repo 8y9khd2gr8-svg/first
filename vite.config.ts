@@ -15,6 +15,10 @@ export default defineConfig({
       workbox: {
         globPatterns: ['**/*.{js,css,html,svg,png,woff2,mp3}'],
         maximumFileSizeToCacheInBytes: 4 * 1024 * 1024,
+        // Kamera modelinin büyük dosyaları baştan indirilmez; kamera ilk açıldığında
+        // indirilip telefona kaydedilir, sonra internetsiz de çalışır.
+        globIgnores: ['mediapipe/**'],
+        runtimeCaching: [{ urlPattern: /\/mediapipe\//, handler: 'CacheFirst', options: { cacheName: 'kamera-modeli' } }],
       },
       manifest: {
         name: 'Zıp Zıp Dünya',

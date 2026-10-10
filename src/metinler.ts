@@ -15,6 +15,7 @@ export const GERI_SAYIM = ['Üç!', 'İki!', 'Bir!', 'Başla!'];
 export const M = {
   yaptinMi: 'Süper! Yaptıysan, Yaptım düğmesine bas!',
   aferin: 'Aferin!',
+  kameraGordu: 'Kamera gördü, harikasın!',
   aileBitti: 'Ailece süpersiniz! Birlikte çok güzel hareket ettiniz!',
   yolaCikiyoruz: 'Yola çıkıyoruz!',
   oncekiniBitir: 'Önce sıradaki durağı bitirelim!',
@@ -62,6 +63,7 @@ export function tumMetinler(): string[] {
     ...ROZETLER.flatMap((r) => [M.yeniRozet(r.ad), M.rozetAdi(r.ad), M.rozetNasil(r.nasil)]),
     M.kostumDolabi,
     M.aileBitti,
+    M.kameraGordu,
     ...AILE_OTURUMU.map((h) => h.sesli),
     ...KOSTUMLER.flatMap((k) => [M.kostumSecildi(k.ad), M.yeniKostum(k.ad)]),
   ]);

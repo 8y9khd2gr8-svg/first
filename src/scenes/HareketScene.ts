@@ -5,6 +5,7 @@ import { AILE_ID, AILE_OTURUMU } from '../aile';
 import { durakBul, haritaSahnesi, oturum } from '../duraklar';
 import { Hareket } from '../hareketler';
 import { hareketKaydet } from '../istatistik';
+import { KAMERA_HAREKETLERI, KameraSayaci, kameraAcikMi } from '../kamera';
 import { GERI_SAYIM, M, SAYILAR } from '../metinler';
 import { bip, konus, sustur, zaferMuzigi } from '../ses';
 import { Zipzip } from '../zipzip';
@@ -19,6 +20,9 @@ export class HareketScene extends Phaser.Scene {
   private zipzip!: Zipzip;
   private sayac!: Phaser.GameObjects.Text;
   private bilgi!: Phaser.GameObjects.Text;
+  // Kamera ile sayma (ebeveyn açtıysa ve hareket destekleniyorsa).
+  private kamera: KameraSayaci | null = null;
+  private kameraHedefe: (() => void) | null = null;
 
   constructor() {
     super('Hareket');
@@ -73,6 +77,7 @@ export class HareketScene extends Phaser.Scene {
       .setOrigin(0.5);
 
     konus(hareket.sesli);
+    this.kameraKur(hareket);
 
     // Gösterim: Zıpzıp hareketi bir iki kez yapar.
     const gosterimSuresi = 2600;
@@ -136,12 +141,30 @@ export class HareketScene extends Phaser.Scene {
     konus(M.yaptinMi);
 
     const x = this.scale.gameSize.width / 2;
-    const dugme = buyukDugme(this, x, 1080, 'Yaptım!', RENK.yesil, () => {
+    let bitti = false;
+    const yaptim = () => {
+      if (bitti) return;
+      bitti = true;
+      this.kameraHedefe = null;
       sustur();
       hareketKaydet(hareket);
       dugme.destroy();
       this.sonraki();
-    }, { genislik: 500, yukseklik: 170, yaziBoyu: 84 });
+    };
+    const dugme = buyukDugme(this, x, 1080, 'Yaptım!', RENK.yesil, yaptim, { genislik: 500, yukseklik: 170, yaziBoyu: 84 });
+    // Kamera hedef sayıyı gördüyse kendiliğinden geçer; görmediyse düğme bekler
+    // (kaybetmek yok) ve kamera saymaya devam eder.
+    if (this.kamera && hareket.tur === 'sayi') {
+      const hedef = hareket.adet;
+      this.kameraHedefe = () => {
+        if (this.kamera && this.kamera.sayi >= hedef) {
+          konus(M.kameraGordu);
+          this.time.delayedCall(900, yaptim);
+          this.kameraHedefe = null;
+        }
+      };
+      this.kameraHedefe();
+    }
     dugme.setScale(0);
     this.tweens.add({ targets: dugme, scale: 1, duration: 400, ease: 'Back.easeOut' });
     this.tweens.add({ targets: dugme, angle: { from: -3, to: 3 }, duration: 500, yoyo: true, repeat: -1, delay: 400 });
@@ -164,6 +187,32 @@ export class HareketScene extends Phaser.Scene {
     this.tweens.add({ targets: aferin, scale: 1, duration: 350, ease: 'Back.easeOut' });
     this.zipzip.birKez('zipla', 900);
     this.time.delayedCall(1300, () => this.scene.restart({ durakId: this.durakId, adim: this.adim + 1 }));
+  }
+
+  // Sağ üstte küçük kamera önizlemesi ve sayı. Görüntü sadece ekranda gösterilir.
+  private kameraKur(hareket: Hareket) {
+    if (!kameraAcikMi() || hareket.tur !== 'sayi' || !KAMERA_HAREKETLERI.includes(hareket.animasyon)) return;
+    const kutu = document.createElement('div');
+    kutu.style.cssText = 'width:150px;height:140px;border-radius:16px;overflow:hidden;background:#0b1430;border:4px solid #FFC93C;position:relative;font-family:"Baloo 2",sans-serif;';
+    const yazi = document.createElement('div');
+    yazi.style.cssText = 'position:absolute;left:0;right:0;bottom:0;background:#0b1430cc;color:#fff;font-weight:700;font-size:20px;text-align:center;line-height:30px;';
+    yazi.textContent = '📷 Hazırlanıyor';
+    const kamera = new KameraSayaci(hareket.animasyon, (sayi, durum) => {
+      yazi.textContent =
+        durum === 'hata' ? '📷 Açılamadı' : durum === 'goremiyorum' ? '📷 Geri git' : durum === 'yukleniyor' ? '📷 Hazırlanıyor' : `📷 ${Math.min(sayi, hareket.adet)}/${hareket.adet}`;
+      this.kameraHedefe?.();
+    });
+    const video = kamera.onizleme;
+    video.style.cssText = 'width:100%;height:110px;object-fit:cover;transform:scaleX(-1);display:block;';
+    kutu.append(video, yazi);
+    this.add.dom(626, 78, kutu);
+    this.kamera = kamera;
+    kamera.baslat();
+    this.events.once('shutdown', () => {
+      kamera.durdur();
+      this.kamera = null;
+      this.kameraHedefe = null;
+    });
   }
 
   // Aile oturumu ya da durağın kendi oturumu.
