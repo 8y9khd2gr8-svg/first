@@ -54,16 +54,17 @@ Hesap açmak, para ödemek ve uygulamayı mağazaya göndermek sizde. Teknik haz
 ## 3b. Play kapalı test paketi (yükleme anahtarı + AAB)
 
 Play'e **AAB** denen imzalı paket yüklenir (APK sadece elden kurulum içindir). Paketi imzalayan
-**yükleme anahtarı** üretildi ve size `PLAY-ANAHTARI-GIZLI.txt` + `zipzip-yukleme.jks` olarak gönderildi.
-Uygulamanın asıl imzasını Google saklar (Play App Signing). Yükleme anahtarı kaybolursa Play Console'dan
-yenisi istenebilir. Yine de **güvenli saklayın, kimseyle paylaşmayın**.
+**yükleme anahtarı** depoda kilitli olarak durur (`android/yukleme-anahtari.jks.enc`, takma adı `zipzip`).
+Kilidi açan **parola** size sohbette verildi; sadece GitHub'daki gizli değerde ve sizde bulunur.
+Uygulamanın asıl imzasını Google saklar (Play App Signing). Parola kaybolursa Play Console'dan
+yeni yükleme anahtarı istenir (Kurulum → Uygulama imzalama → Yükleme anahtarını sıfırla). Yine de **parolayı
+kimseyle paylaşmayın**.
 
-**Bir kez yapılacaklar:**
-1. GitHub'da proje → **Settings** → **Secrets and variables** → **Actions** → **New repository secret**.
-2. `PLAY-ANAHTARI-GIZLI.txt` içindeki üç değeri (ad + değer) tek tek ekleyin: `ANDROID_KEY_ALIAS`,
-   `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEYSTORE_BASE64`. Değerler eklendikten sonra GitHub da göstermez, kimse göremez.
-3. İki dosyayı da güvenli bir yerde saklayın (şifre yöneticisi ya da sadece sizin erişebildiğiniz bulut klasörü).
-   Sonra telefonunuzdaki indirilmiş kopyaları silebilirsiniz.
+**Bir kez yapılacak (telefondan 1 dakika):**
+1. Telefonun tarayıcısında `github.com/8y9khd2gr8-svg/first/settings/secrets/actions` açın (GitHub uygulaması
+   bu ayarı göstermez; açılmazsa tarayıcı menüsünden "Masaüstü sitesi").
+2. **New repository secret** → Name: `PLAY_ANAHTAR_PAROLASI`, Secret: parola → **Add secret**.
+3. Parolayı şifre yöneticisine (ya da sadece sizin açabildiğiniz bir nota) kaydedin.
 
 **Mağaza sayfası görselleri** (kapalı test için de gerekir): `docs/magaza-gorselleri/` klasöründe.
 `ekran-1..7.png` telefon ekran görüntüleri (1080×1920), `tanitim-1024x500.png` "Öne çıkan grafik",

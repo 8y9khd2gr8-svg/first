@@ -87,6 +87,7 @@ test('en uzun sayılı hareket sonuna kadar gider ("Yaptım!" çıkar)', async (
 });
 
 test('Zıpzıp her hareketi hatasız yapar', async ({ page }) => {
+  test.setTimeout(120_000); // 38 hareket tek tek: bulutta ~42 sn, yavaş GitHub makinesinde 60 sn'yi aşabiliyor
   const kayit = await oyunuAc(page);
   await sahneAc(page, 'Kostum');
   const animasyonlar: string[] = await page.evaluate(async () => {
