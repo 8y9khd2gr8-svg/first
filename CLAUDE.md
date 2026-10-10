@@ -118,6 +118,10 @@ Teknoloji: Phaser 3 + TypeScript + Vite, GitHub Pages ile yayın. İleride Capac
   (15 dk aradan sonra yine), her durakta 1 sürpriz (donma / ayna oyunu), soğuma bölüm sonunda ya da Ödül
   ekranındaki "🌙 Bitirelim" ile. Test: sıralı bölümde önceki 2 durağın hareket türü tekrar edilmez; yürü/koş
   komutu "yerinde" der (kamera için çocuk yerinden ayrılmaz). Bilgi 2 cümle; durak sonunda "Evde birine sor: ..."
+- "Bilgiler sadece bu telefonda" kanıtla gösterilir: ebeveyn köşesinin altındaki bağlantı EbeveynVeriScene'i açar (telefonda
+  saklanan her şey + toplam boyut + "uçak modunu açıp deneyin"). Yeni bir kayıt eklenirse bu listeye de eklenmeli.
+- Okunurluk: `npm run test:oyun` her ekranda renk zıtlığını ölçer (küçük yazı 4.5, büyük 3). Turuncu 0xee6a1f, yeşil 0x2fa84f
+  (beyaz yazı okunsun diye); açık kâğıt üstünde turuncu yazı #C2410C.
 - "Uzaktan oyna" (durak girişinde): açıksa "Yaptım!" beklemeden 3 sn sonra geçer (zipzip-uzaktan-v1).
 - Kamera isteğe bağlı kalır (izin velileri tedirgin eder); Ailece'de kamera kapalı (iki kişi güvenilir sayılmaz).
 - Doğruluk: Çin Seddi uzaydan gözle GÖRÜLMEZ (efsane); Truva Atı "efsaneye göre". Ürkütücü kelime yok

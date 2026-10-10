@@ -78,9 +78,8 @@ export class EbeveynMenuScene extends Phaser.Scene {
       : `<span style="font: 400 26px 'Baloo 2', Arial, sans-serif; color: #cfe3ff;">✉️ Görüşlerinizi beta grubuna yazabilirsiniz.</span>`;
     geri.updateSize();
 
-    this.add
-      .text(x, 1198, 'Reklam yok. Hesap yok.\nBütün bilgiler sadece bu telefonda saklanır.', { fontFamily: YAZI_TIPI, fontSize: '26px', color: '#9fb6d9', align: 'center' })
-      .setOrigin(0.5);
+    // "Bilgiler sadece bu telefonda" sözü kanıtıyla: dokununca telefonda saklanan her şey listelenir.
+    baglanti(1190, '🔒 Bilgiler sadece bu telefonda: göster').on('pointerdown', () => this.scene.start('EbeveynVeri', {}));
     this.add.text(x, 1256, `Sürüm ${__SURUM__}`, { fontFamily: YAZI_TIPI, fontSize: '24px', color: '#8299bf' }).setOrigin(0.5);
   }
 }

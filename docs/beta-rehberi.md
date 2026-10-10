@@ -42,6 +42,8 @@ Pasaport ekranının sağ üstündeki ✏️ düğmesinden girilir. Basit bir ç
   Görüntü telefonun içinde işlenir, kaydedilmez, hiçbir yere gönderilmez. Açmak tamamen isteğe bağlıdır.
 - **🧪 Beta: bütün bölümleri aç:** Türkiye Turu'nu bitirmeden diğer bölümlere (Dünya, Uzay, Spor...) bakmak için.
 - **🗑️ Tüm verileri sil:** oyunun bu telefondaki her şeyini siler (iki kez dokunmak gerekir).
+- **🔒 Bilgiler sadece bu telefonda: göster:** oyunun telefonda sakladığı her şeyi listeler. Uçak modunu açıp
+  oyunun aynen çalıştığını kendiniz görebilirsiniz.
 - En altta **sürüm numarası** var (ör. 0.9.0). Bir sorun yazarken bunu da ekleyin.
 
 Hesap, kayıt, reklam yok. Oyun internete bağlanmaz; bütün bilgiler sadece bu telefonda saklanır.
