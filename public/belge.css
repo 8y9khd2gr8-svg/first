@@ -17,3 +17,4 @@ table { width: 100%; border-collapse: collapse; font-size: 15px; }
 th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid color-mix(in srgb, var(--soluk) 35%, transparent); vertical-align: top; }
 .tablo { overflow-x: auto; }
 a { color: var(--vurgu); }
+.kucuk { font-size: 0.85em; opacity: 0.8; }
