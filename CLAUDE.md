@@ -21,7 +21,10 @@ Teknoloji: Phaser 3 + TypeScript + Vite, GitHub Pages ile yayın. İleride Capac
   Hedef sadece mağazalar: web adresi (GitHub Pages) beta sonuna kadar yalnızca test için kalır;
   mağazaya çıkarken oyun siteden kaldırılır, sadece gizlilik.html ve kosullar.html kalır
   (mağazalar gizlilik politikası adresi ister).
-- Kamera ile hareket algılama sonraya bırakıldı; şimdilik çocuk "Yaptım!" düğmesine basar.
+- Hareket doğrulama kararı: "Yaptım!" düğmesi hareket süresi/sayımı bitince belirir (varsayılan).
+  Kamera modu isteğe bağlı, ebeveyn köşesinden açılır: MediaPipe Pose, model dosyası pakette, cihaz
+  içinde çalışır, görüntü kaydedilmez/gönderilmez (gizlilik.html'e eklenmeli). Önce basit hareketler
+  (zıpla, çömel, kollar). Sesli "Yaptım" komutu yok (ses dış sunucuya gidebilir, çocuk sesi zor tanınır).
 
 - Hareket komutları benzetme değil, vücut parçasını söyleyen tek ve net eylem olmalı
   ("Tek ayağını kaldır", "Dizlerini sırayla kaldır"). "Leylek gibi", "kuş gibi kanat çırp",
