@@ -59,6 +59,9 @@ EBEVEYNLER İÇİN
 FİYAT
 Türkiye Turu tamamen ücretsiz. Tek seferlik ödemeyle Dünya Harikaları, Uzay Yolculuğu, Spor Kampı, Dinozorlar Diyarı, Evde Macera ve gelecek bütün bölümler açılır. Abonelik yok.
 
+**Tanıtım metni – Apple** (170; sürüm göndermeden değiştirilebilir)
+Reklamsız, Türkçe, internetsiz çalışan hareket oyunu. Türkiye Turu ücretsiz; zıpla, çömel, damgaları topla!
+
 **Yenilikler (ilk sürüm)**
 Zıp Zıp Dünya yayında! Türkiye'yi, dünyanın harikalarını, uzayı, spor kampını, dinozorları ve evdeki macerayı hareket ederek keşfedin.
 
@@ -118,5 +121,11 @@ FOR PARENTS
 
 PRICE
 The Türkiye Tour is completely free. A single one-time purchase unlocks Wonders of the World, Space Journey, Sports Camp, Dinosaur Land, Adventure at Home and all future chapters. No subscription.
+
+**Promotional text – Apple** (170)
+An ad-free movement game that works offline. The Türkiye Tour is free: jump, squat and collect passport stamps!
+
+**What's new (first release)**
+Zip Zip World is here! Explore Türkiye, the wonders of the world, space, sports camp, dinosaurs and an adventure at home, all by moving.
 
 > Not: İngilizce mağaza sayfası, oyunun kendisi İngilizce olunca açılmalı. O zamana kadar bu metin hazırda bekler.
