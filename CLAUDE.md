@@ -139,7 +139,9 @@ Teknoloji: Phaser 3 + TypeScript + Vite, GitHub Pages ile yayın. İleride Capac
 - Test: `npm run dev` ile açınca `window.oyun` üzerinden sahneler başlatılabilir (sadece geliştirmede).
   `npm test`: veri/kural testleri (tests/veri.test.ts: tekil kimlikler, zincir, "gibi" yok, her cümle
   seslendirme listesinde, kayıt anahtarı zipzip-, kodda dış adres yok). `npm run test:oyun`: Playwright ile
-  bütün ekranlar, her hareket, dış sunucu isteği yok, internetsiz açılış. PR'larda Actions → "Testler" çalışır.
+  bütün ekranlar, her hareket, dış sunucu isteği yok, internetsiz açılış.
+  Yerleşim testi: yazı ekrandan taşmaz, çocuk ekranlarındaki yazı düğmeleri en az 72 nokta (küçük görünen
+  düğmeye `arayuz.genisDokunma` ile geniş dokunma alanı verilir). PR'larda Actions → "Testler" çalışır.
 - Yeni bölüm eklemek: duraklar.ts'e durak listesi + BOLUMLER satırı, BolumScene AYARLAR'a ayar,
   main.ts'e `new BolumScene('id')`, metinler.ts'e cümleler, rozet ve SertifikaScene UNVAN.
   Sonra `npm run seslendirme-metni` ve katalog (scripts/katalog/README.md).
