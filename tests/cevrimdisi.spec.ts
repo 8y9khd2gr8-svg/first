@@ -20,7 +20,7 @@ test('oyun internetsiz açılır', async ({ page, context }) => {
 });
 
 // Yavaş internet ve ucuz telefon için: ilk açılışta indirilen dosyalar (PWA önbelleği) küçük kalsın.
-// Kamera modeli (~24 MB) önbelleğe girmez; sadece ebeveyn kamerayı açınca iner.
+// Kamera modeli (~15 MB) önbelleğe girmez; sadece ebeveyn kamerayı açınca iner.
 // Ölçüm (10 Ekim 2026): önbellek ~2.5 MB, ana dosya ~460 KB (sıkıştırılmış); 4 kat yavaş işlemci + yavaş
 // internette oyun ~2.6 sn'de açılıyor.
 test('ilk açılışta indirilenler küçük kalır (kamera modeli hariç)', async () => {

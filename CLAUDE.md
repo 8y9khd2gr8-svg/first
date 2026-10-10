@@ -140,6 +140,8 @@ Teknoloji: Phaser 3 + TypeScript + Vite, GitHub Pages ile yayın. İleride Capac
   Kameranın saydığı hareketler src/kamera.ts SAYMA_YOLU'nda (13 hareket, 6 sayma yolu: kollar, çömel, zıpla, dizler,
   ayak aç-kapa, yana adım); süreli hareketlerde kamera açılmaz. Yapay vücut noktalarıyla testi: tests/kamera.test.ts.
   Eşikler gerçek çocukla denenmedi; Yağız testinde ayarlanacak.
+  Pakette MediaPipe'in sadece hızlı (SIMD) hâli var (~15 MB; yavaş kopya 9 MB'tı, çıkarıldı): SIMD'siz eski telefonda
+  (iOS 16.4 öncesi) kamera seçeneği görünmez (kamera.ts kameraDesteklenir), oyun aynen çalışır.
 - Doğruluk: Çin Seddi uzaydan gözle GÖRÜLMEZ (efsane); Truva Atı "efsaneye göre". Ürkütücü kelime yok
   ("taş heykel başları" gibi); hayali nesne kaldırmada "hayali" denir (dışarıda gerçek taş kaldırma özentisi olmasın).
 - İleride konuşulacak (acele yok, 23 Nisan ya da sonrası): Zıpzıp'ın kendi dünyası haritası ve ek oyunlar

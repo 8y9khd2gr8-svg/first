@@ -9,7 +9,17 @@ const ANAHTAR = 'zipzip-kamera-v1';
 
 export const kameraAcikMi = () => localStorage.getItem(ANAHTAR) === '1';
 export const kameraAyarla = (acik: boolean) => (acik ? localStorage.setItem(ANAHTAR, '1') : localStorage.removeItem(ANAHTAR));
-export const kameraDesteklenir = () => !!navigator.mediaDevices?.getUserMedia;
+// Pakette MediaPipe'in sadece hızlı (SIMD) hâli var; yavaş kopyası 9 MB olduğu için çıkarıldı.
+// SIMD'i olmayan eski telefonlarda (ör. iOS 16.4'ten eski) kamera seçeneği hiç görünmez, oyun aynen çalışır.
+const SIMD_DENEME = new Uint8Array([0, 97, 115, 109, 1, 0, 0, 0, 1, 5, 1, 96, 0, 1, 123, 3, 2, 1, 0, 10, 10, 1, 8, 0, 65, 0, 253, 15, 253, 98, 11]);
+export const simdVarMi = () => {
+  try {
+    return typeof WebAssembly === 'object' && WebAssembly.validate(SIMD_DENEME);
+  } catch {
+    return false;
+  }
+};
+export const kameraDesteklenir = () => !!navigator.mediaDevices?.getUserMedia && simdVarMi();
 
 // Kameranın sayabildiği hareketler ve nasıl sayıldıkları. Birbirine benzeyen hareketler aynı yolla sayılır
 // (ör. "çömel, sonra yüksel, kollarını aç" da bir çömelmedir). Listede olmayan harekette kamera açılmaz.
