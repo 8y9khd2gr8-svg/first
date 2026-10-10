@@ -6,8 +6,9 @@ import karaVerisi from 'world-atlas/land-110m.json';
 import ulkeVerisi from 'world-atlas/countries-110m.json';
 import { hareketiAzalt, RENK, YAZI_TIPI } from '../ayarlar';
 import { buyukDugme, evDugmesi, yildizliArkaPlan, durakSimgesi, genisDokunma } from '../arayuz';
-import { DUNYA, Durak } from '../duraklar';
-import { bolumAcik, tamamlananlar } from '../ilerleme';
+import { DUNYA, Durak, bolumuAcikMi } from '../duraklar';
+import { kilitliBolumeDokun } from './BolumScene';
+import { tamamlananlar } from '../ilerleme';
 import { M } from '../metinler';
 import { bip, konus, sustur, zaferMuzigi } from '../ses';
 import { Zipzip } from '../zipzip';
@@ -90,7 +91,7 @@ export class DunyaScene extends Phaser.Scene {
       sustur();
       this.scene.start('Harita', {});
     });
-    const uzayAcik = bolumAcik(DUNYA.map((d) => d.id));
+    const uzayAcik = bolumuAcikMi('uzay');
     const uzay = this.add
       .text(640, 160, uzayAcik ? 'Uzay 🚀 ▶' : '🔒 Uzay', {
         fontFamily: YAZI_TIPI,
@@ -104,8 +105,7 @@ export class DunyaScene extends Phaser.Scene {
     genisDokunma(uzay);
     uzay.on('pointerdown', () => {
       if (!uzayAcik) {
-        bip(220, 0.15, 'square', 0.12);
-        konus(M.uzayKilitli);
+        kilitliBolumeDokun(this, 'uzay');
         return;
       }
       bip(880, 0.08, 'square', 0.12);

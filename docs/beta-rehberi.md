@@ -40,7 +40,9 @@ Pasaport ekranının sağ üstündeki ✏️ düğmesinden girilir. Basit bir ç
 - **✏️ Pasaportu düzenle:** çocuğun adı ve isteğe bağlı fotoğrafı. Hepsi sadece telefonda kalır.
 - **📷 Kamerayla sayma (deneme):** isterseniz açın. Zıplama, çömelme ve kol hareketlerini telefon kamerası sayar.
   Görüntü telefonun içinde işlenir, kaydedilmez, hiçbir yere gönderilmez. Açmak tamamen isteğe bağlıdır.
-- **🧪 Beta: bütün bölümleri aç:** Türkiye Turu'nu bitirmeden diğer bölümlere (Dünya, Uzay, Spor...) bakmak için.
+- **🧪 Beta: bütün bölümleri aç:** bütün bölümleri (Dünya, Uzay, Spor...) ödemesiz ve sırayı beklemeden açar.
+  Betada **bunu kullanın**; "⭐ Tam sürüm" ekranındaki **Satın al**'a dokunmayın (Android'de gerçek ödeme alınabilir).
+  Tam sürüm ekranına bakıp "anlaşılır mı?" diye yorum yazmanız ise çok değerli.
 - **🗑️ Tüm verileri sil:** oyunun bu telefondaki her şeyini siler (iki kez dokunmak gerekir).
 - **🔒 Bilgiler sadece bu telefonda: göster:** oyunun telefonda sakladığı her şeyi listeler. Uçak modunu açıp
   oyunun aynen çalıştığını kendiniz görebilirsiniz.

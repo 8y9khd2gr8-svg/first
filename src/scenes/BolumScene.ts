@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import { RENK, YAZI_TIPI, hareketiAzalt } from '../ayarlar';
 import { buyukDugme, evDugmesi, durakSimgesi, genisDokunma } from '../arayuz';
-import { BOLUM_SIRASI, BOLUMLER, BolumId, Durak, bolumuAcikMi } from '../duraklar';
+import { BOLUM_SIRASI, BOLUMLER, BolumId, Durak, bolumKilidi, bolumuAcikMi } from '../duraklar';
 import { tamamlananlar } from '../ilerleme';
 import { M } from '../metinler';
 import { bip, konus, sustur, zaferMuzigi } from '../ses';
@@ -305,9 +305,21 @@ export class BolumScene extends Phaser.Scene {
   }
 }
 
+// Kapalı bölüme dokununca: önceki bölüm bitmediyse kilit cümlesi söylenir. Bölüm sadece tam sürümü
+// bekliyorsa ebeveyn kilidi açılır (ödeme ekranı her zaman kilidin arkasında; çocuk satın alamaz).
+export function kilitliBolumeDokun(sahne: Phaser.Scene, hedef: BolumId) {
+  bip(220, 0.15, 'square', 0.12);
+  if (bolumKilidi(hedef) !== 'odeme') {
+    konus(BOLUM_KISA[hedef].kilitli);
+    return;
+  }
+  const geri = sahne.scene.key;
+  sahne.scene.start('Ebeveyn', { hedef: 'TamSurum', geri, hedefVeri: { geri }, cocugaSoz: M.tamSurumKilitli });
+}
+
 // Önceki/sonraki bölüme geçiş düğmesi (ör. "◀ Uzay", "Dinozor 🦕 ▶"). Kapalı bölümde kilit söylenir.
 export function bolumGecisDugmesi(sahne: Phaser.Scene, x: number, y: number, hedef: BolumId, yon: 'geri' | 'ileri') {
-  const { kisa, simge, kilitli } = BOLUM_KISA[hedef];
+  const { kisa, simge } = BOLUM_KISA[hedef];
   const acik = bolumuAcikMi(hedef);
   const yazi = yon === 'geri' ? `◀ ${kisa}` : acik ? `${kisa} ${simge} ▶` : `🔒 ${kisa}`;
   const parla = yon === 'ileri' && acik;
@@ -324,8 +336,7 @@ export function bolumGecisDugmesi(sahne: Phaser.Scene, x: number, y: number, hed
   genisDokunma(d);
   d.on('pointerdown', () => {
     if (!acik) {
-      bip(220, 0.15, 'square', 0.12);
-      konus(kilitli);
+      kilitliBolumeDokun(sahne, hedef);
       return;
     }
     bip(yon === 'geri' ? 700 : 880, 0.08, 'square', 0.12);

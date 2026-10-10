@@ -28,8 +28,12 @@ import { EbeveynScene } from './scenes/EbeveynScene';
 import { PasaportAyarScene } from './scenes/PasaportAyarScene';
 import { PasaportScene } from './scenes/PasaportScene';
 import { BolumScene } from './scenes/BolumScene';
+import { TamSurumScene } from './scenes/TamSurumScene';
+import { acilistaKontrolEt } from './satinAlma';
 
 kurulumuDinle();
+// Mağaza uygulamasında: bu hesap tam sürümü almış mı? (Yeni telefon; internet yoksa bir şey değişmez.)
+acilistaKontrolEt();
 
 function oyunuBaslat() {
   const oyun = new Phaser.Game({
@@ -44,7 +48,7 @@ function oyunuBaslat() {
     },
     // Ad yazma kutusu ve fotoğraf düğmesi gibi HTML öğeleri için.
     dom: { createContainer: true },
-    scene: [AcilisScene, HaritaScene, DurakScene, HareketScene, OdulScene, PasaportScene, PasaportAyarScene, EbeveynScene, AvatarScene, EbeveynMenuScene, EbeveynVeriScene, EbeveynOzetScene, SertifikaScene, KurulumScene, DunyaScene, GuvenlikScene, RozetScene, UzayScene, MaceraScene, KostumScene, new BolumScene('spor'), new BolumScene('dinozor'), new BolumScene('evde')],
+    scene: [AcilisScene, HaritaScene, DurakScene, HareketScene, OdulScene, PasaportScene, PasaportAyarScene, EbeveynScene, AvatarScene, EbeveynMenuScene, EbeveynVeriScene, EbeveynOzetScene, SertifikaScene, KurulumScene, DunyaScene, GuvenlikScene, RozetScene, UzayScene, MaceraScene, KostumScene, TamSurumScene, new BolumScene('spor'), new BolumScene('dinozor'), new BolumScene('evde')],
   });
   hiziIzle(oyun);
   // Geliştirme sırasında otomatik testlerin oyuna erişebilmesi için.
