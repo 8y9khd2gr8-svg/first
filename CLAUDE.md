@@ -67,7 +67,7 @@ Teknoloji: Phaser 3 + TypeScript + Vite, GitHub Pages ile yayın. İleride Capac
 - PWA: ana ekrana yüklenir, internetsiz çalışır (vite-plugin-pwa). Yazı tipi pakette
   (@fontsource/baloo-2); oyun hiçbir dış sunucuya bağlanmaz, öyle kalmalı.
 - Avatar hayvanları çizim olarak kalır (gerçek fotoğraf değil); ileride çizer Zıpzıp
-  tarzında çizecek. İkonlar: public/ikon/ (Zıpzıp'tan üretildi).
+  tarzında çizecek. İkonlar ve açılış ekranı: `node scripts/ikon-uret.mjs` (oyundaki Zıpzıp'tan; public/ikon, assets, android, ios).
 - Dünya Harikaları (2. bölüm, ücretli kısım): dönen küre (DunyaScene, d3-geo ile canvas'a
   çizilir); Efes → Kolezyum → Piramitler → Petra → Tac Mahal → Çin Seddi → Machu Picchu.
   Türkiye Turu bitince açılır; beta için ebeveyn köşesinde geçici "Beta: Dünya bölümünü aç"

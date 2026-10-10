@@ -70,7 +70,8 @@ kimseyle paylaşmayın**.
 `ekran-1..7.png` telefon ekran görüntüleri (1080×1920), `tanitim-1024x500.png` "Öne çıkan grafik",
 `ikon-512.png` uygulama simgesi. App Store için `iphone/` (1320×2868, 6.9 inç iPhone) ve `ipad/`
 (2064×2752, 13 inç iPad; uygulama iPad'de de çalıştığı için Apple ikisini de ister) klasörleri; aynı 7 ekran, aynı sıra. Oyun değişince yeniden üretmek için: `npx vite --port 5173` açıkken
-`node scripts/magaza-gorselleri.mjs`.
+`node scripts/magaza-gorselleri.mjs`. Uygulama ikonları ve açılış ekranı (Android, iPhone, web) aynı Zıpzıp'tan
+`node scripts/ikon-uret.mjs` ile üretilir (önce bu, sonra mağaza görselleri).
 
 **Her yeni test sürümünde:**
 1. GitHub → **Actions** → **Play kapalı test paketi** → **Run workflow**.

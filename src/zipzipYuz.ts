@@ -95,7 +95,7 @@ export class ZipzipYuz extends Phaser.GameObjects.Container {
     for (const s of [-1, 1] as const) this.gozCiz(g, GOZ_X * s, s);
 
     // Pembe yanaklar hep var; mutluyken daha belirgin.
-    const yanakSaydam = this.ifade === 'mutlu' ? 0.85 : 0.6;
+    const yanakSaydam = this.ifade === 'mutlu' ? 0.9 : 0.75;
     g.fillStyle(YANAK, yanakSaydam).fillEllipse(-66 * b, (GOZ_Y + 36) * b, 30 * b, 20 * b).fillEllipse(66 * b, (GOZ_Y + 36) * b, 30 * b, 20 * b);
 
     if (this.ifade === 'saskin' && this.aciklik < 0.1) {
@@ -119,9 +119,14 @@ export class ZipzipYuz extends Phaser.GameObjects.Container {
     const ust = egri(34, 26, 0, 36, -34, 26, b);
     const sinir = [...dis, ...ust];
     g.fillStyle(AGIZ_ICI).fillPoints(sinir, true);
-    // Dil: ağzın altında pembe bir yay
-    const dilY = 26 + (derinlik - 26) * 0.5;
-    g.fillStyle(DIL).fillEllipse(0, (dilY + (derinlik - dilY) * 0.45) * b, 36 * b, Math.max(4, (derinlik - dilY) * 0.75) * b);
+    // Dil: ağzın alt kenarını izler, üstü yukarı kavisli (ağzın dışına taşmaz).
+    const alt = new Phaser.Curves.QuadraticBezier(new Phaser.Math.Vector2(-34 * b, 26 * b), new Phaser.Math.Vector2(0, derinlik * b), new Phaser.Math.Vector2(34 * b, 26 * b));
+    const dil: Phaser.Math.Vector2[] = [];
+    for (let i = 0; i <= 12; i++) dil.push(alt.getPoint(0.22 + (0.56 * i) / 12));
+    const [bas, son] = [dil[0], dil[dil.length - 1]];
+    const tepe = bas.y - (alt.getPoint(0.5).y - bas.y) * 0.5; // dilin üstü hafif tümsek
+    dil.push(...egri(son.x / b, son.y / b, 0, tepe / b, bas.x / b, bas.y / b, b));
+    g.fillStyle(DIL).fillPoints(dil, true);
     // Üst dişler
     g.fillStyle(0xffffff).fillPoints([...egri(-28, 29, 0, 38, 28, 29, b), ...egri(26, 35, 0, 44, -26, 35, b)], true);
     g.lineStyle(5 * b, LACIVERT).strokePoints(sinir, true);
