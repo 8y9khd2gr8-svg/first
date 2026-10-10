@@ -1,5 +1,9 @@
 apply plugin: 'com.android.application'
 
+// Play her yüklemede daha büyük bir sürüm kodu ister: otomatik iş (android-play.yml) verir; yoksa 1 / "1.0".
+def surumKodu = Integer.parseInt(System.getenv("ANDROID_VERSION_CODE") ?: "1")
+def surumAdi = System.getenv("ANDROID_VERSION_NAME") ?: "1.0"
+
 android {
     namespace "com.zipzipdunya.oyun"
     compileSdk rootProject.ext.compileSdkVersion
@@ -7,9 +11,8 @@ android {
         applicationId "com.zipzipdunya.oyun"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        // Play her yüklemede daha büyük bir sürüm kodu ister: otomatik iş (android-play.yml) verir.
-        versionCode (System.getenv("ANDROID_VERSION_CODE") ?: "1") as Integer
-        versionName System.getenv("ANDROID_VERSION_NAME") ?: "1.0"
+        versionCode surumKodu
+        versionName surumAdi
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
