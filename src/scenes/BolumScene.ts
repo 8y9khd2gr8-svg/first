@@ -99,7 +99,7 @@ const AYARLAR: Partial<Record<BolumId, BolumAyari>> = {
     simge: '🐠',
     zemin: 0x0d3b66,
     arkaPlan: denizAlti,
-    // Kumsaldan (aşağıda) başlayıp mercan resifine (yukarıda) kıvrılan yol.
+    // Kumsaldan (aşağıda) başlayıp mercanlara (yukarıda) kıvrılan yol.
     yerler: [
       { x: 150, y: 1060 },
       { x: 410, y: 1000 },

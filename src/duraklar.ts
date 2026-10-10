@@ -786,10 +786,10 @@ export const OKYANUS: Durak[] = [
   {
     id: 'mercan',
     bolum: 'okyanus',
-    ad: 'Mercan Resifi',
-    yer: 'Mercan Resifi',
+    ad: 'Mercanlar',
+    yer: 'Mercanlar',
     simge: '🐠',
-    bilgi: 'Mercanlar bitkiye benzer ama aslında minik hayvanlardır. Mercan resifleri binlerce balığa ev olur!',
+    bilgi: 'Mercanlar bitkiye benzer ama aslında minik hayvanlardır. Mercanların arasında binlerce balık yaşar!',
     soru: 'Evde birine sor: Denizleri temiz tutmak için ne yapabiliriz?',
     ozel: hikayeli(K.kolSalla, 'Mercanlar akıntıda sallanıyor!', { ritim: 'yavas' }),
     ekler: [

@@ -110,7 +110,7 @@ Teknoloji: Phaser 3 + TypeScript + Vite, GitHub Pages ile yayın. İleride Capac
   Hikâyede bile "… gibi olalım" yok; test (`npm test`) baslik/sesli içinde "gibi" yakalar.
   İstanbul'un 7 Tepesi (çizer gelince) "Yakında".
 - Okyanus (7. bölüm, BolumScene; Evde Macera bitince açılır): deniz canlıları; Deniz Kaplumbağası (Caretta, Dalyan) →
-  Yunus → Ahtapot → Yengeç → Denizatı → Mavi Balina → Mercan Resifi. Köpekbalığı yok (ürkütücü). Rozet/sertifika:
+  Yunus → Ahtapot → Yengeç → Denizatı → Mavi Balina → Mercanlar. Köpekbalığı yok (ürkütücü). Rozet/sertifika:
   Okyanus Kâşifi; kostüm: Dalış Maskesi (bölüm sonu).
 - Büyük Macera (MaceraScene): Oyna → bütün bölümler kıvrımlı yolda; açık bölümler ilerlemesiyle,
   gelecekler "Yakında" (ebeveyne "daha çok şey gelecek" vaadi). Bölüm haritalarının ⌂'si buraya döner.

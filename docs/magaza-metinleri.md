@@ -38,7 +38,7 @@ KEŞFET VE ÖĞREN
 • Spor Kampı: futbol, basketbol, yüzme, jimnastik, tenis, voleybol, atletizm; çocuk istediği sporla başlar
 • Dinozorlar Diyarı: yumurtadan çıkıştan fosil kazısına
 • Evde Macera: en sevdiği oyuncak, bir yastık ve çorap topuyla evde hareket; sonunda da birlikte toplama
-• Okyanus: deniz kaplumbağası, yunus, ahtapot, yengeç, denizatı, mavi balina ve mercan resifi
+• Okyanus: deniz kaplumbağası, yunus, ahtapot, yengeç, denizatı, mavi balina ve mercanlar
 • Her durakta kısa ve ilginç bir "Biliyor muydun?" bilgisi
 
 ÖDÜLLER, BASKI YOK
