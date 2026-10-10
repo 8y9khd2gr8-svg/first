@@ -48,6 +48,8 @@ Teknoloji: Phaser 3 + TypeScript + Vite, GitHub Pages ile yayın. İleride Capac
   doğal sesle (Azure veya ElevenLabs anahtarıyla) public/ses/ altına kaydeder; kaydı olmayan
   cümle telefonun sesiyle okunur. Çocuğun adı sesli söylenmez ("Merhaba gezgin!"), sadece yazılır.
   Yeni bir konus() cümlesi eklenince metinler.ts'e de eklenmeli.
+  Ses kararı: beta için Azure doğal ses (ücretsiz katman; hesabı kullanıcı açar, anahtar ortam
+  ayarlarına gizli değişken). Cümleler oturunca (beta sonrası) seslendirmen/ajansla insan sesi.
 - Çıkış planı: Kasım'da ~100 kişilik beta (TestFlight / Google kapalı test), Ocak sonu yarıyıl
   tatilinde mağaza, 23 Nisan büyük güncelleme. Yorumlar organize ettirilmez (mağaza kuralı);
   çevre beta testçisi olarak kullanılır.
