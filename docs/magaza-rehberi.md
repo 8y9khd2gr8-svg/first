@@ -63,6 +63,11 @@ yenisi istenebilir. Yine de **güvenli saklayın, kimseyle paylaşmayın**.
 3. İki dosyayı da güvenli bir yerde saklayın (şifre yöneticisi ya da sadece sizin erişebildiğiniz bulut klasörü).
    Sonra telefonunuzdaki indirilmiş kopyaları silebilirsiniz.
 
+**Mağaza sayfası görselleri** (kapalı test için de gerekir): `docs/magaza-gorselleri/` klasöründe.
+`ekran-1..7.png` telefon ekran görüntüleri (1080×1920), `tanitim-1024x500.png` "Öne çıkan grafik",
+`ikon-512.png` uygulama simgesi. Oyun değişince yeniden üretmek için: `npx vite --port 5173` açıkken
+`node scripts/magaza-gorselleri.mjs`.
+
 **Her yeni test sürümünde:**
 1. GitHub → **Actions** → **Play kapalı test paketi** → **Run workflow**.
 2. 5-10 dakika sonra işin içine girin, en altta **zip-zip-dunya-play** dosyasını indirin, zip'i açın: `app-release.aab`.
