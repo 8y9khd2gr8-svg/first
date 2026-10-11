@@ -39,6 +39,34 @@ async function sahneAc(page: Page, ad: string, veri: object = {}) {
 
 const BETA = { 'zipzip-beta-dunya': '1' };
 
+// Giriş animasyonları bitene kadar bekler (sonsuz dönen süsler sayılmaz); en çok `enCok` ms.
+async function sakinlesmesiniBekle(page: Page, enCok = 1500) {
+  await page
+    .waitForFunction(
+      () =>
+        (window as any).oyun.scene
+          .getScenes(true)
+          .every((s: any) => s.tweens.getTweens().every((t: any) => t.repeat === -1 || t.loop === -1 || !t.isPlaying())),
+      null,
+      { timeout: enCok, polling: 100 },
+    )
+    .catch(() => {});
+}
+
+// Oyunun saatini hızlandırır: her sahnenin zamanlayıcıları ve animasyonları kat kat hızlı akar.
+// Akış (hangi ekran, hangi sırayla) aynı kalır; sadece bekleme kısalır.
+async function saatiHizlandir(page: Page, kat: number) {
+  await page.evaluate((kat) => {
+    const oyun = (window as any).oyun;
+    oyun.events.on('prestep', () =>
+      oyun.scene.getScenes(true).forEach((s: any) => {
+        s.time.timeScale = kat;
+        s.tweens.timeScale = kat;
+      }),
+    );
+  }, kat);
+}
+
 test('bütün ekranlar hatasız açılır ve dış sunucuya bağlanılmaz', async ({ page }) => {
   const kayit = await oyunuAc(page, BETA);
   const sahneler: [string, object][] = [
@@ -117,6 +145,7 @@ test('durak bitince harita kutlar (sıralı ve serbest bölüm)', async ({ page 
 
 test('en uzun sayılı hareket sonuna kadar gider ("Yaptım!" çıkar)', async ({ page }) => {
   const kayit = await oyunuAc(page);
+  await saatiHizlandir(page, 4);
   // Çin Seddi: 12 tekrar (eskiden 11'de takılıyordu).
   await sahneAc(page, 'Hareket', { durakId: 'cinseddi', adim: 1 });
   await page.waitForFunction(() => (window as any).oyun.scene.getScene('Hareket').children.list.some((c: any) => c.list?.some?.((t: any) => t.text === 'Yaptım!')), null, { timeout: 45_000 }); // bulut bilgisayarı yavaş: 12 tekrar ~30 sn sürebilir
@@ -124,7 +153,7 @@ test('en uzun sayılı hareket sonuna kadar gider ("Yaptım!" çıkar)', async (
 });
 
 test('Zıpzıp her hareketi hatasız yapar', async ({ page }) => {
-  test.setTimeout(120_000); // 38 hareket tek tek: bulutta ~42 sn, yavaş GitHub makinesinde 60 sn'yi aşabiliyor
+  test.setTimeout(120_000); // 38 hareket tek tek
   const kayit = await oyunuAc(page);
   await sahneAc(page, 'Kostum');
   const animasyonlar: string[] = await page.evaluate(async () => {
@@ -133,26 +162,49 @@ test('Zıpzıp her hareketi hatasız yapar', async ({ page }) => {
     const { H } = await import('/src/hareketler.ts');
     return [...new Set([...Object.values(H), ...AILE_OTURUMU, ...TUM_DURAKLAR.flatMap((d) => [d.ozel, ...d.ekler])].map((h: any) => h.animasyon))];
   });
-  for (const a of animasyonlar) {
-    await page.evaluate(async (a) => {
-      const s = (window as any).oyun.scene.getScene('Kostum');
-      const { Zipzip } = await import('/src/zipzip.ts');
-      const z = new Zipzip(s, 360, 700, 1);
-      z.birKez(a, 600, 1);
-      z.birKez(a, 600, 2);
-      (window as any).sonZipzip = z;
-    }, a);
-    await page.waitForTimeout(150);
+  // Zıpzıp kurmak yavaş (küre çizimi): 8 Zıpzıp sırayla kullanılır; her biri iki tekrarı (1,2 sn) bitirmeden yeni hareket almaz.
+  await page.evaluate(async () => {
+    const s = (window as any).oyun.scene.getScene('Kostum');
+    const { Zipzip } = await import('/src/zipzip.ts');
+    (window as any).zipzipler = Array.from({ length: 8 }, (_, i) => new Zipzip(s, 120 + (i % 4) * 160, 500 + Math.floor(i / 4) * 400, 0.6));
+  });
+  for (const [i, a] of animasyonlar.entries()) {
+    await page.evaluate(
+      ([a, i]) => {
+        const z = (window as any).zipzipler[i % 8];
+        z.birKez(a, 600, 1);
+        z.birKez(a, 600, 2);
+      },
+      [a, i] as const,
+    );
+    await page.waitForTimeout(160);
   }
-  await page.waitForTimeout(800);
+  await page.waitForTimeout(1400);
   expect(kayit.hatalar).toEqual([]);
 });
 
 test('"Uzaktan oyna" açıkken bir durak baştan sona kendiliğinden oynanır (ısınma + sürpriz dahil)', async ({ page }) => {
   test.setTimeout(300_000);
   const kayit = await oyunuAc(page, { 'zipzip-uzaktan-v1': '1' });
+  await saatiHizlandir(page, 5); // gerçek sürede ~2 dk
+  // Her hareket adımı (ısınma, özel, sürpriz...) sırayla görülür ve kaydedilir.
+  await page.evaluate(() => {
+    const oyun = (window as any).oyun;
+    const adimlar: number[] = ((window as any).__adimlar = []);
+    oyun.events.on('poststep', () => {
+      const h = oyun.scene.getScene('Hareket');
+      if (!oyun.scene.isActive('Hareket') || adimlar[adimlar.length - 1] === h.adim) return;
+      adimlar.push(h.adim);
+      // Kaç hareket olacağı: liste ilk adımda kurulur; 2. adımda okunur (ilk adımda okumak listeyi yeniden kurar).
+      if (h.adim === 1) (window as any).__adimSayisi = h.liste().length;
+    });
+  });
   await sahneAc(page, 'Hareket', { durakId: 'istanbul', adim: 0 });
-  await page.waitForFunction(() => (window as any).oyun.scene.isActive('Odul'), null, { timeout: 280_000, polling: 1000 });
+  await page.waitForFunction(() => (window as any).oyun.scene.isActive('Odul'), null, { timeout: 280_000, polling: 500 });
+  // Isınma, özel hareket, hikâyeliler ve sürpriz: adımlar 0'dan sırayla, atlamadan, sonuna kadar.
+  const [adimlar, adimSayisi] = await page.evaluate(() => [(window as any).__adimlar, (window as any).__adimSayisi]);
+  expect(adimSayisi).toBeGreaterThanOrEqual(5);
+  expect(adimlar).toEqual([...Array(adimSayisi).keys()]);
   expect(kayit.hatalar).toEqual([]);
 });
 
@@ -298,7 +350,7 @@ test('yazılar okunur (renk zıtlığı)', async ({ page }) => {
   const sorunlar: string[] = [];
   for (const [ad, veri] of sahneler) {
     await sahneAc(page, ad, veri);
-    await page.waitForTimeout(1500);
+    await sakinlesmesiniBekle(page);
     sorunlar.push(
       ...(await page.evaluate(async () => {
         const oyun = (window as any).oyun;
@@ -398,8 +450,11 @@ test('her çocuk ekranında Zıpzıp konuşur (sesli yönlendirme)', async ({ pa
   for (const [ad, veri] of sahneler) {
     await page.evaluate(() => ((window as any).__soylenen.length = 0));
     await sahneAc(page, ad, veri);
-    await page.waitForTimeout(3500);
-    if (!(await page.evaluate(() => (window as any).__soylenen.length))) sessiz.push(ad);
+    // Konuşma başlayınca hemen sıradakine geçilir; 3,5 sn içinde hiç konuşmazsa sessiz sayılır.
+    const konustu = await page
+      .waitForFunction(() => (window as any).__soylenen.length > 0, null, { timeout: 2800, polling: 100 })
+      .then(() => true, () => false);
+    if (!konustu) sessiz.push(ad);
   }
   expect(sessiz).toEqual([]);
   expect(kayit.hatalar).toEqual([]);
