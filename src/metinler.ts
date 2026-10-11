@@ -1,6 +1,6 @@
 import { AILE_OTURUMU } from './aile';
 import { BOLUM_SIRASI, BOLUMLER, TUM_DURAKLAR, oturum } from './duraklar';
-import { AYNA, DONMA, H, ISINMALAR, SOGUMALAR } from './hareketler';
+import { AYNA, DONMA, ISINMALAR, SOGUMALAR } from './hareketler';
 import { uyarlamaCumleleri } from './uyarla';
 import { AVATARLAR } from './pasaport';
 import { ROZETLER } from './rozetler';
@@ -86,7 +86,6 @@ export function tumMetinler(): string[] {
     M.sporHosgeldin, M.sporSec, M.sporBitti, M.sporKilitli, M.dinozorHosgeldin, M.dinozorBitti, M.dinozorKilitli, M.evdeHosgeldin, M.evdeBitti, M.evdeKilitli,
     M.okyanusHosgeldin, M.okyanusBitti, M.okyanusKilitli,
     ...SERTIFIKA_UNVANLARI.map((u) => M.sertifikaBolum(u)),
-    ...Object.values(H).map((h) => h.sesli),
     ...ISINMALAR.map((h) => h.sesli),
     ...SOGUMALAR.map((h) => h.sesli),
     DONMA.sesli, AYNA.sesli, M.devamEdiyoruz, M.dur, M.devam, M.uzaktanAcik, M.bugunlukBitti,

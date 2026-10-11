@@ -8,6 +8,7 @@ import { TextToSpeech } from '@capacitor-community/text-to-speech';
 import { sesAnahtari } from './sesAnahtari';
 import { enIyiSes } from './sesSecimi';
 import { SES_DOSYALARI } from './sesDosyalari';
+import { okunus } from './okunus';
 
 let baglam: AudioContext | null = null;
 
@@ -132,7 +133,7 @@ const TON = 1.15;
 function telefonSesi(metin: string) {
   if (uygulamada) {
     const no = konusmaNo;
-    TextToSpeech.speak({ text: metin, lang: 'tr-TR', rate: HIZ, pitch: TON, voice: uygulamaSesi })
+    TextToSpeech.speak({ text: okunus(metin), lang: 'tr-TR', rate: HIZ, pitch: TON, voice: uygulamaSesi })
       .catch(() => undefined)
       .finally(() => no === konusmaNo && konusmaDurumu(false));
     konusmaDurumu(true, metin.length * 90 + 1500);
@@ -141,7 +142,7 @@ function telefonSesi(metin: string) {
   if (!('speechSynthesis' in window)) return;
   if (!turkceSes) turkceSesiBul();
   speechSynthesis.cancel();
-  const s = new SpeechSynthesisUtterance(metin);
+  const s = new SpeechSynthesisUtterance(okunus(metin));
   s.lang = 'tr-TR';
   if (turkceSes) s.voice = turkceSes;
   s.rate = HIZ;
