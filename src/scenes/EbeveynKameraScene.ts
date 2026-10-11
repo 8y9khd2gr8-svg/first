@@ -76,12 +76,12 @@ export class EbeveynKameraScene extends Phaser.Scene {
       void kamera.baslat();
     }, { genislik: 420, yukseklik: 110, yaziBoyu: 44 });
 
-    // Hangi hareket sayılsın? Seçince sayı sıfırlanır.
+    // Hangi hareket sayılsın? Seçince sayı sıfırlanır. Seçili olan renkle birlikte ✓ ile de belli olur (renk körlüğü).
     let dugmeler: Phaser.GameObjects.Container[] = [];
     const dugmeleriCiz = () => {
       dugmeler.forEach((d) => d.destroy());
       dugmeler = YOLLAR.map(([ad, animasyon], i) =>
-        buyukDugme(this, x + ((i % 2) - 0.5) * 320, 770 + Math.floor(i / 2) * 92, ad, animasyon === this.secili ? RENK.turuncu : RENK.mavi, () => {
+        buyukDugme(this, x + ((i % 2) - 0.5) * 320, 770 + Math.floor(i / 2) * 92, animasyon === this.secili ? `✓ ${ad}` : ad, animasyon === this.secili ? RENK.turuncu : RENK.mavi, () => {
           this.secili = animasyon;
           this.kamera?.yolDegistir(animasyon);
           dugmeleriCiz();
