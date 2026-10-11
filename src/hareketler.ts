@@ -161,6 +161,13 @@ export const DONMA: Hareket = {
   saniye: 14,
   surpriz: 'donma',
 };
+// Oturarak oynarken donma oyunu: ayakla dans yerine kollarla dans.
+export const DONMA_OTURARAK: Hareket = {
+  ...DONMA,
+  baslik: 'Oturduğun yerde dans et!\n“Dur!” deyince kıpırdama!',
+  sesli: 'Sürpriz! Donma oyunu! Oturduğun yerde kollarınla dans et. Dur deyince hiç kıpırdama!',
+  animasyon: 'kolSalla',
+};
 export const AYNA: Hareket = {
   hikaye: 'Sürpriz! Ayna oyunu!',
   baslik: 'Zıpzıp ne yaparsa\naynısını yap!',

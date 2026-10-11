@@ -5,7 +5,7 @@ import path from 'node:path';
 import { test } from 'node:test';
 import { AILE_OTURUMU } from '../src/aile';
 import { BOLUM_SIRASI, BOLUMLER, TUM_DURAKLAR, oturum } from '../src/duraklar';
-import { AYNA, DONMA, ISINMALAR, SOGUMALAR } from '../src/hareketler';
+import { AYNA, AYNA_HAVUZU, DONMA, ISINMALAR, OTURARAK, SOGUMALAR } from '../src/hareketler';
 import { H, Hareket } from '../src/hareketler';
 import { kostumNasil } from '../src/kostumler';
 import { KOSTUMLER } from '../src/kostumler';
@@ -176,7 +176,7 @@ test('ebeveyn ayarları: oturarak listede ayakta hareket yok, aynı durakta tekr
   const liste = new Set(tumMetinler());
   const AYAKTA = new Set(['zipla', 'kos', 'dizler', 'acKapa', 'engel', 'tepin', 'basket', 'parmakUcu', 'tekAyak', 'yanAdim', 'tirman', 'trex', 'sut', 'comel', 'balon', 'yumurta', 'tasKaldir', 'kazi', 'uzan', 'donus', 'kocaman', 'piramit', 'sutun', 'tHarfi']);
   for (const d of TUM_DURAKLAR) {
-    const temel = [...oturum(d), ...ISINMALAR, ...SOGUMALAR];
+    const temel = [...oturum(d), ...ISINMALAR, ...SOGUMALAR, DONMA];
     const oturarak = uyarla(oturum(d), { yas: 'buyuk', oturarak: true });
     const turler = oturarak.map((h) => h.animasyon);
     assert.equal(new Set(turler).size, turler.length, `${d.id}: oturarakta tekrar`);
@@ -194,4 +194,35 @@ test('ebeveyn ayarları: oturarak listede ayakta hareket yok, aynı durakta tekr
   }
   // Oturum kurulurken (ısınma, sürpriz, soğuma dahil) ayar uygulanır.
   assert.ok(oturumKur(TUM_DURAKLAR[0]).length >= 5);
+});
+
+test('oturarak oyna: her durağın her hareketi (ısınma, sürpriz, soğuma dahil) oturarak yapılabilir; Sakin tempo kısaltır', async () => {
+  const { uyarla } = await import('../src/uyarla');
+  // Oturarak hâlde Zıpzıp'ın yapabileceği hareketler sadece OTURARAK listesindekiler (kol/gövde).
+  const SERBEST = new Set(Object.values(OTURARAK).map((h) => h.animasyon));
+  const AYAKTA_SOZ = /zıpla|çömel|\bkoş|yürü|adım|ayağını|ayaklarını|tek ayak|parmak uc|parmak uç|dizini|dizlerini|dimdik dur|arkanı dön|yere vur|yere değ/i;
+  const ayna = { ...AYNA, dizi: AYNA_HAVUZU };
+  const denetle = (yer: string, h: Hareket) => {
+    for (const a of h.dizi ?? [h.animasyon]) assert.ok(SERBEST.has(a), `${yer}: oturarakta ayakta hareket: ${a} (${h.baslik})`);
+    const metin = `${h.hikaye ?? ''} ${h.baslik} ${h.sesli}`.replace(/\n/g, ' ');
+    assert.ok(!AYAKTA_SOZ.test(metin), `${yer}: oturarak cümlede ayakta söz: ${metin}`);
+  };
+  for (const d of TUM_DURAKLAR) {
+    const liste = uyarla([...oturum(d), DONMA, ayna], { yas: 'buyuk', oturarak: true });
+    liste.forEach((h) => denetle(d.id, h));
+  }
+  for (const h of [...ISINMALAR, ...SOGUMALAR]) uyarla([h], { yas: 'buyuk', oturarak: true }).forEach((o) => denetle('ısınma/soğuma', o));
+  // Sakin tempo: süreli hareket kısalır (en az 5 sn), 5+ tekrar azalır, her tekrar yavaşlar.
+  for (const d of TUM_DURAKLAR)
+    for (const ayar of [{ yas: 'kucuk', oturarak: false }, { yas: 'kucuk', oturarak: true }] as const) {
+      const normal = uyarla([...oturum(d), DONMA, ayna], { ...ayar, yas: 'buyuk' });
+      uyarla([...oturum(d), DONMA, ayna], ayar).forEach((h, i) => {
+        const o = normal[i];
+        if (h.tur === 'sure' && o.tur === 'sure') assert.ok(h.saniye < o.saniye || h.saniye === 5, `${d.id}: süre kısalmadı: ${h.baslik}`);
+        if (h.tur === 'sayi' && o.tur === 'sayi') {
+          assert.ok(h.tempoMs > o.tempoMs, `${d.id}: yavaşlamadı: ${h.baslik}`);
+          assert.ok(h.adet <= o.adet, `${d.id}: tekrar arttı: ${h.baslik}`);
+        }
+      });
+    }
 });

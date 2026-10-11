@@ -104,7 +104,7 @@ Teknoloji: Phaser 3 + TypeScript + Vite, GitHub Pages ile yayın. İleride Capac
   oturarak oyna bu soru sorulmadığı için geç geldi; ChatGPT değerlendirmesi, Ekim 2026.) Ebeveyn köşesi → ⚙️ Ayarlar:
   "Hareket temposu" 🐢 Sakin (daha az tekrar, %25 yavaş, süreli hareket kısa; 4-5 yaş/yeni başlayan için önerilir) /
   🐇 Normal (varsayılan); yaş etiketi kullanılmaz (çocuğu damgalamasın). Ve "oturarak oyna"
-  (ayakta yapılan hareketler kol/gövde hareketine döner); src/uyarla.ts, kayıt zipzip-oyun-ayar-v1. Ailece etkilenmez.
+  (ayakta yapılan hareketler kol/gövde hareketine döner, donma oyununda kollarla dans; test her durağı denetler); src/uyarla.ts, kayıt zipzip-oyun-ayar-v1. Ailece etkilenmez.
 - Cinsiyet sorulmaz (veri azaltma, kalıp yargı). "Herkes kendini bulsun" ihtiyacı cinsiyetle
   değil, çocuğun seçtiği ilgi alanıyla karşılanır (ör. Spor Kampı'nda sporunu seçer).
 - Bölüm yol haritası: Türkiye (ücretsiz) → Dünya Harikaları → Uzay Yolculuğu (sıradaki büyük
