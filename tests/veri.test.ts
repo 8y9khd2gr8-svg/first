@@ -14,7 +14,9 @@ import { ROZETLER } from '../src/rozetler';
 import { enIyiSes } from '../src/sesSecimi';
 import { TEPELER } from '../src/tepeler';
 
-const tumHareketler: Hareket[] = [...Object.values(H), ...AILE_OTURUMU, ...ISINMALAR, ...SOGUMALAR, DONMA, AYNA, ...TUM_DURAKLAR.flatMap(oturum)];
+// Oyunda söylenen hareketler (H sadece Ailece'nin temeli; kendi sesli cümlesi söylenmez).
+const soylenenHareketler: Hareket[] = [...AILE_OTURUMU, ...ISINMALAR, ...SOGUMALAR, DONMA, AYNA, ...TUM_DURAKLAR.flatMap(oturum)];
+const tumHareketler: Hareket[] = [...Object.values(H), ...soylenenHareketler];
 
 test('durak, rozet ve kostüm kimlikleri tekil', () => {
   for (const liste of [TUM_DURAKLAR.map((d) => d.id), ROZETLER.map((r) => r.id), KOSTUMLER.map((k) => k.id)]) {
@@ -77,13 +79,21 @@ test('komutlar benzetme değil, net eylem ("gibi" yok); sesli komut boş değil'
 
 test('seslendirilen her cümle seslendirme listesinde', () => {
   const liste = new Set(tumMetinler());
-  for (const h of tumHareketler) assert.ok(liste.has(h.sesli), h.sesli);
+  for (const h of soylenenHareketler) assert.ok(liste.has(h.sesli), h.sesli);
   for (const d of TUM_DURAKLAR) {
     assert.ok(liste.has(M.durakGiris(d.yer, d.ad, d.bilgi, BOLUMLER[d.bolum].kutuBaslik)), d.id);
     assert.ok(liste.has(M.damgaKazandin(d.yer)), d.id);
   }
   for (const r of ROZETLER) assert.ok(liste.has(M.yeniRozet(r.ad)), r.id);
   for (const u of SERTIFIKA_UNVANLARI) assert.ok(liste.has(M.sertifikaBolum(u)), u);
+});
+
+test('okunuş sözlüğü: ekrandaki yazı değişmez, sese okunuşu gider', async () => {
+  const { okunus } = await import('../src/okunus');
+  assert.equal(okunus('T-Rex yürüyor!'), 'Ti Reks yürüyor!');
+  assert.equal(okunus('Kollarını kaldır!'), 'Kollarını kaldır!');
+  // Sözlükte olmayan, motorun yanlış okuyabileceği tire ya da büyük harf kısaltması yeni cümlelerde uyarı verir.
+  for (const c of tumMetinler()) assert.ok(!/[A-ZÇĞİÖŞÜ]{2,}|\b[A-Z]-[A-Z]/.test(okunus(c)), `okunuşu belirsiz: ${c}`);
 });
 
 test('konus() ile söylenen M cümleleri seslendirme listesinde', () => {

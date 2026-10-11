@@ -254,6 +254,37 @@ test('yazılar ekrana sığar, çocuk düğmeleri yeterince büyük', async ({ p
   expect(kayit.hatalar).toEqual([]);
 });
 
+test('her hareketin yazısı (oturarak ve Sakin hâlleri dahil) okunur boyutta kalır', async ({ page }) => {
+  await oyunuAc(page);
+  // Hareket ekranı uzun yazıyı sığdırmak için küçültür (HareketScene); çok küçülürse çocuk okuyamaz.
+  const sorunlar: string[] = await page.evaluate(async () => {
+    const { TUM_DURAKLAR, oturum } = await import('/src/duraklar.ts');
+    const { ISINMALAR, SOGUMALAR, DONMA, AYNA } = await import('/src/hareketler.ts');
+    const { uyarla } = await import('/src/uyarla.ts');
+    const { AILE_OTURUMU } = await import('/src/aile.ts');
+    const { YAZI_TIPI } = await import('/src/ayarlar.ts');
+    const s = (window as any).oyun.scene.getScenes(true)[0];
+    const genislik = (metin: string, boy: number, ek = {}) => {
+      const t = s.add.text(0, 0, metin, { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: `${boy}px`, ...ek });
+      const w = t.width;
+      t.destroy();
+      return w;
+    };
+    const temel = [...TUM_DURAKLAR.flatMap(oturum), ...ISINMALAR, ...SOGUMALAR, DONMA, AYNA, ...AILE_OTURUMU];
+    const ayarlar = [{ yas: 'buyuk', oturarak: false }, { yas: 'kucuk', oturarak: false }, { yas: 'buyuk', oturarak: true }, { yas: 'kucuk', oturarak: true }] as const;
+    const bulunan = new Set<string>();
+    for (const a of ayarlar)
+      for (const h of uyarla(temel, a)) {
+        const komut = 660 / genislik(h.baslik, 72, { align: 'center', stroke: '#000', strokeThickness: 14, lineSpacing: -16 });
+        if (komut < 0.7) bulunan.add(`komut çok uzun (%${Math.round(komut * 100)}): ${h.baslik}`);
+        if (h.baslik.split('\n').length > 2) bulunan.add(`komut 2 satırdan uzun: ${h.baslik}`);
+        if (h.hikaye && 670 / genislik(h.hikaye, 44) < 0.6) bulunan.add(`hikâye çok uzun: ${h.hikaye}`);
+      }
+    return [...bulunan];
+  });
+  expect(sorunlar).toEqual([]);
+});
+
 // Erişilebilirlik: yazı ile arkasındaki zemin arasındaki renk zıtlığı (WCAG). Küçük yazı en az 4.5:1,
 // büyük yazı (telefonda ~24 piksel ve üstü) en az 3:1. Zemin, yazılar gizlenip ekran çizilerek ölçülür.
 test('yazılar okunur (renk zıtlığı)', async ({ page }) => {

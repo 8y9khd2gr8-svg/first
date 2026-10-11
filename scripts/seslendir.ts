@@ -8,6 +8,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { tumMetinler } from '../src/metinler';
 import { sesAnahtari } from '../src/sesAnahtari';
+import { okunus } from '../src/okunus';
 
 const KLASOR = 'public/ses';
 
@@ -48,7 +49,7 @@ for (const metin of metinler) {
   const dosya = path.join(KLASOR, `${sesAnahtari(metin)}.mp3`);
   if (fs.existsSync(dosya)) continue;
   if (!servis) continue;
-  fs.writeFileSync(dosya, await servis(metin));
+  fs.writeFileSync(dosya, await servis(okunus(metin)));
   yeni++;
   console.log('✓', metin.slice(0, 70));
 }
@@ -60,4 +61,5 @@ fs.writeFileSync(
     `// Doğal ses kaydı bulunan cümlelerin anahtarları (public/ses/<anahtar>.mp3).\n` +
     `export const SES_DOSYALARI = new Set<string>(${JSON.stringify(mevcut)});\n`,
 );
-console.log(`${metinler.length} cümle, ${mevcut.length} kayıtlı, ${yeni} yeni.${servis ? '' : ' (Servis anahtarı verilmedi; yeni kayıt üretilmedi.)'}`);
+const harf = metinler.reduce((t, m) => t + okunus(m).length, 0);
+console.log(`${metinler.length} cümle (${harf} harf; Azure ücretsiz katmanı ayda 500.000 harf), ${mevcut.length} kayıtlı, ${yeni} yeni.${servis ? '' : ' (Servis anahtarı verilmedi; yeni kayıt üretilmedi.)'}`);
