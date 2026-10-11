@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { RENK, YAZI_TIPI } from '../ayarlar';
-import { buyukDugme, evDugmesi, yildizliArkaPlan, durakSimgesi } from '../arayuz';
+import { buyukDugme, evDugmesi, yildizliArkaPlan, durakSimgesi, bittiYildizi } from '../arayuz';
 import { Durak, TURKIYE, bolumKilidi, bolumuAcikMi } from '../duraklar';
 import { kilitliBolumeDokun } from './BolumScene';
 import { DURAK_KONUMLARI, HARITA_BOYUTU } from '../haritaKonumlar';
@@ -193,6 +193,7 @@ export class HaritaScene extends Phaser.Scene {
     const isaret = this.add.container(dx, dy);
     isaret.add(this.add.circle(0, 0, 34, bitti ? RENK.sari : acik ? RENK.turuncu : 0x6b7280).setStrokeStyle(5, RENK.beyaz));
     isaret.add(acik ? durakSimgesi(this, durak, 0, 2, 36) : this.add.text(0, 2, '🔒', { fontSize: '36px' }).setOrigin(0.5));
+    if (bitti) isaret.add(bittiYildizi(this, 26, -26, 15));
     const ad = this.add
       .text(0, AD_USTTE.has(durak.id) ? -52 : 52, durak.yer, { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '24px', color: '#ffffff', stroke: '#0b1430', strokeThickness: 6 })
       .setOrigin(0.5);

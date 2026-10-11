@@ -101,6 +101,11 @@ export function evDugmesi(sahne: Phaser.Scene, basinca: () => void) {
   return d;
 }
 
+// Bitmiş durak işareti: sağ üstte beyaz kenarlı altın yıldız. Bitti/bitmedi sadece renkle anlatılmasın (renk körlüğü).
+export function bittiYildizi(sahne: Phaser.Scene, x: number, y: number, boy = 24) {
+  return sahne.add.star(x, y, 5, boy * 0.46, boy, RENK.sari).setStrokeStyle(3, 0xffffff);
+}
+
 // Madalya biçiminde rozet: kurdele, altın (kazanıldıysa) ya da gri daire, ortada simge.
 export function rozetCiz(sahne: Phaser.Scene, x: number, y: number, r: number, simge: string, kazanildi: boolean) {
   const rozet = sahne.add.container(x, y);
