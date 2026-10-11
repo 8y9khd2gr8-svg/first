@@ -405,6 +405,38 @@ test('her çocuk ekranında Zıpzıp konuşur (sesli yönlendirme)', async ({ pa
   expect(kayit.hatalar).toEqual([]);
 });
 
+test('ödül ekranları dolu hâlde de taşmaz: pasaport kâğıdı, uzun ad, damga yazısı', async ({ page }) => {
+  await oyunuAc(page);
+  const hepsi: string[] = await page.evaluate(async () => (await import('/src/duraklar.ts')).TUM_DURAKLAR.map((d) => d.id));
+  const kayit = await oyunuAc(page, { ...BETA, 'zipzip-ilerleme-v1': JSON.stringify(hepsi), 'zipzip-pasaport-v1': JSON.stringify({ ad: 'ŞÜKRÜCANBERKAY', avatar: '🦁', soruldu: true }) });
+  // Bütün damgalar ve bütün bölüm rozetleriyle her sayfa: yazı ve simgeler pasaport kâğıdının (x 36..684) içinde kalır.
+  for (const sayfa of ['turkiye', 'okyanus', 'uzay']) {
+    // Aynı sahne art arda açılırken Phaser bazen hiçbirini açmıyor; araya başka ekran girer.
+    await sahneAc(page, 'Rozet');
+    await sahneAc(page, 'Pasaport', { sayfa });
+    await page.waitForTimeout(1500);
+    const tasan = await page.evaluate(() => {
+      const sahne = (window as any).oyun.scene.getScene('Pasaport');
+      const kagit = sahne.children.list.find((n: any) => n.type === 'Container' && n.list.length > 20);
+      return kagit.list
+        .filter((n: any) => n.getBounds && n.type !== 'Zone')
+        .map((n: any) => ({ ad: n.text ?? n.type, b: n.getBounds() }))
+        .filter(({ b }: any) => b.left < 34 || b.right > 686)
+        .map(({ ad, b }: any) => `${ad} ${Math.round(b.left)}..${Math.round(b.right)}`);
+    });
+    expect(tasan, `Pasaport ${sayfa}`).toEqual([]);
+  }
+  // Uzun yer adı damganın iç çemberine sığar.
+  await sahneAc(page, 'Odul', { durakId: 'kaplumbaga' });
+  const genislik = await page.evaluate(() => {
+    const sahne = (window as any).oyun.scene.getScene('Odul');
+    const ara = (liste: any[]): any => liste.map((n) => (n.text === 'DENİZ KAPLUMBAĞASI' ? n : n.list && ara(n.list))).find(Boolean);
+    return ara(sahne.children.list).displayWidth;
+  });
+  expect(genislik).toBeLessThanOrEqual(252);
+  expect(kayit.hatalar).toEqual([]);
+});
+
 test('durumlar sadece renkle anlatılmaz: biten durakta yıldız, kapalı durakta kilit var (renk körlüğü)', async ({ page }) => {
   const biten = ['istanbul', 'truva', 'efes', 'merkur'];
   const kayit = await oyunuAc(page, { ...BETA, 'zipzip-ilerleme-v1': JSON.stringify(biten) });

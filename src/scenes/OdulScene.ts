@@ -86,7 +86,9 @@ export class OdulScene extends Phaser.Scene {
     cember.lineStyle(4, RENK.turuncu).strokeCircle(0, 0, 145);
     damga.add(cember);
     damga.add(durak ? durakSimgesi(this, durak, 0, -40, 120) : this.add.text(0, -40, '👪', { fontSize: '120px' }).setOrigin(0.5));
-    damga.add(this.add.text(0, 70, durak ? durak.yer.toLocaleUpperCase('tr') : 'AİLE TAKIMI', { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '46px', color: '#FF8A3D' }).setOrigin(0.5));
+    const yerYazi = this.add.text(0, 70, durak ? durak.yer.toLocaleUpperCase('tr') : 'AİLE TAKIMI', { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '46px', color: '#FF8A3D' }).setOrigin(0.5);
+    // Uzun ad (DENİZ KAPLUMBAĞASI) iç çemberden taşmasın: o yükseklikte çemberin genişliği ~250.
+    damga.add(yerYazi.setScale(Math.min(1, 250 / yerYazi.width)));
     damga.add(this.add.text(0, 115, 'ZIP ZIP DÜNYA', { fontFamily: YAZI_TIPI, fontSize: '24px', color: '#FF8A3D' }).setOrigin(0.5));
     damga.setScale(2.5).setAlpha(0);
     this.tweens.add({

@@ -113,7 +113,12 @@ export class PasaportScene extends Phaser.Scene {
         sayfa.add(g);
         const simge = durakSimgesi(this, durak, dx, dy - 8, 54).setAngle(-8);
         sayfa.add(simge);
-        sayfa.add(this.add.text(dx, dy + 82, durak.yer, { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '22px', color: '#C2410C' }).setOrigin(0.5));
+        // Uzun yer adı (Deniz Kaplumbağası) kâğıttan taşmasın: iki satıra iner.
+        sayfa.add(
+          this.add
+            .text(dx, dy + 68, durak.yer, { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '22px', color: '#C2410C', align: 'center', wordWrap: { width: 140 } })
+            .setOrigin(0.5, 0),
+        );
       } else {
         g.lineStyle(4, 0x14213d, 0.25);
         for (let a = 0; a < 360; a += 20) {
@@ -130,10 +135,10 @@ export class PasaportScene extends Phaser.Scene {
     BOLUM_SIRASI.forEach((id, i) => {
       const secili = id === this.sayfaNo;
       const sekme = this.add
-        .text(x + (i - (BOLUM_SIRASI.length - 1) / 2) * 100, 1040, BOLUM_KISA[id].simge, {
+        .text(x + (i - (BOLUM_SIRASI.length - 1) / 2) * 88, 1040, BOLUM_KISA[id].simge, {
           fontSize: '44px',
           backgroundColor: secili ? '#EE6A1F' : '#14213D1a',
-          padding: { x: 14, y: 6 },
+          padding: { x: 10, y: 6 },
         })
         .setOrigin(0.5)
         .setAlpha(secili || bolumuAcikMi(id) ? 1 : 0.4);
@@ -147,7 +152,10 @@ export class PasaportScene extends Phaser.Scene {
 
     // Bölüm rozetleri: kazanıldıysa fotoğraf çerçevesinin köşesinde parlar.
     const kazanilan = kazanilanlar();
-    ROZETLER.filter((r) => r.bolum && kazanilan.has(r.id)).forEach((r, i) => sayfa.add(rozetCiz(this, 285 - i * 44, 525, 22, r.simge, true)));
+    // Hepsi kazanılınca da çerçevenin altında kalsın diye aralık daralır (üst üste biner).
+    const bolumRozetleri = ROZETLER.filter((r) => r.bolum && kazanilan.has(r.id));
+    const aralik = Math.min(44, 200 / Math.max(1, bolumRozetleri.length - 1));
+    bolumRozetleri.forEach((r, i) => sayfa.add(rozetCiz(this, 285 - i * aralik, 525, 22, r.simge, true)));
 
     sayfa.y = 1300;
 
