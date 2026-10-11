@@ -274,7 +274,7 @@ export const UZAY: Durak[] = [
     ekler: [
       hikayeli(K.tekAyak, 'Kalın bulutların altında dengede dur!'),
       hikayeli(K.uzan, 'Parlayan Venüs’e uzan!'),
-      hikayeli(K.dizler, 'Uzay aracından in!'),
+      hikayeli(K.dizler, 'Uzay aracının merdivenini çık!'),
     ],
   },
   {
@@ -363,7 +363,7 @@ export const UZAY: Durak[] = [
     ozel: hikayeli(K.kolSalla, 'Neptün’de rüzgâr esiyor!'),
     ekler: [
       hikayeli(K.kos, 'Rüzgâr çok hızlı, sen de hızlan!'),
-      hikayeli(K.kanat, 'Rüzgârda süzül!'),
+      hikayeli(K.kanat, 'Rüzgârda kollarını aç, salla!'),
       hikayeli(K.balon, 'Eve dönüş vakti!'),
     ],
   },
