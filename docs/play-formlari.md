@@ -62,6 +62,7 @@ Bu kadar. "Hayır" deyince şifreleme ve silme soruları gelmez. Mağaza sayfas�
 Neden doğru:
 - Ad, fotoğraf, ilerleme, hareket kaydı sadece telefonda (ebeveyn köşesindeki "Bu telefonda neler var?" ekranı bunu gösteriyor).
 - Kamera görüntüsü telefonda işleniyor, kaydedilmiyor, gönderilmiyor.
+- iPhone'daki karşılığı: App Store Connect → App Privacy → **"Data Not Collected"** (Veri toplanmıyor). Adımlar `docs/magaza-rehberi.md` 4. bölümde; iki mağazanın cevabı aynı olmalı.
 - Oyunda analiz, çökme raporu ya da reklam kitaplığı yok. Testler oyunun hiçbir dış sunucuya bağlanmadığını her PR'da denetliyor.
 - **Dikkat:** İleride çökme raporu, analiz ya da bulut kaydı eklenirse bu form yeniden doldurulmalı.
 
@@ -72,8 +73,8 @@ Neden doğru:
 | COVID-19 temaslı izleme / durum | Uygulamam bunlardan biri değil |
 | Devlet uygulaması (Government apps) | Hayır |
 | Finansal özellikler (Financial features) | Uygulamamda finansal özellik yok |
-| Sağlık uygulamaları (Health apps) | **"Etkinlik ve fitness"** (Activity and fitness) işaretlenir: oyun hareket ettirir ve hareket özetini telefonda tutar. Tıbbi bir iddiamız yok; "tıbbi" seçenekleri seçme. |
-| Hassas izinler | Gerekmez. Kamera izni hassas izin beyanı istemiyor; izin sadece ebeveyn kamerayla saymayı açarsa ya da pasaport fotoğrafı çekerse soruluyor (gizlilik.html, 4. madde). |
+| Sağlık uygulamaları (Health apps) | **"Etkinlik ve fitness"** (Activity and fitness) işaretlenir: oyun hareket ettirir ve hareket özetini telefonda tutar. Tıbbi bir iddiamız yok; "tıbbi" seçenekleri seçme ("Oturarak oyna" ve 🐢 Sakin tempo erişilebilirlik ayarıdır, tedavi değildir). |
+| Hassas izinler | Gerekmez. Kamera izni hassas izin beyanı istemiyor; izin sadece ebeveyn kamerayla saymayı açarsa, ebeveyn köşesinde kamera denemesini (🔍 Dene) başlatırsa ya da pasaport fotoğrafı çekerse soruluyor (gizlilik.html, 4. madde). |
 
 ## 8. Mağaza ayarları ve sayfası (Store settings / Main store listing)
 | Alan | Değer |

@@ -25,10 +25,10 @@ Hareket et, dünyayı keşfet!
 **Uzun açıklama** (4000)
 
 Zıp Zıp Dünya, 4-9 yaş çocuklar için Türkçe bir hareket ve keşif oyunu.
-Kollu bacaklı, gülen küçük bir dünya olan maskotumuz Zıpzıp ile çocuğunuz Türkiye'yi, dünyanın harikalarını, uzayı ve dinozorların dünyasını gezerken zıplıyor, çömeliyor, koşuyor ve esniyor.
+Kollu bacaklı, gülen küçük bir dünya olan maskotumuz Zıpzıp ile çocuğunuz 7 bölümde 50 durağı (Türkiye, dünyanın harikaları, uzay, spor kampı, dinozorlar, ev ve okyanus) gezerken zıplıyor, çömeliyor, koşuyor ve esniyor.
 
 HAREKET EDEREK GEZ
-• Her durakta 5 hareketlik kısa bir antrenman: ısınma, durağa özel hareket, iki hareket ve soğuma.
+• Her durakta kısa bir antrenman: durağa özel bir hareket, üç hareket ve bir sürpriz oyun (donma ya da ayna oyunu). Oyunun başında ısınma, sonunda soğuma.
 • Zıpzıp hareketi önce gösterir, çocuk sayaçla birlikte yapar.
 • Komutlar kısa ve net: "Dizlerini sırayla kaldır!", "Kollarını kaldır, indir!"
 • Yazı okumayı bilmeyen çocuklar için her şey sesli anlatılır, düğmeler büyüktür.
@@ -62,8 +62,8 @@ EBEVEYNLER İÇİN
 • Sosyal ağ değildir: sohbet, profil ya da başka kullanıcılarla iletişim yok.
 • Çocuktan veri toplanmaz. İlerleme yalnızca telefonda saklanır.
 • İnternetsiz çalışır.
-• Kilitli ebeveyn köşesi: haftalık hareket özeti, pasaport ayarları, tüm verileri silme.
-• İsteğe bağlı kamera ile sayma (deneme): görüntü telefonda işlenir, kaydedilmez ve gönderilmez.
+• Kilitli ebeveyn köşesi: haftalık hareket özeti (bütün bölümlerdeki ilerlemeyle), pasaport ayarları, tüm verileri silme.
+• İsteğe bağlı kamera ile sayma (deneme): görüntü telefonda işlenir, kaydedilmez ve gönderilmez. Ebeveyn köşesindeki "Dene" ekranında kameranın neyi gördüğünü önceden görebilirsiniz.
 
 FİYAT
 Türkiye Turu tamamen ücretsiz. Tek seferlik ödemeyle Dünya Harikaları, Uzay Yolculuğu, Spor Kampı, Dinozorlar Diyarı, Evde Macera, Okyanus ve gelecek bütün bölümler açılır. Abonelik yok.
@@ -95,10 +95,10 @@ kids,movement,exercise,active,fitness,preschool,family,geography,space,wonders,t
 **Full description** (4000)
 
 Zip Zip World is a movement and discovery game for children aged 4-9.
-With Zipzip, our smiling little globe with arms and legs, your child travels across Türkiye, the wonders of the world and outer space while jumping, squatting, running and stretching.
+With Zipzip, our smiling little globe with arms and legs, your child visits 50 stops in 7 chapters (Türkiye, the wonders of the world, space, sports camp, dinosaurs, home and the ocean) while jumping, squatting, running and stretching.
 
 MOVE TO TRAVEL
-• Every stop is a short 5-move workout: warm-up, a special move, two more moves and a cool-down.
+• Every stop is a short workout: a special move, three more moves and a surprise game (freeze or mirror). A warm-up at the start, a cool-down at the end.
 • Zipzip shows each move first, then your child does it along with a counter.
 • Short, clear instructions like "Lift your knees one at a time!"
 • Everything is spoken aloud and the buttons are big, so kids who can't read yet can play too.
@@ -132,8 +132,8 @@ FOR PARENTS
 • Not a social network: no chat, no profiles, no contact with other users.
 • No data is collected from children. Progress is stored only on the device.
 • Works offline.
-• Locked parent corner: weekly activity summary, passport settings and a "delete all data" option.
-• Optional camera counting (beta): images are processed on the device and never recorded or sent.
+• Locked parent corner: weekly activity summary (with progress in every chapter), passport settings and a "delete all data" option.
+• Optional camera counting (beta): images are processed on the device and never recorded or sent. A "Try" screen in the parent corner shows what the camera sees first.
 
 PRICE
 The Türkiye Tour is completely free. A single one-time purchase unlocks Wonders of the World, Space Journey, Sports Camp, Dinosaur Land, Adventure at Home, Ocean and all future chapters. No subscription.
