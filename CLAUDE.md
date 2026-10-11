@@ -56,7 +56,7 @@ Teknoloji: Phaser 3 + TypeScript + Vite, GitHub Pages ile yayın. İleride Capac
 - Hareketler futbol takımının fizyoterapistlerine danışılacak (hareket kataloğu sayfası; ertelendi).
 - Test: ücretli yapay zekâ test hizmeti (Nunu.ai gibi) şimdilik yok; Play ön lansman raporu (ücretsiz, gerçek telefonlarda
   çökme/ekran görüntüsü) + kendi otomatik testlerimiz + Yağız testi. Beta sonrası gerekirse yeniden bakılır.
-- Ebeveyn köşesi (kilitli): haftalık hareket özeti + paylaş, pasaport düzenleme. Özet dürüst:
+- Ebeveyn köşesi (kilitli): haftalık hareket özeti (bütün bölümlerdeki durak ilerlemesiyle) + paylaş, pasaport düzenleme. Özet dürüst:
   sayılar çocuğun "Yaptım!" dediği hareketler; oyun gerçekten yapıldığını algılayamaz. Kamera açıkken yapılan hareketlerden
   kaçını kameranın gördüğü ayrıca yazılır (zipzip-istatistik-v1: kameraAcik / kameraGordu). Kamera ile
   algılama (cihaz içinde, görüntü gönderilmeden) bu yüzden önemli bir sonraki adım.

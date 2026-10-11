@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import { RENK, YAZI_TIPI } from '../ayarlar';
 import { evDugmesi, yildizliArkaPlan } from '../arayuz';
-import { TURKIYE } from '../duraklar';
+import { BOLUM_SIRASI, BOLUMLER, TUM_DURAKLAR } from '../duraklar';
 import { tamamlananlar } from '../ilerleme';
 import { haftalikOzet } from '../istatistik';
 import { pasaportOku } from '../pasaport';
@@ -18,18 +18,21 @@ export class EbeveynOzetScene extends Phaser.Scene {
     yildizliArkaPlan(this);
     const x = this.scale.gameSize.width / 2;
     const ozet = haftalikOzet();
-    const sehir = TURKIYE.filter((d) => tamamlananlar().includes(d.id)).length;
+    // İlerleme bütün bölümlerden sayılır (sadece Türkiye değil); bölüm satırında başlananlar görünür.
+    const biten = new Set(tamamlananlar());
+    const durak = TUM_DURAKLAR.filter((d) => biten.has(d.id)).length;
+    const bolumler = BOLUM_SIRASI.map((id) => ({ ad: KISA_AD[id], biten: BOLUMLER[id].duraklar.filter((d) => biten.has(d.id)).length, toplam: BOLUMLER[id].duraklar.length })).filter((b) => b.biten > 0);
     const dakika = Math.round(ozet.saniye / 60);
     evDugmesi(this, () => this.scene.start('EbeveynMenu'));
 
     this.add.text(x, 160, 'Bu hafta', { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '72px', color: '#FFC93C' }).setOrigin(0.5);
 
-    // Dört kutu: dakika, hareket, zıplama, şehir.
+    // Dört kutu: dakika, hareket, zıplama, durak.
     const kutular: [string, string][] = [
       [`${dakika}`, 'dakika hareket'],
       [`${ozet.hareket}`, 'hareket'],
       [`${ozet.ziplama}`, 'zıplama'],
-      [`${sehir} / ${TURKIYE.length}`, 'şehir gezildi'],
+      [`${durak} / ${TUM_DURAKLAR.length}`, 'toplam durak'],
     ];
     kutular.forEach(([deger, etiket], i) => {
       const kx = x + ((i % 2) - 0.5) * 320;
@@ -40,9 +43,16 @@ export class EbeveynOzetScene extends Phaser.Scene {
       this.add.text(kx, ky + 42, etiket, { fontFamily: YAZI_TIPI, fontSize: '28px', color: '#cfe3ff' }).setOrigin(0.5);
     });
 
+    // Bölüm bölüm ilerleme (bitmiş durak / bölümdeki durak); 4 bölümden fazlası ikinci satıra geçer.
+    const parcalar = bolumler.map((b) => `${b.ad} ${b.biten}/${b.toplam}`);
+    const bolumYazisi = parcalar.length
+      ? [parcalar.slice(0, 4).join('  ·  '), parcalar.slice(4).join('  ·  ')].filter(Boolean).join('\n')
+      : 'Henüz biten durak yok';
+    this.add.text(x, 625, bolumYazisi, { fontFamily: YAZI_TIPI, fontSize: '26px', color: '#ffffff', align: 'center' }).setOrigin(0.5);
+
     // Son 7 günün grafiği (dakika).
     const enCok = Math.max(5 * 60, ...ozet.gunler.map((g) => g.saniye));
-    const tabanY = 880;
+    const tabanY = 920;
     const yukseklik = 170;
     const grafik = this.add.graphics();
     grafik.lineStyle(2, 0xffffff, 0.2).lineBetween(70, tabanY, 650, tabanY);
@@ -68,7 +78,7 @@ export class EbeveynOzetScene extends Phaser.Scene {
     this.add
       .text(
         x,
-        1010,
+        1050,
         `${kameraNotu}\nDünya Sağlık Örgütü 5-17 yaş için günde ortalama\n60 dakika orta-yüksek tempolu hareket önerir.`,
         { fontFamily: YAZI_TIPI, fontSize: '25px', color: '#9fb6d9', align: 'center' },
       )
@@ -77,8 +87,8 @@ export class EbeveynOzetScene extends Phaser.Scene {
     // Paylaş: telefonun kendi paylaşma menüsü (WhatsApp vb.). Gerçek HTML düğmesi, çünkü
     // telefonlar paylaşma menüsünü sadece doğrudan dokunuşla açar.
     const ad = pasaportOku().ad;
-    const metin = `🌍 Zıp Zıp Dünya'da bu hafta${ad ? ` ${ad}` : ''} ${dakika} dakikalık hareket tamamladı, ${ozet.ziplama} kez zıpladı ve Türkiye'de ${sehir} şehir gezdi! 🏃‍♂️`;
-    const paylas = this.add.dom(x, 1180, 'button', PAYLAS_STILI, 'Paylaş 📤');
+    const metin = `🌍 Zıp Zıp Dünya'da bu hafta${ad ? ` ${ad}` : ''} ${dakika} dakikalık hareket tamamladı, ${ozet.ziplama} kez zıpladı ve ${durak} durak gezdi! 🏃‍♂️`;
+    const paylas = this.add.dom(x, 1195, 'button', PAYLAS_STILI, 'Paylaş 📤');
     paylas.addListener('click');
     paylas.on('click', async () => {
       try {
@@ -93,6 +103,10 @@ export class EbeveynOzetScene extends Phaser.Scene {
     });
   }
 }
+
+const KISA_AD: Record<(typeof BOLUM_SIRASI)[number], string> = {
+  turkiye: 'Türkiye', dunya: 'Dünya', uzay: 'Uzay', spor: 'Spor', dinozor: 'Dinozor', evde: 'Evde', okyanus: 'Okyanus',
+};
 
 const PAYLAS_STILI =
   "font: 700 40px 'Baloo 2', Arial, sans-serif; padding: 16px 48px; border-radius: 40px; border: 6px solid #fff; background: #2FA84F; color: #fff;";
