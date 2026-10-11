@@ -6,6 +6,8 @@ takıldığı yerde 10 saniye bekleyin, sonra yardım edin ve "takıldı" diye n
 **Hazırlık (2 dk):** telefon şarjlı, sesi açık, sabit bir yerde (rafa yaslı). Etraf boş, zemin kaymıyor.
 Oyunu ilk kez açıyorsanız ebeveyn köşesinden **🗑️ Tüm verileri sil** ile sıfırdan başlayın.
 
+**Hangi bölüm:** Türkiye Turu'ndan başlayın. 7 bölümün hepsini görmek isterseniz ebeveyn köşesindeki "🧪 Beta: bütün bölümleri aç" Dünya, Uzay, Spor, Dinozor, Evde ve Okyanus bölümlerini açar; Büyük Macera yolundan seçilir. Evde Macera için yumuşak bir oyuncak, bir yastık ve çorap topu hazırlayın.
+
 **Süre:** 15-20 dakika ya da Yağız bırakmak isteyene kadar. Zorlamayın; "bitirmek istiyorum" da bir sonuçtur.
 
 ## İzlerken not alın
@@ -26,6 +28,15 @@ Oyunu ilk kez açıyorsanız ebeveyn köşesinden **🗑️ Tüm verileri sil** 
 | 12 | Bitince ne dedi? Tekrar oynamak istedi mi? | |
 | 13 | Zıpzıp'ın sesini her ekranda duydu mu? Ses anlaşılır mıydı, çok hızlı/yavaş mıydı? (Telefon modeli: ...) | |
 | 14 | Oyun açılırken bekledi mi, sabrı kaçtı mı? (Açılış kaç saniye sürdü, kabaca) | |
+| 15 | Okyanus ya da Evde Macera'yı oynadıysa: hikâyeyi (ör. "Ahtapot dostuna sarıl!") anladı mı, hazırlık (yastık, oyuncak) kolay mıydı? | |
+
+## İsterseniz ikinci tur (ebeveyn köşesi → ⚙️ Ayarlar)
+
+| # | Bakılacak | Not |
+|---|---|---|
+| 16 | 🐢 **Sakin tempo** ile bir durak: daha rahat mı yetişti, yoksa sıkıldı mı? | |
+| 17 | **Oturarak oyna** ile bir durak (sandalyede ya da yerde): kol/gövde hareketlerini anladı mı? Ayağa kalkmak istedi mi? | |
+| 18 | **Kamera denemesi** (kamera ayarının yanında 🔍 Dene): Yağız zıplarken/çömelirken sayı doğru arttı mı? "Geri git" uyarısı çıktı mı? Hangi hareket yanlış sayıldı? (Eşikler buna göre ayarlanacak; bu sayılar özete eklenmez.) | |
 
 ## Sonra Yağız'a sorun (oyun gibi, kısa)
 
