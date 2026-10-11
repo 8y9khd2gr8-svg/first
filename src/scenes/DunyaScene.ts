@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import { geoDistance, geoGraticule10, geoInterpolate, geoOrthographic, geoPath } from 'd3-geo';
 import { hareketiAzalt, RENK, YAZI_TIPI } from '../ayarlar';
-import { buyukDugme, evDugmesi, yildizliArkaPlan, durakSimgesi, genisDokunma } from '../arayuz';
+import { buyukDugme, evDugmesi, yildizliArkaPlan, durakSimgesi, genisDokunma, bittiYildizi } from '../arayuz';
 import { DUNYA, Durak, bolumuAcikMi } from '../duraklar';
 import { kilitliBolumeDokun } from './BolumScene';
 import { tamamlananlar } from '../ilerleme';
@@ -124,6 +124,7 @@ export class DunyaScene extends Phaser.Scene {
       const cip = this.add.container(cx, 1170);
       cip.add(this.add.circle(0, 0, 36, this.biten.has(durak.id) ? RENK.sari : acik ? RENK.turuncu : 0x6b7280).setStrokeStyle(4, RENK.beyaz));
       cip.add(acik ? durakSimgesi(this, durak, 0, 2, 34) : this.add.text(0, 2, '🔒', { fontSize: '34px' }).setOrigin(0.5));
+      if (this.biten.has(durak.id)) cip.add(bittiYildizi(this, 28, -28, 15));
       cip.setSize(80, 80).setInteractive({ useHandCursor: true });
       cip.on('pointerdown', () => {
         if (!acik) {
@@ -335,6 +336,7 @@ export class DunyaScene extends Phaser.Scene {
     const isaret = this.add.container(0, 0);
     isaret.add(this.add.circle(0, 0, 32, bitti ? RENK.sari : acik ? RENK.turuncu : 0x6b7280).setStrokeStyle(5, RENK.beyaz));
     isaret.add(acik ? durakSimgesi(this, durak, 0, 2, 34) : this.add.text(0, 2, '🔒', { fontSize: '34px' }).setOrigin(0.5));
+    if (bitti) isaret.add(bittiYildizi(this, 25, -25, 14));
     isaret.add(
       this.add
         .text(0, 50, durak.yer, { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '24px', color: '#ffffff', stroke: '#0b1430', strokeThickness: 6 })
