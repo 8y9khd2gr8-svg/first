@@ -1,6 +1,7 @@
 import { AILE_OTURUMU } from './aile';
 import { BOLUM_SIRASI, BOLUMLER, TUM_DURAKLAR, oturum } from './duraklar';
 import { AYNA, DONMA, H, ISINMALAR, SOGUMALAR } from './hareketler';
+import { uyarlamaCumleleri } from './uyarla';
 import { AVATARLAR } from './pasaport';
 import { ROZETLER } from './rozetler';
 import { KOSTUMLER, kostumNasil } from './kostumler';
@@ -110,5 +111,7 @@ export function tumMetinler(): string[] {
     });
   });
   for (let i = 1; i <= TUM_DURAKLAR.length; i++) liste.add(M.pasaportDamga(i));
+  // Ebeveyn ayarlarıyla (oturarak, küçükler için daha az tekrar) değişen hareket cümleleri
+  uyarlamaCumleleri([...TUM_DURAKLAR.flatMap(oturum), ...ISINMALAR, ...SOGUMALAR]).forEach((c) => liste.add(c));
   return [...liste];
 }

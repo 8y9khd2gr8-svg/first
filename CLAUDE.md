@@ -50,7 +50,7 @@ Teknoloji: Phaser 3 + TypeScript + Vite, GitHub Pages ile yayın. İleride Capac
   Yeni bir konus() cümlesi eklenince metinler.ts'e de eklenmeli.
   Ses kararı: beta için Azure doğal ses (ücretsiz katman; hesabı kullanıcı açar, anahtar ortam
   ayarlarına gizli değişken). Cümleler oturunca (beta sonrası) seslendirmen/ajansla insan sesi.
-- Çıkış planı: Kasım'da ~100 kişilik beta (TestFlight / Google kapalı test), Ocak sonu yarıyıl
+- Çıkış planı: Kasım'da 25-30 ailelik beta (iki dalga; Play için en az 12 test kullanıcısı 14 gün) (TestFlight / Google kapalı test), Ocak sonu yarıyıl
   tatilinde mağaza, 23 Nisan büyük güncelleme. Yorumlar organize ettirilmez (mağaza kuralı);
   çevre beta testçisi olarak kullanılır.
 - Hareketler futbol takımının fizyoterapistlerine danışılacak (hareket kataloğu sayfası; ertelendi).
@@ -100,6 +100,10 @@ Teknoloji: Phaser 3 + TypeScript + Vite, GitHub Pages ile yayın. İleride Capac
   ekleme yok). 5651 Ek Madde 5 (oyunlar, 1 Kasım 2026): platformlar derecelendirilmemiş oyun sunamaz → mağaza yaş
   derecelendirmesi (IARC/Apple; beklenen PEGI 3 / 4+) eksiksiz yapılır; ayrıntı yönetmeliği takip edilir.
   Ayrıntı ve avukata sorulacaklar: docs/magaza-rehberi.md (4b ve 7). "Sosyal ağ değildir" vurgusu mağaza ve gizlilik metninde.
+- Her yeni özellik/bölümde sorulur: 4-5, 6-7, 8-9 yaş ve hareket kısıtı olan çocuk için nasıl? (Yaşa göre tempo ve
+  oturarak oyna bu soru sorulmadığı için geç geldi; ChatGPT değerlendirmesi, Ekim 2026.) Ebeveyn köşesi → ⚙️ Ayarlar:
+  yaş grubu küçük (4-5: daha az tekrar, %25 yavaş, süreli hareket kısa) / büyük (6-9, varsayılan) ve "oturarak oyna"
+  (ayakta yapılan hareketler kol/gövde hareketine döner); src/uyarla.ts, kayıt zipzip-oyun-ayar-v1. Ailece etkilenmez.
 - Cinsiyet sorulmaz (veri azaltma, kalıp yargı). "Herkes kendini bulsun" ihtiyacı cinsiyetle
   değil, çocuğun seçtiği ilgi alanıyla karşılanır (ör. Spor Kampı'nda sporunu seçer).
 - Bölüm yol haritası: Türkiye (ücretsiz) → Dünya Harikaları → Uzay Yolculuğu (sıradaki büyük

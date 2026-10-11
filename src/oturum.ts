@@ -2,6 +2,7 @@ import { AILE_ID, AILE_OTURUMU } from './aile';
 import { BOLUMLER, Durak, durakBul, oturum } from './duraklar';
 import { AYNA, AYNA_HAVUZU, DONMA, Hareket, ISINMALAR, SOGUMALAR } from './hareketler';
 import { tamamlananlar } from './ilerleme';
+import { uyarla } from './uyarla';
 
 // Bir durağın oyun sırası: [ısınma?] + durağın 4 hareketi (ortasına bir sürpriz) + [soğuma?].
 //  - Isınma: oturumun ilk durağında ya da 15 dakikadan uzun aradan sonra (az önce ısınan tekrar ısınmaz).
@@ -57,7 +58,8 @@ const durakSirasi = (durak: Durak) => BOLUMLER[durak.bolum].duraklar.indexOf(dur
 // Durağın hareket listesi: ilk adımda kurulur, sonraki adımlarda aynısı kullanılır.
 export function oturumListesi(durakId: string, adim: number): Hareket[] {
   if (adim > 0 && aktif?.durakId === durakId) return aktif.liste;
-  const liste = durakId === AILE_ID ? AILE_OTURUMU : durakId === SOGUMA_ID ? [rastgele(SOGUMALAR)] : oturumKur(durakBul(durakId));
+  // Ebeveynin ayarları (oturarak, yaş) uygulanır; Ailece bir büyükle oynandığı için olduğu gibi kalır.
+  const liste = durakId === AILE_ID ? AILE_OTURUMU : uyarla(durakId === SOGUMA_ID ? [rastgele(SOGUMALAR)] : oturumKur(durakBul(durakId)));
   aktif = { durakId, liste };
   return liste;
 }

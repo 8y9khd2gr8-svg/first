@@ -1,11 +1,16 @@
 # Beta gözlem planı (proje sahibi için)
 
-Amaç: Kasım betasında (yaklaşık 100 aile) varsayımlarımızı gerçek çocuklarla sınamak. Ailelere giden rehber
+Amaç: Kasım betasında (25-30 aile) varsayımlarımızı gerçek çocuklarla sınamak. Ailelere giden rehber
 `docs/beta-rehberi.md`. Bu belge, hangi soruların sorulacağını, sonuçların nasıl okunacağını ve neye göre karar
 verileceğini anlatır.
 
-## 1. Kimlerle?
-- Yaş dağılımı hedefi: yaklaşık **⅓ 4-5 yaş, ⅓ 6-7 yaş, ⅓ 8-9 yaş**. Bir grup az kalırsa çevreden tamamlanır.
+## 1. Kimlerle? (25-30 aile yeterli, iki dalga)
+- **1. dalga: 8-10 aile** (Kasım başı). Büyük sorunların çoğu ilk birkaç ailede çıkar; düzeltilir.
+- **2. dalga: 15-20 aile daha** (1-2 hafta sonra). Düzeltmeler işe yaradı mı, yaş grupları arasında fark var mı?
+- **Google Play koşulu:** yeni bireysel geliştirici hesaplarında mağazaya çıkmadan önce kapalı testte en az
+  **12 test kullanıcısının 14 gün kesintisiz** kayıtlı kalması isteniyor (kural değişebilir; Play Console'da doğrulanmalı).
+  Bu yüzden en az 15 Android ailesi hedeflenir ve 14 gün boyunca testten çıkmamaları rica edilir.
+- Yaş dağılımı hedefi: yaklaşık **⅓ 4-5 yaş, ⅓ 6-7 yaş, ⅓ 8-9 yaş** (her gruptan yaklaşık 8 çocuk).
 - Mümkünse birkaç tablet, birkaç eski/yavaş telefon, birkaç iPhone.
 - Kardeşli aileler (iki çocuk aynı telefonda) ve en az 2-3 hareket kısıtı olan çocuk (oturarak oynayan).
 

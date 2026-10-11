@@ -90,6 +90,23 @@ export const K = {
   sallan: k('sallan', 'Kendine sarıl,\nsağa sola sallan!', { saniye: 8 }),
 } satisfies Record<string, Hareket>;
 
+// "Oturarak oyna" (ebeveyn köşesi): ayakta yapılan hareketlerin yerine oturarak yapılabilen kol/gövde hareketleri.
+// Hareket kısıtı olan, yorgun ya da dar alanda oynayan çocuk için. Zıpzıp ayakta gösterir, çocuk oturarak yapar.
+export const OTURARAK = {
+  kollar: k('kollar', 'Oturduğun yerde\nkollarını kaldır, indir!', { adet: 6, tempoMs: 1400 }),
+  kolSalla: k('kolSalla', 'Oturduğun yerde kollarını\nsağa sola salla!', { adet: 8, tempoMs: 1200 }),
+  kanat: k('kanat', 'Oturduğun yerde kollarını\nyana aç, yukarı aşağı salla!', { saniye: 8 }),
+  voleybol: k('voleybol', 'Oturduğun yerde ellerini\nbaşının üstünde birleştir, it!', { adet: 6, tempoMs: 1600 }),
+  raket: k('raket', 'Oturduğun yerde kolunu\nyukarıdan aşağı salla!', { adet: 8, tempoMs: 1300 }),
+  kulac: k('kulac', 'Oturduğun yerde kollarını\nsırayla öne doğru çevir!', { saniye: 8 }),
+  yanaEgil: k('yanaEgil', 'Oturduğun yerde bir yana,\nsonra öbür yana eğil!', { adet: 4, tempoMs: 2400 }),
+  belDondur: k('belDondur', 'Oturduğun yerde\nbelini sağa sola döndür!', { adet: 4, tempoMs: 2000 }),
+  sallan: k('sallan', 'Oturduğun yerde kendine\nsarıl, sağa sola sallan!', { saniye: 8 }),
+} satisfies Partial<Record<Animasyon, Hareket>>;
+
+// Sayıyı yazıyla verir (Beş, On...); yaşa göre tempo ayarı tekrar sayısını değiştirince cümleyi yeniden yazar.
+export const sayiYazi = (n: number) => SAYI_YAZI[n];
+
 type Ek = { adet?: number; saniye?: number; tempoMs?: number; ritim?: Ritim; baslik?: string; sesli?: string };
 
 // Komuta durağın hikâyesini (ve istenirse ritim/miktar) ekler. Sesli: "hikâye + komut".

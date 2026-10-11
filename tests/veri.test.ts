@@ -169,3 +169,29 @@ test('İstanbul’un 7 Tepesi (hazırlık): 7 durak, kimlikler tekil, sıralı b
     for (const t of turler) assert.ok(!onceki.has(t), `${d.id}: "${t}" önceki iki durakta da var`);
   });
 });
+
+test('ebeveyn ayarları: oturarak listede ayakta hareket yok, aynı durakta tekrar yok; küçükte tekrar azalır; cümleler seslendirme listesinde', async () => {
+  const { uyarla } = await import('../src/uyarla');
+  const { oturumKur } = await import('../src/oturum');
+  const liste = new Set(tumMetinler());
+  const AYAKTA = new Set(['zipla', 'kos', 'dizler', 'acKapa', 'engel', 'tepin', 'basket', 'parmakUcu', 'tekAyak', 'yanAdim', 'tirman', 'trex', 'sut', 'comel', 'balon', 'yumurta', 'tasKaldir', 'kazi', 'uzan', 'donus', 'kocaman', 'piramit', 'sutun', 'tHarfi']);
+  for (const d of TUM_DURAKLAR) {
+    const temel = [...oturum(d), ...ISINMALAR, ...SOGUMALAR];
+    const oturarak = uyarla(oturum(d), { yas: 'buyuk', oturarak: true });
+    const turler = oturarak.map((h) => h.animasyon);
+    assert.equal(new Set(turler).size, turler.length, `${d.id}: oturarakta tekrar`);
+    for (const h of oturarak) assert.ok(!AYAKTA.has(h.animasyon), `${d.id}: oturarakta ayakta hareket: ${h.animasyon}`);
+    for (const ayar of [{ yas: 'kucuk', oturarak: false }, { yas: 'kucuk', oturarak: true }, { yas: 'buyuk', oturarak: true }] as const)
+      for (const h of uyarla(temel, ayar)) {
+        assert.ok(liste.has(h.sesli), `seslendirme listesinde yok: ${h.sesli}`);
+        assert.ok(!/\bgibi\b/i.test(h.sesli));
+      }
+    const kucuk = uyarla(oturum(d), { yas: 'kucuk', oturarak: false });
+    kucuk.forEach((h, i) => {
+      const o = oturum(d)[i];
+      if (h.tur === 'sayi' && o.tur === 'sayi') assert.ok(h.adet <= o.adet && h.tempoMs > o.tempoMs, d.id);
+    });
+  }
+  // Oturum kurulurken (ısınma, sürpriz, soğuma dahil) ayar uygulanır.
+  assert.ok(oturumKur(TUM_DURAKLAR[0]).length >= 5);
+});

@@ -46,7 +46,7 @@ test('bütün ekranlar hatasız açılır ve dış sunucuya bağlanılmaz', asyn
     ['Spor', { giris: 'uzay' }], ['Dinozor', { giris: 'uzay' }], ['Evde', { giris: 'uzay' }], ['Okyanus', { giris: 'uzay' }],
     ['Durak', { durakId: 'futbol' }], ['Durak', { durakId: 'oyuncak' }], ['Durak', { durakId: 'yengec' }], ['Hareket', { durakId: 'trex', adim: 1 }],
     ['Odul', { durakId: 'fosil' }], ['Pasaport', { sayfa: 'evde' }], ['Pasaport', { sayfa: 'okyanus' }], ['Rozet', {}], ['Kostum', {}],
-    ['Sertifika', { bolum: 'spor' }], ['Sertifika', { bolum: 'okyanus' }], ['EbeveynMenu', {}], ['EbeveynVeri', {}], ['EbeveynSes', {}], ['EbeveynKamera', {}], ['EbeveynOzet', {}],
+    ['Sertifika', { bolum: 'spor' }], ['Sertifika', { bolum: 'okyanus' }], ['EbeveynMenu', {}], ['EbeveynVeri', {}], ['EbeveynAyar', {}], ['EbeveynSes', {}], ['EbeveynKamera', {}], ['EbeveynOzet', {}],
   ];
   for (const [ad, veri] of sahneler) await sahneAc(page, ad, veri);
   expect(kayit.hatalar).toEqual([]);
@@ -210,7 +210,7 @@ test('yazılar ekrana sığar, çocuk düğmeleri yeterince büyük', async ({ p
     ['Macera', {}, true], ['Harita', {}, true], ['Dunya', {}, true], ['Uzay', {}, true], ['Spor', {}, true], ['Dinozor', {}, true], ['Evde', {}, true], ['Okyanus', {}, true],
     ['Durak', { durakId: 'efes' }, true], ['Durak', { durakId: 'nemrut' }, true], ['Hareket', { durakId: 'istanbul', adim: 1 }, true],
     ['Pasaport', {}, true], ['Rozet', { sayfa: 1 }, true], ['Kostum', {}, false], ['Avatar', {}, true],
-    ['Ebeveyn', { hedef: 'EbeveynMenu', geri: 'Pasaport' }, true], ['EbeveynMenu', {}, true], ['EbeveynVeri', {}, true], ['EbeveynSes', {}, true], ['EbeveynKamera', {}, true], ['EbeveynOzet', {}, true], ['PasaportAyar', {}, true],
+    ['Ebeveyn', { hedef: 'EbeveynMenu', geri: 'Pasaport' }, true], ['EbeveynMenu', {}, true], ['EbeveynVeri', {}, true], ['EbeveynAyar', {}, true], ['EbeveynSes', {}, true], ['EbeveynKamera', {}, true], ['EbeveynOzet', {}, true], ['PasaportAyar', {}, true],
     ['Kurulum', {}, true], ['TamSurum', {}, true], ['Sertifika', { bolum: 'turkiye' }, false],
   ];
   const sorunlar: string[] = [];
@@ -262,7 +262,7 @@ test('yazılar okunur (renk zıtlığı)', async ({ page }) => {
   const sahneler: [string, object][] = [
     ['Acilis', {}], ['Macera', {}], ['Harita', {}], ['Dunya', {}], ['Uzay', {}], ['Spor', {}], ['Okyanus', {}], ['Durak', { durakId: 'efes' }], ['Hareket', { durakId: 'istanbul', adim: 1 }],
     ['Pasaport', {}], ['Rozet', { sayfa: 1 }], ['Kostum', {}], ['Avatar', {}], ['Guvenlik', {}], ['Ebeveyn', { hedef: 'EbeveynMenu', geri: 'Pasaport' }],
-    ['EbeveynMenu', {}], ['EbeveynVeri', {}], ['EbeveynSes', {}], ['EbeveynKamera', {}], ['EbeveynOzet', {}], ['PasaportAyar', {}], ['TamSurum', {}], ['Sertifika', { bolum: 'turkiye' }],
+    ['EbeveynMenu', {}], ['EbeveynVeri', {}], ['EbeveynAyar', {}], ['EbeveynSes', {}], ['EbeveynKamera', {}], ['EbeveynOzet', {}], ['PasaportAyar', {}], ['TamSurum', {}], ['Sertifika', { bolum: 'turkiye' }],
   ];
   const sorunlar: string[] = [];
   for (const [ad, veri] of sahneler) {
