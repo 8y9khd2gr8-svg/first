@@ -175,7 +175,7 @@ export const DUNYA: Durak[] = [
     ozel: hikayeli(K.piramit, 'Piramit olalım!'),
     ekler: [
       hikayeli(K.parmakUcu, 'Kum çok sıcak, dikkat!'),
-      hikayeli(K.kazi, 'Kumda gizli hazine ara!'),
+      hikayeli(K.kazi, 'Kumu kaz, eski bir çömlek bul!'),
       hikayeli(K.yanaEgil, 'Nil kıyısında palmiyeler rüzgârda eğiliyor!'),
     ],
   },
@@ -203,10 +203,10 @@ export const DUNYA: Durak[] = [
     yer: 'Hindistan',
     simge: '🌷',
     bilgi: 'Tac Mahal bembeyaz mermerden yapılmış. Sabah güneşinde pembe, akşam güneşinde altın sarısı görünür!',
-    soru: 'Evde birine sor: Mermer ne renktir?',
+    soru: 'Evde birine sor: Evimizde mermerden yapılmış bir şey var mı?',
     ozel: hikayeli(K.donus, 'Tac Mahal’in bahçesinde dönelim!'),
     ekler: [
-      hikayeli(K.uzan, 'Beyaz kubbenin tepesine bak!'),
+      hikayeli(K.uzan, 'Beyaz kubbenin tepesine uzan!'),
       hikayeli(K.tekAyak, 'Havuzun kenarında dengede dur!'),
       hikayeli(K.kanat, 'Hindistan’ın kuşu tavus kuşu kanat çırpıyor!'),
     ],
@@ -223,7 +223,7 @@ export const DUNYA: Durak[] = [
     ozel: hikayeli(K.yuru, 'Uzun duvarda yürüyelim!', { adet: 12, tempoMs: 900 }),
     ekler: [
       hikayeli(K.kos, 'Duvar çok uzun, hızlanalım!'),
-      hikayeli(K.comel, 'Kulelerden dışarı bak!', { ritim: 'hizli' }),
+      hikayeli(K.comel, 'Alçak kapıdan geçmek için çömel, sonra kalk!', { ritim: 'hizli' }),
       hikayeli(K.yanaEgil, 'Çin’in pandası bambuya uzanıyor!'),
     ],
   },
