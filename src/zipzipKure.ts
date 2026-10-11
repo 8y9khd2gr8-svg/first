@@ -3,7 +3,7 @@ import { geoGraticule10, geoInterpolate, geoOrthographic, geoPath, type GeoPermi
 import { feature } from 'topojson-client';
 import type { Topology } from 'topojson-specification';
 import karaVerisi from 'world-atlas/land-110m.json';
-import ulkeVerisi from 'world-atlas/countries-110m.json';
+import turkiyeSiniri from './turkiye-sinir.json'; // scripts/turkiye-sinir-uret.mjs üretir
 import { hareketiAzalt } from './ayarlar';
 import type { BolumId, Durak } from './duraklar';
 
@@ -12,11 +12,7 @@ import type { BolumId, Durak } from './duraklar';
 // Türkiye her zaman altın sarısı (Zıpzıp'ın evi). Ölçüler gövde birimiyle; (0, 0) kürenin ortası.
 
 export const KARA = feature(karaVerisi as unknown as Topology, (karaVerisi as unknown as Topology).objects.land);
-export const TURKIYE_SINIRI = (() => {
-  const t = ulkeVerisi as unknown as Topology;
-  const ulkeler = feature(t, t.objects.countries) as unknown as { features: (GeoPermissibleObjects & { id?: string })[] };
-  return ulkeler.features.find((f) => f.id === '792')!;
-})();
+export const TURKIYE_SINIRI = turkiyeSiniri as unknown as GeoPermissibleObjects;
 const IZGARA = geoGraticule10();
 
 export const KURE_YARICAP = 108;
@@ -61,6 +57,7 @@ export class ZipzipKure extends Phaser.GameObjects.Image {
   private readonly olcek: number; // bir gövde biriminin resimde kaç piksel olduğu
   private yon: Yon;
   private donus?: Phaser.Tweens.Tween;
+  private sonCizim = 0;
 
   constructor(sahne: Phaser.Scene, birim: number) {
     // Küçük Zıpzıp'ta resim de küçük olur (her karede çizmek hızlı kalsın); büyükte keskin.
@@ -98,8 +95,13 @@ export class ZipzipKure extends Phaser.GameObjects.Image {
       ease: 'Sine.easeInOut',
       onUpdate: () => {
         this.yon = ara(ilerleme.t) as Yon;
+        // Dönerken saniyede en çok ~30 kez çizilir (gözle fark edilmez, telefonu yarı yarıya az yorar).
+        const simdi = this.scene.time.now;
+        if (simdi - this.sonCizim < 30) return;
+        this.sonCizim = simdi;
         this.ciz();
       },
+      onComplete: () => this.ciz(),
     });
   }
 
@@ -128,7 +130,8 @@ export class ZipzipKure extends Phaser.GameObjects.Image {
     c.arc(o, o, r, 0, Math.PI * 2);
     c.fill();
 
-    const projeksiyon = geoOrthographic().scale(r).translate([o, o]).clipAngle(90).precision(1).rotate([-this.yon[0], -this.yon[1]]);
+    // precision(0): kara verisi zaten sık noktalı, ek ara nokta hesabı gerekmez (çizim ~%15 hızlı).
+    const projeksiyon = geoOrthographic().scale(r).translate([o, o]).clipAngle(90).precision(0).rotate([-this.yon[0], -this.yon[1]]);
     const yol = geoPath(projeksiyon, c);
     c.lineJoin = 'round';
     c.beginPath();
