@@ -434,6 +434,8 @@ test('ödül ekranları dolu hâlde de taşmaz: pasaport kâğıdı, uzun ad, da
     return ara(sahne.children.list).displayWidth;
   });
   expect(genislik).toBeLessThanOrEqual(252);
+  expect(kayit.hatalar).toEqual([]);
+});
 
 test('durumlar sadece renkle anlatılmaz: biten durakta yıldız, kapalı durakta kilit var (renk körlüğü)', async ({ page }) => {
   const biten = ['istanbul', 'truva', 'efes', 'merkur'];
