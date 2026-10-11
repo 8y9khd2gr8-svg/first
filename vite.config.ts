@@ -30,7 +30,7 @@ export default defineConfig(({ command }) => ({
   // Sürüm numarası (package.json'dan) ebeveyn köşesinde görünür; geri bildirimde hangi sürüm olduğu anlaşılır.
   define: { __SURUM__: JSON.stringify(paket.version) },
   // Oyun motoru (Phaser) tek başına büyük bir dosya; bu uyarı beklenen bir durum.
-  build: { chunkSizeWarningLimit: 2000, commonjsOptions: { include: [/node_modules/, /phaserHafif\.cjs$/] } },
+  build: { chunkSizeWarningLimit: 2000, commonjsOptions: { include: [/node_modules/, /phaser(Hafif|Nesneleri)\.cjs$/] } },
   // Derlemede Phaser'ın hafif hâli (src/phaserHafif.cjs; kullanılmayan fizik motorları yok).
   // Geliştirmede (npm run dev) tam Phaser kalır: hızlı açılır, davranış aynıdır.
   resolve: command === 'build' ? { alias: [{ find: /^phaser$/, replacement: fileURLToPath(new URL('./src/phaserHafif.cjs', import.meta.url)) }] } : {},
