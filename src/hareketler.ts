@@ -138,7 +138,7 @@ export const ISINMALAR: Hareket[] = [
   hikayeli(K.dizler, 'Isınma: Bacaklar uyansın!', { ritim: 'yavas', adet: 8 }),
   hikayeli(K.belDondur, 'Isınma: Belini ısıt!', { adet: 3 }),
   hikayeli(K.yanaEgil, 'Isınma: Yanlarını esnet!', { adet: 3 }),
-  hikayeli(K.yanAdim, 'Isınma: Yavaş yavaş başla!', { ritim: 'yavas', adet: 6 }),
+  hikayeli(K.yanAdim, 'Isınma: Sakince başla!', { ritim: 'yavas', adet: 6 }),
   hikayeli(K.kos, 'Isınma: Hafif bir koşu!', { saniye: 6 }),
   hikayeli(K.kolSalla, 'Isınma: Kolların uyansın!', { adet: 6 }),
 ];

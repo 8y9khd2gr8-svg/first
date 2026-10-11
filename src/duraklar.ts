@@ -774,7 +774,7 @@ export const OKYANUS: Durak[] = [
     ad: 'Mavi Balina',
     yer: 'Mavi Balina',
     simge: '🐋',
-    bilgi: 'Mavi balina dünyada yaşamış en büyük hayvandır, dinozorlardan bile büyüktür! Kalbi küçük bir araba kadar büyüktür.',
+    bilgi: 'Mavi balina dünyada yaşamış en büyük hayvandır, dinozorlardan bile büyüktür! Kalbi bir insandan bile daha ağırdır.',
     soru: 'Evde birine sor: Bildiğin en büyük hayvan hangisi?',
     ozel: hikayeli(K.kocaman, 'Mavi balina çok büyük!'),
     ekler: [
