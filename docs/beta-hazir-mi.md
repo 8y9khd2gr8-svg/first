@@ -25,8 +25,8 @@ testçilere gönderilecek metin: [beta-rehberi.md](beta-rehberi.md).
 
 | Sıra | İş | Neden önemli | Rehber |
 |---|---|---|---|
-| 1 | Android deneme APK'sını telefonda deneyin: Ebeveyn köşesi → **🔊 Sesi dene** → Dinle | Ses yoksa okuma bilmeyen çocuk oynayamaz; en kritik kontrol | magaza-rehberi 5 |
-| 2 | Aynı denemeyi internetsiz APK ile yapın (uçak modunda) | "İnternete bağlanmaz" sözünün kanıtı | magaza-rehberi 6 |
+| 1 | Android deneme APK'sını telefonda deneyin: Ebeveyn köşesi → **🔊 Sesi dene** → Dinle | Ses yoksa okuma bilmeyen çocuk oynayamaz; en kritik kontrol | Aşağıda 5 (10 dk) |
+| 2 | Aynı denemeyi internetsiz APK ile yapın (uçak modunda) | "İnternete bağlanmaz" sözünün kanıtı | Aşağıda 5 |
 | 3 | Yağız testi (kamerayı da açıp sayım doğru mu bakın) | Gerçek çocukla ilk sonuç | yagiz-testi.md |
 | 4 | Google Play geliştirici hesabı + formlar + ilk yükleme (kapalı test) | Android betası buna bağlı | magaza-rehberi 3, 3b, 4b |
 | 5 | Play'de `tam_surum` ürünü ve lisans testçisi | Ödemeyi gerçekten denemek için | magaza-rehberi 3c |
@@ -78,6 +78,64 @@ gönderilmez") ve fotoğraflara ekleme (yukarıda). Başka izin yok.
 | @mediapipe/tasks-vision (+ model dosyası pakette) | İsteğe bağlı kamera sayımı, telefonun içinde |
 | d3-geo, topojson-client, world-atlas | Dönen dünya ve Zıpzıp'ın küresi (harita verisi pakette) |
 | @fontsource/baloo-2 | Yazı tipi (pakette) |
+
+## 5. Sabah denemesi: Android APK (10 dakika)
+
+Amaç: oyun gerçek bir Android uygulaması olarak sorunsuz mu, ve **internet izni olmadan da** çalışıyor mu?
+İkinci sorunun cevabı, Play sayfasında "internet erişimi yok" yazıp yazamayacağımızı belirler.
+Her adımda **"Görmelisiniz"** yazanı görmüyorsanız adım numarasını ve ekranın fotoğrafını bana getirin.
+
+**Hazırlık (bilgisayarda ya da telefonda, 2 dk)**
+
+1. GitHub'da proje → **Actions** → soldan **Android deneme paketi**. Listede iki yeşil ✅ iş görmelisiniz
+   (önceki oturum ikisini de başlattı). Biri sarı/dönüyorsa birkaç dakika bekleyin; kırmızı ❌ ise bana yazın.
+2. İşlerin her birine girin, en altta **Artifacts** bölümü var:
+   - `zip-zip-dunya-apk-internetsiz` → **asıl denenecek olan bu** (internet izni yok)
+   - `zip-zip-dunya-apk` → internetli, karşılaştırma için (internetsiz sorun çıkarırsa bunu deneriz)
+3. `zip-zip-dunya-apk-internetsiz`'i indirin. Zip'in içinden **app-debug.apk** çıkar; telefona gönderin
+   (kendinize WhatsApp/e-posta ya da kabloyla).
+
+**Kurulum (2 dk)**
+
+4. Telefonda app-debug.apk'ya dokunun. "Bilinmeyen kaynak" uyarısında izin verip **Yükle**.
+   Görmelisiniz: ana ekranda Zıpzıp simgeli **Zıp Zıp Dünya**. (Eski deneme kuruluysa "güncelle" der, sorun değil.)
+5. Kurulduktan sonra telefonun **Ayarlar → Uygulamalar → Zıp Zıp Dünya → İzinler**'e bakın.
+   Görmelisiniz: sadece "Kamera" (henüz izin verilmemiş). Konum, mikrofon, dosya **olmamalı**.
+
+**Uçak modunda oyun (4 dk)**
+
+6. **Uçak modunu açın** (Wi-Fi de kapalı olsun). Uygulamayı açın.
+   Görmelisiniz: 3 saniye içinde açılış ekranı, Zıpzıp ve yazılar düzgün (kutucuk/garip harf yok).
+7. **Oyna ▶** → Büyük Macera → Türkiye → İstanbul durağına girin, bir hareketi yapıp **Yaptım!**'a basın.
+   Görmelisiniz: Zıpzıp konuşuyor (ses geliyor), hareket gösteriliyor, sayaç ilerliyor.
+   Ses yoksa telefonun sesi açık mı bakın; yine yoksa 8. adım sebebini gösterir.
+8. Pasaport (🛂) → sağ üstteki ✏️ → çarpma sorusu → **Ebeveyn köşesi** → **🔊 Sesi dene** → **🔊 Dinle**.
+   Görmelisiniz: örnek cümle duyulur; altta "✅ Telefonun Türkçe sesi: ..." yazar.
+   "⚠️ Telefonda Türkçe ses bulunamadı" yazıyorsa: **⚙️ Türkçe sesi yükle**'ye basın, Türkçeyi indirin
+   (bu adım için uçak modunu kısa süre kapatmanız gerekir), sonra tekrar deneyin. Ne yazdığını not edin.
+9. Ebeveyn köşesine dönün → **📷 Kamerayla sayma** satırının yanındaki **🔍 Dene** → **📷 Kamerayı aç**.
+   Telefon kamera izni sorar, verin. Telefonu 2-3 metre öteye koyun, kollarınızı birkaç kez kaldırın.
+   Görmelisiniz: görüntünüz ve üstünde vücut noktaları, sayı her kaldırışta 1 artar.
+   (Satır hiç görünmüyorsa telefon çok eskidir; bu da bilgi, not edin.)
+10. Ebeveyn köşesinin altındaki **🔒 Bilgiler sadece bu telefonda: göster** bağlantısı.
+    Görmelisiniz: telefonda saklanan kayıtların listesi; internet gerekmeden açılır.
+
+**Sertifika (Türkiye Turu bitmişse, 1 dk)**
+
+11. Türkiye haritasında **🏆 Sertifikanı al** → **Kaydet / Paylaş 📤**.
+    Görmelisiniz: telefonun paylaş menüsü; "Galeriye kaydet"i seçince resim galeride görünür.
+    (Tur bitmemişse bu adımı atlayın; Yağız testinde bakarız.)
+
+**Sonuç**
+
+12. Uçak modunu kapatın. Bana tek satır yazmanız yeter, örneğin:
+    "İnternetsiz: hepsi çalıştı" ya da "İnternetsiz: 8. adımda ses yok, 9 çalıştı, telefon Samsung A54".
+
+| Sonuç | Ne yaparım |
+|---|---|
+| İnternetsiz pakette 6-11 hepsi çalıştı | İnternet iznini kalıcı kaldıran PR'ı açarım (Play'de "internet erişimi yok" görünür) |
+| İnternetsizde bir adım bozuk, internetli pakette aynı adım çalışıyor | İzin kalır; sebebini araştırırım |
+| İki pakette de aynı adım bozuk | İzinle ilgisi yok; o hatayı düzeltirim |
 
 ## Karar
 

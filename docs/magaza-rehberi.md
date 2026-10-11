@@ -159,6 +159,8 @@ Mağaza hesabı açılmadan önce oyunu **gerçek bir Android uygulaması olarak
 4. Zip dosyasını açın, içindeki **app-debug.apk** dosyasını Android telefona gönderin ve açın.
    Telefon "bilinmeyen kaynak" uyarısı verir. Bu dosya sadece deneme içindir, izin verip kurun.
 
+Adım adım 10 dakikalık kontrol listesi (uçak modu, ses, kamera, sertifika): [beta-hazir-mi.md 5. bölüm](beta-hazir-mi.md).
+
 (iPhone'da bu kolaylık yok. iPhone için TestFlight gerekiyor.)
 
 ## 6. Mağazaya çıkmadan önce benim yapacaklarım (kontrol listesi)
