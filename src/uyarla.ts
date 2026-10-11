@@ -1,5 +1,5 @@
 import { oyunAyari, type OyunAyari } from './oyunAyari';
-import { OTURARAK, sayiYazi, type Animasyon, type Hareket } from './hareketler';
+import { DONMA_OTURARAK, OTURARAK, sayiYazi, type Animasyon, type Hareket } from './hareketler';
 
 // Hareket listesini ebeveynin seçtiği ayarlara uyarlar (ebeveyn köşesi → ⚙️ Ayarlar):
 //  - Oturarak oyna: ayakta yapılan hareketler oturarak yapılan kol/gövde hareketine döner (aynı durakta tekrar etmeden).
@@ -25,7 +25,8 @@ const oturarakMi = (h: Hareket) => (h.dizi ?? [h.animasyon]).every((a) => OTURAR
 function oturarakYap(liste: Hareket[]): Hareket[] {
   const kullanilan = new Set<Animasyon>(liste.filter(oturarakMi).map((h) => h.animasyon));
   return liste.map((h) => {
-    if (h.surpriz) return h.dizi ? { ...h, dizi: oturarakDizi(h.dizi) } : h; // donma: oturarak dans; ayna: kol hareketleri
+    if (h.surpriz === 'donma') return DONMA_OTURARAK; // ayakla dans yerine kollarla dans
+    if (h.surpriz) return h.dizi ? { ...h, dizi: oturarakDizi(h.dizi) } : h; // ayna: sadece kol/gövde hareketleri
     if (oturarakMi(h)) return h;
     const ilk = KARSILIK[h.animasyon] ?? 'kollar';
     const id = [ilk, ...OTURARAK_IDLER].find((i) => !kullanilan.has(OTURARAK[i].animasyon)) ?? ilk;
@@ -71,5 +72,5 @@ export function uyarla(liste: Hareket[], ayar: OyunAyari = oyunAyari()): Hareket
 // Ayarlarla ortaya çıkabilecek bütün yeni cümleler (seslendirme listesi için).
 export function uyarlamaCumleleri(hareketler: Hareket[]): string[] {
   const oturarak = Object.values(OTURARAK).map((h) => ({ ...h, hikaye: OTURARAK_HIKAYE }));
-  return [...hareketler, ...oturarak].flatMap((h) => [h.sesli, kucukIcin(h).sesli]);
+  return [...hareketler, ...oturarak, DONMA_OTURARAK].flatMap((h) => [h.sesli, kucukIcin(h).sesli]);
 }
