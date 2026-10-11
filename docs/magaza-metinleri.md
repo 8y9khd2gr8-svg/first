@@ -2,7 +2,9 @@
 
 Mağaza formlarına kopyalanacak metinler. Karakter sınırları parantez içinde.
 **Yazmadığımız şey:** Bir uzman onayı alınmadan "fizyoterapist onaylı" gibi ifadeler kullanılmaz.
-Fizyoterapist görüşü alınınca eklenebilir.
+Fizyoterapist görüşü alınınca eklenebilir. Tıbbi iddia yok: "oturarak oyna" bir tedavi ya da engellilere özel
+uyarlama diye sunulmaz ("hareket kısıtı" da yazılmaz); sadece dar alan, yorgunluk ya da tercih için bir seçenek.
+"Sağlıklı", "kilo", "gelişimi hızlandırır" gibi sonuç vaatleri de yok.
 
 ---
 
@@ -23,13 +25,19 @@ Hareket et, dünyayı keşfet!
 **Uzun açıklama** (4000)
 
 Zıp Zıp Dünya, 4-9 yaş çocuklar için Türkçe bir hareket ve keşif oyunu.
-Neşeli maskotumuz Zıpzıp ile çocuğunuz Türkiye'yi, dünyanın harikalarını, uzayı ve dinozorların dünyasını gezerken zıplıyor, çömeliyor, koşuyor ve esniyor.
+Kollu bacaklı, gülen küçük bir dünya olan maskotumuz Zıpzıp ile çocuğunuz Türkiye'yi, dünyanın harikalarını, uzayı ve dinozorların dünyasını gezerken zıplıyor, çömeliyor, koşuyor ve esniyor.
 
 HAREKET EDEREK GEZ
 • Her durakta 5 hareketlik kısa bir antrenman: ısınma, durağa özel hareket, iki hareket ve soğuma.
 • Zıpzıp hareketi önce gösterir, çocuk sayaçla birlikte yapar.
 • Komutlar kısa ve net: "Dizlerini sırayla kaldır!", "Kollarını kaldır, indir!"
 • Yazı okumayı bilmeyen çocuklar için her şey sesli anlatılır, düğmeler büyüktür.
+• Zıpzıp gezdiği yerle birlikte döner: Türkiye'deyken Türkiye, okyanusta Büyük Okyanus, Piramitlerde Mısır ona bakar.
+
+HER ÇOCUĞA GÖRE AYAR
+• Hareket temposu: "Sakin" seçilirse tekrarlar azalır, ritim yavaşlar. Küçükler ve yeni başlayanlar için.
+• Oturarak oyna: zıplama ve çömelme yerine oturarak yapılan kol ve gövde hareketleri gelir. Dar bir odada, yorgun bir günde ya da ayakta oynamak istemeyen çocuk için.
+• Ayarlar ebeveyn köşesinde, sadece telefonda saklanır.
 
 KEŞFET VE ÖĞREN
 • Türkiye Turu: İstanbul, Truva, Pamukkale, Kapadokya, Nemrut, Göbeklitepe, Karadeniz
@@ -61,7 +69,7 @@ FİYAT
 Türkiye Turu tamamen ücretsiz. Tek seferlik ödemeyle Dünya Harikaları, Uzay Yolculuğu, Spor Kampı, Dinozorlar Diyarı, Evde Macera, Okyanus ve gelecek bütün bölümler açılır. Abonelik yok.
 
 **Tanıtım metni – Apple** (170; sürüm göndermeden değiştirilebilir)
-Reklamsız, Türkçe, internetsiz çalışan hareket oyunu. Türkiye Turu ücretsiz; zıpla, çömel, damgaları topla!
+Reklamsız, internetsiz, Türkçe hareket oyunu. Ayakta ya da oturarak, kendi temposunda oyna. Türkiye Turu ücretsiz!
 
 **Yenilikler (ilk sürüm)**
 Zıp Zıp Dünya yayında! Türkiye'yi, dünyanın harikalarını, uzayı, spor kampını, dinozorları, evdeki macerayı ve okyanusu hareket ederek keşfedin.
@@ -87,13 +95,19 @@ kids,movement,exercise,active,fitness,preschool,family,geography,space,wonders,t
 **Full description** (4000)
 
 Zip Zip World is a movement and discovery game for children aged 4-9.
-With our cheerful mascot Zipzip, your child travels across Türkiye, the wonders of the world and outer space while jumping, squatting, running and stretching.
+With Zipzip, our smiling little globe with arms and legs, your child travels across Türkiye, the wonders of the world and outer space while jumping, squatting, running and stretching.
 
 MOVE TO TRAVEL
 • Every stop is a short 5-move workout: warm-up, a special move, two more moves and a cool-down.
 • Zipzip shows each move first, then your child does it along with a counter.
 • Short, clear instructions like "Lift your knees one at a time!"
 • Everything is spoken aloud and the buttons are big, so kids who can't read yet can play too.
+• Zipzip turns with the journey: Türkiye faces forward in the Türkiye Tour, the Pacific in the Ocean chapter, Egypt at the Pyramids.
+
+SETTINGS FOR EVERY CHILD
+• Movement pace: choose "Calm" for fewer repetitions and a slower rhythm. Great for little ones and beginners.
+• Play seated: jumps and squats are replaced with seated arm and upper-body moves. For a small room, a tired day or a child who'd rather sit.
+• Settings live in the parent corner and are stored only on the device.
 
 EXPLORE AND LEARN
 • Türkiye Tour: Istanbul, Troy, Pamukkale, Cappadocia, Nemrut, Göbeklitepe, the Black Sea
@@ -125,7 +139,7 @@ PRICE
 The Türkiye Tour is completely free. A single one-time purchase unlocks Wonders of the World, Space Journey, Sports Camp, Dinosaur Land, Adventure at Home, Ocean and all future chapters. No subscription.
 
 **Promotional text – Apple** (170)
-An ad-free movement game that works offline. The Türkiye Tour is free: jump, squat and collect passport stamps!
+An ad-free movement game that works offline. Play standing or seated, at your own pace. The Türkiye Tour is free!
 
 **What's new (first release)**
 Zip Zip World is here! Explore Türkiye, the wonders of the world, space, sports camp, dinosaurs, an adventure at home and the ocean, all by moving.
