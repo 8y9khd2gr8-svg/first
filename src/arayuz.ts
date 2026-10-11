@@ -22,6 +22,8 @@ export function buyukDugme(
     .text(0, 4, yazi, { fontFamily: YAZI_TIPI, fontSize: `${yaziBoyu}px`, color: '#ffffff', fontStyle: 'bold' })
     .setOrigin(0.5)
     .setShadow(0, 4, 'rgba(0,0,0,0.3)', 0);
+  // Uzun yazı düğmeden taşmasın: kenarlardan pay bırakıp sığacak kadar küçülür.
+  t.setScale(Math.min(1, (genislik - 36) / t.width));
   dugme.add([g, t]);
   dugme.setSize(genislik, yukseklik).setInteractive({ useHandCursor: true });
 

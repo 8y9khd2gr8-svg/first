@@ -27,8 +27,8 @@ export class EbeveynMenuScene extends Phaser.Scene {
     // Mağaza uygulamasında "Telefona yükle" gereksiz (zaten yüklü): yerinde tam sürüm (ödeme / geri yükleme) durur.
     if (odemeKipi() === 'web') dugme(510, '📲 Telefona yükle', RENK.yesil, 'Kurulum');
     else dugme(510, '⭐ Tam sürüm', RENK.yesil, 'TamSurum', { geri: 'EbeveynMenu' });
-    // Yan yana iki yarım düğme: güvenlik notu ve ses denemesi (telefonda Türkçe ses var mı?).
-    dugme(620, '🛡️ Güvenlik', 0x7c5cd6, 'Guvenlik', { sonra: 'EbeveynMenu' }, -142, 276);
+    // Yan yana iki yarım düğme: nasıl oynanır (güvenlik notu da oradan açılır) ve ses denemesi (telefonda Türkçe ses var mı?).
+    dugme(620, '❓ Nasıl oynanır', 0x7c5cd6, 'EbeveynRehber', {}, -142, 276);
     dugme(620, '🔊 Sesi dene', RENK.mavi, 'EbeveynSes', {}, 142, 276);
 
     // Küçük görünen ayar düğmeleri: yazı sade kalır, dokunma alanı en az 88 nokta (parmak ıskalamasın).
