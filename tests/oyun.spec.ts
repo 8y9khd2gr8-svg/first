@@ -517,5 +517,12 @@ test('durumlar sadece renkle anlatılmaz: biten durakta yıldız, kapalı durakt
     expect(sayim.yildiz, `${ad}: biten durak yıldızı`).toBeGreaterThanOrEqual(yildiz);
     expect(sayim.kilit, `${ad}: kapalı durak kilidi`).toBeGreaterThanOrEqual(kilit);
   }
+  // Kamera denemesinde seçili sayma yolu renkle birlikte ✓ ile de belli olur.
+  await sahneAc(page, 'EbeveynKamera');
+  const secili = await page.evaluate(() => {
+    const ara = (liste: any[]): string[] => liste.flatMap((n) => (n.type === 'Text' && n.text.startsWith('✓') ? [n.text] : n.list ? ara(n.list) : []));
+    return ara((window as any).oyun.scene.getScene('EbeveynKamera').children.list);
+  });
+  expect(secili).toEqual(['✓ Zıpla']);
   expect(kayit.hatalar).toEqual([]);
 });
