@@ -125,10 +125,49 @@ Oyuna ayrıca başka ödeme yolu eklenmez (mağaza kuralları ve "oyun hiçbir y
 4. Uygulamayı **Mac'te Xcode** ile göndereceğiz. Mac'inizde App Store'dan Xcode'u ücretsiz indirin. Adımları gönderme günü birlikte yaparız.
 5. App Store Connect'te:
    - **Kategori:** Çocuklar (Kids) – 6-8 yaş. Bu kategori reklamı ve izleme yazılımlarını yasaklar. Biz zaten kullanmıyoruz.
-   - **Gizlilik etiketi:** "Veri toplanmıyor" (Data Not Collected).
    - **Kamera açıklaması** pakette hazır: "Ebeveyn açarsa kamera... görüntü telefonda işlenir; kaydedilmez ve hiçbir yere gönderilmez."
-6. **TestFlight** ile beta: Kasım'da test linki oluşturulur, beta testçileri TestFlight uygulamasıyla oyunu kurar.
-   Dışarıdan testçi davet etmeden önce Apple kısa bir inceleme yapar (genelde 1-2 gün).
+
+### App Store gizlilik etiketi ("App Privacy") – cevaplar
+
+App Store Connect → uygulama → **App Privacy** → **Get Started**. Sorular ve cevaplarımız:
+
+| Soru | Cevap | Neden |
+|---|---|---|
+| Do you or your third-party partners collect data from this app? | **No, we do not collect data from this app** | Hiçbir bilgi telefondan çıkmaz; oyun sunucuya bağlanmaz |
+| (Sonuç sayfası) | **Data Not Collected** yazmalı | Mağaza sayfasında ebeveyn bunu görür |
+| Privacy Policy URL | gizlilik.html'in adresi (alan adı gelince değişir) | Zorunlu alan |
+
+Apple'ın tanımında "toplamak" = bilgiyi telefondan **dışarı göndermek**. Bizde:
+- Çocuğun adı, fotoğrafı, ilerlemesi: sadece telefonda → toplanmıyor.
+- Kamera görüntüsü: telefonun içinde işlenir, kaydedilmez → toplanmıyor.
+- Satın alma: Apple'ın kendi ödeme ekranı; Apple'ın verisi sayılır, biz görmeyiz → toplanmıyor.
+- Reklam, analiz, çökme raporu kütüphanesi yok.
+
+**Pakette hazır olanlar (11 Ekim):**
+- `PrivacyInfo.xcprivacy` (Apple gizlilik dosyası): "izleme yok, veri toplanmıyor, gerekçe isteyen API yok".
+  Denetlendi: Capacitor kendi dosyasını getiriyor (o da boş); ödeme ve konuşma eklentilerinin iPhone kodu
+  UserDefaults, dosya tarihi, açık kalma süresi gibi Apple'ın gerekçe istediği bilgileri okumuyor. Kayıtlar
+  WebKit'in içinde (Apple'ın kendi parçası). Yeni eklenti eklenirse bu denetim tekrarlanmalı.
+- `ITSAppUsesNonExemptEncryption = NO`: oyun şifreleme kullanmaz (internete bile çıkmaz). Bu sayede her
+  TestFlight yüklemesinde "Export Compliance" sorusu sorulmaz.
+
+### TestFlight adımları (Kasım betası)
+
+1. **Paketi gönderme** (Mac + Xcode, birlikte yaparız): `npm run magaza` → Xcode'da `ios/App/App.xcworkspace`
+   → Signing'de kendi ekibiniz → Product → **Archive** → **Distribute App** → App Store Connect.
+   15-30 dakika sonra App Store Connect → **TestFlight** sekmesinde sürüm görünür ("Processing" biter).
+2. **Kendi telefonunuz (iç test, inceleme yok):** TestFlight → Internal Testing → grup oluşturun, kendi Apple
+   ID'nizi ekleyin. iPhone'a App Store'dan **TestFlight** uygulamasını kurun, davetten oyunu yükleyin.
+   İlk denemede: beta-hazir-mi.md 5. bölümdeki listenin aynısı (uçak modu, 🔊 Sesi dene, 🔍 kamera, sertifika
+   "Resmi Kaydet" — burada fotoğraflara ekleme izni sorulmalı).
+3. **Beta aileleri (dış test):** External Testing → grup ("Beta 1. dalga") → sürümü ekleyin. İlk seferde Apple
+   kısa inceleme ister: "Test Information"a ne denenecek (Türkçe/İngilizce birkaç cümle), iletişim e-postanız
+   ve **Beta App Review** için "giriş gerekmez" notu. Genelde 1-2 gün.
+4. Onaylanınca **Public Link** açın; bağlantıyı WhatsApp mesajıyla (beta-rehberi.md) gönderin. En fazla
+   10.000 kişi; biz 25-30 aile.
+5. Ödeme denemesi: TestFlight'ta satın alma **ücretsizdir** (gerçek para çekilmez). `tam_surum` ürünü
+   App Store Connect'te "Ready to Submit" olmalı (3c).
+6. Her TestFlight sürümü 90 gün geçerli; Ocak'taki mağaza çıkışına kadar en az bir yeni sürüm yükleriz.
 
 ## 4b. Yaş derecelendirmesi (iki mağazada da zorunlu)
 

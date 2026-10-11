@@ -64,6 +64,8 @@ konuşma motorunu bulmak için "TTS_SERVICE" sorgusu ekler (izin değildir).
 - iPhone: `NSPhotoLibraryAddUsageDescription` eklendi. Sertifikayı paylaş ekranında "Resmi Kaydet"e basılınca bu
   metin yoksa uygulama kapanıyordu (Apple kuralı). Metin: "Uygulama fotoğraflarınızı görmez, sadece sertifikayı ekler."
 
+**iPhone gizlilik dosyası**: `ios/App/App/PrivacyInfo.xcprivacy` "izleme yok, veri toplanmıyor" der; App Store etiketi "Data Not Collected" (magaza-rehberi 4).
+
 **iPhone izin metinleri**: Kamera ("Ebeveyn açarsa kamera... görüntü telefonda işlenir; kaydedilmez ve hiçbir yere
 gönderilmez") ve fotoğraflara ekleme (yukarıda). Başka izin yok.
 
