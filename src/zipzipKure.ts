@@ -41,7 +41,6 @@ export function durakYonu(d: Durak): Yon {
 
 // Son bakılan yön oyun boyunca hatırlanır (kaydedilmez): yeni ekrandaki Zıpzıp oradan başlar.
 let sonYon: Yon = TURKIYE_YONU;
-export const zipzipYonu = (): Yon => sonYon;
 export function zipzipYonunuAyarla(yon: Yon) {
   sonYon = yon;
 }
