@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { RENK, YAZI_TIPI, hareketiAzalt } from '../ayarlar';
-import { buyukDugme, evDugmesi, yildizliArkaPlan, genisDokunma } from '../arayuz';
+import { buyukDugme, evDugmesi, yildizliArkaPlan, genisDokunma, bittiYildizi } from '../arayuz';
 import { Durak, UZAY } from '../duraklar';
 import { tamamlananlar } from '../ilerleme';
 import { M } from '../metinler';
@@ -263,6 +263,7 @@ export class UzayScene extends Phaser.Scene {
       kap.add(this.add.circle(0, 0, r + 4, 0x14213d, 0.55));
       kap.add(this.add.text(0, 0, '🔒', { fontSize: `${Math.max(24, r * 0.7)}px` }).setOrigin(0.5));
     }
+    if (bitti) kap.add(bittiYildizi(this, r * 0.7 + 8, -r * 0.7 - 8, 16));
     kap.add(this.add.text(0, r + 22, durak.ad, { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '24px', color: '#ffffff', stroke: '#0b1430', strokeThickness: 6 }).setOrigin(0.5));
     const alan = Math.max(80, r * 2 + 10);
     kap.setSize(alan, alan).setInteractive({ useHandCursor: true });

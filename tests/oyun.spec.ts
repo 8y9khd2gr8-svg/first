@@ -434,5 +434,31 @@ test('ödül ekranları dolu hâlde de taşmaz: pasaport kâğıdı, uzun ad, da
     return ara(sahne.children.list).displayWidth;
   });
   expect(genislik).toBeLessThanOrEqual(252);
+
+test('durumlar sadece renkle anlatılmaz: biten durakta yıldız, kapalı durakta kilit var (renk körlüğü)', async ({ page }) => {
+  const biten = ['istanbul', 'truva', 'efes', 'merkur'];
+  const kayit = await oyunuAc(page, { ...BETA, 'zipzip-ilerleme-v1': JSON.stringify(biten) });
+  // Sahnedeki (kutuların içi dahil) yıldız şekilleri ve kilit yazıları sayılır.
+  const say = () =>
+    page.evaluate(() => {
+      const sahne = (window as any).oyun.scene.getScenes(true)[0];
+      const sayim = { yildiz: 0, kilit: 0 };
+      const gez = (liste: any[]) =>
+        liste.forEach((n) => {
+          if (n.type === 'Star') sayim.yildiz++;
+          if (n.type === 'Text' && n.text === '🔒') sayim.kilit++;
+          if (n.list) gez(n.list);
+        });
+      gez(sahne.children.list);
+      return sayim;
+    });
+  // [sahne, biten durak sayısı (Dünya'da alt sırada bir kez daha), kapalı durak sayısı (Dünya'da iki kez)]
+  const beklenen: [string, number, number][] = [['Harita', 2, 4], ['Dunya', 2, 8], ['Uzay', 1, 6]];
+  for (const [ad, yildiz, kilit] of beklenen) {
+    await sahneAc(page, ad);
+    const sayim = await say();
+    expect(sayim.yildiz, `${ad}: biten durak yıldızı`).toBeGreaterThanOrEqual(yildiz);
+    expect(sayim.kilit, `${ad}: kapalı durak kilidi`).toBeGreaterThanOrEqual(kilit);
+  }
   expect(kayit.hatalar).toEqual([]);
 });
