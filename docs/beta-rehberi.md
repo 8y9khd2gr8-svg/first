@@ -65,6 +65,9 @@ Her soruya "evet / hayır / biraz" demeniz yeterli:
 7. Bir hareket çocuğunuz için **zor ya da güvensiz** geldi mi?
 8. Kendisi **tekrar oynamak istedi mi?**
 
+**Beta sonunda** 5 kısa soru göndereceğiz (çocuğun yaş grubu, kaç kez kendi istedi, zorlandığı hareket, güveninizi
+azaltan bir şey, makul bulduğunuz fiyat). Cevaplamak isteğe bağlıdır.
+
 ## Sorun nasıl bildirilir?
 
 Beta grubuna şunları yazın:

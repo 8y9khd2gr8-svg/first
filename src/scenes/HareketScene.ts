@@ -5,12 +5,13 @@ import { AILE_ID } from '../aile';
 import { durakBul, haritaSahnesi } from '../duraklar';
 import { SOGUMA_ID, hareketYapildi, oturumListesi } from '../oturum';
 import { uzaktanAcikMi } from '../ayarlar';
-import { Animasyon, Hareket } from '../hareketler';
+import { AYNA, Animasyon, DONMA, Hareket } from '../hareketler';
 import { hareketKaydet } from '../istatistik';
 import { KAMERA_HAREKETLERI, KameraSayaci, kameraAcikMi, kameraDesteklenir } from '../kamera';
 import { GERI_SAYIM, M, SAYILAR } from '../metinler';
 import { bip, konus, sustur, zaferMuzigi } from '../ses';
 import { Zipzip } from '../zipzip';
+import { durakYonu, zipzipYonunuAyarla } from '../zipzipKure';
 
 const MASKOT_Y = 640;
 
@@ -82,6 +83,8 @@ export class HareketScene extends Phaser.Scene {
     // Uzun komutlar ekrandan taşmasın.
     komut.setScale(Math.min(1, 660 / komut.width));
 
+    // Zıpzıp durağın olduğu tarafa bakar (Ailece ve soğumada son baktığı yerde kalır).
+    if (this.durakId !== AILE_ID && this.durakId !== SOGUMA_ID) zipzipYonunuAyarla(durakYonu(durakBul(this.durakId)));
     this.zipzip = new Zipzip(this, x, MASKOT_Y, 1.5);
     this.sayac = this.add
       .text(x, 1060, '', { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '150px', color: '#ffffff', stroke: '#0b1430', strokeThickness: 14 })
@@ -92,6 +95,8 @@ export class HareketScene extends Phaser.Scene {
 
     konus(hareket.sesli);
     this.kameraKur(hareket);
+    // Sürpriz oyunlarda Zıpzıp da şaşırır.
+    if (hareket.hikaye === DONMA.hikaye || hareket.hikaye === AYNA.hikaye) this.zipzip.ifadeSec('saskin', 1800);
 
     // Gösterim: Zıpzıp hareketi bir iki kez yapar.
     const gosterimSuresi = 2600;
@@ -215,7 +220,8 @@ export class HareketScene extends Phaser.Scene {
       .setOrigin(0.5)
       .setScale(0);
     this.tweens.add({ targets: aferin, scale: 1, duration: 350, ease: 'Back.easeOut' });
-    this.zipzip.ifadeSec('mutlu');
+    // Aferin'de sırayla gülen gözler ve göz kırpma (hep aynı olmasın).
+    this.zipzip.ifadeSec(this.adim % 2 === 0 ? 'mutlu' : 'kirpan');
     this.zipzip.birKez('zipla', 900);
     this.time.delayedCall(1300, () => this.scene.restart({ durakId: this.durakId, adim: this.adim + 1 }));
   }

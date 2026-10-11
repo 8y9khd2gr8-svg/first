@@ -6,6 +6,7 @@ import { sustur } from '../ses';
 
 const MADDELER: [string, string][] = [
   ['🧹', 'Etrafta boş bir alan açın; sert ve sivri\neşyaları uzaklaştırın.'],
+  ['📱', 'Telefonu düşmeyeceği sağlam bir yere\nkoyun; çocuk ekrana çarpmasın.'],
   ['👀', 'Bir yetişkin yanında olsun.'],
   ['🧦', 'Kaygan zeminde çorapla değil,\nyalınayak oynayın.'],
   ['💧', 'Ara ara su içip dinlenin.'],
@@ -34,9 +35,9 @@ export class GuvenlikScene extends Phaser.Scene {
     this.add.text(x, 190, 'Güvenli oyun', { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '72px', color: '#FFC93C' }).setOrigin(0.5);
 
     MADDELER.forEach(([simge, metin], i) => {
-      const y = 330 + i * 150;
+      const y = 320 + i * 126;
       const g = this.add.graphics();
-      g.fillStyle(0xffffff, 0.08).fillRoundedRect(40, y - 62, 640, 124, 28);
+      g.fillStyle(0xffffff, 0.08).fillRoundedRect(40, y - 55, 640, 110, 28);
       this.add.text(100, y, simge, { fontSize: '56px' }).setOrigin(0.5);
       this.add.text(160, y, metin, { fontFamily: YAZI_TIPI, fontSize: '30px', color: '#ffffff', lineSpacing: 2 }).setOrigin(0, 0.5);
     });

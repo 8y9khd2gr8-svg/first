@@ -6,6 +6,7 @@ import { tamamlananlar } from '../ilerleme';
 import { M } from '../metinler';
 import { bip, konus, sustur, zaferMuzigi } from '../ses';
 import { Zipzip } from '../zipzip';
+import { BOLUM_YONU } from '../zipzipKure';
 import { bolumGecisDugmesi } from './BolumScene';
 
 type Nokta = { x: number; y: number };
@@ -117,6 +118,7 @@ export class UzayScene extends Phaser.Scene {
     const zipzipDurak = yolculukVar ? UZAY[siradaki - 1] : siradaki === -1 ? UZAY[UZAY.length - 1] : siradaki === 0 ? null : UZAY[siradaki - 1];
     const ilk = zipzipYeri(zipzipDurak?.id ?? null);
     const zipzip = new Zipzip(this, 0, 0, 0.3);
+    zipzip.yoneDon(BOLUM_YONU.uzay);
     zipzip.yerlestir(ilk.x, ilk.y);
 
     // Üst kısım

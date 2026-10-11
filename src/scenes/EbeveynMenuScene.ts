@@ -22,7 +22,8 @@ export class EbeveynMenuScene extends Phaser.Scene {
     const dugme = (y: number, yazi: string, renk: number, sahne: string, veri: object = {}, dx = 0, genislik = 560) =>
       buyukDugme(this, x + dx, y, yazi, renk, () => this.scene.start(sahne, veri), { genislik, yukseklik: 100, yaziBoyu: genislik < 560 ? 38 : 44 });
     dugme(290, '📊 Hareket özeti', RENK.turuncu, 'EbeveynOzet');
-    dugme(400, '✏️ Pasaportu düzenle', RENK.mavi, 'PasaportAyar');
+    dugme(400, '✏️ Pasaport', RENK.mavi, 'PasaportAyar', {}, -142, 276);
+    dugme(400, '⚙️ Ayarlar', 0x7c5cd6, 'EbeveynAyar', {}, 142, 276);
     // Mağaza uygulamasında "Telefona yükle" gereksiz (zaten yüklü): yerinde tam sürüm (ödeme / geri yükleme) durur.
     if (odemeKipi() === 'web') dugme(510, '📲 Telefona yükle', RENK.yesil, 'Kurulum');
     else dugme(510, '⭐ Tam sürüm', RENK.yesil, 'TamSurum', { geri: 'EbeveynMenu' });

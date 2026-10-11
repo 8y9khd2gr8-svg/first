@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { RENK, YAZI_TIPI, uzaktanAcikMi } from '../ayarlar';
+import { oyunAyari } from '../oyunAyari';
 import { buyukDugme, evDugmesi, yildizliArkaPlan } from '../arayuz';
 import { tamamlananlar } from '../ilerleme';
 import { haftalikOzet } from '../istatistik';
@@ -35,6 +36,7 @@ export class EbeveynVeriScene extends Phaser.Scene {
       ['Hareket kaydı', `${ozet.gunSayisi} gün, ${ozet.toplamHareket} hareket`],
       ['Kamerayla sayma', kameraAcikMi() ? 'açık (görüntü kaydedilmez)' : 'kapalı'],
       ['Uzaktan oyna', uzaktanAcikMi() ? 'açık' : 'kapalı'],
+      ['Tempo · oturarak', `${oyunAyari().yas === 'kucuk' ? 'sakin' : 'normal'} · ${oyunAyari().oturarak ? 'açık' : 'kapalı'}`],
       ...(odemeKipi() === 'web' ? [] : [['Tam sürüm', tamSurumVarMi() ? 'alındı' : 'alınmadı'] as [string, string]]),
     ];
     const kutuY = 250;

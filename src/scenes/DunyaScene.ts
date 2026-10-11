@@ -1,9 +1,5 @@
 import Phaser from 'phaser';
-import { geoDistance, geoGraticule10, geoInterpolate, geoOrthographic, geoPath, type GeoPermissibleObjects } from 'd3-geo';
-import { feature } from 'topojson-client';
-import type { Topology } from 'topojson-specification';
-import karaVerisi from 'world-atlas/land-110m.json';
-import ulkeVerisi from 'world-atlas/countries-110m.json';
+import { geoDistance, geoGraticule10, geoInterpolate, geoOrthographic, geoPath } from 'd3-geo';
 import { hareketiAzalt, RENK, YAZI_TIPI } from '../ayarlar';
 import { buyukDugme, evDugmesi, yildizliArkaPlan, durakSimgesi, genisDokunma } from '../arayuz';
 import { DUNYA, Durak, bolumuAcikMi } from '../duraklar';
@@ -12,13 +8,8 @@ import { tamamlananlar } from '../ilerleme';
 import { M } from '../metinler';
 import { bip, konus, sustur, zaferMuzigi } from '../ses';
 import { Zipzip } from '../zipzip';
+import { KARA, TURKIYE_SINIRI, durakYonu } from '../zipzipKure';
 
-const KARA = feature(karaVerisi as unknown as Topology, (karaVerisi as unknown as Topology).objects.land);
-const TURKIYE_SINIRI = (() => {
-  const t = ulkeVerisi as unknown as Topology;
-  const ulkeler = feature(t, t.objects.countries) as unknown as { features: (GeoPermissibleObjects & { id?: string })[] };
-  return ulkeler.features.find((f) => f.id === '792')!;
-})();
 const IZGARA = geoGraticule10();
 
 const BOYUT = 600; // küre resminin kenarı (piksel)
@@ -76,6 +67,7 @@ export class DunyaScene extends Phaser.Scene {
     this.ciz();
     const zipzip = new Zipzip(this, KURE.x, KURE.y - 40, 0.42);
     zipzip.yerlestir(KURE.x, KURE.y - 40);
+    zipzip.yoneDon(durakYonu(zipzipDurak));
 
     // Üst kısım: ana ekran, Türkiye'ye dönüş, pasaport, başlık.
     evDugmesi(this, () => {
@@ -165,6 +157,8 @@ export class DunyaScene extends Phaser.Scene {
       altYazi.setText('Yola çıkıyoruz!');
       konus(M.yolaCikiyoruz);
       zipzip.surekli('zipla', 600);
+      // Büyük küreyle birlikte Zıpzıp'ın küresi de sıradaki harikaya döner.
+      this.time.delayedCall(600, () => zipzip.yoneDon(durakYonu(hedef), 2600));
       this.time.delayedCall(600, () =>
         this.don(merkezNoktasi(hedef), 2600, (t) => (this.iz = { bas: onceki.konum!, son: hedef.konum!, t }), () => {
           this.iz = null;

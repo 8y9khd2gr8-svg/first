@@ -3,12 +3,15 @@ import type { Animasyon } from './hareketler';
 import { seciliKostum } from './kostumler';
 import { hareketiAzalt } from './ayarlar';
 import { ZipzipYuz, type Ifade } from './zipzipYuz';
+import { ZipzipKure, type Yon } from './zipzipKure';
 
 // Zıpzıp: gövde (yüzlü dünya) + iki parçalı kollar (omuz-dirsek) ve bacaklar (kalça-diz).
 // Tüm ölçüler maskot çiziminin birimleriyle; "birim" bir çizim biriminin ekranda kaç piksel olduğu.
 
 const UZUV_RENGI = 0xffb627;
-const AYAKKABI_RENGI = 0xff6b6b;
+const UZUV_KENARI = 0xe08e00;
+const AYAKKABI_RENGI = 0xef4e5e;
+const AYAKKABI_KENARI = 0xa52a3a;
 const KALINLIK = 13;
 const KOL = { ust: 38, alt: 36 };
 const BACAK = { ust: 30, alt: 30 };
@@ -280,13 +283,10 @@ export class Zipzip extends Phaser.GameObjects.Container {
   // Gövde + uzuvlar + kostüm: zıplarken birlikte basılıp esner (dış kap yön ve konum için kalır).
   private readonly beden: Phaser.GameObjects.Container;
   private readonly yuz: ZipzipYuz;
+  private readonly kure: ZipzipKure;
   private readonly esneme = { sx: 1, sy: 1 };
   private dongu?: Phaser.Time.TimerEvent;
   private bekleyenler: Phaser.Time.TimerEvent[] = [];
-
-  static yukle(sahne: Phaser.Scene) {
-    sahne.load.svg('govde', 'govde.svg', { width: 484, height: 484 });
-  }
 
   constructor(sahne: Phaser.Scene, x: number, y: number, birim: number) {
     super(sahne, x, y);
@@ -303,13 +303,14 @@ export class Zipzip extends Phaser.GameObjects.Container {
     ]);
 
     this.uzuvlar = {
-      solBacak: this.uzuv(-30, 92, BACAK, true),
-      sagBacak: this.uzuv(30, 92, BACAK, true),
-      solKol: this.uzuv(-96, -6, KOL, false),
-      sagKol: this.uzuv(96, -6, KOL, false),
+      solBacak: this.uzuv(-30, 92, BACAK, true, 1),
+      sagBacak: this.uzuv(30, 92, BACAK, true, -1),
+      solKol: this.uzuv(-96, -6, KOL, false, 1),
+      sagKol: this.uzuv(96, -6, KOL, false, -1),
     };
     // Kollar gövdenin arkasında, bacaklar önünde: diz kalkınca gövdenin önüne gelir.
-    const govde = sahne.add.image(0, 0, 'govde').setScale(birim / 2);
+    this.kure = new ZipzipKure(sahne, birim);
+    const govde = this.kure;
     const { solKol, sagKol, solBacak, sagBacak } = this.uzuvlar;
     this.yuz = new ZipzipYuz(sahne, birim);
     this.beden = sahne.add.container(0, 0, [solKol.kok, sagKol.kok, govde, this.yuz, solBacak.kok, sagBacak.kok]);
@@ -321,7 +322,7 @@ export class Zipzip extends Phaser.GameObjects.Container {
   }
 
   // Uzuv eklemden sağa doğru çizilir: üst parça + ucunda dönebilen alt parça (el ya da ayakkabıyla).
-  private uzuv(ex: number, ey: number, boy: { ust: number; alt: number }, bacak: boolean): UzuvParcasi {
+  private uzuv(ex: number, ey: number, boy: { ust: number; alt: number }, bacak: boolean, yan: 1 | -1): UzuvParcasi {
     const b = this.birim;
     const cizgi = (uzunluk: number) => {
       const g = this.scene.add.graphics();
@@ -330,12 +331,41 @@ export class Zipzip extends Phaser.GameObjects.Container {
       return g;
     };
     const altParca = cizgi(boy.alt);
-    if (bacak) altParca.fillStyle(AYAKKABI_RENGI).fillEllipse((boy.alt + 4) * b, 0, 24 * b, 38 * b);
-    else altParca.fillStyle(UZUV_RENGI).fillCircle(boy.alt * b, 0, 13 * b);
+    if (bacak) this.ayakkabi(altParca, boy.alt, yan);
+    else this.el(altParca, boy.alt);
 
     const dirsek = this.scene.add.container(boy.ust * b, 0, [altParca]);
     const kok = this.scene.add.container(ex * b, ey * b, [cizgi(boy.ust), dirsek]);
     return { kok, dirsek, durum: u(0) };
+  }
+
+  // Eldiven gibi el: avuç + uzvun ucu yönünde üç parmak + yanda başparmak. Yerel çizimde uzuv +x yönünde uzanır.
+  private el(g: Phaser.GameObjects.Graphics, x: number) {
+    const b = this.birim;
+    const parca = (px: number, py: number, en: number, boy: number) => {
+      g.fillStyle(UZUV_RENGI).fillEllipse(px * b, py * b, en * b, boy * b);
+      g.lineStyle(2 * b, UZUV_KENARI).strokeEllipse(px * b, py * b, en * b, boy * b);
+    };
+    for (const py of [-9, 0, 9]) parca(x + 15, py, 18, 10);
+    parca(x + 2, -14, 12, 10);
+    parca(x + 2, 0, 30, 30);
+  }
+
+  // Spor ayakkabı: kırmızı üst, beyaz taban, beyaz bağcıklar. Burnu "yan" tarafa bakar (sol ayak sola).
+  private ayakkabi(g: Phaser.GameObjects.Graphics, x: number, yan: 1 | -1) {
+    const b = this.birim;
+    const burun = 8 * yan;
+    g.fillStyle(0xffffff).fillEllipse((x + 12) * b, burun * b, 14 * b, 52 * b);
+    g.fillStyle(AYAKKABI_RENGI).fillEllipse((x + 4) * b, burun * b, 26 * b, 48 * b);
+    g.lineStyle(2.5 * b, AYAKKABI_KENARI).strokeEllipse((x + 4) * b, burun * b, 26 * b, 48 * b);
+    g.fillStyle(0xffffff).fillRect((x + 9) * b, (burun - 25) * b, 6 * b, 50 * b);
+    g.lineStyle(2.5 * b, 0xffffff);
+    for (const d of [-4, 4]) g.lineBetween((x - 4) * b, (d + 2 * yan) * b, (x + 4) * b, (d - 2 * yan) * b);
+  }
+
+  // Gövde küresini yeni yöne döndürür (bölüme ya da sıradaki durağa bakar).
+  yoneDon(yon: Yon, sure?: number) {
+    this.kure.yoneDon(yon, sure);
   }
 
   private uygula(p: UzuvParcasi) {

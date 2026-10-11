@@ -50,7 +50,7 @@ Teknoloji: Phaser 3 + TypeScript + Vite, GitHub Pages ile yayın. İleride Capac
   Yeni bir konus() cümlesi eklenince metinler.ts'e de eklenmeli.
   Ses kararı: beta için Azure doğal ses (ücretsiz katman; hesabı kullanıcı açar, anahtar ortam
   ayarlarına gizli değişken). Cümleler oturunca (beta sonrası) seslendirmen/ajansla insan sesi.
-- Çıkış planı: Kasım'da ~100 kişilik beta (TestFlight / Google kapalı test), Ocak sonu yarıyıl
+- Çıkış planı: Kasım'da 25-30 ailelik beta (iki dalga; Play için en az 12 test kullanıcısı 14 gün) (TestFlight / Google kapalı test), Ocak sonu yarıyıl
   tatilinde mağaza, 23 Nisan büyük güncelleme. Yorumlar organize ettirilmez (mağaza kuralı);
   çevre beta testçisi olarak kullanılır.
 - Hareketler futbol takımının fizyoterapistlerine danışılacak (hareket kataloğu sayfası; ertelendi).
@@ -67,7 +67,7 @@ Teknoloji: Phaser 3 + TypeScript + Vite, GitHub Pages ile yayın. İleride Capac
 - PWA: ana ekrana yüklenir, internetsiz çalışır (vite-plugin-pwa). Yazı tipi pakette
   (@fontsource/baloo-2); oyun hiçbir dış sunucuya bağlanmaz, öyle kalmalı.
 - Avatar hayvanları çizim olarak kalır (gerçek fotoğraf değil); ileride çizer Zıpzıp
-  tarzında çizecek. İkonlar: public/ikon/ (Zıpzıp'tan üretildi).
+  tarzında çizecek. İkonlar ve açılış ekranı: `node scripts/ikon-uret.mjs` (oyundaki Zıpzıp'tan; public/ikon, assets, android, ios).
 - Dünya Harikaları (2. bölüm, ücretli kısım): dönen küre (DunyaScene, d3-geo ile canvas'a
   çizilir); Efes → Kolezyum → Piramitler → Petra → Tac Mahal → Çin Seddi → Machu Picchu.
   Türkiye Turu bitince açılır; beta için ebeveyn köşesinde geçici "Beta: Dünya bölümünü aç"
@@ -100,6 +100,11 @@ Teknoloji: Phaser 3 + TypeScript + Vite, GitHub Pages ile yayın. İleride Capac
   ekleme yok). 5651 Ek Madde 5 (oyunlar, 1 Kasım 2026): platformlar derecelendirilmemiş oyun sunamaz → mağaza yaş
   derecelendirmesi (IARC/Apple; beklenen PEGI 3 / 4+) eksiksiz yapılır; ayrıntı yönetmeliği takip edilir.
   Ayrıntı ve avukata sorulacaklar: docs/magaza-rehberi.md (4b ve 7). "Sosyal ağ değildir" vurgusu mağaza ve gizlilik metninde.
+- Her yeni özellik/bölümde sorulur: 4-5, 6-7, 8-9 yaş ve hareket kısıtı olan çocuk için nasıl? (Yaşa göre tempo ve
+  oturarak oyna bu soru sorulmadığı için geç geldi; ChatGPT değerlendirmesi, Ekim 2026.) Ebeveyn köşesi → ⚙️ Ayarlar:
+  "Hareket temposu" 🐢 Sakin (daha az tekrar, %25 yavaş, süreli hareket kısa; 4-5 yaş/yeni başlayan için önerilir) /
+  🐇 Normal (varsayılan); yaş etiketi kullanılmaz (çocuğu damgalamasın). Ve "oturarak oyna"
+  (ayakta yapılan hareketler kol/gövde hareketine döner); src/uyarla.ts, kayıt zipzip-oyun-ayar-v1. Ailece etkilenmez.
 - Cinsiyet sorulmaz (veri azaltma, kalıp yargı). "Herkes kendini bulsun" ihtiyacı cinsiyetle
   değil, çocuğun seçtiği ilgi alanıyla karşılanır (ör. Spor Kampı'nda sporunu seçer).
 - Bölüm yol haritası: Türkiye (ücretsiz) → Dünya Harikaları → Uzay Yolculuğu (sıradaki büyük
@@ -157,7 +162,12 @@ Teknoloji: Phaser 3 + TypeScript + Vite, GitHub Pages ile yayın. İleride Capac
   animasyonlar azalır. Telefon yavaşsa da aynısı olur (src/hiz.ts: oyun boyunca gerçek kare hızı ölçülür,
   40'ın altına düşerse süs animasyonları kapanır ve kare hızı 30'a sabitlenir; sonuç kaydedilmez). Yeni
   süs animasyonu `hareketiAzalt()` ile korunmalı. Yağız testinde dikkat dağıtan yer sadeleştirilir.
-- Zıpzıp'ın yüzü kodla çizilir (src/zipzipYuz.ts; govde.svg'de yüz yok): göz kırpar (süs, hareketiAzalt'ta kapalı),
+- Zıpzıp tasarımı (Ekim 2026, "B · Sevimli"): büyük parlak gözler (mavi iris, iki parıltı), kaşlar, hep pembe yanak,
+  açık gülen ağız (diş + dil), bulutlu küre, parmaklı eller, beyaz tabanlı kırmızı spor ayakkabı. Gövde kodla çizilir
+  (src/zipzipKure.ts, d3-geo; govde.svg yok): bölüme göre dünyanın o tarafı görünür (BOLUM_YONU; Dünya Harikaları'nda
+  her durak kendi ülkesi, Okyanus'ta Büyük Okyanus, Dinozorlar'da Kuzey Amerika, diğerleri Türkiye). Haritaya girince ve
+  Dünya'da sıradaki harikaya giderken küre yavaşça döner (hareketiAzalt'ta hemen). Türkiye hep altın sarısı (Zıpzıp'ın evi).
+- Zıpzıp'ın yüzü kodla çizilir (src/zipzipYuz.ts): göz kırpar (süs, hareketiAzalt'ta kapalı),
   konuşurken ağzı oynar (ses.ts konusmayiDinle), ifadeler: normal / mutlu ("Aferin!", varış, açılış) / uykulu (soğuma sonu).
   Zıplarken gövde hafifçe basılıp esner (süs). İleride çizer gelince Rive ile yeniden yapılması düşünülebilir.
 
@@ -198,6 +208,10 @@ Teknoloji: Phaser 3 + TypeScript + Vite, GitHub Pages ile yayın. İleride Capac
 - Kodda isimler ve yorumlar Türkçe.
 - Kota: plan yükseltilmeden tasarruflu çalışılır (yarıyıl öncesi belki yükseltilir). Uzun sohbet
   yerine iş listesi bitince yeni sohbet; istekler toplu; uygun olunca sabah otomatik başlangıç.
+- "Yeni oturuma geçelim" denildiğinde: önce iş seçenekleri (tablo + AskUserQuestion, çoklu seçim), sonra Claude yeni oturumu
+  kendisi açar (claude-code-remote create_session; ilk mesaj hazır: CLAUDE.md'yi oku, son durum, seçilen işler, "onaylı,
+  sormadan yap; testler geçince PR'ı birleştir; büyük ürün kararlarını sabaha bırak"). Önce açık PR birleştirilir ki yeni
+  oturum güncel main'den başlasın. Kullanıcı bir şey yazmaz.
 - "Yeni sohbet aç" denildiğinde, cevabın sonunda yeni sohbete aynen yapıştırılacak hazır bir başlangıç mesajı
   (kod bloğu içinde) verilir: "CLAUDE.md'yi oku", son birleşen PR'lar, kullanıcıda bekleyenler, sıradaki iş
   seçenekleri (önerilen başta). Kullanıcı kopyalayıp yapıştırır, başka bir şey yazmasına gerek kalmaz.

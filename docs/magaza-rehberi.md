@@ -15,7 +15,7 @@ Hesap açmak, para ödemek ve uygulamayı mağazaya göndermek sizde. Teknik haz
 | Ekim sonu – Kasım başı | Marka araştırması ve başvurusu (TÜRKPATENT) | Siz |
 | Kasım başı | Google Play ve Apple geliştirici hesapları | Siz |
 | Kasım başı | 20/B banka hesabı (mali müşavirle) | Siz |
-| Kasım | Kapalı beta: Google'da kapalı test, Apple'da TestFlight (~100 kişi) | Siz gönderirsiniz, paketi ben hazırlarım |
+| Kasım | Kapalı beta: Google'da kapalı test, Apple'da TestFlight (25-30 aile, iki dalga; docs/beta-gozlem-plani.md) | Siz gönderirsiniz, paketi ben hazırlarım |
 | Aralık | Beta düzeltmeleri, ödemenin mağazada denenmesi, insan sesi kaydı | Ben + seslendirmen |
 | Ocak sonu | Mağazaya çıkış; web sitesinden oyun kaldırılır, sadece gizlilik ve koşullar sayfaları kalır | Siz gönderirsiniz, hazırlığı ben yaparım |
 
@@ -70,7 +70,8 @@ kimseyle paylaşmayın**.
 `ekran-1..7.png` telefon ekran görüntüleri (1080×1920), `tanitim-1024x500.png` "Öne çıkan grafik",
 `ikon-512.png` uygulama simgesi. App Store için `iphone/` (1320×2868, 6.9 inç iPhone) ve `ipad/`
 (2064×2752, 13 inç iPad; uygulama iPad'de de çalıştığı için Apple ikisini de ister) klasörleri; aynı 7 ekran, aynı sıra. Oyun değişince yeniden üretmek için: `npx vite --port 5173` açıkken
-`node scripts/magaza-gorselleri.mjs`.
+`node scripts/magaza-gorselleri.mjs`. Uygulama ikonları ve açılış ekranı (Android, iPhone, web) aynı Zıpzıp'tan
+`node scripts/ikon-uret.mjs` ile üretilir (önce bu, sonra mağaza görselleri).
 
 **Her yeni test sürümünde:**
 1. GitHub → **Actions** → **Play kapalı test paketi** → **Run workflow**.
