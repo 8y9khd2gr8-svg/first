@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { RENK, YAZI_TIPI } from '../ayarlar';
 import { buyukDugme, evDugmesi, genisDokunma, yildizliArkaPlan } from '../arayuz';
+import { BOLUMLER, BOLUM_SIRASI, type BolumId } from '../duraklar';
 import { M } from '../metinler';
 import { fiyatGetir, geriYukle, odemeKipi, satinAl, tamSurumVarMi } from '../satinAlma';
 import { konus, sustur } from '../ses';
@@ -96,4 +97,12 @@ export class TamSurumScene extends Phaser.Scene {
   }
 }
 
-const BOLUMLER_YAZISI = '🌍 Dünya Harikaları   🪐 Uzay Yolculuğu\n⚽ Spor Kampı   🦕 Dinozorlar Diyarı\n🧸 Evde Macera\nve ileride gelecek bütün yeni bölümler';
+// Tam sürümle açılan bölümler BOLUMLER'den üretilir (elle yazılan liste Okyanus'u unutmuştu).
+// Record<BolumId, ...>: yeni bölüm eklenince simgesi yazılmazsa derleme hata verir.
+const BOLUM_SIMGESI: Record<BolumId, string> = {
+  turkiye: '🇹🇷', dunya: '🌍', uzay: '🪐', spor: '⚽', dinozor: '🦕', evde: '🧸', okyanus: '🐠',
+};
+const ucretliBolumler = BOLUM_SIRASI.filter((id) => BOLUMLER[id].onceki).map((id) => `${BOLUM_SIMGESI[id]} ${BOLUMLER[id].ad}`);
+const BOLUMLER_YAZISI =
+  Array.from({ length: Math.ceil(ucretliBolumler.length / 2) }, (_, i) => ucretliBolumler.slice(i * 2, i * 2 + 2).join('   ')).join('\n') +
+  '\nve ileride gelecek bütün yeni bölümler';
