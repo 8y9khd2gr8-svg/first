@@ -215,3 +215,6 @@ Teknoloji: Phaser 3 + TypeScript + Vite, GitHub Pages ile yayın. İleride Capac
 - "Yeni sohbet aç" denildiğinde, cevabın sonunda yeni sohbete aynen yapıştırılacak hazır bir başlangıç mesajı
   (kod bloğu içinde) verilir: "CLAUDE.md'yi oku", son birleşen PR'lar, kullanıcıda bekleyenler, sıradaki iş
   seçenekleri (önerilen başta). Kullanıcı kopyalayıp yapıştırır, başka bir şey yazmasına gerek kalmaz.
+- Oturum temizliği: yeni oturum başlarken, işi bitmiş eski oturumları (PR'ları birleşmiş/kapanmış, açık iş yok)
+  archive_session ile arşivler (silmez; konuşmalar okunabilir kalır). Oturum kendini arşivlemez (cevap yarım kalır).
+  Çalışan ya da birleşmemiş PR'ı olan oturuma dokunulmaz.
