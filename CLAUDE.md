@@ -102,7 +102,8 @@ Teknoloji: Phaser 3 + TypeScript + Vite, GitHub Pages ile yayın. İleride Capac
   Ayrıntı ve avukata sorulacaklar: docs/magaza-rehberi.md (4b ve 7). "Sosyal ağ değildir" vurgusu mağaza ve gizlilik metninde.
 - Her yeni özellik/bölümde sorulur: 4-5, 6-7, 8-9 yaş ve hareket kısıtı olan çocuk için nasıl? (Yaşa göre tempo ve
   oturarak oyna bu soru sorulmadığı için geç geldi; ChatGPT değerlendirmesi, Ekim 2026.) Ebeveyn köşesi → ⚙️ Ayarlar:
-  yaş grubu küçük (4-5: daha az tekrar, %25 yavaş, süreli hareket kısa) / büyük (6-9, varsayılan) ve "oturarak oyna"
+  "Hareket temposu" 🐢 Sakin (daha az tekrar, %25 yavaş, süreli hareket kısa; 4-5 yaş/yeni başlayan için önerilir) /
+  🐇 Normal (varsayılan); yaş etiketi kullanılmaz (çocuğu damgalamasın). Ve "oturarak oyna"
   (ayakta yapılan hareketler kol/gövde hareketine döner); src/uyarla.ts, kayıt zipzip-oyun-ayar-v1. Ailece etkilenmez.
 - Cinsiyet sorulmaz (veri azaltma, kalıp yargı). "Herkes kendini bulsun" ihtiyacı cinsiyetle
   değil, çocuğun seçtiği ilgi alanıyla karşılanır (ör. Spor Kampı'nda sporunu seçer).

@@ -3,7 +3,8 @@ import { RENK, YAZI_TIPI } from '../ayarlar';
 import { buyukDugme, evDugmesi, yildizliArkaPlan } from '../arayuz';
 import { oyunAyari, oyunAyariYaz } from '../oyunAyari';
 
-// Ebeveyn köşesi → ⚙️ Ayarlar: yaş grubu (tekrar sayısı ve tempo) ve oturarak oyna.
+// Ebeveyn köşesi → ⚙️ Ayarlar: hareket temposu (Sakin: daha az tekrar, daha yavaş) ve oturarak oyna.
+// Tempo yaşla değil adıyla seçilir (yaş etiketi çocuğu damgalamasın; yeni başlayan büyük çocuk da Sakin'i seçebilir).
 // Değişiklik bir sonraki durakta geçerli olur. Seçimler sadece bu telefonda saklanır.
 export class EbeveynAyarScene extends Phaser.Scene {
   constructor() {
@@ -26,12 +27,12 @@ export class EbeveynAyarScene extends Phaser.Scene {
       this.scene.restart();
     };
 
-    // Yaş grubu
-    baslik(290, 'Çocuğun yaşı');
+    // Hareket temposu (kayıtta yas: 'kucuk' = Sakin)
+    baslik(290, 'Hareket temposu');
     const kucuk = ayar.yas === 'kucuk';
-    buyukDugme(this, x - 150, 400, `${kucuk ? '✓ ' : ''}4-5 yaş`, kucuk ? RENK.yesil : 0x3a4f7a, () => sec({ yas: 'kucuk' }), { genislik: 280, yukseklik: 110, yaziBoyu: 44 });
-    buyukDugme(this, x + 150, 400, `${!kucuk ? '✓ ' : ''}6-9 yaş`, !kucuk ? RENK.yesil : 0x3a4f7a, () => sec({ yas: 'buyuk' }), { genislik: 280, yukseklik: 110, yaziBoyu: 44 });
-    aciklama(520, '4-5 yaşta tekrarlar daha az, ritim daha yavaş\nve süreli hareketler daha kısa olur.');
+    buyukDugme(this, x - 150, 400, `${kucuk ? '✓ ' : ''}🐢 Sakin`, kucuk ? RENK.yesil : 0x3a4f7a, () => sec({ yas: 'kucuk' }), { genislik: 280, yukseklik: 110, yaziBoyu: 44 });
+    buyukDugme(this, x + 150, 400, `${!kucuk ? '✓ ' : ''}🐇 Normal`, !kucuk ? RENK.yesil : 0x3a4f7a, () => sec({ yas: 'buyuk' }), { genislik: 280, yukseklik: 110, yaziBoyu: 44 });
+    aciklama(520, 'Sakin: tekrarlar daha az, ritim daha yavaş.\n4-5 yaş ya da yeni başlayanlar için önerilir.');
 
     // Oturarak oyna
     baslik(680, '🪑 Oturarak oyna');

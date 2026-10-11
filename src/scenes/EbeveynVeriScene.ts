@@ -36,7 +36,7 @@ export class EbeveynVeriScene extends Phaser.Scene {
       ['Hareket kaydı', `${ozet.gunSayisi} gün, ${ozet.toplamHareket} hareket`],
       ['Kamerayla sayma', kameraAcikMi() ? 'açık (görüntü kaydedilmez)' : 'kapalı'],
       ['Uzaktan oyna', uzaktanAcikMi() ? 'açık' : 'kapalı'],
-      ['Yaş grubu · oturarak', `${oyunAyari().yas === 'kucuk' ? 'küçük (4-5)' : 'büyük (6-9)'} · ${oyunAyari().oturarak ? 'açık' : 'kapalı'}`],
+      ['Tempo · oturarak', `${oyunAyari().yas === 'kucuk' ? 'sakin' : 'normal'} · ${oyunAyari().oturarak ? 'açık' : 'kapalı'}`],
       ...(odemeKipi() === 'web' ? [] : [['Tam sürüm', tamSurumVarMi() ? 'alındı' : 'alınmadı'] as [string, string]]),
     ];
     const kutuY = 250;

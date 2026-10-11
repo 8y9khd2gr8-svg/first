@@ -1,5 +1,5 @@
-// Oyun ayarları (ebeveyn köşesi → ⚙️ Ayarlar): yaş grubu (küçüklerde daha az tekrar, daha yavaş) ve oturarak oyna.
-// Sadece bu cihazda saklanır; çocuğun yaşı değil, ebeveynin seçtiği grup tutulur.
+// Oyun ayarları (ebeveyn köşesi → ⚙️ Ayarlar): hareket temposu (yas 'kucuk' = Sakin: daha az tekrar, daha yavaş)
+// ve oturarak oyna. Sadece bu cihazda saklanır; çocuğun yaşı tutulmaz.
 export type OyunAyari = { yas: 'kucuk' | 'buyuk'; oturarak: boolean };
 const OYUN_AYARI_ANAHTAR = 'zipzip-oyun-ayar-v1';
 export function oyunAyari(): OyunAyari {
