@@ -81,13 +81,15 @@ const D = {
   basUstu: { solKol: u(240, 45), sagKol: u(-60, -45), solBacak: u(100), sagBacak: u(80) },
   eldenSol: { solKol: u(170, -50), sagKol: u(40, 30), solBacak: u(100), sagBacak: u(80) },
   eldenSag: { solKol: u(140, -30), sagKol: u(10, 50), solBacak: u(100), sagBacak: u(80) },
-  saril: { solKol: u(130, -100), sagKol: u(50, 100), solBacak: u(100), sagBacak: u(80) },
+  // Kendine sarılma: kollar gövdenin önüne gelir (Adim.kollarOnde), eller karnın önünde.
+  saril: { solKol: u(70, -10), sagKol: u(110, 10), solBacak: u(100), sagBacak: u(80) },
 } satisfies Record<string, Durus>;
 
 // Bir tekrar içindeki adımlar: duruş, gövdenin yukarı/aşağı kayması (birim) ve tekrar süresine oranı.
 // aci: Zıpzıp'ın bütün olarak yana eğilmesi (derece); yon: 1 öne, -1 arkasını dönmüş.
 // x: yana kayma (birim), ör. yastığın üstünden yana zıplarken.
-type Adim = { durus: Durus; y: number; oran: number; yumusama?: string; aci?: number; yon?: number; x?: number };
+// kollarOnde: kollar gövdenin önünde (kendine sarıl).
+type Adim = { durus: Durus; y: number; oran: number; yumusama?: string; aci?: number; yon?: number; x?: number; kollarOnde?: boolean };
 
 const ADIMLAR: Record<Animasyon, Adim[]> = {
   zipla: [
@@ -160,9 +162,10 @@ const ADIMLAR: Record<Animasyon, Adim[]> = {
   ],
   piramit: [{ durus: D.piramit, y: 0, oran: 0.3 }],
   tHarfi: [{ durus: D.yanKapali, y: -10, oran: 0.3 }],
+  // Bir sağa adım: ayak açılırken gövde yarı yola, kapanınca tamamen kayar (çift tekrarda geri, sola).
   yanAdim: [
-    { durus: D.yanAcik, y: -8, oran: 0.4 },
-    { durus: D.yanKapali, y: 0, oran: 0.4 },
+    { durus: D.yanAcik, y: -8, oran: 0.4, x: 20 },
+    { durus: D.yanKapali, y: 0, oran: 0.4, x: 40 },
   ],
   parmakUcu: [
     { durus: D.parmakA, y: -25, oran: 0.5, yumusama: 'Sine.easeOut' },
@@ -240,8 +243,8 @@ const ADIMLAR: Record<Animasyon, Adim[]> = {
     { durus: D.normal, y: 0, oran: 0.15, x: 50 },
   ],
   sallan: [
-    { durus: D.saril, y: 0, oran: 0.5, aci: -10 },
-    { durus: D.saril, y: 0, oran: 0.5, aci: 10 },
+    { durus: D.saril, y: 0, oran: 0.5, aci: -10, kollarOnde: true },
+    { durus: D.saril, y: 0, oran: 0.5, aci: 10, kollarOnde: true },
   ],
   topla: [
     { durus: D.tasAl, y: 50, oran: 0.4 },
@@ -265,6 +268,10 @@ const CIFT: Partial<Record<Animasyon, Adim[]>> = {
   trex: [{ ...ADIMLAR.trex[0], durus: D.trexSag, aci: 5 }, ADIMLAR.trex[1]],
   tepin: ilkAdimi('tepin', D.tepinSag),
   basUstu: ilkAdimi('basUstu', D.basUstuSag),
+  yanAdim: [
+    { ...ADIMLAR.yanAdim[0], x: 20 },
+    { ...ADIMLAR.yanAdim[1], x: 0 },
+  ],
   // Bir sağa, bir sola zıplar.
   yanaZipla: ADIMLAR.yanaZipla.map((a) => ({ ...a, x: -(a.x ?? 0) })),
 };
@@ -399,6 +406,14 @@ export class Zipzip extends Phaser.GameObjects.Container {
     this.scene.tweens.add({ targets: this.esneme, ...hedef, duration: sure, ease: yumusama, onUpdate: () => this.esnet() });
   }
 
+  // Kollar normalde gövdenin arkasında; sarılırken yüzün önüne (bacakların ve şapkanın arkasında) gelir.
+  private kollariYerlestir(onde: boolean) {
+    for (const kol of [this.uzuvlar.solKol.kok, this.uzuvlar.sagKol.kok]) {
+      if (onde) this.beden.moveAbove<Phaser.GameObjects.GameObject>(kol, this.yuz);
+      else this.beden.moveBelow<Phaser.GameObjects.GameObject>(kol, this.kure);
+    }
+  }
+
   // Ayaklar yerde kalsın diye gövde basılırken aşağı kayar.
   private esnet() {
     this.beden.setScale(this.esneme.sx, this.esneme.sy);
@@ -419,6 +434,7 @@ export class Zipzip extends Phaser.GameObjects.Container {
     for (const adim of adimlar) {
       const adimSuresi = sure * adim.oran;
       const olay = this.scene.time.delayedCall(t, () => {
+        this.kollariYerlestir(!!adim.kollarOnde);
         this.durusAl(adim.durus, adimSuresi, adim.yumusama);
         this.kay(adim.y, adimSuresi, adim.yumusama);
         if (adim.aci !== undefined) this.scene.tweens.add({ targets: this, angle: adim.aci, duration: adimSuresi, ease: 'Sine.easeInOut' });
@@ -576,6 +592,7 @@ export class Zipzip extends Phaser.GameObjects.Container {
     this.setScale(1);
     this.esneme.sx = this.esneme.sy = 1;
     this.esnet();
+    this.kollariYerlestir(false);
     this.durusAl(D.normal, 200);
     this.kay(0, 200);
     if (this.x !== this.tabanX) this.scene.tweens.add({ targets: [this, this.golge], x: this.tabanX, duration: 200 });
