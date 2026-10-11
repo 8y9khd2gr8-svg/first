@@ -2,6 +2,8 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Gezgin Sertifikası'nı fotoğraflarınıza kaydetmek için. Uygulama fotoğraflarınızı görmez, sadece sertifikayı ekler.</string>
 	<key>NSCameraUsageDescription</key>
 	<string>Ebeveyn açarsa kamera, çocuğun zıplama, çömelme, kol ve diz hareketlerini sayar. Görüntü telefonda işlenir; kaydedilmez ve hiçbir yere gönderilmez.</string>
 	<key>CFBundleDevelopmentRegion</key>
