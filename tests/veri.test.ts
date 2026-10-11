@@ -236,3 +236,17 @@ test('oturarak oyna: her durağın her hareketi (ısınma, sürpriz, soğuma dah
       });
     }
 });
+
+test('derlemedeki hafif Phaser, kodda kullanılan her oyun nesnesini içerir (src/phaserNesneleri.cjs)', () => {
+  // Testler tam Phaser'la çalışır; hafif hâlde olmayan bir nesne (ör. this.add.particles) sadece mağaza paketinde bozulurdu.
+  const liste = fs.readFileSync('src/phaserNesneleri.cjs', 'utf8');
+  const blok = (ad: string) => new Set([...(liste.split(`${ad}: {`)[1].split('}')[0].matchAll(/^\s+(\w+):/gm))].map((m) => m[1].toLowerCase()));
+  const fabrika = blok('Factories');
+  const yapici = blok('Creators');
+  const kod = dosyalar('src').map((f) => fs.readFileSync(f, 'utf8')).join('\n');
+  const ad = (m: string) => ({ dom: 'domelement', circle: 'arc' } as Record<string, string>)[m.toLowerCase()] ?? m.toLowerCase();
+  for (const [, tur, m] of kod.matchAll(/\.(add|make)\.(\w+)\(/g)) {
+    if (m === 'existing') continue;
+    assert.ok((tur === 'add' ? fabrika : yapici).has(ad(m)), `hafif Phaser'da yok: this.${tur}.${m} → src/phaserNesneleri.cjs'e ekleyin`);
+  }
+});

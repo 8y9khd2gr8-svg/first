@@ -185,9 +185,10 @@ Teknoloji: Phaser 3 + TypeScript + Vite, GitHub Pages ile yayın. İleride Capac
 - `src/hareketler.ts`: hareket listesi. `src/ses.ts`: sesler. Kaydı olmayan cümle: uygulamada telefonun konuşma
   motoru (@capacitor-community/text-to-speech; Android uygulama içi tarayıcısında tarayıcı konuşması çalışmaz),
   tarayıcıda speechSynthesis. Ses seçimi src/sesSecimi.ts (önce internetsiz çalışan Türkçe ses).
-- Açılış hızı: derlemede Phaser'ın hafif hâli (src/phaserHafif.cjs: fizik motorları ve karo haritası yok; geliştirmede
-  tam Phaser). Yeni bir Phaser özelliği (ör. fizik) gerekirse oraya eklenir. Durak simgeleri açılış ekranı çizildikten
-  sonra arkada yüklenir. Ölçüm: `node scripts/acilis-olc.mjs` (6 kat yavaş: ~2,9 sn; önce ~4,5 sn). `src/arayuz.ts`: düğmeler, arka plan.
+- Açılış hızı: derlemede Phaser'ın hafif hâli (src/phaserHafif.cjs: fizik motorları ve karo haritası yok; oyun nesneleri
+  src/phaserNesneleri.cjs: sadece kullandıklarımız, parçacık/video/3B yok; paket 1,50 → 1,34 MB; geliştirmede tam Phaser).
+  Yeni bir Phaser özelliği (ör. fizik, this.add.particles) gerekirse oraya eklenir; `npm test` eksik nesneyi yakalar. Durak simgeleri açılış ekranı çizildikten
+  sonra arkada yüklenir. Ölçüm: `node scripts/acilis-olc.mjs` (6 kat yavaş: ~1,9 sn, Ekim 2026; önce ~4,5 sn). `src/arayuz.ts`: düğmeler, arka plan.
 - Sahne geçişi: `init` alan bir sahneye geçerken HER ZAMAN veri nesnesi ver (`scene.start('X', {})`);
   Phaser veri verilmezse önceki geçişin verisini yeniden kullanır.
 - Test: `npm run dev` ile açınca `window.oyun` üzerinden sahneler başlatılabilir (sadece geliştirmede).

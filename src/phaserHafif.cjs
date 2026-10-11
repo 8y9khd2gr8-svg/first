@@ -22,7 +22,7 @@ var Phaser = {
     Events: require('phaser/src/events'),
     FX: require('phaser/src/fx'),
     Game: require('phaser/src/core/Game'),
-    GameObjects: require('phaser/src/gameobjects'),
+    GameObjects: require('./phaserNesneleri.cjs'),
     Geom: require('phaser/src/geom'),
     Input: require('phaser/src/input'),
     Loader: require('phaser/src/loader'),
