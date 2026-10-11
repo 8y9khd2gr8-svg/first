@@ -41,6 +41,44 @@ testçilere gönderilecek metin: [beta-rehberi.md](beta-rehberi.md).
 - ⬜ Testçilere: "ilk gün Ebeveyn köşesi → 🔊 Sesi dene'ye bakın" hatırlatması
 - ⬜ Beta grubundaki geri bildirimleri haftada bir toplayıp bana getirin (telefon modeli + sürüm numarasıyla)
 
+## 4. Kanıt: telefonda ne izin istiyoruz, içinde ne var? (11 Ekim denetimi)
+
+Ebeveyn "bu uygulama ne istiyor?" diye sorarsa cevap burada. Kaynak: `android/app/src/main/AndroidManifest.xml`,
+eklentilerin kendi izin dosyaları ve `ios/App/App/Info.plist`.
+
+**Android izinleri**
+
+| İzin | Neden | Ebeveyn ne görür |
+|---|---|---|
+| Kamera (`CAMERA`) | Sadece ebeveyn kamera modunu açarsa hareketleri saymak için; pasaport fotoğrafı (isteğe bağlı) | İlk kullanımda telefon izin sorar; vermezse oyun aynen çalışır |
+| Satın alma (`com.android.vending.BILLING`) | Google Play ödeme kütüphanesi ekler; tam sürüm için | İzin sorulmaz (mağazanın kendi ödeme ekranı) |
+| İnternet (`INTERNET`) | Capacitor şablonunda hazır geliyor; oyun hiçbir sunucuya bağlanmaz (`npm run test:oyun` her ekranda denetler) | Play sayfasında "tam ağ erişimi" yazar. Kaldırmak sabah kararı (aşağıda) |
+
+Konum, rehber, mikrofon, dosyalar, bildirim, reklam kimliği **yok**. Konuşma eklentisi sadece telefonun
+konuşma motorunu bulmak için "TTS_SERVICE" sorgusu ekler (izin değildir).
+
+**Bu denetimde değişen**
+- `allowBackup="false"`: Önceden Android, oyunun kayıtlarını (çocuğun adı, fotoğrafı, ilerleme) ailenin Google Drive yedeğine
+  gönderebiliyordu; artık göndermez. "Bilgiler sadece bu telefonda" sözü Android'de de tam doğru.
+  Bedeli: yeni telefona geçince ilerleme taşınmaz (satın alma taşınır: "Satın alımı geri yükle").
+- iPhone: `NSPhotoLibraryAddUsageDescription` eklendi. Sertifikayı paylaş ekranında "Resmi Kaydet"e basılınca bu
+  metin yoksa uygulama kapanıyordu (Apple kuralı). Metin: "Uygulama fotoğraflarınızı görmez, sadece sertifikayı ekler."
+
+**iPhone izin metinleri**: Kamera ("Ebeveyn açarsa kamera... görüntü telefonda işlenir; kaydedilmez ve hiçbir yere
+gönderilmez") ve fotoğraflara ekleme (yukarıda). Başka izin yok.
+
+**İçindeki kütüphaneler** (hepsi pakette, hiçbiri veri göndermez; reklam, analiz, çökme raporu SDK'sı yok)
+
+| Kütüphane | Ne işe yarar |
+|---|---|
+| Capacitor 7 (core, android, ios) | Web oyununu telefon uygulamasına çevirir |
+| @capgo/native-purchases + Google Play Billing 8.3 / StoreKit | Tek seferlik ödeme (sunucusuz) |
+| @capacitor-community/text-to-speech | Kaydı olmayan cümleyi telefonun kendi sesiyle okur |
+| Phaser 3.90 | Oyun motoru (ekranlar, animasyon) |
+| @mediapipe/tasks-vision (+ model dosyası pakette) | İsteğe bağlı kamera sayımı, telefonun içinde |
+| d3-geo, topojson-client, world-atlas | Dönen dünya ve Zıpzıp'ın küresi (harita verisi pakette) |
+| @fontsource/baloo-2 | Yazı tipi (pakette) |
+
 ## Karar
 
 Kod tarafı beta için hazır. Betayı başlatmak için gereken **en az** şey: 1, 3 ve 4 numaralı işler (Android için)
