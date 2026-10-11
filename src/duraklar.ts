@@ -472,7 +472,7 @@ export const SPOR: Durak[] = [
     ozel: hikayeli(K.engel, 'Engelin üstünden atla!'),
     ekler: [
       hikayeli(K.kollar, 'Yarıştan önce kollarını hazırla!'),
-      hikayeli(K.basket, 'Uzun atlama!'),
+      hikayeli(K.basket, 'Yüksek atlama!'),
       hikayeli(K.kos, 'Bitiş çizgisine koş!', { saniye: 10 }),
     ],
   },
@@ -533,7 +533,7 @@ export const DINOZOR: Durak[] = [
     simge: '🪶',
     bilgi: 'Pterozorlar dinozorların uçabilen akrabalarıydı. Bazılarının kanatları küçük bir uçak kadar genişti!',
     soru: 'Evde birine sor: Uçabilen hangi hayvanları biliyorsun?',
-    ozel: hikayeli(K.kanat, 'Gökyüzünde süzül!', { saniye: 10 }),
+    ozel: hikayeli(K.kanat, 'Kanatlarını aç, gökyüzünde uç!', { saniye: 10 }),
     ekler: [
       hikayeli(K.tekAyak, 'Kayanın üstüne kon!', { saniye: 6 }),
       hikayeli(K.balon, 'Sıcak rüzgârla yüksel!'),
@@ -616,7 +616,7 @@ export const EVDE: Durak[] = [
     ekler: [
       hikayeli(K.comel, 'Yastığı yere koy, sonra al!', { baslik: 'Çömel, yastığı yere koy,\nsonra al ve kalk!' }),
       hikayeli(K.kocaman, 'Yastığı bırak, kocaman ol!'),
-      hikayeli(K.tekAyak, 'Yastığa sarıl, dengede dur!', { saniye: 6 }),
+      hikayeli(K.tekAyak, 'Yastığın yanında dengede dur!', { saniye: 6 }),
     ],
   },
   {
@@ -643,8 +643,8 @@ export const EVDE: Durak[] = [
     ozel: { hikaye: 'Adanın üstünden atla!', baslik: 'Yastığın üstünden\nyana zıpla!', sesli: 'Yastığı yere koy. Yastığın üstünden bir sağa, bir sola zıpla! Altı kere!', animasyon: 'yanaZipla', tur: 'sayi', adet: 6, tempoMs: 1600 },
     ekler: [
       hikayeli(K.kos, 'Ada kaçıyor, hızlan!'),
-      hikayeli(K.dizler, 'Adanın yanında dur!'),
-      hikayeli(K.acKapa, 'Adaya bayrak dik!'),
+      hikayeli(K.dizler, 'Adanın kıyısında yerinde yürü!'),
+      hikayeli(K.acKapa, 'Adaya vardın, sevinçten zıpla!'),
     ],
   },
   {
@@ -734,7 +734,7 @@ export const OKYANUS: Durak[] = [
     ozel: hikayeli(K.kollar, 'Ahtapot kollarıyla yüzüyor!'),
     ekler: [
       hikayeli(K.balon, 'Ahtapot yukarı yükseliyor!', { ritim: 'yavas', adet: 3 }),
-      hikayeli(K.yanaEgil, 'Kayaların arasından bak!'),
+      hikayeli(K.yanaEgil, 'Kayaların arasında bir yana, öbür yana eğil!'),
       hikayeli(K.sallan, 'Ahtapot dostuna sarıl!'),
     ],
   },
