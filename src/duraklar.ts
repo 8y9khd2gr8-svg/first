@@ -30,7 +30,7 @@ export const TURKIYE: Durak[] = [
     simge: '🌉',
     bilgi: 'İstanbul’un bir yarısı Avrupa’da, öbür yarısı Asya’da! Köprüden geçince bir kıtadan öbür kıtaya geçersin.',
     soru: 'Evde birine sor: Hangi şehir iki kıtadadır?',
-    ozel: hikayeli(K.uzan, 'Galata Kulesi’nin tepesine bak!'),
+    ozel: hikayeli(K.uzan, 'Galata Kulesi kadar uzun ol!'),
     ekler: [
       hikayeli(K.yanAdim, 'Köprüden Asya’ya geç, Avrupa’ya dön!'),
       hikayeli(K.kulac, 'Boğaz’da yüzme yarışı var!'),
@@ -44,7 +44,7 @@ export const TURKIYE: Durak[] = [
     yer: 'Çanakkale',
     simge: '🐴',
     bilgi: 'Truva çok eski bir şehir; kalıntıları bugün Çanakkale’de. Efsaneye göre insanlar kocaman tahta bir atın içine saklanmış!',
-    soru: 'Evde birine sor: Efsaneye göre Truva Atı’nın içinde kimler saklanmış?',
+    soru: 'Evde birine sor: Truva Atı hangi şehrimizde?',
     ozel: hikayeli(K.kos, 'Truva Atı’na yetiş!'),
     ekler: [
       hikayeli(K.comel, 'Atın içine saklan, sonra dışarı bak!'),
@@ -58,13 +58,13 @@ export const TURKIYE: Durak[] = [
     ad: 'Pamukkale',
     yer: 'Denizli',
     simge: '🏞️',
-    bilgi: 'Pamukkale’nin bembeyaz basamakları kara benzer ama kar değildir! Sıcak sudaki kireç yıllarca birikip bu beyaz taşları yapmıştır; orada ayakkabısız yürünür.',
+    bilgi: 'Pamukkale’yi uzaktan gören kar yağmış sanır ama bu kar değil! Sıcak sudaki kireç binlerce yıl birikip bu beyaz taşları yapmış; orada ayakkabısız yürünür.',
     soru: 'Evde birine sor: Pamukkale neden bembeyaz?',
     ozel: hikayeli(K.yuru, 'Beyaz basamaklardan inelim!'),
     ekler: [
       hikayeli(K.tekAyak, 'Sıcak suya önce tek ayağını sok!'),
       hikayeli(K.kollar, 'Sıcak sudan buhar yükseliyor!', { ritim: 'yavas', adet: 4 }),
-      hikayeli(K.acKapa, 'Su birikintilerinin üstünden atla!'),
+      hikayeli(K.acKapa, 'Bembeyaz Pamukkale’yi gördük, sevinçten zıpla!'),
     ],
   },
   {
@@ -88,12 +88,12 @@ export const TURKIYE: Durak[] = [
     ad: 'Nemrut Dağı',
     yer: 'Adıyaman',
     simge: '⛰️',
-    bilgi: 'Nemrut Dağı’nın tepesinde çok eskiden yapılmış kocaman taş heykeller var. İnsanlar güneşin doğuşunu izlemek için gece yola çıkar!',
+    bilgi: 'Nemrut Dağı’nın tepesinde iki bin yıl önce yapılmış kocaman taş heykeller var. İnsanlar güneşin doğuşunu izlemek için gece yola çıkar!',
     soru: 'Evde birine sor: Güneş hangi yönden doğar?',
     ozel: hikayeli(K.tasKaldir, 'Nemrut’ta güneş doğuyor, sen de yüksel!'),
     ekler: [
       hikayeli(K.tirman, 'Nemrut Dağı’na tırmanalım!', { ritim: 'yavas', adet: 6 }),
-      hikayeli(K.piramit, 'Dağın tepesi üçgen!'),
+      hikayeli(K.piramit, 'Dağın tepesine taşlardan kocaman bir tepecik yapılmış!'),
       hikayeli(K.engel, 'Yoldaki taşların üstünden atla!'),
     ],
   },
@@ -109,7 +109,7 @@ export const TURKIYE: Durak[] = [
     ekler: [
       hikayeli(K.tHarfi, 'Kocaman taşlar T harfine benziyor! Sen de T harfi ol!'),
       hikayeli(K.donus, 'Taşların etrafına bak!'),
-      hikayeli(K.kazi, 'Bilim insanları burayı kazarak buldu!'),
+      hikayeli(K.kazi, 'Bilim insanları toprağı kazıp burayı ortaya çıkardı!'),
     ],
   },
   {
@@ -124,7 +124,7 @@ export const TURKIYE: Durak[] = [
     ekler: [
       hikayeli(K.zipla, 'Yağmur damlalarının üstünden zıpla!'),
       hikayeli(K.uzan, 'Uzun ağaçların tepesine uzan!'),
-      hikayeli(K.kanat, 'Yaylada kartallar süzülüyor!'),
+      hikayeli(K.kanat, 'Yaylada kartallar kanat çırpıyor!'),
     ],
   },
 ];
