@@ -67,7 +67,8 @@ Teknoloji: Phaser 3 + TypeScript + Vite, GitHub Pages ile yayın. İleride Capac
   Beta kontrol listesi: docs/beta-hazir-mi.md.
 - "❓ Nasıl oynanır" (ebeveyn köşesi, EbeveynRehberScene): 4 adım (durağa dokun → Zıpzıp gösterir → "Yaptım!" → damga) +
   ipuçları; güvenlik notu buradan açılır (ilk açılıştaki güvenlik notu aynen kalır). Düğme yazısı uzunsa düğmeye sığacak kadar küçülür (arayuz.buyukDugme).
-- Türkiye Turu bitince Gezgin Sertifikası (resim olarak kaydet/paylaş).
+- Türkiye Turu bitince Gezgin Sertifikası (resim olarak kaydet/paylaş). Kaydet/paylaş telefonun dışına çıktığı için sadece
+  ebeveyn kilidinden sonra (çocuk "🔒 Kaydet / Paylaş"a dokununca kilit; mağaza çocuk kuralları, 12 Ekim).
 - PWA: ana ekrana yüklenir, internetsiz çalışır (vite-plugin-pwa). Yazı tipi pakette
   (@fontsource/baloo-2); oyun hiçbir dış sunucuya bağlanmaz, öyle kalmalı.
 - Avatar hayvanları çizim olarak kalır (gerçek fotoğraf değil); ileride çizer Zıpzıp

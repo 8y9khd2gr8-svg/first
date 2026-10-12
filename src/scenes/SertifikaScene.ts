@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { RENK, YAZI_TIPI } from '../ayarlar';
-import { evDugmesi, yildizliArkaPlan, durakSimgesi } from '../arayuz';
+import { buyukDugme, evDugmesi, yildizliArkaPlan, durakSimgesi } from '../arayuz';
 import { BOLUMLER, BolumId } from '../duraklar';
 import { haftalikOzet } from '../istatistik';
 import { M } from '../metinler';
@@ -26,13 +26,16 @@ const UNVAN: Record<BolumId, { unvan: string; metin: string; birim: string }> = 
 
 export class SertifikaScene extends Phaser.Scene {
   private bolum: BolumId = 'turkiye';
+  // Kaydet/paylaş telefonun dışına çıkar: sadece ebeveyn kilidinden sonra (mağazaların çocuk uygulaması kuralları).
+  private kilitAcik = false;
 
   constructor() {
     super('Sertifika');
   }
 
-  init(veri: { bolum?: BolumId }) {
+  init(veri: { bolum?: BolumId; kilitAcik?: boolean }) {
     this.bolum = veri?.bolum ?? 'turkiye';
+    this.kilitAcik = !!veri?.kilitAcik;
   }
 
   create() {
@@ -98,9 +101,21 @@ export class SertifikaScene extends Phaser.Scene {
     new Zipzip(this, 560, 905, 0.22);
     this.add.text(560, 970, 'Zıpzıp', { fontFamily: YAZI_TIPI, fontStyle: 'bold italic', fontSize: '30px', color: MUREKKEP }).setOrigin(0.5);
 
-    zaferMuzigi();
-    this.time.delayedCall(400, () => konus(M.sertifikaBolum(unvan)));
+    // Ebeveyn kilidinden dönüşte kutlama tekrarlanmaz.
+    if (!this.kilitAcik) {
+      zaferMuzigi();
+      this.time.delayedCall(400, () => konus(M.sertifikaBolum(unvan)));
+    }
 
+    // Çocuk: kilitli düğme ebeveyn kilidine götürür; doğru cevaptan sonra aynı sertifika kaydet/paylaş düğmesiyle açılır.
+    if (!this.kilitAcik) {
+      buyukDugme(this, x, 1150, '🔒 Kaydet / Paylaş', RENK.turuncu, () => {
+        sustur();
+        const veri = { bolum: this.bolum };
+        this.scene.start('Ebeveyn', { hedef: 'Sertifika', hedefVeri: { ...veri, kilitAcik: true }, geri: 'Sertifika', geriVeri: veri, cocugaSoz: M.sertifikaKilitli });
+      }, { genislik: 440, yukseklik: 110, yaziBoyu: 40 });
+      return;
+    }
     // Kaydet / paylaş: sertifikanın resmini çekip telefonun paylaşma menüsünü açar
     // (yoksa resmi indirir). Gerçek HTML düğmesi, çünkü bu işlemler doğrudan dokunuş ister.
     const dugme = this.add.dom(x, 1150, 'button', DUGME_STILI, 'Kaydet / Paylaş 📤');

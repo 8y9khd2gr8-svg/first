@@ -13,7 +13,7 @@ Onay verilmemiş, ertelenmiş ya da reddedilmiş öneriler de buraya yazılır; 
 | # | Konu | Ne öneriliyor / soru | Neden önemli | Eklendiği gün |
 |---|---|---|---|---|
 | K1 | ⏳ Beta kapsamı | Betada hangi bölümler açık olsun? Öneri: Türkiye + Dünya + Ailece (14 durak), diğerleri "Yakında". Seçenekler: dalgalı / hepsi açık / sadece Türkiye | Ses kaydı ve uzman kontrolü 14 durağa odaklanır | 12 Ekim (soru cevapsız kaldı) |
-| K2 | ⏳ Sertifikadaki "Kaydet / Paylaş" çocuk ekranında, kilitsiz | Paylaşımı ebeveyn kilidinin arkasına almak | 🔎 Mağazaların çocuk uygulaması kuralları (Apple Kids, Google Families) dışarı paylaşımı kilit arkasında isteyebilir; güncel kural metniyle doğrulanmalı | 12 Ekim |
+| K2 | ✅ Sertifikadaki "Kaydet / Paylaş" çocuk ekranında kilitsizdi | **Yapıldı (#99, 12 Ekim):** çocuk "🔒 Kaydet / Paylaş"a dokununca ebeveyn kilidi; doğru cevapla aynı sertifika paylaşılabilir. 🔎 Mağaza kural metni yine de mağaza başvurusunda kontrol edilecek | | 12 Ekim |
 | K3 | ⏳ Ebeveyn köşesine giriş | Şu an sadece Pasaport → ✏️ (güvenlik notunda yazıyor, #97). Ayrı kilitli bir "Ebeveyn" düğmesi gerekir mi? | Ebeveynin ayarları (Sakin tempo, ses denemesi) bulması | 12 Ekim |
 | K4 | ⏳ Hareketlerin uzman kontrolü | Beta duraklarının hareket listesi çıkarılıp fizyoterapist/çocuk doktoruna gösterilsin | 🔎 Hiçbir hareketi uzman görmedi; sayı/süre yaşa uygun mu bilinmiyor (sağlık konusunda varsayım yok) | 12 Ekim (fizyoterapist fikri daha önce ertelenmişti) |
 | K5 | ⏳ 4-5 yaş komutları | Çok adımlı komutlar ("Kollarını kaldır, bir yana eğil, sonra öbür yana! Üç kere!") kısaltılsın mı? Sağ/sol ayna sorunu (Zıpzıp çocuğa dönük) nasıl olsun? | 🔎 Gözlem yok, tahmin | 12 Ekim |
