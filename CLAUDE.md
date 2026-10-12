@@ -153,7 +153,7 @@ Teknoloji: Phaser 3 + TypeScript + Vite, GitHub Pages ile yayın. İleride Capac
 - "Uzaktan oyna" (durak girişinde): açıksa "Yaptım!" beklemeden 3 sn sonra geçer (zipzip-uzaktan-v1).
 - Kamera isteğe bağlı kalır (izin velileri tedirgin eder); Ailece'de kamera kapalı (iki kişi güvenilir sayılmaz).
   Kameranın saydığı hareketler src/kamera.ts SAYMA_YOLU'nda (13 hareket, 6 sayma yolu: kollar, çömel, zıpla, dizler,
-  ayak aç-kapa, yana adım); süreli hareketlerde kamera açılmaz. Yapay vücut noktalarıyla testi: tests/kamera.test.ts.
+  ayak aç-kapa, yana adım); süreli hareketlerde kamera açılmaz. Yavaş telefonda tanıma her seferinde sürdüğü kadar ara verir (oyun takılmasın). Yapay vücut noktalarıyla testi: tests/kamera.test.ts.
   Eşikler gerçek çocukla denenmedi; Yağız testinde ayarlanacak.
   Pakette MediaPipe'in sadece hızlı (SIMD) hâli var (~15 MB; yavaş kopya 9 MB'tı, çıkarıldı): SIMD'siz eski telefonda
   (iOS 16.4 öncesi) kamera seçeneği görünmez (kamera.ts kameraDesteklenir), oyun aynen çalışır.

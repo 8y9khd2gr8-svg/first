@@ -194,11 +194,16 @@ export class KameraSayaci {
       await this.video.play();
       this.bildir('goremiyorum');
       let sonZaman = -1;
+      // Yavaş telefonda tanıma uzun sürer ve oyunu (sayaç, Zıpzıp) takıltır: her tanımadan sonra
+      // onun sürdüğü kadar ara verilir, zamanın en çok yarısı tanımaya gider (hızlı telefonda ~30 ms: saniyede ~15 tanıma, sayma için yeter).
+      let siradakiTanima = 0;
       const dongu = () => {
         if (this.bitti) return;
-        if (this.video.readyState >= 2 && this.video.currentTime !== sonZaman) {
+        const simdi = performance.now();
+        if (this.video.readyState >= 2 && this.video.currentTime !== sonZaman && simdi >= siradakiTanima) {
           sonZaman = this.video.currentTime;
-          const sonuc = model.detectForVideo(this.video, performance.now());
+          const sonuc = model.detectForVideo(this.video, simdi);
+          siradakiTanima = 2 * performance.now() - simdi;
           const n = sonuc.landmarks[0];
           this.noktalarGelince?.(n);
           // Tüm vücut (omuzlar ve topuklar) görünüyor mu?
