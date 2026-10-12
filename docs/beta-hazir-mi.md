@@ -1,45 +1,71 @@
 # Beta hazır mı? (Kasım kapalı beta kontrol listesi)
 
-Son kontrol: 10 Ekim 2026, sürüm 0.9.0. ✅ = hazır, ⬜ = bekliyor.
+Son kontrol: **12 Ekim 2026, sürüm 0.9.0**. ✅ = hazır, ⬜ = bekliyor.
 Ayrıntılı adımlar: [magaza-rehberi.md](magaza-rehberi.md), [seslendirme-rehberi.md](seslendirme-rehberi.md),
-testçilere gönderilecek metin: [beta-rehberi.md](beta-rehberi.md).
+testçilere gönderilecek metin: [beta-rehberi.md](beta-rehberi.md), Yağız testi: [yagiz-testi.md](yagiz-testi.md).
+
+## Tek bakışta
+
+| Taraf | Durum |
+|---|---|
+| Oyun (kod) | ✅ Beta için hazır. 7 bölüm, 50 durak; otomatik testler her değişiklikte çalışıyor |
+| Sizde, betayı başlatmak için **şart** olan | ⬜ İnternetsiz APK denemesi · ⬜ Yağız testi · ⬜ Play hesabı (Android) ya da Apple hesabı (iPhone) |
+| Sizde, olursa iyi olan | ⬜ Doğal ses (Azure) · ⬜ Marka başvurusu · ⬜ Avukat görüşmesi · ⬜ Geri bildirim e-posta adresi |
 
 ## 1. Oyun (kod tarafı, bende)
 
 | | Konu | Not |
 |---|---|---|
-| ✅ | 7 bölüm oynanır: Türkiye, Dünya, Uzay, Spor, Dinozor, Evde, Okyanus | Her bölüm öncekini bitirince açılır |
+| ✅ | 7 bölüm oynanır: Türkiye, Dünya, Uzay, Spor, Dinozor, Evde, Okyanus | Her bölüm öncekini bitirince açılır; rozet, kostüm, sertifika |
 | ✅ | Ebeveyn kilidi, güvenlik notu (ilk açılışta), durak girişinde kısa hatırlatma | |
-| ✅ | Ebeveyn köşesi: özet, pasaport, tam sürüm, güvenlik, **🔊 Sesi dene**, kamera, veri silme, "Bu telefonda neler var?" | Sesi dene bu PR'da eklendi |
+| ✅ | Ebeveyn köşesi: özet, pasaport, tam sürüm, ⚙️ Ayarlar, 🔊 Sesi dene, ❓ Nasıl oynanır, kamera + 🔍 Dene, veri silme, "Bu telefonda neler var?" | |
+| ✅ | Herkes oynayabilsin: 🐢 Sakin tempo, oturarak oyna, "Uzaktan oyna", renk körlüğü (biten durakta yıldız, kapalıda kilit) | |
+| ✅ | Okuma bilmeyen çocuk: her çocuk ekranında Zıpzıp konuşur | Otomatik test her ekranı denetler |
 | ✅ | Kamerayla sayma (isteğe bağlı): 13 hareket | Eşikler Yağız testinde ayarlanacak |
-| ✅ | Ödeme: `tam_surum`, geri yükleme, kilidin arkasında | Gerçek mağazada denenmedi (aşağıda 2) |
+| ✅ | Ödeme: `tam_surum`, geri yükleme, kilidin arkasında | Gerçek mağazada denenmedi (2'de 5) |
 | ✅ | İnternetsiz çalışma, dış sunucuya bağlanmama | Otomatik testler her PR'da denetler |
-| ✅ | Okunurluk, düğme büyüklüğü, yazı taşması | Otomatik testler |
-| ✅ | Açılış hızı (yavaş telefonda ~2,9 sn) | |
-| ✅ | Android'de telefon sesi (uygulama içinde) | Gerçek telefonda internetsiz denenmedi (aşağıda 2) |
-| ✅ | Sürüm numarası ebeveyn köşesinin altında; Play paketine otomatik yazılır | iPhone paketi şimdilik "1.0" gösterir, TestFlight'ta sorun değil |
-| ⬜ | Doğal ses: 655 cümle kaydı yok, şimdilik telefonun sesi okuyor | Azure hesabı açılınca `npm run seslendir` (sizde, aşağıda) |
+| ✅ | Okunurluk, düğme büyüklüğü, yazı taşması, renk zıtlığı | Otomatik testler |
+| ✅ | Bozuk kayıtta oyun çökmez, sağlam ilerleme kalır | Otomatik test (12 Ekim) |
+| ✅ | Açılış hızı (6 kat yavaşlatılmış telefonda ~1,9 sn) | |
+| ✅ | Gizlilik ve koşullar taslağı güncel (sesli yönlendirme, tempo, oturarak, kamera) | Avukata gösterilecek (2'de 9) |
+| ✅ | Sürüm numarası ebeveyn köşesinin altında; Play paketine otomatik yazılır | |
+| ⬜ | Doğal ses: 760 cümlenin kaydı yok, şimdilik telefonun sesi okuyor | Azure hesabı açılınca `npm run seslendir` (2'de 7) |
 | ⬜ | Geri bildirim adresi boş; ebeveyn köşesi "beta grubuna yazın" diyor | Betada yeterli; alan adı gelince eklenir |
+| ⬜ | Android internet izni hâlâ var | İnternetsiz APK denemesinin sonucu gelince kaldırırım (2'de 1) |
 
 ## 2. Sizde bekleyenler (betadan önce)
 
 | Sıra | İş | Neden önemli | Rehber |
 |---|---|---|---|
-| 1 | Android deneme APK'sını telefonda deneyin: Ebeveyn köşesi → **🔊 Sesi dene** → Dinle | Ses yoksa okuma bilmeyen çocuk oynayamaz; en kritik kontrol | Aşağıda 5 (10 dk) |
-| 2 | Aynı denemeyi internetsiz APK ile yapın (uçak modunda) | "İnternete bağlanmaz" sözünün kanıtı | Aşağıda 5 |
-| 3 | Yağız testi (kamerayı da açıp sayım doğru mu bakın) | Gerçek çocukla ilk sonuç | yagiz-testi.md |
-| 4 | Google Play geliştirici hesabı + formlar + ilk yükleme (kapalı test) | Android betası buna bağlı | magaza-rehberi 3, 3b, 4b |
+| 1 | **İnternetsiz APK'yı telefonda deneyin** (uçak modunda; 🔊 Sesi dene dahil) | Ses yoksa okuma bilmeyen çocuk oynayamaz; "internete bağlanmaz" sözünün kanıtı | Aşağıda 5 (10 dk) |
+| 2 | Yağız testi (kamerayı da açıp sayım doğru mu bakın) | Gerçek çocukla ilk sonuç | yagiz-testi.md |
+| 3 | Google Play geliştirici hesabı (~25 $, kimlik doğrulama birkaç gün) | Android betası buna bağlı | magaza-rehberi 3 |
+| 4 | Play formları + ilk kapalı test yüklemesi | Hazır cevaplar play-formlari.md'de | magaza-rehberi 3b, 4b |
 | 5 | Play'de `tam_surum` ürünü ve lisans testçisi | Ödemeyi gerçekten denemek için | magaza-rehberi 3c |
-| 6 | Apple geliştirici hesabı (TestFlight) | iPhone betası buna bağlı | magaza-rehberi 4 |
+| 6 | Apple geliştirici hesabı (yıllık ~99 $) + TestFlight | iPhone betası buna bağlı; paket için Mac gerekir | magaza-rehberi 4 |
 | 7 | Azure hesabı ve doğal ses kaydı | Ses daha anlaşılır olur; telefonun sesine bağımlılık biter | seslendirme-rehberi |
-| 8 | Marka araştırması ve başvurusu (TÜRKPATENT, sınıf 9 ve 41) | Ad betada herkese duyulmadan önce | magaza-rehberi 1 |
+| 8 | Marka araştırması ve başvurusu (TÜRKPATENT, sınıf 9 ve 41) | Ad betada duyulmadan önce | magaza-rehberi 1 |
 | 9 | Avukat görüşmesi (gizlilik ve koşullar taslağı) | Mağaza gizlilik adresi ister | magaza-rehberi 7 |
 
-## 3. Beta günü
+## 3. Mağaza adımları kısaca
 
-- ⬜ Beta testçilerine beta-rehberi.md'nin sonundaki WhatsApp mesajı ve davet bağlantıları
-- ⬜ Testçilere: "ilk gün Ebeveyn köşesi → 🔊 Sesi dene'ye bakın" hatırlatması
-- ⬜ Beta grubundaki geri bildirimleri haftada bir toplayıp bana getirin (telefon modeli + sürüm numarasıyla)
+**Google Play (Android)** — Kasım betası için en kısa yol
+1. Play Console'da **Kişisel** hesap aç, kimliği doğrula (birkaç gün).
+2. Uygulamayı oluştur; formları play-formlari.md'deki cevaplarla doldur (hedef kitle, veri güvenliği: "veri toplanmıyor", derecelendirme).
+3. GitHub → Actions → **Play kapalı test paketi** → indirdiğin AAB'yi **Kapalı test** kanalına yükle.
+4. Testçi listesine en az 12 kişinin Gmail adresini ekle; **14 gün** test süresi buradan başlar (yeni hesap kuralı).
+5. `tam_surum` ürününü oluştur, kendini lisans testçisi yap (para çekilmeden ödeme denenir).
+
+**App Store (iPhone)**
+1. Apple Developer Program'a bireysel kayıt.
+2. App Store Connect'te uygulama + gizlilik etiketi ("Data Not Collected"; cevaplar magaza-rehberi 4).
+3. Mac + Xcode ile paketi gönder (birlikte yaparız) → TestFlight iç test (kendi telefonun) → dış test (beta aileleri, Apple 1-2 gün inceler).
+4. `tam_surum` ürününü "Ready to Submit" yap; TestFlight'ta satın alma ücretsizdir.
+
+**Beta günü**
+- ⬜ Testçilere beta-rehberi.md'nin sonundaki WhatsApp mesajı ve davet bağlantıları
+- ⬜ "İlk gün Ebeveyn köşesi → 🔊 Sesi dene'ye bakın" hatırlatması
+- ⬜ Geri bildirimleri haftada bir toplayıp bana getirin (telefon modeli + sürüm numarasıyla)
 
 ## 4. Kanıt: telefonda ne izin istiyoruz, içinde ne var? (11 Ekim denetimi)
 
@@ -52,7 +78,7 @@ eklentilerin kendi izin dosyaları ve `ios/App/App/Info.plist`.
 |---|---|---|
 | Kamera (`CAMERA`) | Sadece ebeveyn kamera modunu açarsa hareketleri saymak için; pasaport fotoğrafı (isteğe bağlı) | İlk kullanımda telefon izin sorar; vermezse oyun aynen çalışır |
 | Satın alma (`com.android.vending.BILLING`) | Google Play ödeme kütüphanesi ekler; tam sürüm için | İzin sorulmaz (mağazanın kendi ödeme ekranı) |
-| İnternet (`INTERNET`) | Capacitor şablonunda hazır geliyor; oyun hiçbir sunucuya bağlanmaz (`npm run test:oyun` her ekranda denetler) | Play sayfasında "tam ağ erişimi" yazar. Kaldırmak sabah kararı (aşağıda) |
+| İnternet (`INTERNET`) | Capacitor şablonunda hazır geliyor; oyun hiçbir sunucuya bağlanmaz (`npm run test:oyun` her ekranda denetler) | Play sayfasında "tam ağ erişimi" yazar. İnternetsiz APK denemesi başarılı olunca kaldırılacak (aşağıda 5) |
 
 Konum, rehber, mikrofon, dosyalar, bildirim, reklam kimliği **yok**. Konuşma eklentisi sadece telefonun
 konuşma motorunu bulmak için "TTS_SERVICE" sorgusu ekler (izin değildir).
@@ -90,7 +116,7 @@ Her adımda **"Görmelisiniz"** yazanı görmüyorsanız adım numarasını ve e
 **Hazırlık (bilgisayarda ya da telefonda, 2 dk)**
 
 1. GitHub'da proje → **Actions** → soldan **Android deneme paketi**. Listede iki yeşil ✅ iş görmelisiniz
-   (önceki oturum ikisini de başlattı). Biri sarı/dönüyorsa birkaç dakika bekleyin; kırmızı ❌ ise bana yazın.
+   (11 Ekim'de ikisi de üretildi; eskidiyse "Run workflow" ile yeniden başlatın). Biri sarı/dönüyorsa birkaç dakika bekleyin; kırmızı ❌ ise bana yazın.
 2. İşlerin her birine girin, en altta **Artifacts** bölümü var:
    - `zip-zip-dunya-apk-internetsiz` → **asıl denenecek olan bu** (internet izni yok)
    - `zip-zip-dunya-apk` → internetli, karşılaştırma için (internetsiz sorun çıkarırsa bunu deneriz)
@@ -141,5 +167,5 @@ Her adımda **"Görmelisiniz"** yazanı görmüyorsanız adım numarasını ve e
 
 ## Karar
 
-Kod tarafı beta için hazır. Betayı başlatmak için gereken **en az** şey: 1, 3 ve 4 numaralı işler (Android için)
-ya da 1, 3 ve 6 (iPhone için). Doğal ses (7) betadan önce gelirse çok iyi olur ama şart değil.
+Kod tarafı beta için hazır. Betayı başlatmak için gereken **en az** şey: 2'deki 1, 2, 3 ve 4 numaralı işler (Android için)
+ya da 1, 2 ve 6 (iPhone için). Doğal ses (7) betadan önce gelirse çok iyi olur ama şart değil.
