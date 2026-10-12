@@ -44,7 +44,7 @@ export class GuvenlikScene extends Phaser.Scene {
 
     // Ebeveyn köşesinin yeri: anne-baba ilk açılışta bilsin (simge tek başına "ayarlar" demiyor).
     this.add
-      .text(x, 1030, 'Ayarlar ve hareket özeti: 🛂 Pasaport → ✏️', { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '28px', color: '#FFC93C' })
+      .text(x, 1030, 'Ayarlar ve özet: Büyük Macera → 🔒 Ebeveyn', { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '28px', color: '#FFC93C' })
       .setOrigin(0.5);
     this.add
       .text(x, 1072, 'Zıp Zıp Dünya bir oyundur; tıbbi tavsiye yerine geçmez.', { fontFamily: YAZI_TIPI, fontSize: '26px', color: '#9fb6d9' })

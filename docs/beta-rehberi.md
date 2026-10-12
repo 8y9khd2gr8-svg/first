@@ -33,7 +33,7 @@ Kurduktan sonra ilk açılışta size (ebeveyne) bir **güvenlik notu** çıkar.
 
 ## Ebeveyn köşesi
 
-Pasaport ekranının sağ üstündeki ✏️ düğmesinden girilir. Basit bir çarpma sorusu sorulur; böylece çocuk giremez.
+Büyük Macera ekranının sağ altındaki küçük **🔒 Ebeveyn** düğmesinden (ya da Pasaport ekranının sağ üstündeki ✏️'den) girilir. Basit bir çarpma sorusu sorulur; böylece çocuk giremez.
 
 - **📊 Hareket özeti:** bu hafta kaç dakika hareket edildi. Sayılar çocuğun "Yaptım!" dediği hareketlerdir.
   Oyun, hareketin gerçekten yapıldığını (kamera kapalıyken) anlayamaz.

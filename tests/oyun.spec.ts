@@ -102,6 +102,22 @@ test('yeni bölümler zincirle açılır', async ({ page }) => {
   expect(await acik()).toEqual([true, true, true, true]);
 });
 
+test('Büyük Macera\'daki küçük Ebeveyn düğmesi önce ebeveyn kilidine gider; ebeveyn köşesinden Macera\'ya dönülür', async ({ page }) => {
+  const kayit = await oyunuAc(page, BETA);
+  await sahneAc(page, 'Macera');
+  const r = (await page.locator('canvas').boundingBox())!;
+  const tikla = (gx: number, gy: number) => page.mouse.click(r.x + (r.width * gx) / 720, r.y + (r.height * gy) / 1280);
+  const etkin = () => page.evaluate(() => (window as any).oyun.scene.getScenes(true).map((s: any) => s.scene.key));
+  await tikla(640, 1180);
+  await expect.poll(etkin).toEqual(['Ebeveyn']);
+  // Kilit geçilince (testte doğrudan) ebeveyn köşesi açılır; ev düğmesi Büyük Macera'ya döner.
+  await page.evaluate(() => { const o = (window as any).oyun; o.scene.getScene('Ebeveyn').scene.start('EbeveynMenu', { geri: 'Macera' }); });
+  await page.waitForTimeout(500);
+  await tikla(80, 80);
+  await expect.poll(etkin).toEqual(['Macera']);
+  expect(kayit.hatalar).toEqual([]);
+});
+
 test('tam sürüm: ödeme kilidi ebeveyn kilidine götürür, satın alınca bölümler açılır', async ({ page }) => {
   await oyunuAc(page, {}, '/?odeme=deneme');
   const kilit = () =>

@@ -3,7 +3,7 @@ import { DONMA_OTURARAK, OTURARAK, sayiYazi, type Animasyon, type Hareket } from
 
 // Hareket listesini ebeveynin seçtiği ayarlara uyarlar (ebeveyn köşesi → ⚙️ Ayarlar):
 //  - Oturarak oyna: ayakta yapılan hareketler oturarak yapılan kol/gövde hareketine döner (aynı durakta tekrar etmeden).
-//  - Küçük (4-5 yaş): tekrarlar daha az, ritim daha yavaş, süreli hareketler daha kısa.
+//  - Küçük (4-5 yaş): tekrarlar daha az, ritim daha yavaş, süreli hareketler daha kısa, çok adımlı komut kısa.
 // Cümleler değişince yeni hâlleri de seslendirme listesindedir (metinler.ts tumMetinler → uyarlamaCumleleri).
 
 type OturarakId = keyof typeof OTURARAK;
@@ -46,9 +46,62 @@ function sondakiniDegistir(metin: string, eski: string, yeni: string) {
   return i < 0 ? metin : metin.slice(0, i) + yeni + metin.slice(i + eski.length);
 }
 
+// Sakin tempoda kısa komut (4-5 yaş, K5; tahmine dayanır, Yağız/4-5 yaş testinde bakılacak): çok adımlı komut
+// tek ve net eyleme iner. Zıpzıp hareketin tamamını yine gösterir; hikâye aynen kalır. Anahtar: komutun ekrandaki yazısı.
+// Listede olmayan komut (zaten kısa olan, eşyayla yapılan bazıları, oturarak komutları) değişmez.
+export const KISA_KOMUT: Record<string, string> = {
+  'Zıpla, ayaklarını aç, kapa!': 'Ayaklarını\naç, kapa!',
+  'Çömel, sonra yavaşça yüksel, kollarını aç!': 'Çömel ve kalk!',
+  'Yastığı başının üstünde tut, yerinde yürü!': 'Yastığı başının\nüstünde tut!',
+  'Topu tut, çömel, zıpla, kollarını yukarı uzat!': 'Topla\nyukarı zıpla!',
+  'Çömel, zıpla, kollarını yukarı uzat!': 'Yukarı zıpla!',
+  'Ellerini beline koy, belini döndür!': 'Belini döndür!',
+  'Ellerini beline koy, göbeğini çevir!': 'Belini döndür!',
+  'Çömel, yastığı yere koy, sonra al ve kalk!': 'Yastığı yere koy,\ngeri al!',
+  'Olduğun yerde dizlerini kaldırarak yürü!': 'Yerinde\ndizlerini kaldır!',
+  'Kollarını aç, arkanı dön, geri dön!': 'Arkanı dön,\ngeri dön!',
+  'Zıpla, dizlerini yukarı çek!': 'Yüksek zıpla!',
+  'Kollarını yana aç, yukarı aşağı salla!': 'Kollarını\nyukarı aşağı salla!',
+  'Çömel, ellerinle yeri sırayla kaz!': 'Ellerinle\nyeri kaz!',
+  'Kollarını ve bacaklarını aç, kocaman ol!': 'Kollarını ve\nbacaklarını aç!',
+  'Kollarını kaldır, sağa sola salla!': 'Kollarını\nsağa sola salla!',
+  'Kollarını sırayla öne doğru çevir!': 'Kollarını çevir!',
+  'Parmak uçlarında yerinde yürü!': 'Parmak ucunda\nyerinde yürü!',
+  'Ayaklarını aç, ellerini başının üstünde birleştir!': 'Ellerini başının\nüstünde birleştir!',
+  'Kolunu yukarıdan aşağı doğru salla!': 'Kolunu\naşağı salla!',
+  'Kendine sarıl, sağa sola sallan!': 'Sağa sola sallan!',
+  'Kendine sarıl, yavaşça sallan!': 'Yavaşça sallan!',
+  'Oyuncağına sarıl, sağa sola sallan!': 'Oyuncağınla\nsallan!',
+  'Dimdik dur, kollarını yukarı uzat!': 'Dimdik dur!',
+  'Kollarını yana aç, dimdik dur!': 'Kollarını yana aç!',
+  'Çömel, ellerini yere değdir, kollarını yukarı kaldır!': 'Eğil ve uzan!',
+  'Çömel, oyuncağını al, yukarı kaldır!': 'Oyuncağını\nyukarı kaldır!',
+  'Tek ayağını kaldır, kollarını yana aç!': 'Tek ayağını kaldır!',
+  'Dizini kaldır, öbür kolunu uzat!': 'Dizlerini\nsırayla kaldır!',
+  'Çömel, eşyayı al, yerine koy!': 'Eşyayı yerine koy!',
+  'Dirseklerini bük, yerinde büyük adımlar at!': 'Yerinde\nbüyük adımlar at!',
+  'Parmak ucunda yüksel, kollarını uzat!': 'Kollarını\nyukarı uzat!',
+  'Yavaşça yüksel, kollarını uzat!': 'Kollarını\nyukarı uzat!',
+  'Ellerini başının üstünde birleştir, yukarı it!': 'Ellerini yukarı it!',
+  'Bir sağa, bir sola adım at!': 'Yana adım at!',
+  'Kollarını kaldır, bir yana eğil, sonra öbür yana!': 'Bir yana,\nöbür yana eğil!',
+  'Çömel, küçül, sonra kalk ve kollarını aç!': 'Çömel ve kalk!',
+};
+
+function kisalt(h: Hareket): Hareket {
+  const kisa = KISA_KOMUT[h.baslik.replace(/\n/g, ' ')];
+  if (!kisa || h.dizi || h.surpriz) return h;
+  const duz = kisa.replace(/\n/g, ' ');
+  // Eski cümle sayıyı söylüyorsa kısa cümle de söyler ("... Beş kere!"); hikâye sayıyı söylüyorsa söylemez.
+  const sayi = h.tur === 'sayi' && h.sesli.includes(sayiYazi(h.adet)) && !(h.hikaye ?? '').includes(sayiYazi(h.adet)) ? ` ${sayiYazi(h.adet)} kere!` : '';
+  const ritimSozu = h.ritim === 'yavas' ? 'Yavaş yavaş! ' : h.ritim === 'hizli' ? 'Hızlı hızlı! ' : '';
+  return { ...h, baslik: kisa, sesli: `${h.hikaye ? `${h.hikaye} ` : ''}${ritimSozu}${duz}${sayi}` };
+}
+
 // Küçükler için: 5 ve üstü tekrar yaklaşık %60'a iner (en az 3), ritim %25 yavaşlar, süreli hareket %25 kısalır (en az 5 sn).
 // Hikâye sayıyı söylüyorsa ("Yedi kuleyi say") tekrar sayısı değişmez, sadece yavaşlar.
-export function kucukIcin(h: Hareket): Hareket {
+export function kucukIcin(uzun: Hareket): Hareket {
+  const h = kisalt(uzun);
   if (h.tur === 'sure') return { ...h, saniye: Math.max(5, Math.round(h.saniye * 0.75)) };
   const yavas = { ...h, tempoMs: Math.round(h.tempoMs * 1.25) };
   const eskiYazi = sayiYazi(h.adet);
