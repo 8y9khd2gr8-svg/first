@@ -16,10 +16,19 @@
     <style>
       html, body { margin: 0; height: 100%; background: #14213D; overflow: hidden; }
       #oyun { width: 100%; height: 100%; }
+      /* Yatay telefonda (ya da çok basık pencerede) oyun çok küçülür: "telefonu dik çevir" resmi.
+         Mağaza uygulamasında telefon zaten dik kilitli; bu, test sitesi ve iPad'in basık penceresi için. */
+      #dondur { display: none; position: fixed; inset: 0; z-index: 10; background: #14213D; color: #fff;
+        flex-direction: column; align-items: center; justify-content: center; gap: 8px; font: 700 22px 'Baloo 2', sans-serif; text-align: center; }
+      #dondur .telefon { font-size: 96px; animation: dondur 2s ease-in-out infinite; }
+      @keyframes dondur { 0%, 30% { transform: rotate(-90deg); } 60%, 100% { transform: rotate(0deg); } }
+      @media (prefers-reduced-motion: reduce) { #dondur .telefon { animation: none; } }
+      @media (orientation: landscape) and (max-height: 500px) { #dondur { display: flex; } }
     </style>
   </head>
   <body>
     <div id="oyun"></div>
+    <div id="dondur" aria-label="Telefonu dik çevir"><div class="telefon">📱</div><div>🔄 Telefonu dik çevir</div></div>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>
