@@ -166,6 +166,9 @@ Teknoloji: Phaser 3 + TypeScript + Vite, GitHub Pages ile yayın. İleride Capac
   Kamera denemesi (EbeveynKameraScene, ebeveyn köşesinde kamera ayarının yanında "🔍 Dene"): canlı görüntü + vücut noktaları,
   6 sayma yolundan biri seçilir, sayı ve "görüyorum/geri git" durumu görünür; kamera dokununca açılır, sayılar özete eklenmez.
   Yağız testinde eşik ayarı için kullanılır.
+  Kamera denemesinde ölçüm satırı (tanıma ms, tanıma/sn, oyunun kare hızı, son sayımın gecikmesi; kaydedilmez). Zıplama inişte
+  sayılır, 400 ms içindeki ikinci iniş sayılmaz (ZIPLAMA_EN_AZ_ARA_MS). "🌍 Zıpzıp da zıplasın" (ZiplaDenemeScene, zıplama
+  prototipi): kamerayla her zıplamada Zıpzıp bir kez zıplar + yıldız yanar (10'da Aferin); kamerasız ritim + dokunma.
 - Doğruluk: Çin Seddi uzaydan gözle GÖRÜLMEZ (efsane); Truva Atı "efsaneye göre". Ürkütücü kelime yok
   ("taş heykel başları" gibi); hayali nesne kaldırmada "hayali" denir (dışarıda gerçek taş kaldırma özentisi olmasın).
 - İleride konuşulacak (acele yok, 23 Nisan ya da sonrası): Zıpzıp'ın kendi dünyası haritası ve ek oyunlar
