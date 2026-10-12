@@ -191,20 +191,26 @@ test('"Uzaktan oyna" açıkken bir durak baştan sona kendiliğinden oynanır (�
   await page.evaluate(() => {
     const oyun = (window as any).oyun;
     const adimlar: number[] = ((window as any).__adimlar = []);
+    const gorulen: string[] = ((window as any).__gorulen = []);
     oyun.events.on('poststep', () => {
       const h = oyun.scene.getScene('Hareket');
       if (!oyun.scene.isActive('Hareket') || adimlar[adimlar.length - 1] === h.adim) return;
       adimlar.push(h.adim);
-      // Kaç hareket olacağı: liste ilk adımda kurulur; 2. adımda okunur (ilk adımda okumak listeyi yeniden kurar).
-      if (h.adim === 1) (window as any).__adimSayisi = h.liste().length;
+      gorulen.push(h.liste()[h.adim].sesli);
+      // Durak başında kurulan liste: sonraki adımlar bu listeden, kaymadan gelmeli.
+      if (h.adim === 0) (window as any).__ilkListe = h.liste().map((x: any) => x.sesli);
     });
   });
   await sahneAc(page, 'Hareket', { durakId: 'istanbul', adim: 0 });
   await page.waitForFunction(() => (window as any).oyun.scene.isActive('Odul'), null, { timeout: 280_000, polling: 500 });
   // Isınma, özel hareket, hikâyeliler ve sürpriz: adımlar 0'dan sırayla, atlamadan, sonuna kadar.
-  const [adimlar, adimSayisi] = await page.evaluate(() => [(window as any).__adimlar, (window as any).__adimSayisi]);
-  expect(adimSayisi).toBeGreaterThanOrEqual(5);
-  expect(adimlar).toEqual([...Array(adimSayisi).keys()]);
+  // (Eskiden ısınmadan sonra liste yeniden kurulup ısınma düşüyor, özel hareket atlanıyordu.)
+  const [adimlar, gorulen, ilkListe] = await page.evaluate(() => [(window as any).__adimlar, (window as any).__gorulen, (window as any).__ilkListe]);
+  expect(ilkListe.length).toBeGreaterThanOrEqual(6);
+  expect(ilkListe[0]).toContain('Isınma');
+  expect(adimlar).toEqual([...Array(ilkListe.length).keys()]);
+  expect(gorulen).toEqual(ilkListe);
+  expect(gorulen.some((g: string) => g.includes('Galata'))).toBe(true);
   expect(kayit.hatalar).toEqual([]);
 });
 

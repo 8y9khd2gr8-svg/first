@@ -26,6 +26,8 @@ export class HareketScene extends Phaser.Scene {
   // Kamera ile sayma (ebeveyn açtıysa ve hareket destekleniyorsa).
   private kamera: KameraSayaci | null = null;
   private kameraHedefe: (() => void) | null = null;
+  // Bu adımda kullanılan oturum listesi (create'te bir kez alınır).
+  private oturum: Hareket[] = [];
 
   constructor() {
     super('Hareket');
@@ -40,7 +42,9 @@ export class HareketScene extends Phaser.Scene {
     this.donuk = false;
     yildizliArkaPlan(this);
     const x = this.scale.gameSize.width / 2;
-    const liste = this.liste();
+    // Liste adım başında bir kez alınır: "Yaptım!"dan sonra yeniden kurulursa ısınma düşer ve sıradaki (özel) hareket atlanırdı.
+    this.oturum = oturumListesi(this.durakId, this.adim);
+    const liste = this.oturum;
     const hareket = liste[this.adim];
 
     evDugmesi(this, () => {
@@ -254,7 +258,7 @@ export class HareketScene extends Phaser.Scene {
 
   // Durağın oyun sırası (ısınma, sürpriz, soğuma dahil); durak başında bir kez kurulur.
   private liste(): Hareket[] {
-    return oturumListesi(this.durakId, this.adim);
+    return this.oturum;
   }
 
   // Birleşik harekette her tekrarın kendi hareketi (zıpla, zıpla, çömel...).
