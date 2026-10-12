@@ -8,8 +8,9 @@ export default defineConfig({
   testDir: 'tests',
   testMatch: '*.spec.ts',
   timeout: 60_000,
+  // Dosyalar ayrı işçilerde aynı anda koşar (butun-duraklar uzun sürer); bir dosyanın testleri kendi içinde sırayla.
   fullyParallel: false,
-  workers: 1,
+  workers: 2,
   reporter: 'list',
   use: {
     baseURL: 'http://localhost:5199/',
