@@ -4,13 +4,15 @@ const veri = JSON.parse(fs.readFileSync(veriYol, 'utf8'));
 const poz = JSON.parse(fs.readFileSync(pozYol, 'utf8'));
 const k = (s) => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;');
 const kartlar = veri.map((h, i) => `
-<section class="kart" id="h${i}">
-  <div class="ust"><span class="no">${i + 1}</span><h2>${k(h.baslik)}</h2></div>
+<section class="kart${h.beta ? ' beta' : ''}" id="h${i}">
+  <div class="ust"><span class="no">${i + 1}</span><h2>${k(h.baslik)}</h2>${h.beta ? '<span class="rozet">Betada</span>' : ''}</div>
   <div class="pozlar">${(poz[h.animasyon] ?? []).map((b) => `<img alt="" src="data:image/jpeg;base64,${b}">`).join('')}</div>
   <dl>
     <dt>Sesli komut</dt><dd>“${k(h.sesli)}”</dd>
     ${h.hikaye ? `<dt>Hikâye</dt><dd>${k(h.hikaye)}</dd>` : ''}
     <dt>Miktar</dt><dd>${k(h.miktar)} · ${k(h.tempo)}</dd>
+    <dt>🐢 Sakin tempoda</dt><dd>${k(h.sakin)}</dd>
+    <dt>🪑 Oturarak oynanınca</dt><dd>${h.oturarak ? `“${k(h.oturarak.baslik)}” · ${k(h.oturarak.miktar)}` : 'Aynı hareket (oturarak da yapılabilir ya da Ailece)'}</dd>
     <dt>Nerede</dt><dd>${h.yerler.map(k).join(' · ')}</dd>
   </dl>
   <fieldset class="karar"><legend>Değerlendirme</legend>
@@ -28,6 +30,8 @@ header{background:var(--lac);color:#fff;padding:24px 16px}header h1{margin:0 0 6
 main{max-width:1000px;margin:0 auto;padding:16px}
 .bilgi{background:#fff;border-radius:14px;padding:16px;margin-bottom:16px;border-left:6px solid var(--sari)}
 .liste{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
+.rozet{margin-left:auto;background:var(--sari);color:var(--lac);border-radius:8px;padding:2px 8px;font-size:12px;font-weight:700;white-space:nowrap}
+body.sadeceBeta .kart:not(.beta){display:none}
 .kart{background:#fff;border-radius:14px;padding:14px;box-shadow:0 1px 4px #0002;break-inside:avoid}
 .ust{display:flex;gap:10px;align-items:center}.no{background:var(--tur);color:#fff;border-radius:50%;min-width:32px;height:32px;display:grid;place-items:center;font-weight:700}
 h2{font-size:18px;margin:0}
@@ -38,13 +42,23 @@ textarea{width:100%;min-height:64px;border:1px solid #dde;border-radius:10px;pad
 .dugmeler{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}button{background:var(--tur);color:#fff;border:0;border-radius:10px;padding:10px 16px;font:inherit;font-weight:700;cursor:pointer}
 @media print{header{background:#fff;color:#000}header h1{color:#000}.dugmeler{display:none}.kart{box-shadow:none;border:1px solid #ccc}body{background:#fff}}
 </style></head><body>
-<header><h1>Zıp Zıp Dünya – Hareket Kataloğu</h1><div>4-9 yaş için Türkçe hareket oyunu · ${veri.length} hareket · fizyoterapist değerlendirmesi için</div></header>
+<header><h1>Zıp Zıp Dünya – Hareket Kataloğu</h1><div>4-9 yaş için Türkçe hareket oyunu · ${veri.length} hareket · fizyoterapist / çocuk hekimi değerlendirmesi için · ${new Date().toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' })}</div></header>
 <main>
 <div class="bilgi">
-<p><strong>Oyun nasıl çalışıyor?</strong> Her durakta 5 hareket yapılır: ısınma → durağa özel hareket → 2 hareket → soğuma. Maskot Zıpzıp hareketi önce gösterir, sonra çocuk sayaçla birlikte yapar. Kaybetmek ya da süre baskısı yoktur. Resimler, Zıpzıp'ın bir tekrardaki duruşlarıdır.</p>
-<p><strong>Sizden ricamız:</strong> Her hareketin 4-9 yaşa uygunluğu, tekrar sayısı ve hızı, dikkat edilmesi gereken bir nokta (eklem, denge, zemin) ve ısınma/soğumanın yeterliliği hakkında görüşünüz.</p>
-<p>Her kartta “Uygun / Değişmeli / Çıkarılmalı” seçip not yazabilirsiniz. Notlar bu tarayıcıda kendiliğinden saklanır. Bitince <strong>“PDF olarak kaydet”</strong> düğmesiyle kaydedip gönderebilirsiniz.</p>
-<div class="dugmeler"><button onclick="print()">PDF olarak kaydet / yazdır</button><button onclick="if(confirm('Bütün notlar silinsin mi?')){localStorage.removeItem(A);location.reload()}" style="background:#8892a6">Notları temizle</button></div>
+<p><strong>Oyun nasıl çalışıyor?</strong> Her durak kısa bir antrenmandır: oturumun ilk durağında 1 ısınma hareketi, durağa özel 1 hareket ve 3 hareket daha, arada 1 sürpriz oyun (donma ya da ayna oyunu), bölümün son durağında ya da çocuk “Bitirelim” deyince 1 soğuma hareketi. Maskot Zıpzıp hareketi önce gösterir, sonra çocuk sayaçla birlikte yapar. Kaybetmek ya da süre baskısı yoktur; çocuk hazır olunca “Yaptım!”a dokunur. Resimler, Zıpzıp'ın bir tekrardaki başlangıç, orta ve en uç anıdır.</p>
+<p><strong>Ebeveyn ayarları:</strong> 🐢 <em>Sakin tempo</em> (küçükler ve yeni başlayanlar için önerilir: 5 ve üstü tekrar yaklaşık %60'a iner, en az 3; ritim %25 yavaşlar; süreli hareket %25 kısalır, en az 5 sn) ve 🪑 <em>oturarak oyna</em> (hareket kısıtı, yorgunluk ya da dar alan için: ayakta yapılan hareketler oturarak yapılan kol/gövde hareketine döner). Her kartta bu iki hâl de yazılı.</p>
+<p><strong>Öncelik:</strong> <span class="rozet" style="margin:0">Betada</span> etiketli ${veri.filter((h) => h.beta).length} hareket Kasım'daki ilk denemede (Türkiye Turu, Dünya Harikaları, Ailece; ısınma, sürpriz ve soğuma her durakta) kullanılacak. Önce bunlara bakmanız yeterli.</p>
+<p><strong>Sizden ricamız:</strong> Her hareketin uygunluğu, tekrar sayısı ve hızı, dikkat edilmesi gereken bir nokta (eklem, denge, zemin). Özellikle şu soruların cevabı bize çok yardımcı olur:</p>
+<ol>
+<li>4-5 yaş için 🐢 Sakin tempodaki miktarlar uygun mu? Bu yaşta çıkarılması gereken hareket var mı?</li>
+<li>6-7 ve 8-9 yaş için normal miktarlar uygun mu, az mı, çok mu?</li>
+<li>Zıplama hareketleri: evde (halı/parke, alt kat komşusu) tekrar sayıları ve ayakkabı/yalınayak önerisi?</li>
+<li>Tek ayak denge ve dönme hareketleri: süre ve düşme riski açısından uygun mu?</li>
+<li>🪑 Oturarak hâller hareket kısıtı olan bir çocuk için uygun mu?</li>
+<li>Bir oturumda tek ısınma hareketi ve sondaki tek soğuma hareketi yeterli mi? Günlük süre için önerileriniz?</li>
+</ol>
+<p>Her kartta “Uygun / Değişmeli / Çıkarılmalı” seçip not yazabilirsiniz. Notlar bu tarayıcıda kendiliğinden saklanır. Bitince <strong>“PDF olarak kaydet”</strong> düğmesiyle kaydedip gönderebilirsiniz. <em>Bu oyun tıbbi tavsiye yerine geçmez; görüşünüz hareketleri güvenli hâle getirmek içindir.</em></p>
+<div class="dugmeler"><button onclick="print()">PDF olarak kaydet / yazdır</button><button onclick="document.body.classList.toggle('sadeceBeta');this.textContent=document.body.classList.contains('sadeceBeta')?'Bütün hareketleri göster':'Sadece betadakileri göster'" style="background:#14213D">Sadece betadakileri göster</button><button onclick="if(confirm('Bütün notlar silinsin mi?')){localStorage.removeItem(A);location.reload()}" style="background:#8892a6">Notları temizle</button></div>
 </div>
 <div class="liste">${kartlar}</div>
 </main>
