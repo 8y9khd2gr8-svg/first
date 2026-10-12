@@ -425,6 +425,8 @@ test('yazılar okunur (renk zıtlığı)', async ({ page }) => {
 // Durak sonunda çocuk kutlamadan önce "Haritaya dön"e basarsa yeni kostüm/rozet kaybolmaz; sonraki seferde kutlanır.
 test('kutlama görülmeden çıkılırsa yeni kostüm sonra yine kutlanır', async ({ page }) => {
   const kayit = await oyunuAc(page, { 'zipzip-ilerleme-v1': JSON.stringify(['istanbul', 'truva', 'pamukkale']) });
+  // Oyun saati 3 kat: testler iki işçide aynı anda koşarken yavaş makinede de süre yetsin (çıkış yine kutlamadan önce).
+  await saatiHizlandir(page, 3);
   // İlk kutlama rozet ya da kostüm olabilir; ikisinin kutlanan kayıtları birlikte sayılır.
   const kutlanan = () =>
     page.evaluate(() => [...(JSON.parse(localStorage.getItem('zipzip-kostum-v1') ?? '{}').kutlanan ?? []), ...JSON.parse(localStorage.getItem('zipzip-rozetler-v1') ?? '[]')]);
