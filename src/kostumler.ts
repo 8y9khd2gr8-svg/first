@@ -43,7 +43,12 @@ type Kayit = { secili?: string; kutlanan?: string[] };
 function oku(): Kayit {
   try {
     const k = JSON.parse(localStorage.getItem(ANAHTAR) ?? '{}');
-    return typeof k === 'object' && k ? k : {};
+    if (typeof k !== 'object' || !k) return {};
+    // Bozuk alan yok sayılır (seçili kostüm metin, kutlananlar metin dizisi olmalı).
+    return {
+      secili: typeof k.secili === 'string' ? k.secili : undefined,
+      kutlanan: Array.isArray(k.kutlanan) ? k.kutlanan.filter((x: unknown): x is string => typeof x === 'string') : undefined,
+    };
   } catch {
     return {};
   }
