@@ -29,10 +29,14 @@ export class DurakScene extends Phaser.Scene {
     });
 
     // Gezegenlerde ve sporlarda yer ve ad aynı ("Satürn"); iki kez yazmayalım.
-    if (durak.yer !== durak.ad) this.add.text(x, 170, durak.yer, { fontFamily: YAZI_TIPI, fontSize: '44px', color: '#cfe3ff' }).setOrigin(0.5);
-    this.add
-      .text(x, 250, durak.ad, { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '88px', color: '#FFC93C', stroke: '#0b1430', strokeThickness: 14 })
-      .setOrigin(0.5);
+    // Uzun adlar ("Deniz Kaplumbağası") ekrana sığacak kadar küçülür.
+    const sigdir = (t: Phaser.GameObjects.Text) => t.setScale(Math.min(1, 660 / t.width));
+    if (durak.yer !== durak.ad) sigdir(this.add.text(x, 170, durak.yer, { fontFamily: YAZI_TIPI, fontSize: '44px', color: '#cfe3ff' }).setOrigin(0.5));
+    sigdir(
+      this.add
+        .text(x, 250, durak.ad, { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '88px', color: '#FFC93C', stroke: '#0b1430', strokeThickness: 14 })
+        .setOrigin(0.5),
+    );
 
     const simge = durakSimgesi(this, durak, x, 470, 200);
     if (!hareketiAzalt()) this.tweens.add({ targets: simge, y: 445, duration: 1400, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });

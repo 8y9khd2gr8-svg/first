@@ -102,3 +102,32 @@ test('Ailece ve "Bitirelim" soğuması baştan sona oynanır', async ({ page }) 
   expect(soguma.length).toBe(1);
   expect(hatalar).toEqual([]);
 });
+
+test('her durağın giriş ekranında yazılar ekrana sığar', async ({ page }) => {
+  test.setTimeout(120_000);
+  const hatalar = await hazirla(page, {});
+  const duraklar: string[] = await page.evaluate(async () => (await import('/src/duraklar.ts')).TUM_DURAKLAR.map((d: any) => d.id));
+  const tasan: string[] = [];
+  for (const id of duraklar) {
+    tasan.push(
+      ...(await page.evaluate(async (id) => {
+        const oyun = (window as any).oyun;
+        oyun.scene.getScenes(true).forEach((s: any) => s.scene.key !== 'Durak' && s.scene.stop());
+        oyun.scene.start('Durak', { durakId: id }); // açıksa yeniden başlar
+        await new Promise((r) => setTimeout(r, 300));
+        if (!oyun.scene.isActive('Durak')) return [`${id}: ekran açılmadı`];
+        const bulunan: string[] = [];
+        const gez = (o: any) => {
+          if (o.type === 'Container') return o.list.forEach(gez);
+          if (o.type !== 'Text' || !o.text?.trim()) return;
+          const r = o.getBounds();
+          if (r.left < -1 || r.right > 721 || r.top < -1 || r.bottom > 1281) bulunan.push(`${id}: "${o.text.slice(0, 30)}"`);
+        };
+        oyun.scene.getScene('Durak').children.list.forEach(gez);
+        return bulunan;
+      }, id)),
+    );
+  }
+  expect(tasan).toEqual([]);
+  expect(hatalar).toEqual([]);
+});
