@@ -32,7 +32,8 @@ export const M = {
   turaHosgeldin: 'Türkiye turuna hoş geldin! İlk durağımız İstanbul. Dokun ve başla!',
   siradaki: (yer: string) => `Sıradaki durağımız ${yer}!`,
   // Yer ve ad aynıysa (ör. "Satürn", "Futbol") bir kez söylenir.
-  durakGiris: (yer: string, ad: string, bilgi: string, baslik = 'Biliyor muydun?') => `${yer}! ${yer === ad ? '' : `${ad}. `}${baslik} ${bilgi}`,
+  // Sonda ne yapılacağı söylenir (okuma bilmeyen çocuk düğmeyi beklemesin).
+  durakGiris: (yer: string, ad: string, bilgi: string, baslik = 'Biliyor muydun?') => `${yer}! ${yer === ad ? '' : `${ad}. `}${baslik} ${bilgi} Hazırsan Başla’ya dokun!`,
   damgaKazandin: (yer: string) => `Süpersin! ${yer} damgasını kazandın!`,
   karakterSec: 'Pasaportun için bir karakter seç!',
   karakterSecildi: (ad: string) => `${ad}! Harika seçim!`,
