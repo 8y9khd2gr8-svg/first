@@ -38,6 +38,14 @@ Oyunu ilk kez açıyorsanız ebeveyn köşesinden **🗑️ Tüm verileri sil** 
 | 17 | **Oturarak oyna** ile bir durak (sandalyede ya da yerde): kol/gövde hareketlerini anladı mı? Ayağa kalkmak istedi mi? | |
 | 18 | **Kamera denemesi** (kamera ayarının yanında 🔍 Dene): Yağız zıplarken/çömelirken sayı doğru arttı mı? "Geri git" uyarısı çıktı mı? Hangi hareket yanlış sayıldı? (Eşikler buna göre ayarlanacak; bu sayılar özete eklenmez.) | |
 
+## Zıplama denemesi (kamera, 5 dk)
+Büyük Macera → sağ alttaki **🔒 Ebeveyn** → 📷 Kamerayla sayma yanındaki **🔍 Dene** → **🌍 Zıpzıp da zıplasın** → **📷 Kamerayla zıpla**.
+Telefonu Yağız'ın baştan ayağa görüneceği yere koyun ("✅ Görüyorum" yazmalı).
+1. Yağız 10 kez zıplasın (aralarda kısa bekleyerek). Zıpzıp kaç kez zıpladı? Bir zıplamada iki kez zıpladığı oldu mu?
+2. Yağız 30 saniye sadece dursun / kollarını sallasın: Zıpzıp kendiliğinden zıpladı mı?
+3. Ekranın altındaki küçük ölçüm satırının **ekran görüntüsünü** gönderin (tanıma ms, kare/sn, son zıplama ms).
+Kamerasız da deneyin: kamera açmadan Zıpzıp ritimle zıplar, ekrana dokununca da zıplar. Yağız hangisini sevdi?
+
 ## Sonra Yağız'a sorun (oyun gibi, kısa)
 
 - "En çok hangi hareketi sevdin?"
