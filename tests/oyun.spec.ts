@@ -526,3 +526,23 @@ test('durumlar sadece renkle anlatılmaz: biten durakta yıldız, kapalı durakt
   expect(secili).toEqual(['✓ Zıpla']);
   expect(kayit.hatalar).toEqual([]);
 });
+
+test('iPad ve yatay ekran: oyun ekranı doldurur, dokunuş doğru yere gider; yatay telefonda "dik çevir" görünür', async ({ page }) => {
+  for (const [w, h] of [[820, 1180], [1032, 1376], [1376, 1032]]) {
+    await page.setViewportSize({ width: w, height: h });
+    const kayit = await oyunuAc(page);
+    await expect(page.locator('#dondur')).toBeHidden();
+    // Oyun 720×1280'lik tuvali ekrana sığdırır: ekranın yüksekliği (ya da genişliği) tam kullanılır.
+    const kutu = (await page.locator('#oyun canvas').boundingBox())!;
+    expect(Math.max(kutu.height / h, kutu.width / w)).toBeGreaterThan(0.99);
+    // "Oyna" düğmesine (tuvalde 360, 1090) ekrandaki yerinden dokununca açılış ekranından çıkılır.
+    await page.mouse.click(kutu.x + (360 / 720) * kutu.width, kutu.y + (1090 / 1280) * kutu.height);
+    await page.waitForFunction(() => !(window as any).oyun.scene.isActive('Acilis'));
+    expect(kayit.hatalar).toEqual([]);
+    page.removeAllListeners();
+  }
+  await page.setViewportSize({ width: 844, height: 390 });
+  await expect(page.locator('#dondur')).toBeVisible();
+  await page.setViewportSize({ width: 390, height: 844 });
+  await expect(page.locator('#dondur')).toBeHidden();
+});
