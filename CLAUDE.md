@@ -213,12 +213,20 @@ Teknoloji: Phaser 3 + TypeScript + Vite, GitHub Pages ile yayın. İleride Capac
   başta), sonra AskUserQuestion ile en güçlü 4'ünü sun (önerilen ilk sırada, "(Önerilen)"
   etiketiyle); kullanıcı yazmadan seçebilsin. Her zaman en iyisi için kafa yor.
 - Her aşama küçük ve telefonda test edilebilir olsun; sonunda Yağız (6 yaş) test eder.
-- Değişiklikler PR olarak açılır; testleri geçince PR'ı Claude birleştirir (kullanıcı onayladı).
+- Değişiklikler PR olarak açılır; testleri geçince PR'ı Claude birleştirir (kullanıcı onayladı). Ama GitHub'daki `test`
+  kontrolü (iş akışı "Testler") PR'ın son hâlinde yeşil olmadan ve sonucu okunmadan birleştirilmez; kırmızıysa önce
+  düzeltilir (12 Ekim: #94 kırmızıyken birleşti, ders). Oyunda neyin değişeceğine kullanıcıyla birlikte karar verilir.
+- Çalışan sürüm etiketlenir (ilk: `v0.9.0` = fe37906, 12 Ekim). main'e giren her şey test sitesinde (GitHub Pages)
+  hemen yayınlanır. Geri alma: PR'daki Revert düğmesi → geri alma PR'ı → test yeşil → birleştir; geçmiş yeniden
+  yazılmaz (force push yok). Bulut oturumu etiket, release ve dal koruması oluşturamaz; bunları kullanıcı GitHub'dan yapar.
+- Kayıt: `docs/KAYIT.md` her oturum başında okunur, sonunda güncellenir (birleşenler, hatalar, ölçümler, kararlar).
+  Onay verilmemiş, ertelenmiş ya da cevapsız kalan her öneri/soru/bulgu da oraya yazılır; ancak karar verilince
+  listeden çıkar. Sohbette kalıp kaybolan bilgi olmamalı (oturum kapanınca bulut bilgisayarı silinir).
 - Kodda isimler ve yorumlar Türkçe.
 - Kota: plan yükseltilmeden tasarruflu çalışılır (yarıyıl öncesi belki yükseltilir). Uzun sohbet
   yerine iş listesi bitince yeni sohbet; istekler toplu; uygun olunca sabah otomatik başlangıç.
 - "Yeni oturuma geçelim" denildiğinde: önce iş seçenekleri (tablo + AskUserQuestion, çoklu seçim), sonra Claude yeni oturumu
-  kendisi açar (claude-code-remote create_session; ilk mesaj hazır: CLAUDE.md'yi oku, son durum, seçilen işler, "onaylı,
+  kendisi açar (claude-code-remote create_session; ilk mesaj hazır: CLAUDE.md'yi ve docs/KAYIT.md'yi oku, son durum, seçilen işler, "onaylı,
   sormadan yap; testler geçince PR'ı birleştir; büyük ürün kararlarını sabaha bırak"). Önce açık PR birleştirilir ki yeni
   oturum güncel main'den başlasın. Kullanıcı bir şey yazmaz.
 - "Yeni sohbet aç" denildiğinde, cevabın sonunda yeni sohbete aynen yapıştırılacak hazır bir başlangıç mesajı
