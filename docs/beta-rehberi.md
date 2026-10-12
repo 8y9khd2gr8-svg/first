@@ -42,7 +42,8 @@ Büyük Macera ekranının sağ altındaki küçük **🔒 Ebeveyn** düğmesind
   yükleneceğini adım adım yazar. Okuma bilmeyen çocuk yönlendirmeyi sesten anlar; lütfen ilk gün deneyin.
 - **📷 Kamerayla sayma (deneme):** isterseniz açın. Zıplama, çömelme, kol, diz, ayak aç-kapa ve yana adım hareketlerini telefon kamerası sayar.
   Görüntü telefonun içinde işlenir, kaydedilmez, hiçbir yere gönderilmez. Açmak tamamen isteğe bağlıdır.
-- **🧪 Beta: bütün bölümleri aç:** bütün bölümleri (Dünya, Uzay, Spor...) ödemesiz ve sırayı beklemeden açar.
+- **🧪 Beta: Dünya bölümünü aç:** Dünya Harikaları'nı ödemesiz ve Türkiye Turu'nu beklemeden açar. Betada Türkiye Turu,
+  Dünya Harikaları ve Ailece açık; diğer bölümler (Uzay, Spor, Dinozor, Evde, Okyanus) Büyük Macera'da "Yakında" görünür.
   Betada **bunu kullanın**; "⭐ Tam sürüm" ekranındaki **Satın al**'a dokunmayın (Android'de gerçek ödeme alınabilir).
   Tam sürüm ekranına bakıp "anlaşılır mı?" diye yorum yazmanız ise çok değerli.
 - **🗑️ Tüm verileri sil:** oyunun bu telefondaki her şeyini siler (iki kez dokunmak gerekir).

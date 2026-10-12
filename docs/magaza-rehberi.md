@@ -100,7 +100,7 @@ gönderdiği banka hesabı, 20/B hesabı olabilir):
 6. Kendinizi **lisans test kullanıcısı** yapın: Play Console ana sayfası → **Ayarlar → Lisans testi** → Google hesabınızı ekleyin.
    Böylece kapalı testte "test kartıyla" para ödemeden satın almayı deneyebilirsiniz.
 
-**Beta testçileri gerçek para ödemesin:** Beta rehberindeki gibi ebeveyn köşesindeki **"🧪 Beta: bütün bölümleri aç"** düğmesini
+**Beta testçileri gerçek para ödemesin:** Beta rehberindeki gibi ebeveyn köşesindeki **"🧪 Beta: Dünya bölümünü aç"** düğmesini
 kullansınlar (mağazadan önce kaldırılacak). Kapalı testte "Satın al"a dokunan, lisans testçisi değilse gerçek ödeme yapar.
 
 **Apple** (App Store Connect, gönderme günü birlikte):
@@ -204,7 +204,8 @@ Adım adım 10 dakikalık kontrol listesi (uçak modu, ses, kamera, sertifika): 
 
 ## 6. Mağazaya çıkmadan önce benim yapacaklarım (kontrol listesi)
 
-- [ ] Ebeveyn köşesindeki "Beta: bütün bölümleri aç" düğmesini kaldırmak
+- [ ] Ebeveyn köşesindeki "Beta: Dünya bölümünü aç" düğmesini kaldırmak
+- [ ] Mağazada hangi bölümlerin açık olacağına karar vermek (`src/duraklar.ts` BETA_BOLUMLERI; betada Türkiye + Dünya)
 - [x] Tek seferlik ödemeyi mağaza ödeme sistemine bağlamak, "satın alımı geri yükle" düğmesi (ürün kimliği `tam_surum`, bkz. 3c)
 - [x] Ödeme ekranını ebeveyn kilidinin arkasına koymak
 - [ ] Lisans testçisiyle kapalı testte gerçek satın alma ve geri yüklemeyi denemek (Android), TestFlight'ta aynısı (iPhone)

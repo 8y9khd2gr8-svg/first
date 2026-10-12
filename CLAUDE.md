@@ -93,6 +93,9 @@ Teknoloji: Phaser 3 + TypeScript + Vite, GitHub Pages ile yayın. İleride Capac
   mağazaya çıktıktan sonra satışlara bakılarak seçilecek.
   Bağış: uygulama içinde bağış toplanmaz (Apple kuralı, Yardım Toplama Kanunu). Mağaza sonrası
   değerlendirilecek: gelirden bağış sözü (ör. her satışa 1 fidan) ya da oyun içi sanal fidan teması.
+- Beta kapsamı (K1, 12 Ekim): betada Türkiye + Dünya + Ailece açık; diğer 5 bölüm Büyük Macera'da "Yakında" (kod silinmez).
+  Tek liste: src/duraklar.ts BETA_BOLUMLERI. Web test sitesinde `?bolumler=hepsi` hepsini açar (otomatik testler bunu kullanır).
+  Beta düğmesi sadece önceki/ödeme kilidini atlar (betada Dünya'yı açar). Kapalı "yakında" bölüme dokununca "yakında" denir.
 - Beta hazırlığı: ilk açılışta bir kez ebeveyn güvenlik notu; durak girişinde kısa hatırlatma;
   public/gizlilik.html ve kosullar.html (taslak, avukata gösterilecek; iletişim adresi eklenecek);
   ebeveyn köşesinde "Tüm verileri sil" (zipzip- ile başlayan bütün anahtarlar). Yeni bir cihaz

@@ -6,7 +6,7 @@ takıldığı yerde 10 saniye bekleyin, sonra yardım edin ve "takıldı" diye n
 **Hazırlık (2 dk):** telefon şarjlı, sesi açık, sabit bir yerde (rafa yaslı). Etraf boş, zemin kaymıyor.
 Oyunu ilk kez açıyorsanız ebeveyn köşesinden **🗑️ Tüm verileri sil** ile sıfırdan başlayın.
 
-**Hangi bölüm:** Türkiye Turu'ndan başlayın. 7 bölümün hepsini görmek isterseniz ebeveyn köşesindeki "🧪 Beta: bütün bölümleri aç" Dünya, Uzay, Spor, Dinozor, Evde ve Okyanus bölümlerini açar; Büyük Macera yolundan seçilir. Evde Macera için yumuşak bir oyuncak, bir yastık ve çorap topu hazırlayın.
+**Hangi bölüm:** Türkiye Turu'ndan başlayın. Betada Türkiye Turu, Dünya Harikaları ve Ailece açık; diğer bölümler Büyük Macera'da "Yakında" görünür. Dünya'yı Türkiye bitmeden görmek isterseniz ebeveyn köşesindeki "🧪 Beta: Dünya bölümünü aç"; Büyük Macera yolundan seçilir. (Test sitesinde adresin sonuna `?bolumler=hepsi` eklerseniz 7 bölüm de açılabilir; Evde Macera için yumuşak bir oyuncak, bir yastık ve çorap topu hazırlayın.)
 
 **Süre:** 15-20 dakika ya da Yağız bırakmak isteyene kadar. Zorlamayın; "bitirmek istiyorum" da bir sonuçtur.
 
