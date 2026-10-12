@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { test } from 'node:test';
 import type { NormalizedLandmark } from '@mediapipe/tasks-vision';
-import { BURUN, KAMERA_HAREKETLERI, SAG_BILEK, SAG_DIZ, SAG_KALCA, SAG_OMUZ, SAG_TOPUK, SOL_BILEK, SOL_DIZ, SOL_KALCA, SOL_OMUZ, SOL_TOPUK, Sayici, simdVarMi } from '../src/kamera';
+import { BURUN, KAMERA_HAREKETLERI, ZIPLAMA_EN_AZ_ARA_MS, SAG_BILEK, SAG_DIZ, SAG_KALCA, SAG_OMUZ, SAG_TOPUK, SOL_BILEK, SOL_DIZ, SOL_KALCA, SOL_OMUZ, SOL_TOPUK, Sayici, simdVarMi } from '../src/kamera';
 import { K } from '../src/hareketler';
 
 type Durus = { x?: number; omuzY?: number; kalcaY?: number; bilekY?: number; solDizY?: number; sagDizY?: number; ayakAciklik?: number; topukY?: number };
@@ -31,13 +31,17 @@ function nokta(d: Durus): NormalizedLandmark[] {
   return n;
 }
 
-// Her tekrar: birkaç kare "ayakta", birkaç kare hareketin içinde.
-function say(animasyon: string, tekrar: (i: number) => Durus[], adet: number): number {
+// Her tekrar: birkaç kare "ayakta", birkaç kare hareketin içinde. Kareler arası 50 ms (saniyede 20 tanıma).
+function say(animasyon: string, tekrar: (i: number) => Durus[], adet: number, kareBasina = 6, kareMs = 50): number {
   const s = new Sayici(animasyon as never);
-  for (let k = 0; k < 10; k++) s.besle(nokta({}));
-  for (let i = 0; i < adet; i++) for (const d of tekrar(i)) for (let k = 0; k < 6; k++) s.besle(nokta(d));
+  let zaman = 0;
+  const besle = (d: Durus) => s.besle(nokta(d), (zaman += kareMs));
+  for (let k = 0; k < 10; k++) besle({});
+  for (let i = 0; i < adet; i++) for (const d of tekrar(i)) for (let k = 0; k < kareBasina; k++) besle(d);
   return s.sayi;
 }
+
+const HAVADA: Durus = { omuzY: 0.22, kalcaY: 0.47, topukY: 0.82 };
 
 test('kamera: her sayma yolu tekrarları doğru sayar', () => {
   const ayakta: Durus = {};
@@ -65,6 +69,25 @@ test('kamera: görüntüdeki küçük titreme tekrar sayılmaz', () => {
     for (let k = 0; k < 300; k++) s.besle(nokta({}).map((p) => ({ ...p, x: p.x + rastgele(), y: p.y + rastgele() })));
     assert.equal(s.sayi, 0, a);
   }
+});
+
+test('kamera zıplama: 1 zıplama = 1 olay; titreme ve yarım zıplama sayılmaz', () => {
+  assert.equal(say('zipla', () => [HAVADA, {}], 1), 1);
+  assert.equal(say('zipla', () => [HAVADA, {}], 10), 10);
+  // Yarım zıplama / topuk kaldırma (omuz boyun %4'ü kadar yükselir): sayılmaz.
+  assert.equal(say('zipla', () => [{ omuzY: 0.276, kalcaY: 0.526, topukY: 0.876 }, {}], 10), 0);
+  // Kararsız eşikte titreme (omuz ±%3 oynar): sayılmaz.
+  assert.equal(say('zipla', (i) => [{ omuzY: i % 2 ? 0.282 : 0.318 }], 40, 1), 0);
+});
+
+test('kamera zıplama: 400 ms içinde iki iniş tek zıplama sayılır', () => {
+  // İnişte sarsıntı: 100 ms havada, 100 ms yerde, yine 100 ms havada → ikinci iniş ilkinden ~200 ms sonra.
+  assert.equal(say('zipla', () => [HAVADA, {}, HAVADA, {}], 1, 2), 1);
+  // Arka arkaya hızlı ama gerçek zıplamalar (her biri 600 ms) hepsi sayılır.
+  assert.equal(say('zipla', () => [HAVADA, {}], 5, 6), 5);
+  // Sınır: inişler arası tam 400 ms sayılır, 350 ms sayılmaz.
+  assert.equal(say('zipla', () => [HAVADA, {}], 4, 4, ZIPLAMA_EN_AZ_ARA_MS / 8), 4);
+  assert.equal(say('zipla', () => [HAVADA, {}], 4, 4, 350 / 8), 2);
 });
 
 test('pakette MediaPipe sadece SIMD hâliyle durur; SIMD denetimi çalışır', () => {
