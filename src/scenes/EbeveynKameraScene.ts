@@ -107,8 +107,12 @@ export class EbeveynKameraScene extends Phaser.Scene {
     dugmeleriCiz();
 
     genisDokunma(
-      this.add.text(x, 1056, '↺ Sayıyı sıfırla', { fontFamily: YAZI_TIPI, fontSize: '32px', color: '#cfe3ff', backgroundColor: '#ffffff1f', padding: { x: 20, y: 14 } }).setOrigin(0.5),
+      this.add.text(x - 170, 1056, '↺ Sayıyı sıfırla', { fontFamily: YAZI_TIPI, fontSize: '32px', color: '#cfe3ff', backgroundColor: '#ffffff1f', padding: { x: 20, y: 14 } }).setOrigin(0.5),
     ).on('pointerdown', () => this.kamera?.yolDegistir(this.secili));
+    // Zıplama prototipi: çocuk zıplayınca Zıpzıp da zıplar (kamerasız da oynanır).
+    genisDokunma(
+      this.add.text(x + 170, 1056, '🌍 Zıpzıp da zıplasın', { fontFamily: YAZI_TIPI, fontSize: '32px', color: '#ffffff', backgroundColor: '#1e7b3a', padding: { x: 20, y: 14 } }).setOrigin(0.5),
+    ).on('pointerdown', () => this.scene.start('ZiplaDeneme', {}));
 
     this.add
       .text(x, 1122, 'Görüntü kaydedilmez, hiçbir yere gönderilmez.\nBu denemedeki sayılar özete eklenmez.', { fontFamily: YAZI_TIPI, fontSize: '25px', color: '#9fb6d9', align: 'center' })

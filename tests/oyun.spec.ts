@@ -74,7 +74,7 @@ test('bütün ekranlar hatasız açılır ve dış sunucuya bağlanılmaz', asyn
     ['Spor', { giris: 'uzay' }], ['Dinozor', { giris: 'uzay' }], ['Evde', { giris: 'uzay' }], ['Okyanus', { giris: 'uzay' }],
     ['Durak', { durakId: 'futbol' }], ['Durak', { durakId: 'oyuncak' }], ['Durak', { durakId: 'yengec' }], ['Hareket', { durakId: 'trex', adim: 1 }],
     ['Odul', { durakId: 'fosil' }], ['Pasaport', { sayfa: 'evde' }], ['Pasaport', { sayfa: 'okyanus' }], ['Rozet', {}], ['Kostum', {}],
-    ['Sertifika', { bolum: 'spor' }], ['Sertifika', { bolum: 'okyanus' }], ['EbeveynMenu', {}], ['EbeveynVeri', {}], ['EbeveynRehber', {}], ['EbeveynAyar', {}], ['EbeveynSes', {}], ['EbeveynKamera', {}], ['EbeveynOzet', {}],
+    ['Sertifika', { bolum: 'spor' }], ['Sertifika', { bolum: 'okyanus' }], ['EbeveynMenu', {}], ['EbeveynVeri', {}], ['EbeveynRehber', {}], ['EbeveynAyar', {}], ['EbeveynSes', {}], ['EbeveynKamera', {}], ['ZiplaDeneme', {}], ['EbeveynOzet', {}],
   ];
   for (const [ad, veri] of sahneler) await sahneAc(page, ad, veri);
   expect(kayit.hatalar).toEqual([]);
@@ -268,7 +268,7 @@ test('yazılar ekrana sığar, çocuk düğmeleri yeterince büyük', async ({ p
     ['Macera', {}, true], ['Harita', {}, true], ['Dunya', {}, true], ['Uzay', {}, true], ['Spor', {}, true], ['Dinozor', {}, true], ['Evde', {}, true], ['Okyanus', {}, true],
     ['Durak', { durakId: 'efes' }, true], ['Durak', { durakId: 'nemrut' }, true], ['Hareket', { durakId: 'istanbul', adim: 1 }, true],
     ['Pasaport', {}, true], ['Rozet', { sayfa: 1 }, true], ['Kostum', {}, false], ['Avatar', {}, true],
-    ['Ebeveyn', { hedef: 'EbeveynMenu', geri: 'Pasaport' }, true], ['EbeveynMenu', {}, true], ['EbeveynVeri', {}, true], ['EbeveynRehber', {}, true], ['EbeveynAyar', {}, true], ['EbeveynSes', {}, true], ['EbeveynKamera', {}, true], ['EbeveynOzet', {}, true], ['PasaportAyar', {}, true],
+    ['Ebeveyn', { hedef: 'EbeveynMenu', geri: 'Pasaport' }, true], ['EbeveynMenu', {}, true], ['EbeveynVeri', {}, true], ['EbeveynRehber', {}, true], ['EbeveynAyar', {}, true], ['EbeveynSes', {}, true], ['EbeveynKamera', {}, true], ['ZiplaDeneme', {}, true], ['EbeveynOzet', {}, true], ['PasaportAyar', {}, true],
     ['Kurulum', {}, true], ['TamSurum', {}, true], ['Sertifika', { bolum: 'turkiye' }, false],
   ];
   const sorunlar: string[] = [];
@@ -351,7 +351,7 @@ test('yazılar okunur (renk zıtlığı)', async ({ page }) => {
   const sahneler: [string, object][] = [
     ['Acilis', {}], ['Macera', {}], ['Harita', {}], ['Dunya', {}], ['Uzay', {}], ['Spor', {}], ['Okyanus', {}], ['Durak', { durakId: 'efes' }], ['Hareket', { durakId: 'istanbul', adim: 1 }],
     ['Pasaport', {}], ['Rozet', { sayfa: 1 }], ['Kostum', {}], ['Avatar', {}], ['Guvenlik', {}], ['Ebeveyn', { hedef: 'EbeveynMenu', geri: 'Pasaport' }],
-    ['EbeveynMenu', {}], ['EbeveynVeri', {}], ['EbeveynRehber', {}], ['EbeveynAyar', {}], ['EbeveynSes', {}], ['EbeveynKamera', {}], ['EbeveynOzet', {}], ['PasaportAyar', {}], ['TamSurum', {}], ['Sertifika', { bolum: 'turkiye' }],
+    ['EbeveynMenu', {}], ['EbeveynVeri', {}], ['EbeveynRehber', {}], ['EbeveynAyar', {}], ['EbeveynSes', {}], ['EbeveynKamera', {}], ['ZiplaDeneme', {}], ['EbeveynOzet', {}], ['PasaportAyar', {}], ['TamSurum', {}], ['Sertifika', { bolum: 'turkiye' }],
   ];
   const sorunlar: string[] = [];
   for (const [ad, veri] of sahneler) {
@@ -568,6 +568,30 @@ test('iPad ve yatay ekran: oyun ekranı doldurur, dokunuş doğru yere gider; ya
   await expect(page.locator('#dondur')).toBeVisible();
   await page.setViewportSize({ width: 390, height: 844 });
   await expect(page.locator('#dondur')).toBeHidden();
+});
+
+test('Zıpzıp da zıplasın (kamerasız): ritimle ve dokununca zıplar, 10 yıldızda Aferin', async ({ page }) => {
+  const kayit = await oyunuAc(page, BETA);
+  await sahneAc(page, 'ZiplaDeneme');
+  const durum = () => page.evaluate(() => {
+    const s = (window as any).oyun.scene.getScene('ZiplaDeneme');
+    return { toplam: s.ziplamaSayisi as number, yanan: s.yanan as number, kamera: s.kameraZiplamasi as number, aferin: s.children.list.some((c: any) => c.text === 'Aferin!') };
+  });
+  // Ritim: kendiliğinden zıplar.
+  await page.waitForFunction(() => (window as any).oyun.scene.getScene('ZiplaDeneme').ziplamaSayisi >= 1, null, { timeout: 15_000 });
+  // Dokunma: Zıpzıp'a dokununca hemen bir zıplama daha (ritimden önce).
+  const once = await durum();
+  const r = await page.locator('canvas').boundingBox();
+  await page.mouse.click(r!.x + r!.width / 2, r!.y + (r!.height * 490) / 1280);
+  const sonra = await durum();
+  expect(sonra.toplam).toBe(once.toplam + 1);
+  expect(sonra.yanan).toBe(once.yanan + 1);
+  expect(sonra.kamera).toBe(0);
+  // 10 yıldız dolunca Aferin, sonra yıldızlar söner ve oyun sürer (kaybetmek yok).
+  await saatiHizlandir(page, 8);
+  await page.waitForFunction(() => (window as any).oyun.scene.getScene('ZiplaDeneme').children.list.some((c: any) => c.text === 'Aferin!'), null, { timeout: 20_000 });
+  await page.waitForFunction(() => { const s = (window as any).oyun.scene.getScene('ZiplaDeneme'); return s.ziplamaSayisi > 10 && !s.children.list.some((c: any) => c.text === 'Aferin!'); }, null, { timeout: 20_000 });
+  expect(kayit.hatalar).toEqual([]);
 });
 
 test('sayfa öğeleri (kamera kutusu, bağlantılar) oyunun düğmelerini örtmez', async ({ page }) => {
