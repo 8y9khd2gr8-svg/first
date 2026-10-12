@@ -12,16 +12,16 @@ Onay verilmemiş, ertelenmiş ya da reddedilmiş öneriler de buraya yazılır; 
 
 | # | Konu | Ne öneriliyor / soru | Neden önemli | Eklendiği gün |
 |---|---|---|---|---|
-| K1 | ⏳ Beta kapsamı | Betada hangi bölümler açık olsun? Öneri: Türkiye + Dünya + Ailece (14 durak), diğerleri "Yakında". Seçenekler: dalgalı / hepsi açık / sadece Türkiye | Ses kaydı ve uzman kontrolü 14 durağa odaklanır | 12 Ekim (soru cevapsız kaldı) |
+| K1 | ✅ Beta kapsamı | **Yapıldı (#105, 12 Ekim):** betada Türkiye + Dünya + Ailece açık, diğer 5 bölüm Büyük Macera'da "Yakında" (kod duruyor; tek liste `BETA_BOLUMLERI`; test sitesinde `?bolumler=hepsi` hepsini açar) | Ses kaydı ve uzman kontrolü 14 durağa odaklanır | 12 Ekim |
 | K2 | ✅ Sertifikadaki "Kaydet / Paylaş" çocuk ekranında kilitsizdi | **Yapıldı (#99, 12 Ekim):** çocuk "🔒 Kaydet / Paylaş"a dokununca ebeveyn kilidi; doğru cevapla aynı sertifika paylaşılabilir. 🔎 Mağaza kural metni yine de mağaza başvurusunda kontrol edilecek | | 12 Ekim |
-| K3 | ⏳ Ebeveyn köşesine giriş | Şu an sadece Pasaport → ✏️ (güvenlik notunda yazıyor, #97). Ayrı kilitli bir "Ebeveyn" düğmesi gerekir mi? | Ebeveynin ayarları (Sakin tempo, ses denemesi) bulması | 12 Ekim |
+| K3 | ✅ Ebeveyn köşesine giriş | **Yapıldı (#106):** Büyük Macera'nın sağ altında küçük kilitli "🔒 Ebeveyn" düğmesi (Pasaport → ✏️ da duruyor); güvenlik notu yeni yeri söylüyor | Ebeveynin ayarları bulması | 12 Ekim |
 | K4 | ⏳ Hareketlerin uzman kontrolü | Katalog güncel (#101, 12 Ekim): `docs/hareket-katalogu.html`; 79 hareket, her kartta Sakin tempo ve oturarak hâli, 49'u "Betada" etiketli, uzmana 6 soru, Uygun/Değişmeli/Çıkarılmalı + not, PDF kaydet. **Kullanıcıda:** fizyoterapist/çocuk hekimine göndermek | 🔎 Hiçbir hareketi uzman görmedi (sağlık konusunda varsayım yok) | 12 Ekim |
-| K5 | ⏳ 4-5 yaş komutları | Çok adımlı komutlar ("Kollarını kaldır, bir yana eğil, sonra öbür yana! Üç kere!") kısaltılsın mı? Sağ/sol ayna sorunu (Zıpzıp çocuğa dönük) nasıl olsun? | 🔎 Gözlem yok, tahmin | 12 Ekim |
+| K5 | ⏳ 4-5 yaş komutları | **Kısmen yapıldı (#106):** Sakin tempoda 36 çok adımlı komut tek eyleme iner (`src/uyarla.ts` KISA_KOMUT; tahmin, 4-5 yaşla denenecek; seslendirme 761 → 857 cümle). **Açık:** sağ/sol ayna sorunu (Zıpzıp çocuğa dönük) | 🔎 Gözlem yok, tahmin | 12 Ekim |
 | K6 | ⏳ 8-9 yaş ilgisi | Kaybettirmeyen zorluk ("kendi rekorun", daha hızlı tempo) konuşulsun mu? Ya da hedef yaş 4-8'e daralsın mı? | Görsel dil küçük kardeş oyunu gibi görünebilir | 12 Ekim |
 | K7 | ⏳ Yayın onayı | GitHub Pages yayınına "onay gerekli" eklemek (her yayın kullanıcı onayıyla). Öneri: şimdilik gerek yok, main koruması yeterli | Yanlışlıkla yayın riski | 12 Ekim |
 | K8 | ⏳ Eski dallar | GitHub'da ~100 eski dal var (çoğu birleşmiş) | Temizlik; tek tek kontrol edilmeden silinmez | 12 Ekim |
 | K9 | ⏳ IS_AKISI'nın depoya ayrı belge olarak girmesi | Şimdilik `docs/rapor-2026-10-12/IS_AKISI.md` içinde ve CLAUDE.md'de özet | — | 12 Ekim |
-| K10 | ⏳ Performans (çok yavaş telefon) | Uzay haritası ve kamera denemesi ekranı ölçümde sınıra yakın; gerekirse sabit çizimleri resme çevirmek | 🔎 Gerçek telefonda ölçülmedi | 12 Ekim |
+| K10 | ⏳ Performans (çok yavaş telefon) | Uzay haritası ve kamera denemesi ekranı ölçümde sınıra yakın; gerekirse sabit çizimleri resme çevirmek. **12 Ekim: ertelendi** (iş listesindeki 6. iş): gerçek telefon ölçümü yok; önce kamera denemesindeki ölçüm satırıyla (#103) telefonda ölçülecek | 🔎 Gerçek telefonda ölçülmedi | 12 Ekim |
 | K11 | ⏳ ChatGPT değerlendirmesi | Rapor paketi ve oynanış analizi (`docs/rapor-2026-10-12/OYNANIS_ANALIZI.md/.pdf`) ChatGPT'ye verildi; önerileri gelince buraya maddelenecek | — | 12 Ekim |
 | K12 | ⏳ Görseller | Kullanıcı görsel gönderecek; güçlü/zayıf yönleri değerlendirilecek | — | 12 Ekim |
 | K13 | ✅ Kameranın rolü | **Karar (12 Ekim):** isteğe bağlı kalır, macerada "önerilen". Kamerasız da tam oynanır; kamera açıkken dünya gerçek tepki verir; her yeni mekanik iki yoldan (kameralı/kamerasız) tasarlanır | Bütün oynanış kararları buna bağlı | 12 Ekim |
@@ -32,6 +32,8 @@ Onay verilmemiş, ertelenmiş ya da reddedilmiş öneriler de buraya yazılır; 
 | K18 | ⏳ Beta hangi mekanikle? | Öneri: Kasım betası bugünkü mekanikle; yeni mekanik (her tekrarın dünyada sonucu, tek hareketle gerçek tepki prototipi) beta sırasında | Takvim | 12 Ekim (analiz) |
 | K19 | ⏳ Oynanış yol haritası | A1-A4 (mevcut sistem) ve B1-B6 (yeni mekanik), ayrıntı OYNANIS_ANALIZI.md bölüm 8 | Hangi sırayla başlanacak | 12 Ekim (analiz) |
 | K20 | ✅ Zıplama prototipi kararları | **12 Ekim:** D1 kamera denemesinde ("Zıpzıp da zıplasın") · D2 kamerasızda ritim + dokunma · D3 inişte + en az 400 ms ara · D4 kamera denemesinde ebeveynin gördüğü ölçüm satırı (kaydetmez). Plan: `docs/rapor-2026-10-12/ZIPLAMA_PROTOTIPI_PLANI.md` | Sıradaki geliştirme | 12 Ekim |
+| K22 | ⏳ Zıplamanın dünyada sonucu (iş 3) | Tek bekleyen engel mi, 3 engelli kısa parkur mu, köprü mü? Seçenek tablosu 12 Ekim sohbetinde soruldu (önerilen: bekleyen tek engel, önce "Zıpzıp da zıplasın" ekranında) | Oynanış değişikliği: kullanıcı seçmeden yapılmaz | 12 Ekim |
+| K23 | ⏳ Yağız testi: zıplama prototipi | Ebeveyn köşesi → 📷 kamera → 🔍 Dene → 🌍 Zıpzıp da zıplasın → 📷 Kamerayla zıpla; 10 zıplama: Zıpzıp kaç kez zıpladı, ölçüm satırının ekran görüntüsü (hedefler: 10'da en az 8, tek zıplamada çift tepki yok, gecikme ≤ 300 ms) | Eşikler ve 400 ms koruma gerçek çocukla ayarlanacak | 12 Ekim |
 | K21 | ✅ Birleştirme onayı | **12 Ekim:** testi yeşil, küçük, geri alınabilir PR'ları Claude birleştirir (kalıcı onay). Oynanışı/kapsamı ciddi değiştiren, yayın/dağıtım, force push, geniş silme, GitHub güvenlik/erişim ayarı, para harcama, çocuk verisini saklama/gönderme için tek tek açık onay | Çalışma kuralı | 12 Ekim |
 
 ## 2. Kullanıcıda bekleyenler
@@ -55,6 +57,19 @@ Onay verilmemiş, ertelenmiş ya da reddedilmiş öneriler de buraya yazılır; 
 ---
 
 ## 4. Oturum günlüğü (en yeni üstte)
+
+### 12 Ekim 2026 (öğleden sonra) — zıplama prototipi, beta kapsamı, kısa komut, ebeveyn düğmesi
+**Birleşenler (hepsi `test` son hâlinde yeşil ve okunarak):**
+- #103 Kamera denemesinde ölçüm satırı (D4: tanıma ms ort/en uzun, tanıma/sn, oyunun kare hızı, son sayımın gecikmesi; kaydedilmez) + zıplamada 400 ms çift tetik koruması (D3). Yapay vücut noktası testleri: 1 zıplama = 1, yarım zıplama / titreme = 0, 400 ms içinde iki iniş = 1.
+- #104 "🌍 Zıpzıp da zıplasın" (D1-D2, ZiplaDenemeScene): kamerayla her zıplamada Zıpzıp bir kez zıplar + yıldız; 10'da Aferin; kamerasız ritim + dokunma. 2 yeni sesli cümle.
+- #106 Sakin tempoda kısa komut (K5) + Büyük Macera'da kilitli Ebeveyn düğmesi (K3).
+- #105 Beta kapsamı (K1).
+
+**Ölçüm (bulut, telefon değil):** sahte kamerayla bulutta tanıma 1,5-4,6 sn (ekran kartı yok; telefonu temsil etmez). Gerçek değer Yağız testinde ölçüm satırından okunacak.
+
+**Ertelenen:** iş 6 (çizim hızlandırma, K10) gerçek telefon ölçümü gelene kadar. İş 3 (dünyada sonuç, K22) kullanıcı seçimini bekliyor.
+
+**Not:** Bir push GitHub'da "fatal error in commit_refs" ile geri döndü; ikinci denemede geçti (geçici).
 
 ### 12 Ekim 2026 — 50 durak testi, bölüm gezintisi, yavaş telefon, ebeveyn deneyimi, rapor, koruma planı
 **Birleşenler (hepsi test yeşilken; #94 hariç):**
