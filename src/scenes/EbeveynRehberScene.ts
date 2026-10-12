@@ -11,7 +11,7 @@ const ADIMLAR: [string, string, string][] = [
 ];
 
 const IPUCLARI = [
-  '⏱️ Günde 10-15 dakika yeter; "🌙 Bitirelim" ile soğuyup bitirin.',
+  '⏱️ 10-15 dakikayla başlayın; "🌙 Bitirelim" ile soğuyup bitirin.',
   '⚙️ Ayarlar: 🐢 Sakin tempo (küçükler için), Oturarak oyna.',
   '📱 Telefonu sağlam bir yere koyun; çocuk biraz geride dursun.',
 ];

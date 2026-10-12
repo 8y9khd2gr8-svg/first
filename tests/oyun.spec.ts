@@ -569,3 +569,35 @@ test('iPad ve yatay ekran: oyun ekranı doldurur, dokunuş doğru yere gider; ya
   await page.setViewportSize({ width: 390, height: 844 });
   await expect(page.locator('#dondur')).toBeHidden();
 });
+
+test('sayfa öğeleri (kamera kutusu, bağlantılar) oyunun düğmelerini örtmez', async ({ page }) => {
+  const kayit = await oyunuAc(page, BETA);
+  const ortulen: string[] = [];
+  for (const ad of ['EbeveynKamera', 'EbeveynMenu', 'PasaportAyar', 'EbeveynOzet', 'Sertifika']) {
+    await sahneAc(page, ad, ad === 'Sertifika' ? { bolum: 'turkiye' } : {});
+    await sakinlesmesiniBekle(page);
+    ortulen.push(
+      ...(await page.evaluate((ad) => {
+        const oyun = (window as any).oyun;
+        const tuval: HTMLCanvasElement = oyun.canvas;
+        const r = tuval.getBoundingClientRect();
+        const k = r.width / 720;
+        const bulunan: string[] = [];
+        const yazi = (o: any): string => (o.type === 'Text' ? o.text : (o.list ?? []).map(yazi).join(' '));
+        const gez = (o: any) => {
+          if (o.visible === false) return;
+          if (o.input?.enabled && o.type !== 'DOMElement') {
+            const m = o.getWorldTransformMatrix();
+            const ust = document.elementFromPoint(r.left + m.tx * k, r.top + m.ty * k);
+            if (ust && ust !== tuval) bulunan.push(`[${ad}] "${yazi(o).trim().slice(0, 30)}" üstünde ${ust.tagName}`);
+          }
+          (o.list ?? []).forEach(gez);
+        };
+        oyun.scene.getScene(ad).children.list.forEach(gez);
+        return bulunan;
+      }, ad)),
+    );
+  }
+  expect(ortulen).toEqual([]);
+  expect(kayit.hatalar).toEqual([]);
+});

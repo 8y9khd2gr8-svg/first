@@ -87,7 +87,7 @@ export class EbeveynOzetScene extends Phaser.Scene {
     // Paylaş: telefonun kendi paylaşma menüsü (WhatsApp vb.). Gerçek HTML düğmesi, çünkü
     // telefonlar paylaşma menüsünü sadece doğrudan dokunuşla açar.
     const ad = pasaportOku().ad;
-    const metin = `🌍 Zıp Zıp Dünya'da bu hafta${ad ? ` ${ad}` : ''} ${dakika} dakikalık hareket tamamladı, ${ozet.ziplama} kez zıpladı ve ${durak} durak gezdi! 🏃‍♂️`;
+    const metin = `🌍 Zıp Zıp Dünya'da bu hafta${ad ? ` ${ad}` : ''} ${dakika} dakikalık hareket tamamladı, ${ozet.ziplama} kez zıpladı ve ${durak} durak gezdi! 🏃`;
     const paylas = this.add.dom(x, 1195, 'button', PAYLAS_STILI, 'Paylaş 📤');
     paylas.addListener('click');
     paylas.on('click', async () => {

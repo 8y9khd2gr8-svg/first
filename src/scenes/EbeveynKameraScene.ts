@@ -52,11 +52,12 @@ export class EbeveynKameraScene extends Phaser.Scene {
     tuval.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:contain;';
     this.add.dom(x, 395, kutu);
 
-    const durum = this.add.text(x, 600, 'Kamera kapalı', { fontFamily: YAZI_TIPI, fontSize: '30px', color: '#cfe3ff' }).setOrigin(0.5);
+    const durum = this.add.text(x, 600, '', { fontFamily: YAZI_TIPI, fontSize: '30px', color: '#cfe3ff' }).setOrigin(0.5);
     const sayi = this.add.text(x, 670, '', { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '72px', color: '#ffffff' }).setOrigin(0.5);
 
-    // Kamera kendiliğinden açılmaz; ebeveyn dokununca açılır.
-    const ac = buyukDugme(this, x, 395, '📷 Kamerayı aç', RENK.yesil, () => {
+    // Kamera kendiliğinden açılmaz; ebeveyn dokununca açılır. Düğme kutunun altında: kutu (sayfa öğesi)
+    // oyun tuvalinin üstünde durur, düğme kutunun içinde olsaydı görünmezdi.
+    const ac = buyukDugme(this, x, 635, '📷 Kamerayı aç', RENK.yesil, () => {
       ac.destroy();
       let sonSayi = 0;
       const kamera = new KameraSayaci(

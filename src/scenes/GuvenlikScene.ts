@@ -42,8 +42,12 @@ export class GuvenlikScene extends Phaser.Scene {
       this.add.text(160, y, metin, { fontFamily: YAZI_TIPI, fontSize: '30px', color: '#ffffff', lineSpacing: 2 }).setOrigin(0, 0.5);
     });
 
+    // Ebeveyn köşesinin yeri: anne-baba ilk açılışta bilsin (simge tek başına "ayarlar" demiyor).
     this.add
-      .text(x, 1060, 'Zıp Zıp Dünya bir oyundur; tıbbi tavsiye yerine geçmez.', { fontFamily: YAZI_TIPI, fontSize: '26px', color: '#9fb6d9' })
+      .text(x, 1030, 'Ayarlar ve hareket özeti: 🛂 Pasaport → ✏️', { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '28px', color: '#FFC93C' })
+      .setOrigin(0.5);
+    this.add
+      .text(x, 1072, 'Zıp Zıp Dünya bir oyundur; tıbbi tavsiye yerine geçmez.', { fontFamily: YAZI_TIPI, fontSize: '26px', color: '#9fb6d9' })
       .setOrigin(0.5);
 
     buyukDugme(this, x, 1170, 'Anladım ✓', RENK.yesil, () => {
