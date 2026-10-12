@@ -11,7 +11,7 @@ async function hazirla(page: Page, depo: Record<string, string>) {
   const hatalar: string[] = [];
   page.on('pageerror', (e) => hatalar.push(e.message));
   page.on('console', (m) => m.type() === 'error' && hatalar.push(m.text()));
-  await page.goto('/');
+  await page.goto('/?bolumler=hepsi');
   await page.evaluate((depo) => {
     localStorage.clear();
     localStorage.setItem('zipzip-guvenlik-notu-v1', '1');

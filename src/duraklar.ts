@@ -823,11 +823,26 @@ export const BOLUMLER: Record<BolumId, Bolum> = {
 export const BOLUM_SIRASI = Object.keys(BOLUMLER) as BolumId[];
 export const TUM_DURAKLAR: Durak[] = BOLUM_SIRASI.flatMap((id) => BOLUMLER[id].duraklar);
 
-// Bölüm açık mı? Önceki bölüm bitmiş olmalı; Türkiye dışındaki bölümler ayrıca tam sürüm ister.
-// Beta düğmesi (ebeveyn köşesi) ikisini de atlar; mağazaya çıkmadan kaldırılacak.
-export type BolumKilidi = 'onceki' | 'odeme' | null;
+// Betada açık bölümler (K1, 12 Ekim): Türkiye + Dünya (+ Ailece, her zaman açık). Diğerleri Büyük Macera'da
+// "Yakında" görünür; kodları durur. Tek liste: bölüm açmak için buraya eklenir.
+export const BETA_BOLUMLERI: readonly BolumId[] = ['turkiye', 'dunya'];
+// Web test sitesinde adres sonunda ?bolumler=hepsi varsa bütün bölümler açılabilir (deneme ve otomatik testler için;
+// cihaza kaydedilmez).
+const hepsiAcikMi = () => {
+  try {
+    return new URLSearchParams(location.search).get('bolumler') === 'hepsi';
+  } catch {
+    return false;
+  }
+};
+export const bolumYakindaMi = (id: BolumId) => !BETA_BOLUMLERI.includes(id) && !hepsiAcikMi();
+
+// Bölüm açık mı? Betada olmayan bölüm "yakında"; önceki bölüm bitmiş olmalı; Türkiye dışındaki bölümler ayrıca tam sürüm ister.
+// Beta düğmesi (ebeveyn köşesi) önceki/ödeme kilidini atlar (betada bu Dünya'yı açar); mağazaya çıkmadan kaldırılacak.
+export type BolumKilidi = 'yakinda' | 'onceki' | 'odeme' | null;
 
 export function bolumKilidi(id: BolumId): BolumKilidi {
+  if (bolumYakindaMi(id)) return 'yakinda';
   if (betaDunyaAcikMi()) return null;
   const onceki = BOLUMLER[id].onceki;
   if (!onceki) return null;

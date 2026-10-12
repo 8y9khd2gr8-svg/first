@@ -72,9 +72,9 @@ export class EbeveynMenuScene extends Phaser.Scene {
       this.scene.start('Acilis');
     });
 
-    // Beta testi için: Dünya bölümünü Türkiye Turu bitmeden açar. Mağazaya çıkmadan kaldırılacak.
+    // Beta testi için: Dünya bölümünü Türkiye Turu bitmeden açar (diğer bölümler betada "Yakında"). Mağazaya çıkmadan kaldırılacak.
     const beta = betaDunyaAcikMi();
-    baglanti(1020, beta ? '🧪 Beta: bütün bölümler açık (kapat)' : '🧪 Beta: bütün bölümleri aç').on('pointerdown', () => {
+    baglanti(1020, beta ? '🧪 Beta: Dünya bölümü açık (kapat)' : '🧪 Beta: Dünya bölümünü aç').on('pointerdown', () => {
       betaDunyaAc(!beta);
       this.scene.restart();
     });

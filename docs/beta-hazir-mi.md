@@ -8,7 +8,7 @@ testçilere gönderilecek metin: [beta-rehberi.md](beta-rehberi.md), Yağız tes
 
 | Taraf | Durum |
 |---|---|
-| Oyun (kod) | ✅ Beta için hazır. 7 bölüm, 50 durak; otomatik testler her değişiklikte çalışıyor |
+| Oyun (kod) | ✅ Beta için hazır. Betada Türkiye + Dünya + Ailece (14 durak + Ailece), diğer 5 bölüm "Yakında"; otomatik testler her değişiklikte çalışıyor |
 | Sizde, betayı başlatmak için **şart** olan | ⬜ İnternetsiz APK denemesi · ⬜ Yağız testi · ⬜ Play hesabı (Android) ya da Apple hesabı (iPhone) |
 | Sizde, olursa iyi olan | ⬜ Doğal ses (Azure) · ⬜ Marka başvurusu · ⬜ Avukat görüşmesi · ⬜ Geri bildirim e-posta adresi |
 
@@ -16,7 +16,7 @@ testçilere gönderilecek metin: [beta-rehberi.md](beta-rehberi.md), Yağız tes
 
 | | Konu | Not |
 |---|---|---|
-| ✅ | 7 bölüm oynanır: Türkiye, Dünya, Uzay, Spor, Dinozor, Evde, Okyanus | Her bölüm öncekini bitirince açılır; rozet, kostüm, sertifika |
+| ✅ | Betada Türkiye Turu, Dünya Harikaları ve Ailece açık; Uzay, Spor, Dinozor, Evde, Okyanus Büyük Macera'da "Yakında" (kodları duruyor; K1, 12 Ekim) | Dünya, Türkiye bitince açılır; rozet, kostüm, sertifika. Test sitesinde adres sonuna `?bolumler=hepsi` yazılırsa 7 bölüm de açılabilir |
 | ✅ | Ebeveyn kilidi, güvenlik notu (ilk açılışta), durak girişinde kısa hatırlatma | |
 | ✅ | Ebeveyn köşesi: özet, pasaport, tam sürüm, ⚙️ Ayarlar, 🔊 Sesi dene, ❓ Nasıl oynanır, kamera + 🔍 Dene, veri silme, "Bu telefonda neler var?" | |
 | ✅ | Herkes oynayabilsin: 🐢 Sakin tempo, oturarak oyna, "Uzaktan oyna", renk körlüğü (biten durakta yıldız, kapalıda kilit) | |

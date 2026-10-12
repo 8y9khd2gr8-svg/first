@@ -329,11 +329,16 @@ export class BolumScene extends Phaser.Scene {
   }
 }
 
-// Kapalı bölüme dokununca: önceki bölüm bitmediyse kilit cümlesi söylenir. Bölüm sadece tam sürümü
+// Kapalı bölüme dokununca: betada olmayan bölümde "yakında", önceki bölüm bitmediyse kilit cümlesi söylenir. Bölüm sadece tam sürümü
 // bekliyorsa ebeveyn kilidi açılır (ödeme ekranı her zaman kilidin arkasında; çocuk satın alamaz).
 export function kilitliBolumeDokun(sahne: Phaser.Scene, hedef: BolumId) {
   bip(220, 0.15, 'square', 0.12);
-  if (bolumKilidi(hedef) !== 'odeme') {
+  const kilit = bolumKilidi(hedef);
+  if (kilit === 'yakinda') {
+    konus(M.yakinda);
+    return;
+  }
+  if (kilit !== 'odeme') {
     konus(BOLUM_KISA[hedef].kilitli);
     return;
   }

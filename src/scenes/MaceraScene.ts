@@ -109,12 +109,13 @@ export class MaceraScene extends Phaser.Scene {
       const kap = this.add.container(nx, ny);
       if (s.tur === 'bolum') {
         const acik = bolumuAcikMi(s.id);
+        const yakinda = bolumKilidi(s.id) === 'yakinda'; // betada olmayan bölüm: kilit değil, "Yakında"
         const duraklar = BOLUMLER[s.id].duraklar;
         const bitenSayisi = duraklar.filter((d) => biten.has(d.id)).length;
         const tamam = bitenSayisi === duraklar.length;
         kap.add(this.add.circle(0, 0, 54, acik ? s.renk : 0x4b5563).setStrokeStyle(6, tamam ? RENK.sari : RENK.beyaz));
         kap.add(this.add.text(0, 2, BOLUM_KISA[s.id].simge, { fontSize: '56px' }).setOrigin(0.5).setAlpha(acik ? 1 : 0.5));
-        if (!acik) kap.add(this.add.text(30, 30, '🔒', { fontSize: '30px' }).setOrigin(0.5));
+        if (!acik && !yakinda) kap.add(this.add.text(30, 30, '🔒', { fontSize: '30px' }).setOrigin(0.5));
         const yazi = this.add.container(solda ? 80 : -80, 0);
         yazi.add(
           this.add
@@ -122,17 +123,28 @@ export class MaceraScene extends Phaser.Scene {
             .setOrigin(solda ? 0 : 1, 0.5),
         );
         yazi.add(
-          this.add
-            .text(0, 22, tamam ? `🏆 ${bitenSayisi}/${duraklar.length} tamam!` : acik ? `⭐ ${bitenSayisi}/${duraklar.length} durak` : bolumKilidi(s.id) === 'odeme' ? '🔒 Tam sürümde' : `🔒 ${BOLUM_KISA[BOLUMLER[s.id].onceki!].kisa} bitince açılır`, {
-              fontFamily: YAZI_TIPI,
-              fontSize: '26px',
-              color: tamam ? '#FFC93C' : '#cfe3ff',
-            })
-            .setOrigin(solda ? 0 : 1, 0.5),
+          yakinda
+            ? this.add
+                .text(0, 22, 'Yakında', { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '22px', color: '#14213D', backgroundColor: '#9fb6d9', padding: { x: 12, y: 2 } })
+                .setOrigin(solda ? 0 : 1, 0.5)
+            : this.add
+                .text(0, 22, tamam ? `🏆 ${bitenSayisi}/${duraklar.length} tamam!` : acik ? `⭐ ${bitenSayisi}/${duraklar.length} durak` : bolumKilidi(s.id) === 'odeme' ? '🔒 Tam sürümde' : `🔒 ${BOLUM_KISA[BOLUMLER[s.id].onceki!].kisa} bitince açılır`, {
+                  fontFamily: YAZI_TIPI,
+                  fontSize: '26px',
+                  color: tamam ? '#FFC93C' : '#cfe3ff',
+                })
+                .setOrigin(solda ? 0 : 1, 0.5),
         );
         kap.add(yazi);
         kap.setSize(120, 120).setInteractive({ useHandCursor: true });
         kap.on('pointerdown', () => {
+          if (yakinda) {
+            bip(500, 0.1, 'triangle', 0.15);
+            this.tweens.add({ targets: kap, angle: { from: -6, to: 6 }, duration: 80, yoyo: true, repeat: 2, onComplete: () => kap.setAngle(0) });
+            konus(M.yakinda);
+            zipzip.ifadeSec('dusunen', 2200);
+            return;
+          }
           if (!acik) {
             this.tweens.add({ targets: kap, x: nx + 8, duration: 50, yoyo: true, repeat: 3 });
             kilitliBolumeDokun(this, s.id);
