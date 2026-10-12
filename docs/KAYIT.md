@@ -31,6 +31,8 @@ Onay verilmemiş, ertelenmiş ya da reddedilmiş öneriler de buraya yazılır; 
 | K17 | ⏳ Başarısızlık politikası | Kamera görmezse ne olur, kaç denemede Zıpzıp yardım eder? Öneri: sadece olumlu geri bildirim, bekleyen engel | Çocuğun "yapamıyorum" hissetmemesi | 12 Ekim (analiz) |
 | K18 | ⏳ Beta hangi mekanikle? | Öneri: Kasım betası bugünkü mekanikle; yeni mekanik (her tekrarın dünyada sonucu, tek hareketle gerçek tepki prototipi) beta sırasında | Takvim | 12 Ekim (analiz) |
 | K19 | ⏳ Oynanış yol haritası | A1-A4 (mevcut sistem) ve B1-B6 (yeni mekanik), ayrıntı OYNANIS_ANALIZI.md bölüm 8 | Hangi sırayla başlanacak | 12 Ekim (analiz) |
+| K20 | ✅ Zıplama prototipi kararları | **12 Ekim:** D1 kamera denemesinde ("Zıpzıp da zıplasın") · D2 kamerasızda ritim + dokunma · D3 inişte + en az 400 ms ara · D4 kamera denemesinde ebeveynin gördüğü ölçüm satırı (kaydetmez). Plan: `docs/rapor-2026-10-12/ZIPLAMA_PROTOTIPI_PLANI.md` | Sıradaki geliştirme | 12 Ekim |
+| K21 | ✅ Birleştirme onayı | **12 Ekim:** testi yeşil, küçük, geri alınabilir PR'ları Claude birleştirir (kalıcı onay). Oynanışı/kapsamı ciddi değiştiren, yayın/dağıtım, force push, geniş silme, GitHub güvenlik/erişim ayarı, para harcama, çocuk verisini saklama/gönderme için tek tek açık onay | Çalışma kuralı | 12 Ekim |
 
 ## 2. Kullanıcıda bekleyenler
 
@@ -38,6 +40,7 @@ Onay verilmemiş, ertelenmiş ya da reddedilmiş öneriler de buraya yazılır; 
 |---|---|---|
 | U1 | 👤 GitHub'da `v0.9.0` etiketi/release (hedef **fe37906**) | Bulut oturumu oluşturamıyor (403). Adımlar 12 Ekim sohbetinde |
 | U2 | 👤 GitHub'da main koruması (kural seti: PR zorunlu, `test` kontrolü yeşil ve güncel, bypass listesi boş, silme/force push yasak) | Bulut oturumu oluşturamıyor (403). Kurulunca Claude doğrular |
+| U7 | 👤 Mac'e ertelenebilir: `v0.9.0` etiketi ve main koruması (U1-U2), iPhone mağaza paketi | Kullanıcı şu an sadece iPhone kullanıyor (Claude ve GitHub uygulamaları); terminal yok. GitHub uygulamasında bu ayarlar yok (bildiğim kadarıyla); Safari masaüstü görünümüyle yapılabilir |
 | U3 | 👤 İnternetsiz APK'yı telefonda denemek | Sonuç gelince Android INTERNET izni kaldırılır (sonuç gelmeden kaldırılmaz) |
 | U4 | 👤 Yağız testi (+ mümkünse 4-5 ve 8-9 yaştan birer çocuk) | docs/yagiz-testi.md |
 | U5 | 👤 Play geliştirici hesabı, sonra Apple | docs/beta-hazir-mi.md |
@@ -73,5 +76,7 @@ Onay verilmemiş, ertelenmiş ya da reddedilmiş öneriler de buraya yazılır; 
 **Kararlar (kullanıcı):** PR'ları Claude birleştirir ama sadece `test` yeşil ve okunmuşken; oyun değişikliklerine birlikte karar; çalışan sürüm etiketi + main koruması + kural CLAUDE.md'ye (etiket ve koruma kullanıcıda, U1-U2); her oturumda her şey kayda geçer (bu dosya).
 
 **Sonradan (aynı gün):** #99 sertifika kaydet/paylaş ebeveyn kilidinin arkasına alındı (vazgeçince aynı bölüme dönülür; test). Oynanış analizi (ChatGPT talimatıyla, salt-okunur): bugünkü oyun "izle-yap-say"; kamera Zıpzıp'ı ya da dünyayı etkilemiyor, sadece sayıyor; 38 animasyon ≈ 20-22 gerçek desen; kararlar K13-K19. Kullanıcıya "kod yazmıyorum" sözü yanlış anlaşıldı: sadece o inceleme görevi içindi; kodu Claude yazmaya devam eder.
+
+**Daha sonra (aynı gün):** #100 kayıt + oynanış analizi, #101 hareket kataloğu güncel (Sakin/oturarak/beta, uzmana 6 soru). Kullanıcı ChatGPT ile iş bölümü ve "ana talimat" verdi (önce çalışan oyunu koru; tek hareketin güvenilir algılanması → Zıpzıp tepkisi → dünyada sonuç; onay sınırları K21). Zıplama prototipi teknik planı (PDF kullanıcıya verildi) ve kararlar K20. Yağız ile telefondan test yapılacak (sonuçlar bekleniyor).
 
 **Teslim edilenler:** ChatGPT rapor paketi; oynanış analizi PDF'i (`docs/rapor-2026-10-12/OYNANIS_ANALIZI.pdf`); (zip, PDF özet, 6 belge, 30 ekran görüntüsü) → depoda `docs/rapor-2026-10-12/` (tek tek ekran görüntüleri hariç).

@@ -11,6 +11,7 @@
 | `YOL_HARITASI.md` | 4 öncelik grubunda işler: durum, yapılacak, bağımlılık, tamamlanma ölçütü |
 | `IS_AKISI.md` | Dal/PR iş akışı, çalışan sürümü koruma, geri alma |
 | `OYNANIS_ANALIZI.md` / `.pdf` | Oynanış vizyonu analizi: kamera, hareket envanteri, görev türleri, üç dünya, ücretli değer, yol haritası (aynı gün, sonradan) |
+| `ZIPLAMA_PROTOTIPI_PLANI.md` / `.pdf` | Gerçek hareket tepkisi: zıplama prototipinin teknik planı ve kararları (D1-D4) |
 | `ekran-kolaji.jpg` | 30 ekran görüntüsü tek sayfada (tek tek dosyalar ChatGPT paketindeydi, depoya konmadı) |
 | `OZET.pdf` | Okunabilir 3-4 sayfalık özet |
 
