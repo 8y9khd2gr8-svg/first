@@ -52,8 +52,23 @@ export class EbeveynKameraScene extends Phaser.Scene {
     tuval.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:contain;';
     this.add.dom(x, 395, kutu);
 
-    const durum = this.add.text(x, 600, '', { fontFamily: YAZI_TIPI, fontSize: '30px', color: '#cfe3ff' }).setOrigin(0.5);
-    const sayi = this.add.text(x, 670, '', { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '72px', color: '#ffffff' }).setOrigin(0.5);
+    const durum = this.add.text(x, 595, '', { fontFamily: YAZI_TIPI, fontSize: '30px', color: '#cfe3ff' }).setOrigin(0.5);
+    const sayi = this.add.text(x, 650, '', { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '60px', color: '#ffffff' }).setOrigin(0.5);
+    // Ölçüm satırı (ebeveyn için; telefon ne kadar hızlı tanıyor?). Hiçbir şey kaydedilmez; ekran görüntüsüyle paylaşılır.
+    const olcum = this.add.text(x, 722, '', { fontFamily: YAZI_TIPI, fontSize: '22px', color: '#9fb6d9', align: 'center' }).setOrigin(0.5);
+    this.time.addEvent({
+      delay: 500,
+      loop: true,
+      callback: () => {
+        if (!this.kamera || this.kamera.durum === 'yukleniyor' || this.kamera.durum === 'hata') return;
+        const o = this.kamera.olcum;
+        const ms = (v: number) => `${Math.round(v)} ms`;
+        olcum.setText(
+          `Tanıma ${ms(o.tanimaOrtMs)} (en uzun ${ms(o.tanimaEnKotuMs)}) · ${o.saniyedeTanima.toFixed(1)} tanıma/sn\n` +
+            `Oyun ${Math.round(this.game.loop.actualFps)} kare/sn · Son sayım ${o.sonSayimMs === null ? '–' : ms(o.sonSayimMs)}`,
+        );
+      },
+    });
 
     // Kamera kendiliğinden açılmaz; ebeveyn dokununca açılır. Düğme kutunun altında: kutu (sayfa öğesi)
     // oyun tuvalinin üstünde durur, düğme kutunun içinde olsaydı görünmezdi.
@@ -82,7 +97,7 @@ export class EbeveynKameraScene extends Phaser.Scene {
     const dugmeleriCiz = () => {
       dugmeler.forEach((d) => d.destroy());
       dugmeler = YOLLAR.map(([ad, animasyon], i) =>
-        buyukDugme(this, x + ((i % 2) - 0.5) * 320, 770 + Math.floor(i / 2) * 92, animasyon === this.secili ? `✓ ${ad}` : ad, animasyon === this.secili ? RENK.turuncu : RENK.mavi, () => {
+        buyukDugme(this, x + ((i % 2) - 0.5) * 320, 790 + Math.floor(i / 2) * 92, animasyon === this.secili ? `✓ ${ad}` : ad, animasyon === this.secili ? RENK.turuncu : RENK.mavi, () => {
           this.secili = animasyon;
           this.kamera?.yolDegistir(animasyon);
           dugmeleriCiz();
@@ -92,7 +107,7 @@ export class EbeveynKameraScene extends Phaser.Scene {
     dugmeleriCiz();
 
     genisDokunma(
-      this.add.text(x, 1040, '↺ Sayıyı sıfırla', { fontFamily: YAZI_TIPI, fontSize: '32px', color: '#cfe3ff', backgroundColor: '#ffffff1f', padding: { x: 20, y: 14 } }).setOrigin(0.5),
+      this.add.text(x, 1056, '↺ Sayıyı sıfırla', { fontFamily: YAZI_TIPI, fontSize: '32px', color: '#cfe3ff', backgroundColor: '#ffffff1f', padding: { x: 20, y: 14 } }).setOrigin(0.5),
     ).on('pointerdown', () => this.kamera?.yolDegistir(this.secili));
 
     this.add

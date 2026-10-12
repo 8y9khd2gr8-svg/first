@@ -60,6 +60,10 @@ function modelYukle(): Promise<PoseLandmarker> {
 
 export type KameraDurumu = 'yukleniyor' | 'goremiyorum' | 'goruyorum' | 'hata';
 
+// Zıplama inişte sayılır; bir önceki sayılan inişten bu kadar kısa sürede gelen iniş aynı zıplamanın
+// sarsıntısı sayılır (çift tetik koruması). Çocuk saniyede en çok 2-3 kez zıplayabilir.
+export const ZIPLAMA_EN_AZ_ARA_MS = 400;
+
 // Bir hareketin tekrarlarını sayar. Eşikler vücut boyuna göre (omuz-topuk mesafesi)
 // oranlanır; böylece çocuğun kameraya uzaklığı önemli olmaz.
 export class Sayici {
@@ -69,12 +73,14 @@ export class Sayici {
   private yol: SaymaYolu | undefined;
   private kalkanDiz: number | null = null; // dizler: o an havadaki diz
   private taraf: -1 | 0 | 1 = 0; // yana adım: gövde ortanın solunda mı sağında mı
+  private sonInis = -Infinity; // zıpla: son sayılan inişin zamanı (ms)
 
   constructor(animasyon: Animasyon) {
     this.yol = SAYMA_YOLU[animasyon];
   }
 
-  besle(n: NormalizedLandmark[]) {
+  // zaman: karenin zamanı (ms); testler yapay zaman verir.
+  besle(n: NormalizedLandmark[], zaman = performance.now()) {
     const gorunur = (i: number) => (n[i]?.visibility ?? 0) > 0.5;
     const orta = (a: number, b: number) => (n[a].y + n[b].y) / 2;
     const omuz = orta(SOL_OMUZ, SAG_OMUZ);
@@ -109,7 +115,10 @@ export class Sayici {
       if (!this.yukarida && yukselme > 0.07) this.yukarida = true;
       else if (this.yukarida && yukselme < 0.025) {
         this.yukarida = false;
-        this.sayi++;
+        if (zaman - this.sonInis >= ZIPLAMA_EN_AZ_ARA_MS) {
+          this.sayi++;
+          this.sonInis = zaman;
+        }
       }
     } else if (this.yol === 'dizler') {
       // Bir diz kalçaya yaklaşınca "kalktı", yeniden aşağı inince bir tekrar (her diz ayrı sayılır).
@@ -149,9 +158,21 @@ export class Sayici {
   }
 }
 
+// Kamera denemesinde ebeveynin gördüğü ölçüm (telefon ne kadar hızlı tanıyor?). Sadece bellekte; kaydedilmez.
+export type KameraOlcumu = {
+  tanimaOrtMs: number; // son tanımaların ortalama süresi
+  tanimaEnKotuMs: number; // son tanımaların en uzunu
+  saniyedeTanima: number; // son 2 saniyede saniyede kaç kare tanındı
+  sonSayimMs: number | null; // son sayılan tekrarda: kare alındıktan sayılana kadar geçen süre
+};
+const OLCUM_PENCERESI = 30;
+
 // Hareket ekranında açılan kamera: küçük önizleme ve sayma.
 export class KameraSayaci {
   durum: KameraDurumu = 'yukleniyor';
+  private sureler: number[] = [];
+  private tanimaZamanlari: number[] = [];
+  private sonSayimMs: number | null = null;
   private video = document.createElement('video');
   private akis: MediaStream | null = null;
   private sayici: Sayici;
@@ -203,14 +224,17 @@ export class KameraSayaci {
         if (this.video.readyState >= 2 && this.video.currentTime !== sonZaman && simdi >= siradakiTanima) {
           sonZaman = this.video.currentTime;
           const sonuc = model.detectForVideo(this.video, simdi);
-          siradakiTanima = 2 * performance.now() - simdi;
+          const bitis = performance.now();
+          siradakiTanima = 2 * bitis - simdi;
+          this.olcumEkle(simdi, bitis - simdi);
           const n = sonuc.landmarks[0];
           this.noktalarGelince?.(n);
           // Tüm vücut (omuzlar ve topuklar) görünüyor mu?
           const tamGorunuyor = !!n && [SOL_OMUZ, SAG_OMUZ, SOL_TOPUK, SAG_TOPUK].every((i) => (n[i]?.visibility ?? 0) > 0.5);
           if (tamGorunuyor) {
             const once = this.sayici.sayi;
-            this.sayici.besle(n);
+            this.sayici.besle(n, simdi);
+            if (once !== this.sayici.sayi) this.sonSayimMs = performance.now() - simdi;
             if (this.durum !== 'goruyorum' || once !== this.sayici.sayi) this.bildir('goruyorum');
           } else if (this.durum !== 'goremiyorum') this.bildir('goremiyorum');
         }
@@ -220,6 +244,24 @@ export class KameraSayaci {
     } catch {
       this.bildir('hata');
     }
+  }
+
+  get olcum(): KameraOlcumu {
+    const s = this.sureler;
+    const simdi = performance.now();
+    return {
+      tanimaOrtMs: s.length ? s.reduce((a, b) => a + b, 0) / s.length : 0,
+      tanimaEnKotuMs: s.length ? Math.max(...s) : 0,
+      saniyedeTanima: this.tanimaZamanlari.filter((z) => simdi - z <= 2000).length / 2,
+      sonSayimMs: this.sonSayimMs,
+    };
+  }
+
+  private olcumEkle(zaman: number, sure: number) {
+    this.sureler.push(sure);
+    if (this.sureler.length > OLCUM_PENCERESI) this.sureler.shift();
+    this.tanimaZamanlari.push(zaman);
+    while (this.tanimaZamanlari.length && zaman - this.tanimaZamanlari[0] > 2000) this.tanimaZamanlari.shift();
   }
 
   // Kamera denemesi: başka bir hareketi saymaya baştan başlar (kamera kapanmadan).
