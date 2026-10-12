@@ -601,3 +601,62 @@ test('sayfa öğeleri (kamera kutusu, bağlantılar) oyunun düğmelerini örtme
   expect(ortulen).toEqual([]);
   expect(kayit.hatalar).toEqual([]);
 });
+
+test('sertifika: kaydet/paylaş sadece ebeveyn kilidinden sonra; vazgeçince aynı bölümün sertifikasına dönülür', async ({ page }) => {
+  await page.addInitScript(() => {
+    const soylenen: string[] = ((window as any).__soylenen = []);
+    const sahte = { speak: (s: SpeechSynthesisUtterance) => soylenen.push(s.text), cancel: () => {}, getVoices: () => [], addEventListener: () => {}, onvoiceschanged: null };
+    Object.defineProperty(window, 'speechSynthesis', { value: sahte, configurable: true });
+  });
+  const kayit = await oyunuAc(page, BETA);
+  // Sahnedeki etkin düğmelerden yazısı uyana dokunur (Phaser düğmeleri pointerdown dinler).
+  const dokun = (sahne: string, yazi: RegExp) =>
+    page.evaluate(
+      ([sahne, kaynak]) => {
+        const re = new RegExp(kaynak);
+        const s = (window as any).oyun.scene.getScene(sahne);
+        const metin = (o: any): string => (o.type === 'Text' ? o.text : (o.list ?? []).map(metin).join(' '));
+        const bul = (o: any): any => (o.input?.enabled && re.test(metin(o)) ? o : (o.list ?? []).map(bul).find(Boolean));
+        const d = s.children.list.map(bul).find(Boolean);
+        d.emit('pointerdown', { x: 0, y: 0 });
+      },
+      [sahne, yazi.source] as const,
+    );
+  const htmlDugme = () => page.evaluate(() => [...document.querySelectorAll('button')].some((b) => b.textContent?.includes('Paylaş')));
+
+  // Çocuk ekranı: paylaşım düğmesi yok, kilitli düğme var.
+  await sahneAc(page, 'Sertifika', { bolum: 'uzay' });
+  expect(await htmlDugme()).toBe(false);
+  await page.evaluate(() => ((window as any).__soylenen.length = 0));
+  await dokun('Sertifika', /🔒 Kaydet/);
+  await page.waitForFunction(() => (window as any).oyun.scene.isActive('Ebeveyn'));
+  expect(await page.evaluate(() => (window as any).__soylenen)).toContain('Sertifikanı kaydetmek için bir büyüğüne göster!');
+
+  // Yanlış cevap: aynı bölümün (Uzay) sertifikasına, kilitli hâliyle dönülür.
+  const [yanlis, dogru] = await page.evaluate(() => {
+    const s = (window as any).oyun.scene.getScene('Ebeveyn');
+    const [a, b] = s.children.list.find((o: any) => o.type === 'Text' && /×/.test(o.text)).text.match(/\d+/g).map(Number);
+    const sayilar = s.children.list.filter((o: any) => o.input?.enabled && o.list).map((o: any) => Number(o.list.find((t: any) => t.type === 'Text')?.text));
+    return [sayilar.find((n: number) => Number.isFinite(n) && n !== a * b), a * b];
+  });
+  await dokun('Ebeveyn', new RegExp(`^\\s*${yanlis}\\s*$`));
+  await page.waitForFunction(() => (window as any).oyun.scene.isActive('Sertifika'));
+  expect(await page.evaluate(() => (window as any).oyun.scene.getScene('Sertifika').bolum)).toBe('uzay');
+  expect(await htmlDugme()).toBe(false);
+
+  // Doğru cevap: aynı sertifika, kaydet/paylaş düğmesiyle.
+  await dokun('Sertifika', /🔒 Kaydet/);
+  await page.waitForFunction(() => (window as any).oyun.scene.isActive('Ebeveyn'));
+  const dogru2 = await page.evaluate(() => {
+    const s = (window as any).oyun.scene.getScene('Ebeveyn');
+    const [a, b] = s.children.list.find((o: any) => o.type === 'Text' && /×/.test(o.text)).text.match(/\d+/g).map(Number);
+    return a * b;
+  });
+  expect(dogru).toBeGreaterThan(0);
+  await dokun('Ebeveyn', new RegExp(`^\\s*${dogru2}\\s*$`));
+  await page.waitForFunction(() => (window as any).oyun.scene.isActive('Sertifika'));
+  await page.waitForTimeout(300);
+  expect(await page.evaluate(() => (window as any).oyun.scene.getScene('Sertifika').bolum)).toBe('uzay');
+  expect(await htmlDugme()).toBe(true);
+  expect(kayit.hatalar).toEqual([]);
+});

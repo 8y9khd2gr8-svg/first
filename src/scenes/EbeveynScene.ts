@@ -8,6 +8,7 @@ export class EbeveynScene extends Phaser.Scene {
   private hedef = 'PasaportAyar';
   private geri = 'Pasaport';
   private hedefVeri: object = {};
+  private geriVeri: object = {};
   private cocugaSoz?: string;
 
   constructor() {
@@ -15,10 +16,12 @@ export class EbeveynScene extends Phaser.Scene {
   }
 
   // cocugaSoz: kilide neden gelindiğini çocuğa söyleyen cümle (ör. "Bu macerayı açmak için bir büyüğüne göster!").
-  init(veri: { hedef?: string; geri?: string; hedefVeri?: object; cocugaSoz?: string }) {
+  // geriVeri: vazgeçilince dönülen ekranın verisi (ör. hangi bölümün sertifikası).
+  init(veri: { hedef?: string; geri?: string; hedefVeri?: object; geriVeri?: object; cocugaSoz?: string }) {
     this.hedef = veri.hedef ?? 'PasaportAyar';
     this.geri = veri.geri ?? 'Pasaport';
     this.hedefVeri = veri.hedefVeri ?? {};
+    this.geriVeri = veri.geriVeri ?? {};
     this.cocugaSoz = veri.cocugaSoz;
   }
 
@@ -26,7 +29,7 @@ export class EbeveynScene extends Phaser.Scene {
     sustur();
     yildizliArkaPlan(this);
     const x = this.scale.gameSize.width / 2;
-    evDugmesi(this, () => this.scene.start(this.geri, {}));
+    evDugmesi(this, () => this.scene.start(this.geri, this.geriVeri));
 
     const a = Phaser.Math.Between(3, 9);
     const b = Phaser.Math.Between(3, 9);
@@ -51,7 +54,7 @@ export class EbeveynScene extends Phaser.Scene {
         if (sayi === dogru) this.scene.start(this.hedef, this.hedefVeri);
         else {
           bip(200, 0.2, 'square', 0.15);
-          this.scene.start(this.geri, {});
+          this.scene.start(this.geri, this.geriVeri);
         }
       }, { genislik: 250, yukseklik: 150, yaziBoyu: 70 });
     });
