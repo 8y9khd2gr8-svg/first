@@ -6,14 +6,17 @@ import { M } from '../metinler';
 import { bip, konus, zaferMuzigi } from '../ses';
 import { Zipzip } from '../zipzip';
 
-// "Zıpzıp da zıplasın" (zıplama prototipi, kamera denemesinden açılır): çocuk zıplayınca Zıpzıp da bir kez
-// zıplar ve bir yıldız yanar; 10 yıldızda "Aferin!". Kaybetmek yok.
+// "Zıpzıp da zıplasın" (zıplama prototipi, kamera denemesinden açılır): Zıpzıp'ın önünde bir kütük bekler (K22: bekleyen
+// tek engel). Çocuk zıplayınca Zıpzıp da bir kez zıplar, kütük altından geçer, bir yıldız yanar ve sıradaki kütük gelip
+// yine bekler; 10 yıldızda "Aferin!". Kütük acele ettirmez, çarpmak/kaybetmek yok.
 // Kameralı yol: kamera her zıplamayı (inişte, 400 ms çift tetik korumasıyla) görünce Zıpzıp zıplar.
 // Kamerasız yol: Zıpzıp ritimle zıplar (çocuk onunla zıplar); ekrana dokunan çocuk Zıpzıp'ı hemen zıplatır.
 // Görüntü kaydedilmez, gönderilmez; sayılar özete eklenmez. Ölçüm satırı ebeveyn içindir.
 const HEDEF = 10;
 const RITIM_MS = 1300;
 const ZIPLAMA_MS = 600;
+const ZEMIN_Y = 712; // Zıpzıp'ın ayaklarının bastığı yer
+const ENGEL_X = 530; // kütüğün beklediği yer (Zıpzıp'ın önü)
 
 const DURUM_YAZISI: Record<KameraDurumu, string> = {
   yukleniyor: 'Kamera hazırlanıyor…',
@@ -28,10 +31,12 @@ export class ZiplaDenemeScene extends Phaser.Scene {
   private yildizlar: Phaser.GameObjects.Text[] = [];
   private ritim?: Phaser.Time.TimerEvent;
   private kutlaniyor = false;
+  private engel?: Phaser.GameObjects.Container;
   // Testler okur: toplam zıplama ve kaçının kameradan geldiği.
   ziplamaSayisi = 0;
   kameraZiplamasi = 0;
   yanan = 0;
+  gecilenEngel = 0;
 
   constructor() {
     super('ZiplaDeneme');
@@ -42,7 +47,8 @@ export class ZiplaDenemeScene extends Phaser.Scene {
     this.yildizlar = [];
     this.ritim = undefined;
     this.kutlaniyor = false;
-    this.ziplamaSayisi = this.kameraZiplamasi = this.yanan = 0;
+    this.engel = undefined;
+    this.ziplamaSayisi = this.kameraZiplamasi = this.yanan = this.gecilenEngel = 0;
     yildizliArkaPlan(this);
     const x = this.scale.gameSize.width / 2;
     const geri = () => this.scene.start('EbeveynKamera', {});
@@ -56,7 +62,11 @@ export class ZiplaDenemeScene extends Phaser.Scene {
       );
     }
 
+    // Zemin: kütüklerin yuvarlandığı yol.
+    this.add.rectangle(x, ZEMIN_Y + 14, 720, 28, 0x2f7d3b);
+    this.add.rectangle(x, ZEMIN_Y + 2, 720, 6, 0x4caf50);
     this.zipzip = new Zipzip(this, x, 520, 1.2);
+    this.engelGetir();
 
     // Dokunma: Zıpzıp'ın olduğu geniş alan (düğmeler hariç).
     this.add
@@ -136,6 +146,42 @@ export class ZiplaDenemeScene extends Phaser.Scene {
     });
   }
 
+  // Kütük: kahverengi gövde, sağ ucunda açık renkli yıllık halkaları.
+  private kutuk(x: number) {
+    const k = this.add.container(x, ZEMIN_Y - 30);
+    const g = this.add.graphics();
+    g.fillStyle(0x8b5a2b).fillRoundedRect(-55, -28, 110, 56, 14);
+    g.fillStyle(0x6f4520).fillRect(-40, -18, 50, 5).fillRect(-30, 6, 44, 5);
+    g.fillStyle(0xd9a066).fillEllipse(50, 0, 26, 52);
+    g.lineStyle(3, 0x8b5a2b).strokeEllipse(50, 0, 14, 30);
+    k.add(g);
+    return k;
+  }
+
+  // Sıradaki kütük sağdan gelir ve Zıpzıp'ın önünde bekler.
+  private engelGetir() {
+    const engel = this.kutuk(870);
+    this.engel = engel;
+    this.tweens.add({ targets: engel, x: ENGEL_X, duration: 500, ease: 'Quad.easeOut' });
+  }
+
+  // Zıpzıp havadayken kütük altından geçip arkada kaybolur; sonra yenisi gelir.
+  private engeliGecir() {
+    const engel = this.engel;
+    if (!engel) return;
+    this.tweens.killTweensOf(engel);
+    this.gecilenEngel++;
+    this.tweens.add({
+      targets: engel,
+      x: 190,
+      delay: ZIPLAMA_MS * 0.2,
+      duration: ZIPLAMA_MS * 0.5,
+      onComplete: () => this.tweens.add({ targets: engel, x: -150, duration: 300, onComplete: () => engel.destroy() }),
+    });
+    // Sıradaki kütük hemen yola çıkar: arka arkaya zıplamada da her zıplama bir kütük geçer.
+    this.engelGetir();
+  }
+
   private ritmiDurdur() {
     this.ritim?.remove();
     this.ritim = undefined;
@@ -149,6 +195,7 @@ export class ZiplaDenemeScene extends Phaser.Scene {
     if (!kameradan && this.ritim) this.ritim.reset({ delay: RITIM_MS, loop: true, callback: () => this.zipla(false) });
     this.zipzip.durdur();
     this.zipzip.birKez('zipla', ZIPLAMA_MS);
+    this.engeliGecir();
     const yildiz = this.yildizlar[this.yanan++];
     yildiz.setText('★').setColor('#FFC93C');
     if (!hareketiAzalt()) this.tweens.add({ targets: yildiz, scale: { from: 1.6, to: 1 }, duration: 300, ease: 'Back.easeOut' });
