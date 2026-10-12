@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { RENK, YAZI_TIPI } from '../ayarlar';
+import { RENK, YAZI_TIPI, hareketiAzalt } from '../ayarlar';
 import { buyukDugme, rozetCiz, yildizliArkaPlan, durakSimgesi, genisDokunma } from '../arayuz';
 import { kazanilanlar, ROZETLER } from '../rozetler';
 import { BOLUM_SIRASI, BOLUMLER, BolumId, TUM_DURAKLAR, bolumuAcikMi } from '../duraklar';
@@ -62,6 +62,10 @@ export class PasaportScene extends Phaser.Scene {
       const ipucu = this.add.text(191, 512, 'Karakterini seç!', { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '26px', color: '#C2410C' }).setOrigin(0.5);
       sayfa.add(ipucu);
       this.tweens.add({ targets: ipucu, scale: 1.12, duration: 500, yoyo: true, repeat: -1 });
+      // Okuma bilmeyen çocuk için: çerçeveyi gösteren el (hareketi azalt'ta durur).
+      const el = this.add.text(274, 452, '👆', { fontSize: '52px' }).setOrigin(0.5).setAngle(-25);
+      sayfa.add(el);
+      if (!hareketiAzalt()) this.tweens.add({ targets: el, x: 264, y: 440, duration: 500, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
     }
     // Fotoğraf yoksa çocuk çerçeveye dokunup karakterini seçer.
     if (!pasaport.foto) {
