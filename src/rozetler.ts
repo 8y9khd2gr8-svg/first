@@ -75,7 +75,7 @@ const KUTLANAN_ANAHTAR = 'zipzip-rozetler-v1';
 function kutlananlar(): Set<string> {
   try {
     const k = JSON.parse(localStorage.getItem(KUTLANAN_ANAHTAR) ?? '[]');
-    return new Set(Array.isArray(k) ? k : []);
+    return new Set(Array.isArray(k) ? k.filter((r): r is string => typeof r === 'string') : []);
   } catch {
     return new Set();
   }

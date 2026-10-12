@@ -527,6 +527,21 @@ test('durumlar sadece renkle anlatılmaz: biten durakta yıldız, kapalı durakt
   expect(kayit.hatalar).toEqual([]);
 });
 
+test('bozuk cihaz kaydıyla da bütün ekranlar hatasız açılır', async ({ page }) => {
+  const anahtarlar = ['zipzip-ilerleme-v1', 'zipzip-pasaport-v1', 'zipzip-oyun-ayar-v1', 'zipzip-istatistik-v1', 'zipzip-rozetler-v1', 'zipzip-kostum-v1', 'zipzip-tam-surum-v1', 'zipzip-uzaktan-v1', 'zipzip-kamera-v1'];
+  const bozuklar = ['{bozuk', 'null', '{"gunler":{"2026-10-12":{"saniye":"x","sayac":5}},"ad":5,"foto":"javascript:x","avatar":"x","secili":7,"kutlanan":"a","yas":3}'];
+  const sahneler: [string, object][] = [
+    ['Acilis', {}], ['Macera', {}], ['Harita', { giris: 'uzay' }], ['Dunya', {}], ['Durak', { durakId: 'istanbul' }], ['Odul', { durakId: 'istanbul' }],
+    ['Pasaport', {}], ['Rozet', {}], ['Kostum', {}], ['Sertifika', { bolum: 'turkiye' }], ['EbeveynMenu', {}], ['EbeveynVeri', {}], ['EbeveynAyar', {}], ['EbeveynOzet', {}],
+  ];
+  for (const deger of bozuklar) {
+    const kayit = await oyunuAc(page, { ...BETA, ...Object.fromEntries(anahtarlar.map((a) => [a, deger])) });
+    for (const [ad, veri] of sahneler) await sahneAc(page, ad, veri);
+    expect(kayit.hatalar, deger).toEqual([]);
+    page.removeAllListeners();
+  }
+});
+
 test('iPad ve yatay ekran: oyun ekranı doldurur, dokunuş doğru yere gider; yatay telefonda "dik çevir" görünür', async ({ page }) => {
   for (const [w, h] of [[820, 1180], [1032, 1376], [1376, 1032]]) {
     await page.setViewportSize({ width: w, height: h });

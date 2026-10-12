@@ -9,10 +9,24 @@ const ANAHTAR = 'zipzip-istatistik-v1';
 type Gun = { saniye: number; hareket: number; ziplama: number; sayac?: Record<string, number>; kameraAcik?: number; kameraGordu?: number };
 type Kayit = { gunler: Record<string, Gun>; ilkGun?: string };
 
+const sayi = (n: unknown): n is number => typeof n === 'number' && Number.isFinite(n) && n >= 0;
+const sayiYa0 = (n: unknown) => (sayi(n) ? n : 0);
+
 function oku(): Kayit {
   try {
     const k = JSON.parse(localStorage.getItem(ANAHTAR) ?? '{}');
-    return { gunler: typeof k.gunler === 'object' && k.gunler ? k.gunler : {}, ilkGun: k.ilkGun };
+    if (typeof k !== 'object' || !k) return { gunler: {} };
+    // Bozuk gün kaydı yok sayılır, sayı olmayan alan 0 sayılır; sağlam günler kalır.
+    const gunler: Record<string, Gun> = {};
+    if (typeof k.gunler === 'object' && k.gunler && !Array.isArray(k.gunler)) {
+      for (const [gun, g] of Object.entries<any>(k.gunler)) {
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(gun) || typeof g !== 'object' || !g) continue;
+        const sayac: Record<string, number> = {};
+        if (typeof g.sayac === 'object' && g.sayac) for (const [a, n] of Object.entries(g.sayac)) if (sayi(n)) sayac[a] = n;
+        gunler[gun] = { saniye: sayiYa0(g.saniye), hareket: sayiYa0(g.hareket), ziplama: sayiYa0(g.ziplama), sayac, kameraAcik: sayiYa0(g.kameraAcik), kameraGordu: sayiYa0(g.kameraGordu) };
+      }
+    }
+    return { gunler, ilkGun: typeof k.ilkGun === 'string' ? k.ilkGun : undefined };
   } catch {
     return { gunler: {} };
   }
