@@ -148,6 +148,8 @@ Teknoloji: Phaser 3 + TypeScript + Vite, GitHub Pages ile yayın. İleride Capac
   (beyaz yazı okunsun diye); açık kâğıt üstünde turuncu yazı #C2410C.
 - Renk körlüğü: durum sadece renkle anlatılmaz (biten durakta altın yıldız arayuz.bittiYildizi, kapalıda 🔒, kazanılmamış rozette "?";
   `npm run test:oyun` denetler). Biten sarı / sıradaki turuncu renkleri şimdilik kalır, çizer gelince birlikte bakılır (Ekim 2026 kararı).
+- Ekran: oyun 720×1280 dik tuvali ekrana sığdırır. Telefon dik kilitli; yatay telefonda/basık pencerede index.html "📱 Telefonu dik
+  çevir" gösterir. iPad yatayda oyun ortada, yanlar boş: betada böyle kalır, iPad'li ailelerin görüşüne bakılır (Ekim 2026 kararı).
 - "Uzaktan oyna" (durak girişinde): açıksa "Yaptım!" beklemeden 3 sn sonra geçer (zipzip-uzaktan-v1).
 - Kamera isteğe bağlı kalır (izin velileri tedirgin eder); Ailece'de kamera kapalı (iki kişi güvenilir sayılmaz).
   Kameranın saydığı hareketler src/kamera.ts SAYMA_YOLU'nda (13 hareket, 6 sayma yolu: kollar, çömel, zıpla, dizler,
