@@ -15,15 +15,22 @@ Onay verilmemiş, ertelenmiş ya da reddedilmiş öneriler de buraya yazılır; 
 | K1 | ⏳ Beta kapsamı | Betada hangi bölümler açık olsun? Öneri: Türkiye + Dünya + Ailece (14 durak), diğerleri "Yakında". Seçenekler: dalgalı / hepsi açık / sadece Türkiye | Ses kaydı ve uzman kontrolü 14 durağa odaklanır | 12 Ekim (soru cevapsız kaldı) |
 | K2 | ✅ Sertifikadaki "Kaydet / Paylaş" çocuk ekranında kilitsizdi | **Yapıldı (#99, 12 Ekim):** çocuk "🔒 Kaydet / Paylaş"a dokununca ebeveyn kilidi; doğru cevapla aynı sertifika paylaşılabilir. 🔎 Mağaza kural metni yine de mağaza başvurusunda kontrol edilecek | | 12 Ekim |
 | K3 | ⏳ Ebeveyn köşesine giriş | Şu an sadece Pasaport → ✏️ (güvenlik notunda yazıyor, #97). Ayrı kilitli bir "Ebeveyn" düğmesi gerekir mi? | Ebeveynin ayarları (Sakin tempo, ses denemesi) bulması | 12 Ekim |
-| K4 | ⏳ Hareketlerin uzman kontrolü | Beta duraklarının hareket listesi çıkarılıp fizyoterapist/çocuk doktoruna gösterilsin | 🔎 Hiçbir hareketi uzman görmedi; sayı/süre yaşa uygun mu bilinmiyor (sağlık konusunda varsayım yok) | 12 Ekim (fizyoterapist fikri daha önce ertelenmişti) |
+| K4 | ⏳ Hareketlerin uzman kontrolü | Fizyoterapist/çocuk hekimi her hareketi görsün. **Düzeltme:** resimli, işaretlenebilir katalog zaten var (`docs/hareket-katalogu.html`, #20 döneminden) ama 79 hareketin 7'si eskimişti; güncelleme ve Sakin/oturarak/beta bilgisi ekleme işi sürüyor | 🔎 Hiçbir hareketi uzman görmedi (sağlık konusunda varsayım yok) | 12 Ekim |
 | K5 | ⏳ 4-5 yaş komutları | Çok adımlı komutlar ("Kollarını kaldır, bir yana eğil, sonra öbür yana! Üç kere!") kısaltılsın mı? Sağ/sol ayna sorunu (Zıpzıp çocuğa dönük) nasıl olsun? | 🔎 Gözlem yok, tahmin | 12 Ekim |
 | K6 | ⏳ 8-9 yaş ilgisi | Kaybettirmeyen zorluk ("kendi rekorun", daha hızlı tempo) konuşulsun mu? Ya da hedef yaş 4-8'e daralsın mı? | Görsel dil küçük kardeş oyunu gibi görünebilir | 12 Ekim |
 | K7 | ⏳ Yayın onayı | GitHub Pages yayınına "onay gerekli" eklemek (her yayın kullanıcı onayıyla). Öneri: şimdilik gerek yok, main koruması yeterli | Yanlışlıkla yayın riski | 12 Ekim |
 | K8 | ⏳ Eski dallar | GitHub'da ~100 eski dal var (çoğu birleşmiş) | Temizlik; tek tek kontrol edilmeden silinmez | 12 Ekim |
 | K9 | ⏳ IS_AKISI'nın depoya ayrı belge olarak girmesi | Şimdilik `docs/rapor-2026-10-12/IS_AKISI.md` içinde ve CLAUDE.md'de özet | — | 12 Ekim |
 | K10 | ⏳ Performans (çok yavaş telefon) | Uzay haritası ve kamera denemesi ekranı ölçümde sınıra yakın; gerekirse sabit çizimleri resme çevirmek | 🔎 Gerçek telefonda ölçülmedi | 12 Ekim |
-| K11 | ⏳ ChatGPT değerlendirmesi | Rapor paketi ChatGPT'ye verildi; önerileri gelince buraya maddelenecek | — | 12 Ekim |
+| K11 | ⏳ ChatGPT değerlendirmesi | Rapor paketi ve oynanış analizi (`docs/rapor-2026-10-12/OYNANIS_ANALIZI.md/.pdf`) ChatGPT'ye verildi; önerileri gelince buraya maddelenecek | — | 12 Ekim |
 | K12 | ⏳ Görseller | Kullanıcı görsel gönderecek; güçlü/zayıf yönleri değerlendirilecek | — | 12 Ekim |
+| K13 | ✅ Kameranın rolü | **Karar (12 Ekim):** isteğe bağlı kalır, macerada "önerilen". Kamerasız da tam oynanır; kamera açıkken dünya gerçek tepki verir; her yeni mekanik iki yoldan (kameralı/kamerasız) tasarlanır | Bütün oynanış kararları buna bağlı | 12 Ekim |
+| K14 | ⏳ Kamerasız oynanışta engeli ne geçirir? | "Yaptım!" mı, saat mi, dokunma mı? | K13'ün sonucu; macera mekaniği bunu bekliyor | 12 Ekim (analiz) |
+| K15 | ⏳ Çekirdek fiil seti | Macera için 6-8 temel hareket (öneri: zıpla, çömel, kollar yukarı, dizler, yana adım, aç-kapa; hepsi kamerayla sayılabilir). Kullanıcı notu: amaç 40-50 hareketi yaptırmak değil | Macera bu fiillerle kurulur | 12 Ekim (analiz) |
+| K16 | ⏳ Ücretsiz bölüm | Türkiye Turu öğretici olarak mı kalır, yerine "Keşif Ormanı" mı gelir? | Marka (Zıpzıp Türkiye merkezli), sertifika, mağaza metinleri | 12 Ekim (analiz) |
+| K17 | ⏳ Başarısızlık politikası | Kamera görmezse ne olur, kaç denemede Zıpzıp yardım eder? Öneri: sadece olumlu geri bildirim, bekleyen engel | Çocuğun "yapamıyorum" hissetmemesi | 12 Ekim (analiz) |
+| K18 | ⏳ Beta hangi mekanikle? | Öneri: Kasım betası bugünkü mekanikle; yeni mekanik (her tekrarın dünyada sonucu, tek hareketle gerçek tepki prototipi) beta sırasında | Takvim | 12 Ekim (analiz) |
+| K19 | ⏳ Oynanış yol haritası | A1-A4 (mevcut sistem) ve B1-B6 (yeni mekanik), ayrıntı OYNANIS_ANALIZI.md bölüm 8 | Hangi sırayla başlanacak | 12 Ekim (analiz) |
 
 ## 2. Kullanıcıda bekleyenler
 
@@ -65,4 +72,6 @@ Onay verilmemiş, ertelenmiş ya da reddedilmiş öneriler de buraya yazılır; 
 
 **Kararlar (kullanıcı):** PR'ları Claude birleştirir ama sadece `test` yeşil ve okunmuşken; oyun değişikliklerine birlikte karar; çalışan sürüm etiketi + main koruması + kural CLAUDE.md'ye (etiket ve koruma kullanıcıda, U1-U2); her oturumda her şey kayda geçer (bu dosya).
 
-**Teslim edilenler:** ChatGPT rapor paketi (zip, PDF özet, 6 belge, 30 ekran görüntüsü) → depoda `docs/rapor-2026-10-12/` (tek tek ekran görüntüleri hariç).
+**Sonradan (aynı gün):** #99 sertifika kaydet/paylaş ebeveyn kilidinin arkasına alındı (vazgeçince aynı bölüme dönülür; test). Oynanış analizi (ChatGPT talimatıyla, salt-okunur): bugünkü oyun "izle-yap-say"; kamera Zıpzıp'ı ya da dünyayı etkilemiyor, sadece sayıyor; 38 animasyon ≈ 20-22 gerçek desen; kararlar K13-K19. Kullanıcıya "kod yazmıyorum" sözü yanlış anlaşıldı: sadece o inceleme görevi içindi; kodu Claude yazmaya devam eder.
+
+**Teslim edilenler:** ChatGPT rapor paketi; oynanış analizi PDF'i (`docs/rapor-2026-10-12/OYNANIS_ANALIZI.pdf`); (zip, PDF özet, 6 belge, 30 ekran görüntüsü) → depoda `docs/rapor-2026-10-12/` (tek tek ekran görüntüleri hariç).
