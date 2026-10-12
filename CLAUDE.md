@@ -58,6 +58,8 @@ Teknoloji: Phaser 3 + TypeScript + Vite, GitHub Pages ile yayın. İleride Capac
 - Hareketler futbol takımının fizyoterapistlerine danışılacak (hareket kataloğu sayfası; ertelendi).
 - Test: ücretli yapay zekâ test hizmeti (Nunu.ai gibi) şimdilik yok; Play ön lansman raporu (ücretsiz, gerçek telefonlarda
   çökme/ekran görüntüsü) + kendi otomatik testlerimiz + Yağız testi. Beta sonrası gerekirse yeniden bakılır.
+- Ebeveyn köşesine giriş (K3, 12 Ekim): Büyük Macera'nın sağ altındaki küçük "🔒 Ebeveyn" ya da Pasaport → ✏️ (ikisi de kilitli);
+  ev düğmesi gelinen yere döner.
 - Ebeveyn köşesi (kilitli): haftalık hareket özeti (bütün bölümlerdeki durak ilerlemesiyle) + paylaş, pasaport düzenleme. Özet dürüst:
   sayılar çocuğun "Yaptım!" dediği hareketler; oyun gerçekten yapıldığını algılayamaz. Kamera açıkken yapılan hareketlerden
   kaçını kameranın gördüğü ayrıca yazılır (zipzip-istatistik-v1: kameraAcik / kameraGordu). Kamera ile
@@ -111,7 +113,7 @@ Teknoloji: Phaser 3 + TypeScript + Vite, GitHub Pages ile yayın. İleride Capac
 - Her yeni özellik/bölümde sorulur: 4-5, 6-7, 8-9 yaş ve hareket kısıtı olan çocuk için nasıl? (Yaşa göre tempo ve
   oturarak oyna bu soru sorulmadığı için geç geldi; ChatGPT değerlendirmesi, Ekim 2026.) Ebeveyn köşesi → ⚙️ Ayarlar:
   "Hareket temposu" 🐢 Sakin (daha az tekrar, %25 yavaş, süreli hareket kısa; 4-5 yaş/yeni başlayan için önerilir) /
-  🐇 Normal (varsayılan); yaş etiketi kullanılmaz (çocuğu damgalamasın). Ve "oturarak oyna"
+  🐇 Normal (varsayılan); Sakin tempoda çok adımlı komut kısa ve tek eylemli olur (src/uyarla.ts KISA_KOMUT; tahmin, 4-5 yaşla denenecek); yaş etiketi kullanılmaz (çocuğu damgalamasın). Ve "oturarak oyna"
   (ayakta yapılan hareketler kol/gövde hareketine döner, donma oyununda kollarla dans; test her durağı denetler); src/uyarla.ts, kayıt zipzip-oyun-ayar-v1. Ailece etkilenmez.
 - Cinsiyet sorulmaz (veri azaltma, kalıp yargı). "Herkes kendini bulsun" ihtiyacı cinsiyetle
   değil, çocuğun seçtiği ilgi alanıyla karşılanır (ör. Spor Kampı'nda sporunu seçer).

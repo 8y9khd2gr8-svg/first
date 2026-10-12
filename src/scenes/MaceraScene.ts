@@ -71,6 +71,16 @@ export class MaceraScene extends Phaser.Scene {
       sustur();
       this.scene.start('Hareket', { durakId: AILE_ID, adim: 0 });
     });
+    // Ebeveyn köşesi (K3): küçük ve sakin; dokununca önce ebeveyn kilidi (çarpma sorusu).
+    const ebeveyn = this.add.container(640, 1180);
+    ebeveyn.add(this.add.circle(0, 0, 40, 0xffffff, 0.12).setStrokeStyle(3, RENK.beyaz, 0.5));
+    ebeveyn.add(this.add.text(0, 0, '🔒', { fontSize: '34px' }).setOrigin(0.5));
+    ebeveyn.add(this.add.text(0, 58, 'Ebeveyn', { fontFamily: YAZI_TIPI, fontSize: '24px', color: '#cfe3ff' }).setOrigin(0.5));
+    ebeveyn.setSize(110, 110).setInteractive({ useHandCursor: true });
+    ebeveyn.on('pointerdown', () => {
+      sustur();
+      this.scene.start('Ebeveyn', { hedef: 'EbeveynMenu', geri: 'Macera', hedefVeri: { geri: 'Macera' } });
+    });
     this.add
       .text(x, 85, 'Büyük Macera', { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '58px', color: '#FFC93C', stroke: '#0b1430', strokeThickness: 12 })
       .setOrigin(0.5);

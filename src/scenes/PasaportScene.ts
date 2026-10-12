@@ -194,7 +194,7 @@ export class PasaportScene extends Phaser.Scene {
     ayar.setSize(88, 88).setInteractive({ useHandCursor: true });
     ayar.on('pointerdown', () => {
       bip(500, 0.08);
-      this.scene.start('Ebeveyn', { hedef: 'EbeveynMenu', geri: 'Pasaport' });
+      this.scene.start('Ebeveyn', { hedef: 'EbeveynMenu', geri: 'Pasaport', hedefVeri: { geri: 'Pasaport' } });
     });
 
     if (!pasaport.ad) {

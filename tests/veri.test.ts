@@ -206,6 +206,27 @@ test('ebeveyn ayarları: oturarak listede ayakta hareket yok, aynı durakta tekr
   assert.ok(oturumKur(TUM_DURAKLAR[0]).length >= 5);
 });
 
+test('Sakin tempoda kısa komut: çok adımlı komut tek eyleme iner, listedeki her komut oyunda var', async () => {
+  const { uyarla, KISA_KOMUT } = await import('../src/uyarla');
+  const hepsi = [...TUM_DURAKLAR.flatMap((d) => [d.ozel, ...d.ekler]), ...ISINMALAR, ...SOGUMALAR];
+  const yazilar = new Set(hepsi.map((h) => h.baslik.replace(/\n/g, ' ')));
+  for (const [uzun, kisa] of Object.entries(KISA_KOMUT)) {
+    assert.ok(yazilar.has(uzun), `kısa komut listesinde oyunda olmayan komut: ${uzun}`);
+    const duz = kisa.replace(/\n/g, ' ');
+    assert.ok(duz.split(' ').length <= 5 && !/sonra/.test(duz), `kısa komut uzun: ${duz}`);
+  }
+  for (const h of hepsi) {
+    const [k] = uyarla([h], { yas: 'kucuk', oturarak: false });
+    const kisa = KISA_KOMUT[h.baslik.replace(/\n/g, ' ')];
+    if (kisa && !h.dizi) {
+      assert.equal(k.baslik, kisa);
+      assert.ok(k.sesli.includes(kisa.replace(/\n/g, ' ')) && (!h.hikaye || k.sesli.startsWith(h.hikaye)), k.sesli);
+    }
+    // Normal tempoda komut değişmez.
+    assert.equal(uyarla([h], { yas: 'buyuk', oturarak: false })[0].baslik, h.baslik);
+  }
+});
+
 test('oturarak oyna: her durağın her hareketi (ısınma, sürpriz, soğuma dahil) oturarak yapılabilir; Sakin tempo kısaltır', async () => {
   const { uyarla } = await import('../src/uyarla');
   // Oturarak hâlde Zıpzıp'ın yapabileceği hareketler sadece OTURARAK listesindekiler (kol/gövde).
