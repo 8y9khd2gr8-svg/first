@@ -213,7 +213,12 @@ Teknoloji: Phaser 3 + TypeScript + Vite, GitHub Pages ile yayın. İleride Capac
   başta), sonra AskUserQuestion ile en güçlü 4'ünü sun (önerilen ilk sırada, "(Önerilen)"
   etiketiyle); kullanıcı yazmadan seçebilsin. Her zaman en iyisi için kafa yor.
 - Her aşama küçük ve telefonda test edilebilir olsun; sonunda Yağız (6 yaş) test eder.
-- Değişiklikler PR olarak açılır; testleri geçince PR'ı Claude birleştirir (kullanıcı onayladı).
+- Değişiklikler PR olarak açılır; testleri geçince PR'ı Claude birleştirir (kullanıcı onayladı). Ama GitHub'daki `test`
+  kontrolü (iş akışı "Testler") PR'ın son hâlinde yeşil olmadan ve sonucu okunmadan birleştirilmez; kırmızıysa önce
+  düzeltilir (12 Ekim: #94 kırmızıyken birleşti, ders). Oyunda neyin değişeceğine kullanıcıyla birlikte karar verilir.
+- Çalışan sürüm etiketlenir (ilk: `v0.9.0` = fe37906, 12 Ekim). main'e giren her şey test sitesinde (GitHub Pages)
+  hemen yayınlanır. Geri alma: PR'daki Revert düğmesi → geri alma PR'ı → test yeşil → birleştir; geçmiş yeniden
+  yazılmaz (force push yok). Bulut oturumu etiket, release ve dal koruması oluşturamaz; bunları kullanıcı GitHub'dan yapar.
 - Kodda isimler ve yorumlar Türkçe.
 - Kota: plan yükseltilmeden tasarruflu çalışılır (yarıyıl öncesi belki yükseltilir). Uzun sohbet
   yerine iş listesi bitince yeni sohbet; istekler toplu; uygun olunca sabah otomatik başlangıç.
