@@ -17,8 +17,15 @@ export const AVATARLAR: { simge: string; ad: string }[] = [
 
 export function pasaportOku(): Pasaport {
   try {
-    const kayit = JSON.parse(localStorage.getItem(ANAHTAR) ?? '{}');
-    return { ad: typeof kayit.ad === 'string' ? kayit.ad : '', foto: kayit.foto, avatar: kayit.avatar, soruldu: !!kayit.soruldu };
+    const k = JSON.parse(localStorage.getItem(ANAHTAR) ?? '{}');
+    const kayit = typeof k === 'object' && k ? k : {};
+    // Bozuk alan yok sayılır: fotoğraf sadece resim verisiyse, karakter sadece listedekiyse kullanılır.
+    return {
+      ad: typeof kayit.ad === 'string' ? kayit.ad.slice(0, 40) : '',
+      foto: typeof kayit.foto === 'string' && kayit.foto.startsWith('data:image/') ? kayit.foto : undefined,
+      avatar: AVATARLAR.some((a) => a.simge === kayit.avatar) ? kayit.avatar : undefined,
+      soruldu: kayit.soruldu === true,
+    };
   } catch {
     return { ad: '' };
   }
