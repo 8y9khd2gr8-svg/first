@@ -90,7 +90,7 @@ export class EbeveynMenuScene extends Phaser.Scene {
     const geri = this.add.dom(x, 1115, 'div', 'width:640px;text-align:center;', '');
     (geri.node as HTMLDivElement).innerHTML = ILETISIM_EPOSTA
       ? `<a href="${geriBildirimAdresi()}" style="${BAGLANTI_STILI}">✉️ Geri bildirim yaz</a>`
-      : `<span style="font: 400 26px 'Baloo 2', Arial, sans-serif; color: #cfe3ff;">✉️ Görüşlerinizi beta grubuna yazabilirsiniz.</span>`;
+      : `<span style="font: 400 24px 'Baloo 2', Arial, sans-serif; color: #9fb6d9;">Görüş ve hataları beta grubumuza mesajla iletebilirsiniz.</span>`;
     geri.updateSize();
 
     // "Bilgiler sadece bu telefonda" sözü kanıtıyla: dokununca telefonda saklanan her şey listelenir.
