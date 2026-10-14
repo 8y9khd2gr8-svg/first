@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import { RENK, YAZI_TIPI, hareketiAzalt } from '../ayarlar';
 import { buyukDugme, evDugmesi, yildizliArkaPlan } from '../arayuz';
-import { KameraSayaci, kameraDesteklenir, type KameraDurumu } from '../kamera';
+import { KameraSayaci, kameraDesteklenir, kameraDurumYazisi } from '../kamera';
 import { M } from '../metinler';
 import { bip, konus, zaferMuzigi } from '../ses';
 import { Zipzip } from '../zipzip';
@@ -17,13 +17,6 @@ const RITIM_MS = 1300;
 const ZIPLAMA_MS = 600;
 const ZEMIN_Y = 712; // Zıpzıp'ın ayaklarının bastığı yer
 const ENGEL_X = 530; // kütüğün beklediği yer (Zıpzıp'ın önü)
-
-const DURUM_YAZISI: Record<KameraDurumu, string> = {
-  yukleniyor: 'Kamera hazırlanıyor…',
-  goremiyorum: '📷 Baştan ayağa görünmeli: biraz geri gidin',
-  goruyorum: '✅ Görüyorum: zıpla!',
-  hata: 'Kamera açılamadı (izin verilmedi mi?)',
-};
 
 export class ZiplaDenemeScene extends Phaser.Scene {
   private kamera: KameraSayaci | null = null;
@@ -90,9 +83,11 @@ export class ZiplaDenemeScene extends Phaser.Scene {
       onizleme.setVisible(true);
       let sonSayi = 0;
       const kamera = new KameraSayaci('zipla', (n, d) => {
-        durum.setText(DURUM_YAZISI[d]);
-        // Kamera açılamazsa kamerasız yola dönülür (oyun durmaz).
-        if (d === 'hata') ritimBaslat();
+        durum.setText(kameraDurumYazisi(d, kamera.hata, '✅ Görüyorum: zıpla!', '📷 Baştan ayağa görünmeli: biraz geri gidin'));
+        // Kamera açılamazsa ya da durursa kamerasız yola dönülür (oyun durmaz); görüntü geri gelirse ritim durur.
+        if (d === 'hata' || d === 'durdu') {
+          if (!this.ritim) ritimBaslat();
+        } else if (d !== 'yukleniyor' && this.ritim) this.ritmiDurdur();
         if (n > sonSayi) this.zipla(true);
         sonSayi = n;
       });
@@ -124,7 +119,7 @@ export class ZiplaDenemeScene extends Phaser.Scene {
       delay: 500,
       loop: true,
       callback: () => {
-        if (!this.kamera || this.kamera.durum === 'yukleniyor' || this.kamera.durum === 'hata') return;
+        if (!this.kamera || this.kamera.durum === 'yukleniyor' || this.kamera.durum === 'hata' || this.kamera.durum === 'durdu') return;
         const o = this.kamera.olcum;
         const ms = (v: number) => `${Math.round(v)} ms`;
         olcum.setText(

@@ -3,7 +3,7 @@ import type { NormalizedLandmark } from '@mediapipe/tasks-vision';
 import { RENK, YAZI_TIPI } from '../ayarlar';
 import { buyukDugme, evDugmesi, genisDokunma, yildizliArkaPlan } from '../arayuz';
 import type { Animasyon } from '../hareketler';
-import { KameraSayaci, type KameraDurumu } from '../kamera';
+import { KameraSayaci, kameraDurumYazisi } from '../kamera';
 import { bip } from '../ses';
 
 // Kamera denemesi (ebeveyn köşesi): kameranın neyi gördüğünü ve nasıl saydığını canlı gösterir.
@@ -18,13 +18,6 @@ const YOLLAR: [string, Animasyon][] = [
 const KEMIKLER: [number, number][] = [
   [11, 12], [11, 13], [13, 15], [12, 14], [14, 16], [11, 23], [12, 24], [23, 24], [23, 25], [25, 27], [24, 26], [26, 28],
 ];
-
-const DURUM_YAZISI: Record<KameraDurumu, string> = {
-  yukleniyor: 'Kamera hazırlanıyor…',
-  goremiyorum: 'Baştan ayağa görünmeli: biraz geri gidin',
-  goruyorum: '✅ Bütün vücut görünüyor',
-  hata: 'Kamera açılamadı (izin verilmedi mi?)',
-};
 
 export class EbeveynKameraScene extends Phaser.Scene {
   private kamera: KameraSayaci | null = null;
@@ -60,7 +53,7 @@ export class EbeveynKameraScene extends Phaser.Scene {
       delay: 500,
       loop: true,
       callback: () => {
-        if (!this.kamera || this.kamera.durum === 'yukleniyor' || this.kamera.durum === 'hata') return;
+        if (!this.kamera || this.kamera.durum === 'yukleniyor' || this.kamera.durum === 'hata' || this.kamera.durum === 'durdu') return;
         const o = this.kamera.olcum;
         const ms = (v: number) => `${Math.round(v)} ms`;
         olcum.setText(
@@ -78,7 +71,7 @@ export class EbeveynKameraScene extends Phaser.Scene {
       const kamera = new KameraSayaci(
         this.secili,
         (n, d) => {
-          durum.setText(DURUM_YAZISI[d]);
+          durum.setText(kameraDurumYazisi(d, kamera.hata, '✅ Bütün vücut görünüyor'));
           sayi.setText(`Sayı: ${n}`);
           if (n > sonSayi) bip(990, 0.12);
           sonSayi = n;

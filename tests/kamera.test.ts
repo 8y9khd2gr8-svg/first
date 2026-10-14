@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { test } from 'node:test';
 import type { NormalizedLandmark } from '@mediapipe/tasks-vision';
-import { BURUN, KAMERA_HAREKETLERI, ZIPLAMA_EN_AZ_ARA_MS, SAG_BILEK, SAG_DIZ, SAG_KALCA, SAG_OMUZ, SAG_TOPUK, SOL_BILEK, SOL_DIZ, SOL_KALCA, SOL_OMUZ, SOL_TOPUK, Sayici, simdVarMi } from '../src/kamera';
+import { BURUN, KAMERA_HAREKETLERI, kameraDurumYazisi, kameraHatasi, ZIPLAMA_EN_AZ_ARA_MS, SAG_BILEK, SAG_DIZ, SAG_KALCA, SAG_OMUZ, SAG_TOPUK, SOL_BILEK, SOL_DIZ, SOL_KALCA, SOL_OMUZ, SOL_TOPUK, Sayici, simdVarMi } from '../src/kamera';
 import { K } from '../src/hareketler';
 
 type Durus = { x?: number; omuzY?: number; kalcaY?: number; bilekY?: number; solDizY?: number; sagDizY?: number; ayakAciklik?: number; topukY?: number };
@@ -133,4 +133,15 @@ test('kamera zıplama: çömelip kalkmak sayılmaz, sonraki zıplamalar yine say
 test('kamera zıplama: gerçek zıplamanın havası (yarım saniye) takılma korumasına takılmaz', () => {
   // 600 ms havada (uzun bir zıplama) yine sayılır; takılma koruması ancak ZIPLAMA_EN_UZUN_HAVA_MS sonra devreye girer.
   assert.equal(say('zipla', () => [HAVADA, {}], 5, 12, 50), 5);
+});
+
+test('kamera açılamayınca nedeni ayrılır: kamera yok / izin yok / başka', () => {
+  assert.equal(kameraHatasi(new DOMException('', 'NotFoundError')), 'kameraYok');
+  assert.equal(kameraHatasi(new DOMException('', 'OverconstrainedError')), 'kameraYok');
+  assert.equal(kameraHatasi(new DOMException('', 'NotAllowedError')), 'izinYok');
+  assert.equal(kameraHatasi(new Error('model')), 'diger');
+  assert.equal(kameraHatasi(undefined), 'diger');
+  assert.match(kameraDurumYazisi('hata', 'kameraYok', ''), /bulunamadı/);
+  assert.match(kameraDurumYazisi('hata', 'izinYok', ''), /izin verilmedi/);
+  assert.match(kameraDurumYazisi('durdu', null, ''), /durdu/);
 });
