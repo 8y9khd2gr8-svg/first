@@ -607,7 +607,7 @@ test('iPad ve yatay ekran: oyun ekranı doldurur, dokunuş doğru yere gider; ya
   await expect(page.locator('#dondur')).toBeHidden();
 });
 
-test('Zıpzıp da zıplasın (kamerasız): ritimle ve dokununca zıplar, 10 yıldızda Aferin', async ({ page }) => {
+test('Zıpzıp da zıplasın (kamerasız): ritimle ve dokununca zıplar, kütüğü geçer, 10 yıldızda Aferin', async ({ page }) => {
   const kayit = await oyunuAc(page, BETA);
   await sahneAc(page, 'ZiplaDeneme');
   const durum = () => page.evaluate(() => {
@@ -624,6 +624,8 @@ test('Zıpzıp da zıplasın (kamerasız): ritimle ve dokununca zıplar, 10 yıl
   expect(sonra.toplam).toBe(once.toplam + 1);
   expect(sonra.yanan).toBe(once.yanan + 1);
   expect(sonra.kamera).toBe(0);
+  // Bekleyen engel: her zıplamada bir kütük geçilir, sıradaki kütük gelip bekler.
+  expect(await page.evaluate(() => (window as any).oyun.scene.getScene('ZiplaDeneme').gecilenEngel)).toBe(sonra.toplam);
   // 10 yıldız dolunca Aferin, sonra yıldızlar söner ve oyun sürer (kaybetmek yok).
   await saatiHizlandir(page, 8);
   await page.waitForFunction(() => (window as any).oyun.scene.getScene('ZiplaDeneme').children.list.some((c: any) => c.text === 'Aferin!'), null, { timeout: 20_000 });
