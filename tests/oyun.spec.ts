@@ -764,3 +764,68 @@ test('sertifika: kaydet/paylaş sadece ebeveyn kilidinden sonra; vazgeçince ayn
   expect(await htmlDugme()).toBe(true);
   expect(kayit.hatalar).toEqual([]);
 });
+
+// Kamera denemesi: kamera yok / izin yok ayrı yazılır; açıldıktan sonra görüntü kesilirse "Görüyorum"da kalmaz.
+// Gerçek kamera yerine sahte getUserMedia (hata ya da boyanan bir tuvalin görüntüsü).
+async function sahteKamera(page: Page, hata?: string) {
+  await page.addInitScript((hata) => {
+    (navigator.mediaDevices as any).getUserMedia = async () => {
+      if (hata) throw new DOMException('deneme', hata);
+      const t = document.createElement('canvas');
+      t.width = 160;
+      t.height = 120;
+      const c = t.getContext('2d')!;
+      let i = 0;
+      setInterval(() => { c.fillStyle = `hsl(${(i += 20) % 360},60%,50%)`; c.fillRect(0, 0, 160, 120); }, 50);
+      const akis = t.captureStream(20);
+      (window as any).sahteAkis = akis;
+      return akis;
+    };
+  }, hata);
+}
+
+async function kameraYazisi(page: Page, sahne: string, icerir: string) {
+  await page.waitForFunction(
+    ([sahne, icerir]) => (window as any).oyun.scene.getScene(sahne).children.list.some((c: any) => c.type === 'Text' && c.text.includes(icerir)),
+    [sahne, icerir] as const,
+    { timeout: 30_000 },
+  );
+}
+
+for (const [hata, yazi] of [['NotFoundError', 'kamera bulunamadı'], ['NotAllowedError', 'Kameraya izin verilmedi']]) {
+  test(`kamera denemesi: ${hata} kendi yazısıyla gösterilir`, async ({ page }) => {
+    await sahteKamera(page, hata);
+    const kayit = await oyunuAc(page, BETA);
+    await sahneAc(page, 'EbeveynKamera');
+    const r = (await page.locator('canvas').boundingBox())!;
+    await page.mouse.click(r.x + r.width / 2, r.y + (r.height * 635) / 1280); // 📷 Kamerayı aç
+    await kameraYazisi(page, 'EbeveynKamera', yazi);
+    expect(kayit.hatalar).toEqual([]);
+  });
+}
+
+test('kamera denemesi: görüntü kesilince "Kamera durdu" yazar', async ({ page }) => {
+  await sahteKamera(page);
+  const kayit = await oyunuAc(page, BETA);
+  await sahneAc(page, 'EbeveynKamera');
+  const r = (await page.locator('canvas').boundingBox())!;
+  await page.mouse.click(r.x + r.width / 2, r.y + (r.height * 635) / 1280);
+  await kameraYazisi(page, 'EbeveynKamera', 'Baştan ayağa görünmeli');
+  await page.evaluate(() => (window as any).sahteAkis.getTracks().forEach((t: MediaStreamTrack) => t.stop()));
+  await kameraYazisi(page, 'EbeveynKamera', 'Kamera durdu');
+  expect(kayit.hatalar).toEqual([]);
+});
+
+test('Zıpzıp da zıplasın: kamera durunca yazı söyler ve ritim yolu geri gelir', async ({ page }) => {
+  await sahteKamera(page);
+  const kayit = await oyunuAc(page, BETA);
+  await sahneAc(page, 'ZiplaDeneme');
+  const r = (await page.locator('canvas').boundingBox())!;
+  await page.mouse.click(r.x + r.width / 2, r.y + (r.height * 925) / 1280); // 📷 Kamerayla zıpla
+  await kameraYazisi(page, 'ZiplaDeneme', 'Baştan ayağa görünmeli');
+  expect(await page.evaluate(() => !!(window as any).oyun.scene.getScene('ZiplaDeneme').ritim)).toBe(false);
+  await page.evaluate(() => (window as any).sahteAkis.getTracks().forEach((t: MediaStreamTrack) => t.stop()));
+  await kameraYazisi(page, 'ZiplaDeneme', 'Kamera durdu');
+  expect(await page.evaluate(() => !!(window as any).oyun.scene.getScene('ZiplaDeneme').ritim)).toBe(true);
+  expect(kayit.hatalar).toEqual([]);
+});

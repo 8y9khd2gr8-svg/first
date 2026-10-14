@@ -58,7 +58,29 @@ function modelYukle(): Promise<PoseLandmarker> {
   return modelSozu;
 }
 
-export type KameraDurumu = 'yukleniyor' | 'goremiyorum' | 'goruyorum' | 'hata';
+// durdu: kamera açıldıktan sonra görüntü kesildi (ekran kilidi, uygulama değişimi, başka uygulama kamerayı aldı).
+export type KameraDurumu = 'yukleniyor' | 'goremiyorum' | 'goruyorum' | 'durdu' | 'hata';
+// Kamera açılamayınca nedeni (ebeveyn ekranları ayrı yazı gösterir): kamera yok / izin verilmedi / başka bir sorun.
+export type KameraHatasi = 'kameraYok' | 'izinYok' | 'diger';
+export const kameraHatasi = (e: unknown): KameraHatasi => {
+  const ad = (e as { name?: string } | null)?.name;
+  if (ad === 'NotFoundError' || ad === 'OverconstrainedError' || ad === 'DevicesNotFoundError') return 'kameraYok';
+  if (ad === 'NotAllowedError' || ad === 'SecurityError' || ad === 'PermissionDeniedError') return 'izinYok';
+  return 'diger';
+};
+// Ebeveyn ekranlarındaki (kamera denemesi, Zıpzıp da zıplasın) durum yazısı. Oyundaki hareket ekranı kendi kısa yazısını kullanır.
+export const kameraDurumYazisi = (d: KameraDurumu, hata: KameraHatasi | null, goruyorum: string, goremiyorum = 'Baştan ayağa görünmeli: biraz geri gidin') =>
+  d === 'yukleniyor' ? 'Kamera hazırlanıyor…'
+  : d === 'goremiyorum' ? goremiyorum
+  : d === 'goruyorum' ? goruyorum
+  : d === 'durdu' ? '⏸ Kamera durdu.\n⌂ ile çıkıp kamerayı yeniden açın.'
+  : hata === 'kameraYok' ? 'Bu cihazda kamera bulunamadı.'
+  : hata === 'izinYok' ? 'Kameraya izin verilmedi.\nTelefonun ayarlarından izin verin.'
+  : 'Kamera açılamadı.';
+// Bu kadar süre yeni kare gelmezse kamera durmuş sayılır (görüntü geri gelirse durum kendiliğinden düzelir).
+export const KAMERA_DURDU_MS = 2000;
+// Sayfa gizliyken (ekran kilidi) döngü durur; dönüşte bu kadar uzun ara görülürse bekleme baştan sayılır.
+const DONGU_ARASI_EN_COK_MS = 1000;
 
 // Zıplama inişte sayılır; bir önceki sayılan inişten bu kadar kısa sürede gelen iniş aynı zıplamanın
 // sarsıntısı sayılır (çift tetik koruması). Çocuk saniyede en çok 2-3 kez zıplayabilir.
@@ -180,6 +202,7 @@ const OLCUM_PENCERESI = 30;
 // Hareket ekranında açılan kamera: küçük önizleme ve sayma.
 export class KameraSayaci {
   durum: KameraDurumu = 'yukleniyor';
+  hata: KameraHatasi | null = null;
   private sureler: number[] = [];
   private tanimaZamanlari: number[] = [];
   private sonSayimMs: number | null = null;
@@ -224,14 +247,25 @@ export class KameraSayaci {
       this.video.srcObject = akis;
       await this.video.play();
       this.bildir('goremiyorum');
+      const izler = akis.getVideoTracks();
+      izler.forEach((t) => t.addEventListener('ended', () => !this.bitti && this.bildir('durdu')));
       let sonZaman = -1;
+      let sonKare = performance.now();
+      let sonDongu = sonKare;
       // Yavaş telefonda tanıma uzun sürer ve oyunu (sayaç, Zıpzıp) takıltır: her tanımadan sonra
       // onun sürdüğü kadar ara verilir, zamanın en çok yarısı tanımaya gider (hızlı telefonda ~30 ms: saniyede ~15 tanıma, sayma için yeter).
       let siradakiTanima = 0;
       const dongu = () => {
         if (this.bitti) return;
         const simdi = performance.now();
-        if (this.video.readyState >= 2 && this.video.currentTime !== sonZaman && simdi >= siradakiTanima) {
+        if (simdi - sonDongu > DONGU_ARASI_EN_COK_MS) sonKare = simdi; // sayfa gizliydi: kameraya geri gelme payı
+        sonDongu = simdi;
+        if (this.video.currentTime !== sonZaman) sonKare = simdi;
+        // Bitmiş ya da susturulmuş iz (iPhone kamerayı başka uygulamaya verince "mute" olur) görüntü vermez.
+        const izBitti = izler.some((t) => t.readyState === 'ended' || t.muted);
+        if (izBitti || simdi - sonKare > KAMERA_DURDU_MS) {
+          if (this.durum !== 'durdu') this.bildir('durdu');
+        } else if (this.video.readyState >= 2 && this.video.currentTime !== sonZaman && simdi >= siradakiTanima) {
           sonZaman = this.video.currentTime;
           const sonuc = model.detectForVideo(this.video, simdi);
           const bitis = performance.now();
@@ -251,7 +285,8 @@ export class KameraSayaci {
         this.kare = requestAnimationFrame(dongu);
       };
       dongu();
-    } catch {
+    } catch (e) {
+      this.hata = kameraHatasi(e);
       this.bildir('hata');
     }
   }
