@@ -1,9 +1,10 @@
 import { oyunAyari, type OyunAyari } from './oyunAyari';
-import { DONMA_OTURARAK, OTURARAK, sayiYazi, type Animasyon, type Hareket } from './hareketler';
+import { DONMA_OTURARAK, OTURARAK, SOGUMALAR, sayiYazi, type Animasyon, type Hareket } from './hareketler';
 
 // Hareket listesini ebeveynin seçtiği ayarlara uyarlar (ebeveyn köşesi → ⚙️ Ayarlar):
 //  - Oturarak oyna: ayakta yapılan hareketler oturarak yapılan kol/gövde hareketine döner (aynı durakta tekrar etmeden).
 //  - Küçük (4-5 yaş): tekrarlar daha az, ritim daha yavaş, süreli hareketler daha kısa, çok adımlı komut kısa.
+//  - Hızlı (K6, kaybettirmeyen zorluk): tekrarlar daha çok, ritim daha hızlı, süreli hareketler daha uzun.
 // Cümleler değişince yeni hâlleri de seslendirme listesindedir (metinler.ts tumMetinler → uyarlamaCumleleri).
 
 type OturarakId = keyof typeof OTURARAK;
@@ -116,14 +117,34 @@ export function kucukIcin(uzun: Hareket): Hareket {
   };
 }
 
+// Hızlı tempo: 4+ tekrar yaklaşık 1,5 katına çıkar (en çok 12), ritim %15 hızlanır (en hızlı 650 ms), süreli hareket
+// %25 uzar. Isınma (yavaş ritimli), soğuma ve sürprizler aynen kalır; hikâye sayıyı söylüyorsa tekrar sayısı değişmez.
+const SOGUMA_HIKAYE = new Set(SOGUMALAR.map((h) => h.hikaye));
+export function hizliIcin(h: Hareket): Hareket {
+  if (h.surpriz || h.ritim === 'yavas' || SOGUMA_HIKAYE.has(h.hikaye)) return h;
+  if (h.tur === 'sure') return { ...h, saniye: Math.round(h.saniye * 1.25) };
+  const hizli = { ...h, tempoMs: Math.max(Math.min(650, h.tempoMs), Math.round(h.tempoMs * 0.85)) };
+  const eskiYazi = sayiYazi(h.adet);
+  const hikayedeSayi = !!h.hikaye && h.hikaye.toLocaleLowerCase('tr').includes(eskiYazi.toLocaleLowerCase('tr'));
+  const adet = Math.min(12, Math.round(h.adet * 1.5));
+  if (h.adet < 4 || adet <= h.adet || hikayedeSayi || !h.sesli.includes(eskiYazi)) return hizli;
+  return {
+    ...hizli,
+    adet,
+    sesli: sondakiniDegistir(h.sesli, eskiYazi, sayiYazi(adet)),
+    baslik: sondakiniDegistir(h.baslik, String(h.adet), String(adet)),
+  };
+}
+
 export function uyarla(liste: Hareket[], ayar: OyunAyari = oyunAyari()): Hareket[] {
   let sonuc = ayar.oturarak ? oturarakYap(liste) : liste;
   if (ayar.yas === 'kucuk') sonuc = sonuc.map(kucukIcin);
+  if (ayar.yas === 'hizli') sonuc = sonuc.map(hizliIcin);
   return sonuc;
 }
 
 // Ayarlarla ortaya çıkabilecek bütün yeni cümleler (seslendirme listesi için).
 export function uyarlamaCumleleri(hareketler: Hareket[]): string[] {
   const oturarak = Object.values(OTURARAK).map((h) => ({ ...h, hikaye: OTURARAK_HIKAYE }));
-  return [...hareketler, ...oturarak, DONMA_OTURARAK].flatMap((h) => [h.sesli, kucukIcin(h).sesli]);
+  return [...hareketler, ...oturarak, DONMA_OTURARAK].flatMap((h) => [h.sesli, kucukIcin(h).sesli, hizliIcin(h).sesli]);
 }

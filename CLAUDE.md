@@ -113,7 +113,8 @@ Teknoloji: Phaser 3 + TypeScript + Vite, GitHub Pages ile yayın. İleride Capac
 - Her yeni özellik/bölümde sorulur: 4-5, 6-7, 8-9 yaş ve hareket kısıtı olan çocuk için nasıl? (Yaşa göre tempo ve
   oturarak oyna bu soru sorulmadığı için geç geldi; ChatGPT değerlendirmesi, Ekim 2026.) Ebeveyn köşesi → ⚙️ Ayarlar:
   "Hareket temposu" 🐢 Sakin (daha az tekrar, %25 yavaş, süreli hareket kısa; 4-5 yaş/yeni başlayan için önerilir) /
-  🐇 Normal (varsayılan); Sakin tempoda çok adımlı komut kısa ve tek eylemli olur (src/uyarla.ts KISA_KOMUT; tahmin, 4-5 yaşla denenecek); yaş etiketi kullanılmaz (çocuğu damgalamasın). Ve "oturarak oyna"
+  🐇 Normal (varsayılan) / 🐆 Hızlı (K6, 14 Ekim: kaybettirmeyen zorluk; 4+ tekrar ~1,5 kat, en çok 12, ritim %15 hızlı, süreli %25 uzun;
+  ısınma/soğuma/sürpriz aynen); Sakin tempoda çok adımlı komut kısa ve tek eylemli olur (src/uyarla.ts KISA_KOMUT; tahmin, 4-5 yaşla denenecek); yaş etiketi kullanılmaz (çocuğu damgalamasın). Ve "oturarak oyna"
   (ayakta yapılan hareketler kol/gövde hareketine döner, donma oyununda kollarla dans; test her durağı denetler); src/uyarla.ts, kayıt zipzip-oyun-ayar-v1. Ailece etkilenmez.
 - Cinsiyet sorulmaz (veri azaltma, kalıp yargı). "Herkes kendini bulsun" ihtiyacı cinsiyetle
   değil, çocuğun seçtiği ilgi alanıyla karşılanır (ör. Spor Kampı'nda sporunu seçer).

@@ -3,7 +3,7 @@ import { RENK, YAZI_TIPI } from '../ayarlar';
 import { buyukDugme, evDugmesi, yildizliArkaPlan } from '../arayuz';
 import { oyunAyari, oyunAyariYaz } from '../oyunAyari';
 
-// Ebeveyn köşesi → ⚙️ Ayarlar: hareket temposu (Sakin: daha az tekrar, daha yavaş) ve oturarak oyna.
+// Ebeveyn köşesi → ⚙️ Ayarlar: hareket temposu (Sakin: daha az tekrar, daha yavaş; Hızlı: daha çok, daha hızlı) ve oturarak oyna.
 // Tempo yaşla değil adıyla seçilir (yaş etiketi çocuğu damgalamasın; yeni başlayan büyük çocuk da Sakin'i seçebilir).
 // Değişiklik bir sonraki durakta geçerli olur. Seçimler sadece bu telefonda saklanır.
 export class EbeveynAyarScene extends Phaser.Scene {
@@ -27,12 +27,15 @@ export class EbeveynAyarScene extends Phaser.Scene {
       this.scene.restart();
     };
 
-    // Hareket temposu (kayıtta yas: 'kucuk' = Sakin)
+    // Hareket temposu (kayıtta yas: 'kucuk' = Sakin, 'buyuk' = Normal, 'hizli' = Hızlı)
     baslik(290, 'Hareket temposu');
-    const kucuk = ayar.yas === 'kucuk';
-    buyukDugme(this, x - 150, 400, `${kucuk ? '✓ ' : ''}🐢 Sakin`, kucuk ? RENK.yesil : 0x3a4f7a, () => sec({ yas: 'kucuk' }), { genislik: 280, yukseklik: 110, yaziBoyu: 44 });
-    buyukDugme(this, x + 150, 400, `${!kucuk ? '✓ ' : ''}🐇 Normal`, !kucuk ? RENK.yesil : 0x3a4f7a, () => sec({ yas: 'buyuk' }), { genislik: 280, yukseklik: 110, yaziBoyu: 44 });
-    aciklama(520, 'Sakin: tekrarlar daha az, ritim daha yavaş.\n4-5 yaş ya da yeni başlayanlar için önerilir.');
+    // Üç düğme yan yana: yazı iki satır (hayvan / ad), büyük kalsın diye (küçülünce yeşil üstünde zıtlık yetmez).
+    const tempolar = [['kucuk', '🐢', 'Sakin'], ['buyuk', '🐇', 'Normal'], ['hizli', '🐆', 'Hızlı']] as const;
+    tempolar.forEach(([yas, hayvan, ad], i) => {
+      const secili = ayar.yas === yas;
+      buyukDugme(this, x + (i - 1) * 222, 410, `${secili ? '✓ ' : ''}${hayvan}\n${ad}`, secili ? RENK.yesil : 0x3a4f7a, () => sec({ yas }), { genislik: 210, yukseklik: 130, yaziBoyu: 40 });
+    });
+    aciklama(545, 'Sakin: daha az tekrar, daha yavaş (4-5 yaş\nya da yeni başlayanlar için önerilir).\nHızlı: daha çok tekrar, daha hızlı ritim.');
 
     // Oturarak oyna
     baslik(680, '🪑 Oturarak oyna');
