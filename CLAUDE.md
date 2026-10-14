@@ -157,8 +157,9 @@ Teknoloji: Phaser 3 + TypeScript + Vite, GitHub Pages ile yayın. İleride Capac
   `npm run test:oyun` denetler). Biten sarı / sıradaki turuncu renkleri şimdilik kalır, çizer gelince birlikte bakılır (Ekim 2026 kararı).
 - Ekran: oyun 720×1280 dik tuvali ekrana sığdırır. Telefon dik kilitli; yatay telefonda/basık pencerede index.html "📱 Telefonu dik
   çevir" gösterir. iPad yatayda oyun ortada, yanlar boş: betada böyle kalır, iPad'li ailelerin görüşüne bakılır (Ekim 2026 kararı).
-- "Uzaktan oyna" (durak girişinde): açıksa "Yaptım!" beklemeden 3 sn sonra geçer (zipzip-uzaktan-v1).
-- Kamera isteğe bağlı kalır (izin velileri tedirgin eder); Ailece'de kamera kapalı (iki kişi güvenilir sayılmaz).
+- "Uzaktan oyna" (durak girişinde): açıksa "Yaptım!" beklemeden 3 sn sonra geçer (zipzip-uzaktan-v1). Ailece'de hep açık
+  (14 Ekim: iki kişi 2-3 m geride, telefona yürümesin); dokunarak hemen geçilir.
+- Kamera isteğe bağlı kalır (izin velileri tedirgin eder); Ailece'de kamera kapalı (iki kişi güvenilir sayılmaz; 14 Ekim'de açıldığı fark edildi, düzeltildi).
   Oynanış kararı (12 Ekim): kamera isteğe bağlı kalır, macerada "önerilen" olur; her yeni mekanik kamerasız da oynanır
   (kameralı ve kamerasız iki yol). Bugün kamera sadece sayar, Zıpzıp'ı/dünyayı etkilemez (docs/rapor-2026-10-12/OYNANIS_ANALIZI.md).
   Kameranın saydığı hareketler src/kamera.ts SAYMA_YOLU'nda (13 hareket, 6 sayma yolu: kollar, çömel, zıpla, dizler,

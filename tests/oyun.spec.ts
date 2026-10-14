@@ -237,6 +237,21 @@ test('Zıpzıp her hareketi hatasız yapar', async ({ page }) => {
   expect(kayit.hatalar).toEqual([]);
 });
 
+test('Ailece kendiliğinden ilerler (Uzaktan oyna kapalıyken de) ve kamera açılmaz', async ({ page }) => {
+  test.setTimeout(240_000);
+  const kayit = await oyunuAc(page, { 'zipzip-kamera-v1': '1' });
+  await saatiHizlandir(page, 5);
+  await page.evaluate(() => {
+    const oyun = (window as any).oyun;
+    (window as any).__video = false;
+    oyun.events.on('poststep', () => document.querySelector('video') && ((window as any).__video = true));
+  });
+  await sahneAc(page, 'Hareket', { durakId: 'aile', adim: 0 });
+  await page.waitForFunction(() => (window as any).oyun.scene.isActive('Odul'), null, { timeout: 220_000, polling: 500 });
+  expect(await page.evaluate(() => (window as any).__video)).toBe(false);
+  expect(kayit.hatalar).toEqual([]);
+});
+
 test('"Uzaktan oyna" açıkken bir durak baştan sona kendiliğinden oynanır (ısınma + sürpriz dahil)', async ({ page }) => {
   test.setTimeout(300_000);
   const kayit = await oyunuAc(page, { 'zipzip-uzaktan-v1': '1' });

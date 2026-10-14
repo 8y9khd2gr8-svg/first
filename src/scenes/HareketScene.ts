@@ -163,7 +163,8 @@ export class HareketScene extends Phaser.Scene {
     this.zipzip.durdur();
     this.sayac.setText('');
     this.bilgi.setText('');
-    const uzaktan = uzaktanAcikMi();
+    // Ailece'de hep uzaktan: iki kişi 2-3 metre gerideyken telefona yürümesinler (14 Ekim kararı; dokunarak hemen geçilir).
+    const uzaktan = uzaktanAcikMi() || this.durakId === AILE_ID;
     konus(uzaktan ? M.devamEdiyoruz : M.yaptinMi);
 
     const x = this.scale.gameSize.width / 2;
@@ -232,7 +233,8 @@ export class HareketScene extends Phaser.Scene {
 
   // Sağ üstte küçük kamera önizlemesi ve sayı. Görüntü sadece ekranda gösterilir.
   private kameraKur(hareket: Hareket) {
-    if (!kameraAcikMi() || !kameraDesteklenir() || hareket.tur !== 'sayi' || hareket.dizi || !KAMERA_HAREKETLERI.includes(hareket.animasyon)) return;
+    // Ailece'de kamera açılmaz: iki kişiyi saymak güvenilir değil (karar, 14 Ekim'de yeniden onaylandı).
+    if (this.durakId === AILE_ID || !kameraAcikMi() || !kameraDesteklenir() || hareket.tur !== 'sayi' || hareket.dizi || !KAMERA_HAREKETLERI.includes(hareket.animasyon)) return;
     const kutu = document.createElement('div');
     kutu.style.cssText = 'width:150px;height:140px;border-radius:16px;overflow:hidden;background:#0b1430;border:4px solid #FFC93C;position:relative;font-family:"Baloo 2",sans-serif;';
     const yazi = document.createElement('div');

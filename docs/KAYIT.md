@@ -64,6 +64,8 @@ Onay verilmemiş, ertelenmiş ya da reddedilmiş öneriler de buraya yazılır; 
 - #108 Bekleyen tek engel (K22) — kullanıcı K24'te "K21 geçerli" deyince birleşti.
 - Bu PR: K24 kaydı + sağ/sol ayna (K5 kalanı): kolSalla, sallan, belDondur önce ekranın sağına eğilir (komut "sağa sola" diyor; çocuk ekrana bakınca ekranın sağı kendi sağı).
 
+**Sonra (aynı gün, kullanıcı İngiltere'de; Yağız testi dışı işler):** #110 ⌂ ile açılışa dönülünce "Oyna" çalışmıyordu (kullanıcı telefonda buldu; açılış sahnesindeki bekleme işareti sıfırlanmıyordu; testle yeniden üretildi). #111 🐆 Hızlı tempo (K6). Ailece: Uzaktan oyna hep açık + kamera kapalı (karar vardı ama kamera açılıyordu) + sürüm 0.9.1 (ana ekrandaki sürüm 0.9.0'da kalmıştı, güncelleme görünsün diye) + "beta grubuna yazın" notu düğmeye benzemesin. K14 ✅ ritim + dokunma. Mağaza metinleri: iki sürüm (ilk sürüm: Türkiye + Dünya + Ailece / tam) seçildi.
+
 **Bekleyen:** Yağız testi sonucu (K23): kullanıcı 10 zıplama sonucunu ve ölçüm satırının ekran görüntüsünü gönderecek; sonuca göre eşik/400 ms ayarı. Eski oturum (session_016R…) arşivlendi.
 
 ### 12 Ekim 2026 (öğleden sonra) — zıplama prototipi, beta kapsamı, kısa komut, ebeveyn düğmesi
