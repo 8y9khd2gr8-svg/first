@@ -171,7 +171,8 @@ Teknoloji: Phaser 3 + TypeScript + Vite, GitHub Pages ile yayın. İleride Capac
   6 sayma yolundan biri seçilir, sayı ve "görüyorum/geri git" durumu görünür; kamera dokununca açılır, sayılar özete eklenmez.
   Yağız testinde eşik ayarı için kullanılır.
   Kamera denemesinde ölçüm satırı (tanıma ms, tanıma/sn, oyunun kare hızı, son sayımın gecikmesi; kaydedilmez). Zıplama inişte
-  sayılır, 400 ms içindeki ikinci iniş sayılmaz (ZIPLAMA_EN_AZ_ARA_MS). "🌍 Zıpzıp da zıplasın" (ZiplaDenemeScene, zıplama
+  sayılır, 400 ms içindeki ikinci iniş sayılmaz (ZIPLAMA_EN_AZ_ARA_MS);
+  1 sn'den uzun "havada" kalma sayılmaz, taban yeniden ölçülür (çömel-kalk takılması, ZIPLAMA_EN_UZUN_HAVA_MS). "🌍 Zıpzıp da zıplasın" (ZiplaDenemeScene, zıplama
   prototipi): Zıpzıp'ın önünde kütük bekler (K22: bekleyen tek engel); kamerayla her zıplamada Zıpzıp bir kez zıplar, kütük
   altından geçer, yıldız yanar (10'da Aferin), sıradaki kütük gelip bekler; kamerasız ritim + dokunma. Henüz duraklarda yok.
 - Doğruluk: Çin Seddi uzaydan gözle GÖRÜLMEZ (efsane); Truva Atı "efsaneye göre". Ürkütücü kelime yok

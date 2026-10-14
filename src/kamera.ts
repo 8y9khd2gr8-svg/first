@@ -63,6 +63,9 @@ export type KameraDurumu = 'yukleniyor' | 'goremiyorum' | 'goruyorum' | 'hata';
 // Zıplama inişte sayılır; bir önceki sayılan inişten bu kadar kısa sürede gelen iniş aynı zıplamanın
 // sarsıntısı sayılır (çift tetik koruması). Çocuk saniyede en çok 2-3 kez zıplayabilir.
 export const ZIPLAMA_EN_AZ_ARA_MS = 400;
+// Bir zıplamada havada kalma en çok yarım saniye kadardır. "Havada" durumu bundan çok uzun sürerse bu bir zıplama değildir
+// (ör. çömelip kalkınca omuzlar ayakta durulan yerden yüksek görünür); sayılmadan bırakılır, taban yeniden ölçülür.
+export const ZIPLAMA_EN_UZUN_HAVA_MS = 1000;
 
 // Bir hareketin tekrarlarını sayar. Eşikler vücut boyuna göre (omuz-topuk mesafesi)
 // oranlanır; böylece çocuğun kameraya uzaklığı önemli olmaz.
@@ -74,6 +77,7 @@ export class Sayici {
   private kalkanDiz: number | null = null; // dizler: o an havadaki diz
   private taraf: -1 | 0 | 1 = 0; // yana adım: gövde ortanın solunda mı sağında mı
   private sonInis = -Infinity; // zıpla: son sayılan inişin zamanı (ms)
+  private havalanma = 0; // zıpla: "havada" durumuna geçilen zaman (ms)
 
   constructor(animasyon: Animasyon) {
     this.yol = SAYMA_YOLU[animasyon];
@@ -112,13 +116,19 @@ export class Sayici {
       if (this.taban === null) this.taban = omuz;
       if (!this.yukarida) this.taban = this.taban * 0.9 + omuz * 0.1;
       const yukselme = (this.taban - omuz) / boy;
-      if (!this.yukarida && yukselme > 0.07) this.yukarida = true;
-      else if (this.yukarida && yukselme < 0.025) {
+      if (!this.yukarida && yukselme > 0.07) {
+        this.yukarida = true;
+        this.havalanma = zaman;
+      } else if (this.yukarida && yukselme < 0.025) {
         this.yukarida = false;
         if (zaman - this.sonInis >= ZIPLAMA_EN_AZ_ARA_MS) {
           this.sayi++;
           this.sonInis = zaman;
         }
+      } else if (this.yukarida && zaman - this.havalanma > ZIPLAMA_EN_UZUN_HAVA_MS) {
+        // Takılma koruması: sayılmaz, çocuğun şimdiki duruşu yeni taban olur.
+        this.yukarida = false;
+        this.taban = omuz;
       }
     } else if (this.yol === 'dizler') {
       // Bir diz kalçaya yaklaşınca "kalktı", yeniden aşağı inince bir tekrar (her diz ayrı sayılır).

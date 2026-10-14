@@ -113,18 +113,24 @@ test('kamera zıplama: art arda 10 zıplama (her biri ~450 ms) hepsi sayılır',
   assert.equal(say('zipla', () => [HAVADA, {}, {}], 10, 3, 50), 10);
 });
 
-// Bilinen sorun (14 Ekim, çocuksuz denemede bulundu; henüz düzeltilmedi, karar bekliyor): çömelip kalkınca taban çömelme
-// yüksekliğinde kalır, kalkış "havada" sayılır ve iniş hiç gelmez; sonraki zıplamalar sayılmaz. Düzeltilince todo kalkar.
-test('kamera zıplama: çömelip kalktıktan sonra zıplamalar yine sayılır', { todo: 'bilinen sorun: sayaç havada takılır' }, () => {
+// 14 Ekim'de çocuksuz denemede bulunan sorun: çömelip kalkınca sayaç "havada" takılıyor, sonraki zıplamalar sayılmıyordu.
+// Artık 1 sn'den uzun "havada" kalma sayılmadan bırakılır (kamera.ts ZIPLAMA_EN_UZUN_HAVA_MS); eşikler aynı.
+test('kamera zıplama: çömelip kalkmak sayılmaz, sonraki zıplamalar yine sayılır', () => {
   const s = new Sayici('zipla');
   let zaman = 0;
   const besle = (d: Durus) => s.besle(nokta(d), (zaman += 66));
   for (let k = 0; k < 20; k++) besle({});
   for (let k = 0; k < 10; k++) besle({ omuzY: 0.5, kalcaY: 0.75 });
   for (let k = 0; k < 20; k++) besle({});
+  assert.equal(s.sayi, 0);
   for (let i = 0; i < 5; i++) {
     for (let k = 0; k < 4; k++) besle(HAVADA);
     for (let k = 0; k < 8; k++) besle({});
   }
   assert.equal(s.sayi, 5);
+});
+
+test('kamera zıplama: gerçek zıplamanın havası (yarım saniye) takılma korumasına takılmaz', () => {
+  // 600 ms havada (uzun bir zıplama) yine sayılır; takılma koruması ancak ZIPLAMA_EN_UZUN_HAVA_MS sonra devreye girer.
+  assert.equal(say('zipla', () => [HAVADA, {}], 5, 12, 50), 5);
 });
