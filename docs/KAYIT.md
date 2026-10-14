@@ -67,7 +67,7 @@ Onay verilmemiş, ertelenmiş ya da reddedilmiş öneriler de buraya yazılır; 
 **Dürüst ölçüm notları:** oyun hiçbir zıplama ölçümünü kaydetmez (ekrandan çıkınca kaybolur). "Son zıplama ms" = inişin
 algılandığı karenin işleme süresi; kamera gecikmesi ve iniş eşiği payı dahil değil. Tanıma ort/en uzun son 30 tanımadan.
 **Bilinen riskler (açık):** ekran kilitlenmesi (oyun ekranı açık tutmaz; iPhone otomatik kilit), kadrajda ikinci kişi,
-telefonun oynaması, ışık; eşikler gerçek çocukla denenmedi. Ekran açık tutma (Wake Lock) önerisi ⏳ (test sonucuna göre).
+telefonun oynaması, ışık; eşikler gerçek çocukla denenmedi. Ekran açık tutma (Wake Lock): **kullanıcı seçti (14 Ekim): kod yok**, testte iPhone Otomatik Kilit elle 5 dk/Asla yapılır.
 **Bekleyen:** 👤 K23 sonucu (10 adımlı tablo + kırpılmış ekran görüntüsü). Kütüğü duraklara taşıma (K22) bundan sonra ayrı karar.
 
 ### 14 Ekim 2026 — birleştirme kuralı (K24), #108, sağ/sol ayna
