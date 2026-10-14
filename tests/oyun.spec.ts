@@ -829,3 +829,25 @@ test('Zıpzıp da zıplasın: kamera durunca yazı söyler ve ritim yolu geri ge
   expect(await page.evaluate(() => !!(window as any).oyun.scene.getScene('ZiplaDeneme').ritim)).toBe(true);
   expect(kayit.hatalar).toEqual([]);
 });
+
+test('"Bu telefonda neler var?": uygulamadaki en uzun hâlde de yazılar "Tamam"ın altında kalmaz, her kayıt listede', async ({ page }) => {
+  const kayit = await oyunuAc(page, { ...BETA, 'zipzip-guvenlik-notu-v1': '1' }, '/?odeme=deneme');
+  await sahneAc(page, 'EbeveynVeri');
+  const sonuc = await page.evaluate(() => {
+    const s = (window as any).oyun.scene.getScene('EbeveynVeri');
+    const yazi = (o: any): string => (o.type === 'Text' ? o.text : (o.list ?? []).map(yazi).join(' '));
+    const tamam = s.children.list.find((o: any) => o.type === 'Container' && yazi(o).includes('Tamam'));
+    const tb = tamam.getBounds();
+    const yazilar = s.children.list.filter((o: any) => o.type === 'Text');
+    return {
+      ortulen: yazilar.filter((t: any) => {
+        const b = t.getBounds();
+        return b.bottom > tb.top && b.top < tb.bottom && b.right > tb.left && b.left < tb.right;
+      }).map((t: any) => t.text),
+      metin: yazilar.map((t: any) => t.text).join('|'),
+    };
+  });
+  expect(sonuc.ortulen).toEqual([]);
+  for (const satir of ['Tam sürüm', 'Güvenlik notu · beta', 'okundu · bölümler açık', 'Uzaktan oyna', 'Kamerayla sayma']) expect(sonuc.metin).toContain(satir);
+  expect(kayit.hatalar).toEqual([]);
+});
