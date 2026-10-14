@@ -36,6 +36,7 @@ Onay verilmemiş, ertelenmiş ya da reddedilmiş öneriler de buraya yazılır; 
 | K23 | ⏳ Yağız testi: zıplama prototipi | Ebeveyn köşesi → 📷 kamera → 🔍 Dene → 🌍 Zıpzıp da zıplasın → 📷 Kamerayla zıpla; 10 zıplama: Zıpzıp kaç kez zıpladı, ölçüm satırının ekran görüntüsü (hedefler: 10'da en az 8, tek zıplamada çift tepki yok, gecikme ≤ 300 ms) | Eşikler ve 400 ms koruma gerçek çocukla ayarlanacak | 12 Ekim |
 | K21 | ✅ Birleştirme onayı | **12 Ekim:** testi yeşil, küçük, geri alınabilir PR'ları Claude birleştirir (kalıcı onay). Oynanışı/kapsamı ciddi değiştiren, yayın/dağıtım, force push, geniş silme, GitHub güvenlik/erişim ayarı, para harcama, çocuk verisini saklama/gönderme için tek tek açık onay | Çalışma kuralı | 12 Ekim |
 | K24 | ✅ Birleştirme kuralı çelişkisi | **14 Ekim, kullanıcı seçti: K21 geçerli.** "Ana talimat"taki her birleştirmeye açık onay isteği yerine K21 uygulanır (testi yeşil, küçük, geri alınabilir PR'ı Claude birleştirir; K21'deki istisnalar için tek tek onay). #103-#107'nin sormadan birleşmesi bu kurala uygun sayıldı; #108 bu kararla birleşti | Çalışma kuralı | 14 Ekim |
+| K25 | ⏳ Gerçek çocuk gibi gezinme testi | 14 Ekim: "Oyna" ikinci kez çalışmıyordu, testler yakalamadı (ekranları kısayoldan açıyorlardı, hiçbir yolu iki kez yürümüyorlardı). Öneri: ana yolları gerçek dokunuşla en az iki kez dolaşan test (açılış → macera → harita → durak → ödül → geri; Ailece iki kez; ebeveyn köşesi gir/çık) | Bu türden başka gizli hata olabilir | 14 Ekim |
 
 ## 2. Kullanıcıda bekleyenler
 
@@ -64,7 +65,7 @@ Onay verilmemiş, ertelenmiş ya da reddedilmiş öneriler de buraya yazılır; 
 - #108 Bekleyen tek engel (K22) — kullanıcı K24'te "K21 geçerli" deyince birleşti.
 - Bu PR: K24 kaydı + sağ/sol ayna (K5 kalanı): kolSalla, sallan, belDondur önce ekranın sağına eğilir (komut "sağa sola" diyor; çocuk ekrana bakınca ekranın sağı kendi sağı).
 
-**Sonra (aynı gün, kullanıcı İngiltere'de; Yağız testi dışı işler):** #110 ⌂ ile açılışa dönülünce "Oyna" çalışmıyordu (kullanıcı telefonda buldu; açılış sahnesindeki bekleme işareti sıfırlanmıyordu; testle yeniden üretildi). #111 🐆 Hızlı tempo (K6). Ailece: Uzaktan oyna hep açık + kamera kapalı (karar vardı ama kamera açılıyordu) + sürüm 0.9.1 (ana ekrandaki sürüm 0.9.0'da kalmıştı, güncelleme görünsün diye) + "beta grubuna yazın" notu düğmeye benzemesin. K14 ✅ ritim + dokunma. Mağaza metinleri: iki sürüm (ilk sürüm: Türkiye + Dünya + Ailece / tam) seçildi.
+**Sonra (aynı gün, kullanıcı İngiltere'de; Yağız testi dışı işler):** #110 ⌂ ile açılışa dönülünce "Oyna" çalışmıyordu (kullanıcı telefonda buldu; açılış sahnesindeki bekleme işareti sıfırlanmıyordu; testle yeniden üretildi). #111 🐆 Hızlı tempo (K6). Ailece: Uzaktan oyna hep açık + kamera kapalı (karar vardı ama kamera açılıyordu) + sürüm 0.9.1 (ana ekrandaki sürüm 0.9.0'da kalmıştı, güncelleme görünsün diye) + "beta grubuna yazın" notu düğmeye benzemesin. K14 ✅ ritim + dokunma. Mağaza metinleri: iki sürüm (ilk sürüm: Türkiye + Dünya + Ailece / tam) yapıldı (#113). Kullanıcı ana ekrandaki uygulamada Oyna düzeltmesini doğruladı (uygulamayı kapatıp açınca yeni sürüm geldi).
 
 **Bekleyen:** Yağız testi sonucu (K23): kullanıcı 10 zıplama sonucunu ve ölçüm satırının ekran görüntüsünü gönderecek; sonuca göre eşik/400 ms ayarı. Eski oturum (session_016R…) arşivlendi.
 
