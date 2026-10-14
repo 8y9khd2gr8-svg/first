@@ -35,6 +35,7 @@ Onay verilmemiş, ertelenmiş ya da reddedilmiş öneriler de buraya yazılır; 
 | K22 | ✅ Zıplamanın dünyada sonucu (iş 3) | **Kullanıcı seçti (12 Ekim): bekleyen tek engel.** Yapıldı (#108, "Zıpzıp da zıplasın" ekranında): Zıpzıp'ın önünde kütük bekler, zıplayınca altından geçer, yıldız yanar, sıradaki kütük gelir; acele/çarpma/kaybetme yok. Duraklara taşımak ayrı karar (Yağız testinden sonra) | Oynanış değişikliği | 12 Ekim |
 | K23 | ⏳ Yağız testi: zıplama prototipi | Ebeveyn köşesi → 📷 kamera → 🔍 Dene → 🌍 Zıpzıp da zıplasın → 📷 Kamerayla zıpla; 10 zıplama: Zıpzıp kaç kez zıpladı, ölçüm satırının ekran görüntüsü (hedefler: 10'da en az 8, tek zıplamada çift tepki yok, gecikme ≤ 300 ms) | Eşikler ve 400 ms koruma gerçek çocukla ayarlanacak | 12 Ekim |
 | K21 | ✅ Birleştirme onayı | **12 Ekim:** testi yeşil, küçük, geri alınabilir PR'ları Claude birleştirir (kalıcı onay). Oynanışı/kapsamı ciddi değiştiren, yayın/dağıtım, force push, geniş silme, GitHub güvenlik/erişim ayarı, para harcama, çocuk verisini saklama/gönderme için tek tek açık onay | Çalışma kuralı | 12 Ekim |
+| K24 | ✅ Birleştirme kuralı çelişkisi | **14 Ekim, kullanıcı seçti: K21 geçerli.** "Ana talimat"taki her birleştirmeye açık onay isteği yerine K21 uygulanır (testi yeşil, küçük, geri alınabilir PR'ı Claude birleştirir; K21'deki istisnalar için tek tek onay). #103-#107'nin sormadan birleşmesi bu kurala uygun sayıldı; #108 bu kararla birleşti | Çalışma kuralı | 14 Ekim |
 
 ## 2. Kullanıcıda bekleyenler
 
