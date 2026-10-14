@@ -60,6 +60,23 @@ Onay verilmemiş, ertelenmiş ya da reddedilmiş öneriler de buraya yazılır; 
 
 ## 4. Oturum günlüğü (en yeni üstte)
 
+### 14 Ekim 2026 (gece) — Yağız testi öncesi çocuksuz hazırlık
+**Korunan sürüm:** main 429280b (0.9.1; #114 + #115). Geri alma yolu: PR'daki Revert düğmesi (etiket `v0.9.0` = fe37906).
+**Bulgu 1 (⏳ karar bekliyor, kod değişmedi):** zıplama sayacı çömelip kalkınca "havada" takılır (taban çömelme
+yüksekliğinde kalır, kalkış yükselme sayılır, iniş hiç gelmez) → sonraki zıplamalar sayılmaz; ancak yeniden açınca düzelir.
+Yapay noktalarla doğrulandı; `tests/kamera.test.ts` içinde todo testi. Oyundaki zıplama hareketinde de olur (her harekette sayaç
+yenilendiği için etkisi o hareketle sınırlı; "Yaptım!" yine çıkar). Öneri: havada kalma 1 sn'yi geçerse sayılmadan sıfırla
+(eşikler aynı kalır).
+**Bulgu 2 (⏳):** kamera akışı durursa (ekran kilidi, uygulama değişimi, başka uygulama kamerayı alırsa) oyun fark etmez; yazı
+"✅ Görüyorum"da kalır, Zıpzıp tepki vermez. Öneri: 2 sn yeni kare gelmezse "Kamera durdu, dokunup yeniden açın".
+**Bulgu 3 (öneri):** kamera hiç yoksa / izin reddedilince aynı yazı ("izin verilmedi mi?"); kamerasız ritim yolu sürer.
+**Yapılan:** 3 yeni kamera testi (yanlış pozitif: kollar/omuz %3/sallanma = 0; yavaş telefon 5 tanıma/sn = 10/10; art arda 10
+zıplama ~450 ms = 10/10) + 1 todo (bulgu 1). Protokol: çömelme en sona (adım 10), "Takılırsa" yolu; sonuç şablonu
+`docs/yagiz-zipla-sonuc.md`. Testler: npm test 31 geçti + 1 todo; test:oyun 36/36; tsc temiz.
+**Wake Lock incelemesi (kod yok, kullanıcı kararı):** iOS Safari 16.4+ destekler; ana ekran uygulamasında iOS 18.4'ten önce
+çalışmıyordu (WebKit 254545). Sayfa gizlenince kilit düşer, geri gelince yeniden istemek için dokunma gerekebilir (WebKit
+255363). Düşük güç modunda reddedilebilir. Capacitor sürümünde ayrı eklenti gerekebilir. Öneri: test sonrası, sadece kamera açıkken.
+
 ### 14 Ekim 2026 (akşam) — zıplama testi hazırlığı (0.9.1)
 **İnceleme:** ZiplaDenemeScene, EbeveynKameraScene, kamera.ts (Sayici zıpla yolu, KameraSayaci ölçümü), tests/kamera.test.ts, oyun.spec zıplama testi.
 **Bulgu (düzeltildi):** "Kamera gördü" sayısı Aferin kutlamasının 2 sn'sinde gelen kamera zıplamalarını saymıyordu; 10. zıplamada

@@ -94,3 +94,37 @@ test('pakette MediaPipe sadece SIMD hâliyle durur; SIMD denetimi çalışır', 
   assert.equal(simdVarMi(), true);
   assert.deepEqual(fs.readdirSync('public/mediapipe').filter((d) => d.includes('nosimd')), []);
 });
+
+// Yağız testi (K23) öncesi: gerçek çocuk gerektirmeyen zıplama senaryoları. Eşikler (%7, 400 ms) değişmez; mevcut davranışı belgeler.
+test('kamera zıplama: zıplamadan yapılan hareketler sayılmaz (yanlış pozitif)', () => {
+  // Kolları yukarı kaldırıp indirmek, omuzlar yerinde.
+  assert.equal(say('zipla', () => [{ bilekY: 0.1 }, {}], 10), 0);
+  // Kollar kalkarken omuzlar da biraz kalkar (boyun %3'ü): sayılmaz.
+  assert.equal(say('zipla', () => [{ bilekY: 0.1, omuzY: 0.282 }, {}], 10), 0);
+  // Yerinde sağa sola sallanmak.
+  assert.equal(say('zipla', (i) => [{ x: i % 2 ? 0.45 : 0.55 }], 20), 0);
+});
+
+test('kamera zıplama: yavaş telefonda (saniyede 5 tanıma) havada tek kare görülse de sayılır', () => {
+  assert.equal(say('zipla', () => [HAVADA, {}, {}], 10, 1, 200), 10);
+});
+
+test('kamera zıplama: art arda 10 zıplama (her biri ~450 ms) hepsi sayılır', () => {
+  assert.equal(say('zipla', () => [HAVADA, {}, {}], 10, 3, 50), 10);
+});
+
+// Bilinen sorun (14 Ekim, çocuksuz denemede bulundu; henüz düzeltilmedi, karar bekliyor): çömelip kalkınca taban çömelme
+// yüksekliğinde kalır, kalkış "havada" sayılır ve iniş hiç gelmez; sonraki zıplamalar sayılmaz. Düzeltilince todo kalkar.
+test('kamera zıplama: çömelip kalktıktan sonra zıplamalar yine sayılır', { todo: 'bilinen sorun: sayaç havada takılır' }, () => {
+  const s = new Sayici('zipla');
+  let zaman = 0;
+  const besle = (d: Durus) => s.besle(nokta(d), (zaman += 66));
+  for (let k = 0; k < 20; k++) besle({});
+  for (let k = 0; k < 10; k++) besle({ omuzY: 0.5, kalcaY: 0.75 });
+  for (let k = 0; k < 20; k++) besle({});
+  for (let i = 0; i < 5; i++) {
+    for (let k = 0; k < 4; k++) besle(HAVADA);
+    for (let k = 0; k < 8; k++) besle({});
+  }
+  assert.equal(s.sayi, 5);
+});

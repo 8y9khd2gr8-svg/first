@@ -60,9 +60,18 @@ Ekranın altında **✅ Görüyorum: zıpla!** yazmadan başlamayın. Ekrana kim
 | 5 | Zıpzıp, Yağız yere indikten hemen sonra mı zıpladı, belirgin geç mi? (gözle; "hemen / biraz geç / çok geç") | |
 | 6 | **Ekran görüntüsü** alın (yan tuş + ses açma). Sonra **Kırp** ile kamera kutusunu çıkarıp sadece alttaki ölçüm satırını bırakın (Yağız'ın görüntüsü gönderilmesin) | |
 | 7 | **Kamera gördü** sayısını yazın. 10 zıplama için beklenen: başlangıç + 10 | Son: … |
-| 8 | Yağız **30 sn** yerinde dursun, sonra kollarını sallasın, çömelip kalksın (zıplamadan) | Bu sırada Zıpzıp zıpladı mı, kaç kez? |
+| 8 | Yağız **30 sn** yerinde dursun, sonra kollarını yukarı kaldırıp indirsin, sağa sola sallansın (zıplamadan, **çömelmeden**) | Bu sırada Zıpzıp zıpladı mı, kaç kez? |
 | 9 | Hızlı seri: Yağız **5 kez arka arkaya** (beklemeden) zıplasın | Kamera gördü kaç arttı? |
-| 10 | Kamerasız: ⌂ → tekrar 🌍 Zıpzıp da zıplasın (kamerayı açmadan): Zıpzıp ritimle zıplar, ekrana dokununca da. Yağız hangisini sevdi? | |
+| 10 | En son: Yağız bir kez **çömelip kalksın**, sonra 3 kez zıplasın | Zıpzıp zıpladı mı? (Bilinen sorun: çömelince sayaç takılabilir; aşağıya bakın) |
+| 11 | Kamerasız: ⌂ → tekrar 🌍 Zıpzıp da zıplasın (kamerayı açmadan): Zıpzıp ritimle zıplar, ekrana dokununca da. Yağız hangisini sevdi? | |
+
+**Takılırsa:** "✅ Görüyorum" yazdığı hâlde Zıpzıp zıplamayı bırakırsa: ⌂ → 🌍 Zıpzıp da zıplasın → 📷 Kamerayla zıpla (sayaç
+sıfırdan başlar). Not alın: hangi adımda, takılmadan hemen önce Yağız ne yaptı (çömeldi, telefona yaklaştı, eğildi…)?
+Çocuksuz denemede bulunan bilinen sorun: çömelip kalkınca sayaç "havada" kalır ve sonraki zıplamaları saymaz
+(`tests/kamera.test.ts` todo). Ekran kilitlenir ya da başka uygulamaya geçilirse kamera durabilir ama yazı "Görüyorum"da kalır:
+yine ⌂ ile çıkıp yeniden açın.
+
+Sonuçları `docs/yagiz-zipla-sonuc.md` şablonuna yazın (Notlar uygulamasına kopyalanabilir).
 
 **Başarı ölçütü (K23):** adım 2'de 10 zıplamanın en az 8'i sayıldı · hiçbir zıplamada çift tepki yok · adım 8'de kendiliğinden
 zıplama yok (ya da en çok 1) · ölçüm satırında tanıma/sn en az ~8 · Zıpzıp gözle "hemen" tepki verdi.
