@@ -661,6 +661,15 @@ test('Zıpzıp da zıplasın (kamerasız): ritimle ve dokununca zıplar, kütü�
   // 10 yıldız dolunca Aferin, sonra yıldızlar söner ve oyun sürer (kaybetmek yok).
   await saatiHizlandir(page, 8);
   await page.waitForFunction(() => (window as any).oyun.scene.getScene('ZiplaDeneme').children.list.some((c: any) => c.text === 'Aferin!'), null, { timeout: 20_000 });
+  // Aferin anında kameranın gördüğü zıplama da "Kamera gördü"ye eklenir (fazla sayım gizlenmesin), yıldız yanmaz.
+  const kutlamada = await page.evaluate(() => {
+    const s = (window as any).oyun.scene.getScene('ZiplaDeneme');
+    const once = { kamera: s.kameraZiplamasi, yanan: s.yanan };
+    s.zipla(true);
+    return { once, kamera: s.kameraZiplamasi, yanan: s.yanan };
+  });
+  expect(kutlamada.kamera).toBe(kutlamada.once.kamera + 1);
+  expect(kutlamada.yanan).toBe(kutlamada.once.yanan);
   await page.waitForFunction(() => { const s = (window as any).oyun.scene.getScene('ZiplaDeneme'); return s.ziplamaSayisi > 10 && !s.children.list.some((c: any) => c.text === 'Aferin!'); }, null, { timeout: 20_000 });
   expect(kayit.hatalar).toEqual([]);
 });

@@ -189,9 +189,10 @@ export class ZiplaDenemeScene extends Phaser.Scene {
 
   // Bir zıplama: Zıpzıp bir kez zıplar, bir yıldız yanar. Dokunmada ritim baştan başlar (üst üste binmesin).
   private zipla(kameradan: boolean) {
+    // Kameranın gördüğü her zıplama sayılır, Aferin anında gelen de (ölçüm satırı fazla sayımı gizlemesin; Yağız testi K23).
+    if (kameradan) this.kameraZiplamasi++;
     if (this.kutlaniyor) return;
     this.ziplamaSayisi++;
-    if (kameradan) this.kameraZiplamasi++;
     if (!kameradan && this.ritim) this.ritim.reset({ delay: RITIM_MS, loop: true, callback: () => this.zipla(false) });
     this.zipzip.durdur();
     this.zipzip.birKez('zipla', ZIPLAMA_MS);

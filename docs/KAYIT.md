@@ -33,7 +33,7 @@ Onay verilmemiş, ertelenmiş ya da reddedilmiş öneriler de buraya yazılır; 
 | K19 | ⏳ Oynanış yol haritası | A1-A4 (mevcut sistem) ve B1-B6 (yeni mekanik), ayrıntı OYNANIS_ANALIZI.md bölüm 8 | Hangi sırayla başlanacak | 12 Ekim (analiz) |
 | K20 | ✅ Zıplama prototipi kararları | **12 Ekim:** D1 kamera denemesinde ("Zıpzıp da zıplasın") · D2 kamerasızda ritim + dokunma · D3 inişte + en az 400 ms ara · D4 kamera denemesinde ebeveynin gördüğü ölçüm satırı (kaydetmez). Plan: `docs/rapor-2026-10-12/ZIPLAMA_PROTOTIPI_PLANI.md` | Sıradaki geliştirme | 12 Ekim |
 | K22 | ✅ Zıplamanın dünyada sonucu (iş 3) | **Kullanıcı seçti (12 Ekim): bekleyen tek engel.** Yapıldı (#108, "Zıpzıp da zıplasın" ekranında): Zıpzıp'ın önünde kütük bekler, zıplayınca altından geçer, yıldız yanar, sıradaki kütük gelir; acele/çarpma/kaybetme yok. Duraklara taşımak ayrı karar (Yağız testinden sonra) | Oynanış değişikliği | 12 Ekim |
-| K23 | ⏳ Yağız testi: zıplama prototipi | Ebeveyn köşesi → 📷 kamera → 🔍 Dene → 🌍 Zıpzıp da zıplasın → 📷 Kamerayla zıpla; 10 zıplama: Zıpzıp kaç kez zıpladı, ölçüm satırının ekran görüntüsü (hedefler: 10'da en az 8, tek zıplamada çift tepki yok, gecikme ≤ 300 ms) | Eşikler ve 400 ms koruma gerçek çocukla ayarlanacak | 12 Ekim |
+| K23 | 👤 Yağız testi: zıplama prototipi | 10 adımlı protokol `docs/yagiz-testi.md` "Zıplama denemesi" (15 Ekim hazırlığı). Ölçütler: 10'da en az 8, çift tepki yok, 30 sn durmada kendiliğinden zıplama yok, tanıma/sn ≥ ~8, gözle "hemen". "Son zıplama ms" sadece kare işleme süresi (gerçek gecikme değil). Ekran görüntüsü kırpılıp gönderilir (çocuğun görüntüsü yok) | Eşikler ve 400 ms koruma gerçek çocukla ayarlanacak | 14 Ekim |
 | K21 | ✅ Birleştirme onayı | **12 Ekim:** testi yeşil, küçük, geri alınabilir PR'ları Claude birleştirir (kalıcı onay). Oynanışı/kapsamı ciddi değiştiren, yayın/dağıtım, force push, geniş silme, GitHub güvenlik/erişim ayarı, para harcama, çocuk verisini saklama/gönderme için tek tek açık onay | Çalışma kuralı | 12 Ekim |
 | K24 | ✅ Birleştirme kuralı çelişkisi | **14 Ekim, kullanıcı seçti: K21 geçerli.** "Ana talimat"taki her birleştirmeye açık onay isteği yerine K21 uygulanır (testi yeşil, küçük, geri alınabilir PR'ı Claude birleştirir; K21'deki istisnalar için tek tek onay). #103-#107'nin sormadan birleşmesi bu kurala uygun sayıldı; #108 bu kararla birleşti | Çalışma kuralı | 14 Ekim |
 | K25 | ⏳ Gerçek çocuk gibi gezinme testi | 14 Ekim: "Oyna" ikinci kez çalışmıyordu, testler yakalamadı (ekranları kısayoldan açıyorlardı, hiçbir yolu iki kez yürümüyorlardı). Öneri: ana yolları gerçek dokunuşla en az iki kez dolaşan test (açılış → macera → harita → durak → ödül → geri; Ailece iki kez; ebeveyn köşesi gir/çık) | Bu türden başka gizli hata olabilir | 14 Ekim |
@@ -59,6 +59,16 @@ Onay verilmemiş, ertelenmiş ya da reddedilmiş öneriler de buraya yazılır; 
 ---
 
 ## 4. Oturum günlüğü (en yeni üstte)
+
+### 14 Ekim 2026 (akşam) — zıplama testi hazırlığı (0.9.1)
+**İnceleme:** ZiplaDenemeScene, EbeveynKameraScene, kamera.ts (Sayici zıpla yolu, KameraSayaci ölçümü), tests/kamera.test.ts, oyun.spec zıplama testi.
+**Bulgu (düzeltildi):** "Kamera gördü" sayısı Aferin kutlamasının 2 sn'sinde gelen kamera zıplamalarını saymıyordu; 10. zıplamada
+çift tetik olursa fazla sayım gizlenirdi. Artık her kamera zıplaması sayılır (yıldız yine yanmaz). Test eski kodda kırmızı, yenide yeşil.
+**Dürüst ölçüm notları:** oyun hiçbir zıplama ölçümünü kaydetmez (ekrandan çıkınca kaybolur). "Son zıplama ms" = inişin
+algılandığı karenin işleme süresi; kamera gecikmesi ve iniş eşiği payı dahil değil. Tanıma ort/en uzun son 30 tanımadan.
+**Bilinen riskler (açık):** ekran kilitlenmesi (oyun ekranı açık tutmaz; iPhone otomatik kilit), kadrajda ikinci kişi,
+telefonun oynaması, ışık; eşikler gerçek çocukla denenmedi. Ekran açık tutma (Wake Lock) önerisi ⏳ (test sonucuna göre).
+**Bekleyen:** 👤 K23 sonucu (10 adımlı tablo + kırpılmış ekran görüntüsü). Kütüğü duraklara taşıma (K22) bundan sonra ayrı karar.
 
 ### 14 Ekim 2026 — birleştirme kuralı (K24), #108, sağ/sol ayna
 **Birleşenler (`test` son hâlinde yeşil ve okunarak):**
