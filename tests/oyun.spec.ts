@@ -383,7 +383,7 @@ test('her hareketin yazısı (oturarak ve Sakin hâlleri dahil) okunur boyutta k
       return w;
     };
     const temel = [...TUM_DURAKLAR.flatMap(oturum), ...ISINMALAR, ...SOGUMALAR, DONMA, AYNA, ...AILE_OTURUMU];
-    const ayarlar = [{ yas: 'buyuk', oturarak: false }, { yas: 'kucuk', oturarak: false }, { yas: 'buyuk', oturarak: true }, { yas: 'kucuk', oturarak: true }] as const;
+    const ayarlar = [{ yas: 'buyuk', oturarak: false }, { yas: 'kucuk', oturarak: false }, { yas: 'buyuk', oturarak: true }, { yas: 'kucuk', oturarak: true }, { yas: 'hizli', oturarak: false }] as const;
     const bulunan = new Set<string>();
     for (const a of ayarlar)
       for (const h of uyarla(temel, a)) {

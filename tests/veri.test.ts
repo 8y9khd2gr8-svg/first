@@ -191,7 +191,7 @@ test('ebeveyn ayarları: oturarak listede ayakta hareket yok, aynı durakta tekr
     const turler = oturarak.map((h) => h.animasyon);
     assert.equal(new Set(turler).size, turler.length, `${d.id}: oturarakta tekrar`);
     for (const h of oturarak) assert.ok(!AYAKTA.has(h.animasyon), `${d.id}: oturarakta ayakta hareket: ${h.animasyon}`);
-    for (const ayar of [{ yas: 'kucuk', oturarak: false }, { yas: 'kucuk', oturarak: true }, { yas: 'buyuk', oturarak: true }] as const)
+    for (const ayar of [{ yas: 'kucuk', oturarak: false }, { yas: 'kucuk', oturarak: true }, { yas: 'buyuk', oturarak: true }, { yas: 'hizli', oturarak: false }, { yas: 'hizli', oturarak: true }] as const)
       for (const h of uyarla(temel, ayar)) {
         assert.ok(liste.has(h.sesli), `seslendirme listesinde yok: ${h.sesli}`);
         assert.ok(!/\bgibi\b/i.test(h.sesli));
@@ -201,6 +201,14 @@ test('ebeveyn ayarları: oturarak listede ayakta hareket yok, aynı durakta tekr
       const o = oturum(d)[i];
       if (h.tur === 'sayi' && o.tur === 'sayi') assert.ok(h.adet <= o.adet && h.tempoMs > o.tempoMs, d.id);
     });
+    // Hızlı tempo: tekrar azalmaz, ritim yavaşlamaz, süre kısalmaz; en az bir hareket gerçekten zorlaşır.
+    const hizli = uyarla(oturum(d), { yas: 'hizli', oturarak: false });
+    hizli.forEach((h, i) => {
+      const o = oturum(d)[i];
+      if (h.tur === 'sayi' && o.tur === 'sayi') assert.ok(h.adet >= o.adet && h.adet <= 12 && h.tempoMs <= o.tempoMs, `${d.id}: ${h.baslik}`);
+      if (h.tur === 'sure' && o.tur === 'sure') assert.ok(h.saniye >= o.saniye, `${d.id}: ${h.baslik}`);
+    });
+    assert.ok(hizli.some((h, i) => JSON.stringify(h) !== JSON.stringify(oturum(d)[i])), `${d.id}: hızlı tempo bir şey değiştirmedi`);
   }
   // Oturum kurulurken (ısınma, sürpriz, soğuma dahil) ayar uygulanır.
   assert.ok(oturumKur(TUM_DURAKLAR[0]).length >= 5);
