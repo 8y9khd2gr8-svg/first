@@ -62,13 +62,13 @@ Ekranın altında **✅ Görüyorum: zıpla!** yazmadan başlamayın. Ekrana kim
 | 7 | **Kamera gördü** sayısını yazın. 10 zıplama için beklenen: başlangıç + 10 | Son: … |
 | 8 | Yağız **30 sn** yerinde dursun, sonra kollarını yukarı kaldırıp indirsin, sağa sola sallansın (zıplamadan, **çömelmeden**) | Bu sırada Zıpzıp zıpladı mı, kaç kez? |
 | 9 | Hızlı seri: Yağız **5 kez arka arkaya** (beklemeden) zıplasın | Kamera gördü kaç arttı? |
-| 10 | En son: Yağız bir kez **çömelip kalksın**, sonra 3 kez zıplasın | Zıpzıp zıpladı mı? (Bilinen sorun: çömelince sayaç takılabilir; aşağıya bakın) |
+| 10 | En son: Yağız bir kez **çömelip kalksın**, sonra 3 kez zıplasın | Çömelip kalkarken Zıpzıp zıpladı mı (zıplamamalı)? Sonraki 3 zıplamanın kaçı sayıldı? |
 | 11 | Kamerasız: ⌂ → tekrar 🌍 Zıpzıp da zıplasın (kamerayı açmadan): Zıpzıp ritimle zıplar, ekrana dokununca da. Yağız hangisini sevdi? | |
 
 **Takılırsa:** "✅ Görüyorum" yazdığı hâlde Zıpzıp zıplamayı bırakırsa: ⌂ → 🌍 Zıpzıp da zıplasın → 📷 Kamerayla zıpla (sayaç
 sıfırdan başlar). Not alın: hangi adımda, takılmadan hemen önce Yağız ne yaptı (çömeldi, telefona yaklaştı, eğildi…)?
-Çocuksuz denemede bulunan bilinen sorun: çömelip kalkınca sayaç "havada" kalır ve sonraki zıplamaları saymaz
-(`tests/kamera.test.ts` todo). Ekran kilitlenir ya da başka uygulamaya geçilirse kamera durabilir ama yazı "Görüyorum"da kalır:
+Çocuksuz denemede bulunan "çömelince takılma" düzeltildi (sayaç en geç 1 sn'de kendini toparlar; gerçek çocukla adım 10 doğrular).
+Ekran kilitlenir ya da başka uygulamaya geçilirse kamera durabilir ama yazı "Görüyorum"da kalır:
 yine ⌂ ile çıkıp yeniden açın.
 
 Sonuçları `docs/yagiz-zipla-sonuc.md` şablonuna yazın (Notlar uygulamasına kopyalanabilir).

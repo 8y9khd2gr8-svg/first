@@ -62,11 +62,11 @@ Onay verilmemiş, ertelenmiş ya da reddedilmiş öneriler de buraya yazılır; 
 
 ### 14 Ekim 2026 (gece) — Yağız testi öncesi çocuksuz hazırlık
 **Korunan sürüm:** main 429280b (0.9.1; #114 + #115). Geri alma yolu: PR'daki Revert düğmesi (etiket `v0.9.0` = fe37906).
-**Bulgu 1 (⏳ karar bekliyor, kod değişmedi):** zıplama sayacı çömelip kalkınca "havada" takılır (taban çömelme
+**Bulgu 1 (✅ kullanıcı seçti: testten önce düzelt; ayrı PR):** zıplama sayacı çömelip kalkınca "havada" takılır (taban çömelme
 yüksekliğinde kalır, kalkış yükselme sayılır, iniş hiç gelmez) → sonraki zıplamalar sayılmaz; ancak yeniden açınca düzelir.
 Yapay noktalarla doğrulandı; `tests/kamera.test.ts` içinde todo testi. Oyundaki zıplama hareketinde de olur (her harekette sayaç
-yenilendiği için etkisi o hareketle sınırlı; "Yaptım!" yine çıkar). Öneri: havada kalma 1 sn'yi geçerse sayılmadan sıfırla
-(eşikler aynı kalır).
+yenilendiği için etkisi o hareketle sınırlı; "Yaptım!" yine çıkar). Düzeltme: havada kalma 1 sn'yi geçerse sayılmadan
+sıfırlanır (ZIPLAMA_EN_UZUN_HAVA_MS; %7 ve 400 ms aynı). Gerçek çocukla protokol adım 10 doğrular.
 **Bulgu 2 (⏳):** kamera akışı durursa (ekran kilidi, uygulama değişimi, başka uygulama kamerayı alırsa) oyun fark etmez; yazı
 "✅ Görüyorum"da kalır, Zıpzıp tepki vermez. Öneri: 2 sn yeni kare gelmezse "Kamera durdu, dokunup yeniden açın".
 **Bulgu 3 (öneri):** kamera hiç yoksa / izin reddedilince aynı yazı ("izin verilmedi mi?"); kamerasız ritim yolu sürer.
