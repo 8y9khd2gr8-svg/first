@@ -144,10 +144,12 @@ const ADIMLAR: Record<Animasyon, Adim[]> = {
     { durus: D.yanAcik, y: 0, oran: 0.4, yon: 1 },
   ],
   kocaman: [{ durus: D.acik, y: -10, oran: 0.3 }],
+  // "Sağa sola" diyen hareketler ekranın sağına başlar (aci > 0, x > 0): çocuk ekrana bakar, ekranın sağı
+  // çocuğun sağıdır; Zıpzıp ayna gibi gösterir (yana adım ve yana zıplama da önce sağa gider).
   belDondur: [
-    { durus: D.heykel, y: 0, oran: 0.25, aci: -12 },
-    { durus: D.heykel, y: 6, oran: 0.25, aci: 0 },
     { durus: D.heykel, y: 0, oran: 0.25, aci: 12 },
+    { durus: D.heykel, y: 6, oran: 0.25, aci: 0 },
+    { durus: D.heykel, y: 0, oran: 0.25, aci: -12 },
     { durus: D.heykel, y: -6, oran: 0.25, aci: 0 },
   ],
   yanaEgil: [
@@ -157,8 +159,8 @@ const ADIMLAR: Record<Animasyon, Adim[]> = {
     { durus: D.kollarYukari, y: 0, oran: 0.2, aci: 0 },
   ],
   kolSalla: [
-    { durus: D.kollarYukari, y: 0, oran: 0.5, aci: -10 },
     { durus: D.kollarYukari, y: 0, oran: 0.5, aci: 10 },
+    { durus: D.kollarYukari, y: 0, oran: 0.5, aci: -10 },
   ],
   piramit: [{ durus: D.piramit, y: 0, oran: 0.3 }],
   tHarfi: [{ durus: D.yanKapali, y: -10, oran: 0.3 }],
@@ -243,8 +245,8 @@ const ADIMLAR: Record<Animasyon, Adim[]> = {
     { durus: D.normal, y: 0, oran: 0.15, x: 50 },
   ],
   sallan: [
-    { durus: D.saril, y: 0, oran: 0.5, aci: -10, kollarOnde: true },
     { durus: D.saril, y: 0, oran: 0.5, aci: 10, kollarOnde: true },
+    { durus: D.saril, y: 0, oran: 0.5, aci: -10, kollarOnde: true },
   ],
   topla: [
     { durus: D.tasAl, y: 50, oran: 0.4 },

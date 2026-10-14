@@ -225,7 +225,7 @@ Teknoloji: Phaser 3 + TypeScript + Vite, GitHub Pages ile yayın. İleride Capac
   başta), sonra AskUserQuestion ile en güçlü 4'ünü sun (önerilen ilk sırada, "(Önerilen)"
   etiketiyle); kullanıcı yazmadan seçebilsin. Her zaman en iyisi için kafa yor.
 - Her aşama küçük ve telefonda test edilebilir olsun; sonunda Yağız (6 yaş) test eder.
-- Onay sınırları (12 Ekim): testi yeşil, küçük ve geri alınabilir PR'ları Claude birleştirir (kalıcı onay). Tek tek açık onay
+- Onay sınırları (12 Ekim; 14 Ekim'de "her birleştirmeye onay" isteğine karşı yeniden seçildi, K24): testi yeşil, küçük ve geri alınabilir PR'ları Claude birleştirir (kalıcı onay). Tek tek açık onay
   gerekenler: oynanışı ya da ürün kapsamını ciddi değiştirmek, yayın/dağıtım kararı, force push / geçmişi yeniden yazmak, geniş
   silme, GitHub güvenlik/erişim ayarı, para harcamak, çocuğa ait kamera/görüntü/ses/hareket verisini saklamak ya da göndermek.
   Proje sahibi şu an sadece iPhone kullanıyor (Claude ve GitHub uygulamaları; terminal yok): bilgisayar gerektiren işler açıkça
