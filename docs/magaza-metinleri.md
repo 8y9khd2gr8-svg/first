@@ -8,7 +8,79 @@ uyarlama diye sunulmaz ("hareket kısıtı" da yazılmaz); sadece dar alan, yorg
 
 ---
 
-## Türkçe
+## Hangi metin? (14 Ekim kararı: iki sürüm)
+- **İlk sürüm (Türkiye + Dünya + Ailece):** mağazaya beta kapsamıyla (K1) çıkılırsa bu kullanılır. Mağazalar açıklamada olup
+  uygulamada olmayan içerik için başvuruyu reddedebilir; Apple "yakında gelecek" içeriğin açıklamada anlatılmasını da sevmez.
+  Bu yüzden ilk sürüm metninde kapalı bölümlerin (Uzay, Spor, Dinozor, Evde, Okyanus) adı geçmez.
+- **Tam sürüm:** bütün bölümler açılınca (aşağıdaki "Türkçe" ve "English"). Bölüm açıldıkça ilk sürüm metnine eklenir.
+- İngilizce metin şimdilik sadece tam sürüm için var; ilk sürüm İngilizcesi İngilizce mağaza sayfası gerekirse yazılır.
+
+---
+
+## Türkçe – ilk sürüm (Türkiye + Dünya + Ailece)
+
+**Uygulama adı** (30): Zıp Zıp Dünya
+
+**Alt başlık – Apple** (30): Hareket et, dünyayı keşfet!
+
+**Kısa açıklama – Google** (80)
+Çocuklar için reklamsız hareket oyunu: zıpla, çömel, Türkiye'yi ve dünyayı gez!
+
+**Anahtar kelimeler – Apple** (100, virgülle)
+çocuk,hareket,spor,egzersiz,oyun,türkiye,harita,okul öncesi,aile,eğitici,dünya,harikalar
+
+**Uzun açıklama** (4000)
+
+Zıp Zıp Dünya, 4-9 yaş çocuklar için Türkçe bir hareket ve keşif oyunu.
+Kollu bacaklı, gülen küçük bir dünya olan maskotumuz Zıpzıp ile çocuğunuz Türkiye'yi ve dünyanın harikalarını 14 durakta gezerken zıplıyor, çömeliyor, koşuyor ve esniyor.
+
+HAREKET EDEREK GEZ
+• Her durakta kısa bir antrenman: durağa özel bir hareket, üç hareket ve bir sürpriz oyun (donma ya da ayna oyunu). Oyunun başında ısınma, sonunda soğuma.
+• Zıpzıp hareketi önce gösterir, çocuk sayaçla birlikte yapar.
+• Komutlar kısa ve net: "Dizlerini sırayla kaldır!", "Kollarını kaldır, indir!"
+• Yazı okumayı bilmeyen çocuklar için her şey sesli anlatılır, düğmeler büyüktür.
+• Zıpzıp gezdiği yerle birlikte döner: Türkiye'deyken Türkiye, Piramitlerde Mısır ona bakar.
+
+HER ÇOCUĞA GÖRE AYAR
+• Hareket temposu: "Sakin" seçilirse tekrarlar azalır, ritim yavaşlar (küçükler ve yeni başlayanlar için); "Hızlı" seçilirse tekrarlar artar, ritim hızlanır (daha fazlasını isteyenler için).
+• Oturarak oyna: zıplama ve çömelme yerine oturarak yapılan kol ve gövde hareketleri gelir. Dar bir odada, yorgun bir günde ya da ayakta oynamak istemeyen çocuk için.
+• Ayarlar ebeveyn köşesinde, sadece telefonda saklanır.
+
+KEŞFET VE ÖĞREN
+• Türkiye Turu: İstanbul, Truva, Pamukkale, Kapadokya, Nemrut, Göbeklitepe, Karadeniz
+• Dünya Harikaları: Efes, Kolezyum, Piramitler, Petra, Tac Mahal, Çin Seddi, Machu Picchu
+• Her durakta kısa ve ilginç bir "Biliyor muydun?" bilgisi
+
+ÖDÜLLER, BASKI YOK
+• Pasaport damgaları, rozetler ve hareket ettikçe açılan kostümler
+• Bölüm sonunda kaydedilip paylaşılabilen sertifika
+• Kaybetmek yok, süre baskısı yok, "her gün gir" bildirimi yok
+
+AİLECE HAREKET
+• "Ailece" bölümünde çocuk bir büyüğüyle el ele zıplıyor, ayna oyunu oynuyor ve sarılarak bitiriyor. Telefona gitmeye gerek yok: hareketler kendiliğinden ilerler.
+
+EBEVEYNLER İÇİN
+• Reklam yok. Hesap ya da kayıt yok.
+• Sosyal ağ değildir: sohbet, profil ya da başka kullanıcılarla iletişim yok.
+• Çocuktan veri toplanmaz. İlerleme yalnızca telefonda saklanır.
+• İnternetsiz çalışır.
+• Kilitli ebeveyn köşesi: haftalık hareket özeti, pasaport ayarları, tüm verileri silme.
+• İsteğe bağlı kamera ile sayma (deneme): görüntü telefonda işlenir, kaydedilmez ve gönderilmez. Ebeveyn köşesindeki "Dene" ekranında kameranın neyi gördüğünü önceden görebilirsiniz.
+
+FİYAT
+Türkiye Turu ve Ailece tamamen ücretsiz. Tek seferlik ödemeyle Dünya Harikaları açılır; sonradan eklenen bölümler de bu ödemeye dahildir. Abonelik yok.
+
+**Tanıtım metni – Apple** (170)
+Reklamsız, internetsiz, Türkçe hareket oyunu. Ayakta ya da oturarak, kendi temposunda oyna. Türkiye Turu ücretsiz!
+
+**Yenilikler (ilk sürüm)**
+Zıp Zıp Dünya yayında! Türkiye'yi ve dünyanın harikalarını hareket ederek keşfedin.
+
+Not: "Ailece ücretsiz" doğru (14 Ekim: Büyük Macera'dan ödeme sormadan açılıyor). Bu değişirse metin de değişir.
+
+---
+
+## Türkçe – tam sürüm (bütün bölümler açılınca)
 
 **Uygulama adı** (Apple 30, Google 30)
 Zıp Zıp Dünya
@@ -35,7 +107,7 @@ HAREKET EDEREK GEZ
 • Zıpzıp gezdiği yerle birlikte döner: Türkiye'deyken Türkiye, okyanusta Büyük Okyanus, Piramitlerde Mısır ona bakar.
 
 HER ÇOCUĞA GÖRE AYAR
-• Hareket temposu: "Sakin" seçilirse tekrarlar azalır, ritim yavaşlar. Küçükler ve yeni başlayanlar için.
+• Hareket temposu: "Sakin" seçilirse tekrarlar azalır, ritim yavaşlar (küçükler ve yeni başlayanlar için); "Hızlı" seçilirse tekrarlar artar, ritim hızlanır (daha fazlasını isteyenler için).
 • Oturarak oyna: zıplama ve çömelme yerine oturarak yapılan kol ve gövde hareketleri gelir. Dar bir odada, yorgun bir günde ya da ayakta oynamak istemeyen çocuk için.
 • Ayarlar ebeveyn köşesinde, sadece telefonda saklanır.
 
