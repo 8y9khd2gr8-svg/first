@@ -38,13 +38,36 @@ Oyunu ilk kez açıyorsanız ebeveyn köşesinden **🗑️ Tüm verileri sil** 
 | 17 | **Oturarak oyna** ile bir durak (sandalyede ya da yerde): kol/gövde hareketlerini anladı mı? Ayağa kalkmak istedi mi? | |
 | 18 | **Kamera denemesi** (kamera ayarının yanında 🔍 Dene): Yağız zıplarken/çömelirken sayı doğru arttı mı? "Geri git" uyarısı çıktı mı? Hangi hareket yanlış sayıldı? (Eşikler buna göre ayarlanacak; bu sayılar özete eklenmez.) | |
 
-## Zıplama denemesi (kamera, 5 dk)
-Büyük Macera → sağ alttaki **🔒 Ebeveyn** → 📷 Kamerayla sayma yanındaki **🔍 Dene** → **🌍 Zıpzıp da zıplasın** → **📷 Kamerayla zıpla**.
-Telefonu Yağız'ın baştan ayağa görüneceği yere koyun ("✅ Görüyorum" yazmalı).
-1. Yağız 10 kez zıplasın (aralarda kısa bekleyerek). Zıpzıp kaç kez zıpladı? Bir zıplamada iki kez zıpladığı oldu mu?
-2. Yağız 30 saniye sadece dursun / kollarını sallasın: Zıpzıp kendiliğinden zıpladı mı?
-3. Ekranın altındaki küçük ölçüm satırının **ekran görüntüsünü** gönderin (tanıma ms, kare/sn, son zıplama ms).
-Kamerasız da deneyin: kamera açmadan Zıpzıp ritimle zıplar, ekrana dokununca da zıplar. Yağız hangisini sevdi?
+## Zıplama denemesi (kamera, 10 dk) — K23
+**Yol:** Büyük Macera → sağ alttaki **🔒 Ebeveyn** (çarpma sorusu) → 📷 Kamerayla sayma yanındaki **🔍 Dene** →
+**🌍 Zıpzıp da zıplasın** → **📷 Kamerayla zıpla** (izin sorulursa "İzin ver").
+
+**Hazırlık:** iPhone'da Ayarlar → Ekran ve Parlaklık → Otomatik Kilit'i test boyunca 5 dk ya da "Asla" yapın (oyun ekranı
+açık tutmaz; 30 sn hareketsizlikte ekran kilitlenirse kamera durur). Telefon dik, sabit (rafa/kitaplara yaslı, elde
+değil: telefon oynarsa omuzlar oynamış gibi görünür). Yağız 2-3 m uzakta; başının üstünde boşluk, ayakları görünür.
+Kadrajda başka kimse olmasın (kamera tek kişiye bakar, yanlış kişiyi seçebilir). Oda aydınlık, ışık arkadan gelmesin.
+Ekranın altında **✅ Görüyorum: zıpla!** yazmadan başlamayın. Ekrana kimse dokunmasın (dokunma da Zıpzıp'ı zıplatır).
+
+**Sayılar (ekranın altındaki küçük ölçüm satırı, 2. satır sonu):** **Kamera gördü: N** = kameranın saydığı zıplama
+(Aferin anında gelenler dahil). Oyun bunu hiçbir yere kaydetmez; ekrandan çıkınca kaybolur.
+
+| Adım | Ne yapılır | Not alın |
+|---|---|---|
+| 1 | "Görüyorum" yazınca **Kamera gördü** sayısını yazın (0 olmalı) | Başlangıç: … |
+| 2 | Yağız **10 kez zıplasın**, her zıplamadan sonra 1-2 sn dursun. Siz yüksek sesle sayın. | |
+| 3 | Her zıplamada Zıpzıp **bir kez** mi zıpladı? Kaçırdığı / iki kez zıpladığı zıplamanın sırasını yazın (ör. "4'te kaçırdı") | Kaçırılan: … Çift: … |
+| 4 | 10. zıplamadan sonra "Aferin!" çıktı mı? | |
+| 5 | Zıpzıp, Yağız yere indikten hemen sonra mı zıpladı, belirgin geç mi? (gözle; "hemen / biraz geç / çok geç") | |
+| 6 | **Ekran görüntüsü** alın (yan tuş + ses açma). Sonra **Kırp** ile kamera kutusunu çıkarıp sadece alttaki ölçüm satırını bırakın (Yağız'ın görüntüsü gönderilmesin) | |
+| 7 | **Kamera gördü** sayısını yazın. 10 zıplama için beklenen: başlangıç + 10 | Son: … |
+| 8 | Yağız **30 sn** yerinde dursun, sonra kollarını sallasın, çömelip kalksın (zıplamadan) | Bu sırada Zıpzıp zıpladı mı, kaç kez? |
+| 9 | Hızlı seri: Yağız **5 kez arka arkaya** (beklemeden) zıplasın | Kamera gördü kaç arttı? |
+| 10 | Kamerasız: ⌂ → tekrar 🌍 Zıpzıp da zıplasın (kamerayı açmadan): Zıpzıp ritimle zıplar, ekrana dokununca da. Yağız hangisini sevdi? | |
+
+**Başarı ölçütü (K23):** adım 2'de 10 zıplamanın en az 8'i sayıldı · hiçbir zıplamada çift tepki yok · adım 8'de kendiliğinden
+zıplama yok (ya da en çok 1) · ölçüm satırında tanıma/sn en az ~8 · Zıpzıp gözle "hemen" tepki verdi.
+"Son zıplama … ms" sadece telefonun o kareyi işleme süresidir; kameranın kendi gecikmesini ve inişin algılanma payını içermez,
+bu yüzden gerçek gecikmeyi adım 5'teki göz izlenimi gösterir.
 
 ## Sonra Yağız'a sorun (oyun gibi, kısa)
 
