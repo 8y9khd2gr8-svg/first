@@ -21,6 +21,8 @@ export class AcilisScene extends Phaser.Scene {
   }
 
   create() {
+    // Sahne aynı nesneyle yeniden başlar: ⌂ ile açılışa dönülünce "Oyna" yine çalışsın.
+    this.gidiyor = false;
     yildizliArkaPlan(this);
     const { width } = this.scale.gameSize;
     const x = width / 2;

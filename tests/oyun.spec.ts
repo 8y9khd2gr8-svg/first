@@ -139,6 +139,23 @@ test('Büyük Macera\'daki küçük Ebeveyn düğmesi önce ebeveyn kilidine gid
   expect(kayit.hatalar).toEqual([]);
 });
 
+test('⌂ ile açılışa dönülünce "Oyna" yine çalışır (ikinci kez de Büyük Macera açılır)', async ({ page }) => {
+  const kayit = await oyunuAc(page, { ...BETA, 'zipzip-pasaport-v1': JSON.stringify({ ad: '', avatar: '🐼', soruldu: true }) });
+  const r = (await page.locator('canvas').boundingBox())!;
+  const tikla = (gx: number, gy: number) => page.mouse.click(r.x + (r.width * gx) / 720, r.y + (r.height * gy) / 1280);
+  const etkin = () => page.evaluate(() => (window as any).oyun.scene.getScenes(true).map((s: any) => s.scene.key));
+  await expect.poll(etkin).toEqual(['Acilis']);
+  for (let i = 0; i < 2; i++) {
+    await page.waitForTimeout(500);
+    await tikla(360, 1090);
+    await expect.poll(etkin).toEqual(['Macera']);
+    await page.waitForTimeout(500);
+    await tikla(80, 80);
+    await expect.poll(etkin).toEqual(['Acilis']);
+  }
+  expect(kayit.hatalar).toEqual([]);
+});
+
 test('tam sürüm: ödeme kilidi ebeveyn kilidine götürür, satın alınca bölümler açılır', async ({ page }) => {
   await oyunuAc(page, {}, '/?odeme=deneme&bolumler=hepsi');
   const kilit = () =>
