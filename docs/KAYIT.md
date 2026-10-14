@@ -16,7 +16,7 @@ Onay verilmemiş, ertelenmiş ya da reddedilmiş öneriler de buraya yazılır; 
 | K2 | ✅ Sertifikadaki "Kaydet / Paylaş" çocuk ekranında kilitsizdi | **Yapıldı (#99, 12 Ekim):** çocuk "🔒 Kaydet / Paylaş"a dokununca ebeveyn kilidi; doğru cevapla aynı sertifika paylaşılabilir. 🔎 Mağaza kural metni yine de mağaza başvurusunda kontrol edilecek | | 12 Ekim |
 | K3 | ✅ Ebeveyn köşesine giriş | **Yapıldı (#106):** Büyük Macera'nın sağ altında küçük kilitli "🔒 Ebeveyn" düğmesi (Pasaport → ✏️ da duruyor); güvenlik notu yeni yeri söylüyor | Ebeveynin ayarları bulması | 12 Ekim |
 | K4 | ⏳ Hareketlerin uzman kontrolü | Katalog güncel (#101, 12 Ekim): `docs/hareket-katalogu.html`; 79 hareket, her kartta Sakin tempo ve oturarak hâli, 49'u "Betada" etiketli, uzmana 6 soru, Uygun/Değişmeli/Çıkarılmalı + not, PDF kaydet. **Kullanıcıda:** fizyoterapist/çocuk hekimine göndermek | 🔎 Hiçbir hareketi uzman görmedi (sağlık konusunda varsayım yok) | 12 Ekim |
-| K5 | ⏳ 4-5 yaş komutları | **Kısmen yapıldı (#106):** Sakin tempoda 36 çok adımlı komut tek eyleme iner (`src/uyarla.ts` KISA_KOMUT; tahmin, 4-5 yaşla denenecek; seslendirme 761 → 857 cümle). **Açık:** sağ/sol ayna sorunu (Zıpzıp çocuğa dönük) | 🔎 Gözlem yok, tahmin | 12 Ekim |
+| K5 | ⏳ 4-5 yaş komutları | **Kısmen yapıldı (#106):** Sakin tempoda 36 çok adımlı komut tek eyleme iner (`src/uyarla.ts` KISA_KOMUT; tahmin, 4-5 yaşla denenecek; seslendirme 761 → 857 cümle). **14 Ekim:** sağ/sol ayna sorunu düzeltildi: "sağa sola" diyen salla/sallan/bel döndür artık ekranın sağına (çocuğun sağına) başlıyor; yana adım/zıplama zaten öyleydi. Sağ/sol adı geçen tek taraflı komut yok | 🔎 Gözlem yok, tahmin | 14 Ekim |
 | K6 | ⏳ 8-9 yaş ilgisi | Kaybettirmeyen zorluk ("kendi rekorun", daha hızlı tempo) konuşulsun mu? Ya da hedef yaş 4-8'e daralsın mı? | Görsel dil küçük kardeş oyunu gibi görünebilir | 12 Ekim |
 | K7 | ⏳ Yayın onayı | GitHub Pages yayınına "onay gerekli" eklemek (her yayın kullanıcı onayıyla). Öneri: şimdilik gerek yok, main koruması yeterli | Yanlışlıkla yayın riski | 12 Ekim |
 | K8 | ⏳ Eski dallar | GitHub'da ~100 eski dal var (çoğu birleşmiş) | Temizlik; tek tek kontrol edilmeden silinmez | 12 Ekim |
@@ -58,6 +58,13 @@ Onay verilmemiş, ertelenmiş ya da reddedilmiş öneriler de buraya yazılır; 
 ---
 
 ## 4. Oturum günlüğü (en yeni üstte)
+
+### 14 Ekim 2026 — birleştirme kuralı (K24), #108, sağ/sol ayna
+**Birleşenler (`test` son hâlinde yeşil ve okunarak):**
+- #108 Bekleyen tek engel (K22) — kullanıcı K24'te "K21 geçerli" deyince birleşti.
+- Bu PR: K24 kaydı + sağ/sol ayna (K5 kalanı): kolSalla, sallan, belDondur önce ekranın sağına eğilir (komut "sağa sola" diyor; çocuk ekrana bakınca ekranın sağı kendi sağı).
+
+**Bekleyen:** Yağız testi sonucu (K23): kullanıcı 10 zıplama sonucunu ve ölçüm satırının ekran görüntüsünü gönderecek; sonuca göre eşik/400 ms ayarı. Eski oturum (session_016R…) arşivlendi.
 
 ### 12 Ekim 2026 (öğleden sonra) — zıplama prototipi, beta kapsamı, kısa komut, ebeveyn düğmesi
 **Birleşenler (hepsi `test` son hâlinde yeşil ve okunarak):**
