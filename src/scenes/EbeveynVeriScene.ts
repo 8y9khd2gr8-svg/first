@@ -2,7 +2,8 @@ import Phaser from 'phaser';
 import { RENK, YAZI_TIPI, uzaktanAcikMi } from '../ayarlar';
 import { oyunAyari } from '../oyunAyari';
 import { buyukDugme, evDugmesi, yildizliArkaPlan } from '../arayuz';
-import { tamamlananlar } from '../ilerleme';
+import { betaDunyaAcikMi, tamamlananlar } from '../ilerleme';
+import { guvenlikNotuGoruldu } from '../guvenlik';
 import { haftalikOzet } from '../istatistik';
 import { kameraAcikMi } from '../kamera';
 import { KOSTUMLER, seciliKostum } from '../kostumler';
@@ -38,9 +39,11 @@ export class EbeveynVeriScene extends Phaser.Scene {
       ['Uzaktan oyna', uzaktanAcikMi() ? 'açık' : 'kapalı'],
       ['Tempo · oturarak', `${{ kucuk: 'sakin', buyuk: 'normal', hizli: 'hızlı' }[oyunAyari().yas]} · ${oyunAyari().oturarak ? 'açık' : 'kapalı'}`],
       ...(odemeKipi() === 'web' ? [] : [['Tam sürüm', tamSurumVarMi() ? 'alındı' : 'alınmadı'] as [string, string]]),
+      ['Güvenlik notu · beta', `${guvenlikNotuGoruldu() ? 'okundu' : 'okunmadı'} · ${betaDunyaAcikMi() ? 'bölümler açık' : 'kapalı'}`],
     ];
-    const kutuY = 250;
-    const satirBoyu = 58;
+    // Satırlar sıkı: en kalabalık hâlde (uygulamada "Tam sürüm" satırıyla) alttaki yazılar "Tamam"ın altında kalmasın.
+    const kutuY = 235;
+    const satirBoyu = 48;
     this.add.rectangle(x, kutuY + (satirlar.length * satirBoyu) / 2, 640, satirlar.length * satirBoyu + 30, 0xffffff, 0.08).setStrokeStyle(2, 0xffffff, 0.2);
     satirlar.forEach(([ad, deger], i) => {
       const y = kutuY + 15 + satirBoyu * i + satirBoyu / 2;
@@ -48,7 +51,7 @@ export class EbeveynVeriScene extends Phaser.Scene {
       this.add.text(650, y, deger, { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '28px', color: '#ffffff' }).setOrigin(1, 0.5);
     });
 
-    const altY = kutuY + satirlar.length * satirBoyu + 50;
+    const altY = kutuY + satirlar.length * satirBoyu + 40;
     this.add
       .text(
         x,
@@ -60,7 +63,7 @@ export class EbeveynVeriScene extends Phaser.Scene {
 
     // Kanıtı ebeveyn kendisi görsün: internet olmadan da oyun aynen çalışır.
     this.add
-      .text(x, altY + 205, '✈️ Kendiniz deneyin: uçak modunu açın,\noyun aynen çalışmaya devam eder.', {
+      .text(x, altY + 175, '✈️ Kendiniz deneyin: uçak modunu açın,\noyun aynen çalışmaya devam eder.', {
         fontFamily: YAZI_TIPI,
         fontStyle: 'bold',
         fontSize: '30px',
