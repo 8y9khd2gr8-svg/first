@@ -36,7 +36,11 @@ Onay verilmemiş, ertelenmiş ya da reddedilmiş öneriler de buraya yazılır; 
 | K23 | 👤 Yağız testi: zıplama prototipi | 10 adımlı protokol `docs/yagiz-testi.md` "Zıplama denemesi" (15 Ekim hazırlığı). Ölçütler: 10'da en az 8, çift tepki yok, 30 sn durmada kendiliğinden zıplama yok, tanıma/sn ≥ ~8, gözle "hemen". "Son zıplama ms" sadece kare işleme süresi (gerçek gecikme değil). Ekran görüntüsü kırpılıp gönderilir (çocuğun görüntüsü yok) | Eşikler ve 400 ms koruma gerçek çocukla ayarlanacak | 14 Ekim |
 | K21 | ✅ Birleştirme onayı | **12 Ekim:** testi yeşil, küçük, geri alınabilir PR'ları Claude birleştirir (kalıcı onay). Oynanışı/kapsamı ciddi değiştiren, yayın/dağıtım, force push, geniş silme, GitHub güvenlik/erişim ayarı, para harcama, çocuk verisini saklama/gönderme için tek tek açık onay | Çalışma kuralı | 12 Ekim |
 | K24 | ✅ Birleştirme kuralı çelişkisi | **14 Ekim, kullanıcı seçti: K21 geçerli.** "Ana talimat"taki her birleştirmeye açık onay isteği yerine K21 uygulanır (testi yeşil, küçük, geri alınabilir PR'ı Claude birleştirir; K21'deki istisnalar için tek tek onay). #103-#107'nin sormadan birleşmesi bu kurala uygun sayıldı; #108 bu kararla birleşti | Çalışma kuralı | 14 Ekim |
-| K25 | ⏳ Gerçek çocuk gibi gezinme testi | 14 Ekim: "Oyna" ikinci kez çalışmıyordu, testler yakalamadı (ekranları kısayoldan açıyorlardı, hiçbir yolu iki kez yürümüyorlardı). Öneri: ana yolları gerçek dokunuşla en az iki kez dolaşan test (açılış → macera → harita → durak → ödül → geri; Ailece iki kez; ebeveyn köşesi gir/çık) | Bu türden başka gizli hata olabilir | 14 Ekim |
+| K25 | ✅ Gerçek çocuk gibi gezinme testi | **Yapıldı (#119, 15 Ekim gecesi):** `tests/gezinti.spec.ts` düğmelere ekrandaki yerinden fareyle dokunur; Oyna → Türkiye → durak → ödül → ⌂ → ⌂ iki tur, Ailece iki kez, 🔒 Ebeveyn gir/çık iki kez. #110 hatası geri konunca kırmızı oluyor. İşlemci 4-6 kat yavaşken de geçiyor (`GEZINTI_YAVAS=4`). Oyunda hata bulmadı | | 14 Ekim |
+| K26 | ⏳ "Hareket Kâşifi" rozeti betada kazanılamaz | Koşul "her hareketi en az bir kez dene" bütün bölümlerin (Uzay, Spor, Dinozor, Evde, Okyanus) hareketlerini istiyor; betada açık Türkiye + Dünya + Ailece ile 30'dan fazla hareket hiç gelmiyor. Seçenekler: (a) koşul sadece açık bölümlerin hareketlerine bakar (önerilen; kazanılan rozet kaybolmaz) (b) betada rozeti gizle (c) böyle kalsın ("?" görünür). Ürün kararı, kod değişmedi | Çocuk asla kazanamayacağı bir rozet görür | 15 Ekim |
+| K27 | ⏳ Oyundaki hareket ekranında kamera durursa | Ebeveyn ekranlarında artık "⏸ Kamera durdu" yazıyor (#118). Hareket ekranındaki küçük kamera kutusu (HareketScene) onaysız değiştirilmedi: kamera durunca son sayıyı göstermeye devam eder, "Yaptım!" yine çıkar (kaybetmek yok). Öneri: kutuda "📷 Durdu" yazsın (tek satır, oynanış aynı) | Ebeveyn kameranın saydığını sanabilir | 15 Ekim |
+| K28 | ⏳ Testlerdeki "sakinleşmesini bekle" yardımcısı | `tests/oyun.spec.ts` sakinlesmesiniBekle Phaser 3.90'da olmayan `t.repeat` alanına bakıyor; Zıpzıp'ın sürekli küçük animasyonları yüzünden hep 1,5 sn'nin sonuna kadar bekliyor. Hata değil (testler doğru), sadece yavaşlık; düzeltmek testlerin zamanlamasını değiştirir | Test süresi | 15 Ekim |
+| K29 | ✅ Oturum uzayınca uyarı | **14 Ekim, kullanıcı istedi:** bağlam ~300 bin token'ı geçince ya da iş listesi bitince Claude cevabın sonunda "Yeni oturuma geçelim mi? (kota için)" diye sorar; yarım iş/açık PR varsa önce o biter. CLAUDE.md'ye yazıldı | Kota | 14 Ekim |
 
 ## 2. Kullanıcıda bekleyenler
 
@@ -48,7 +52,7 @@ Onay verilmemiş, ertelenmiş ya da reddedilmiş öneriler de buraya yazılır; 
 | U3 | 👤 İnternetsiz APK'yı telefonda denemek | Sonuç gelince Android INTERNET izni kaldırılır (sonuç gelmeden kaldırılmaz) |
 | U4 | 👤 Yağız testi (+ mümkünse 4-5 ve 8-9 yaştan birer çocuk) | docs/yagiz-testi.md |
 | U5 | 👤 Play geliştirici hesabı, sonra Apple | docs/beta-hazir-mi.md |
-| U6 | 👤 Azure (doğal ses), marka başvurusu, avukat, iletişim e-postası | docs/beta-hazir-mi.md |
+| U6 | 👤 Azure (doğal ses), marka başvurusu, avukat, iletişim e-postası | docs/beta-hazir-mi.md. 15 Ekim: gizlilik.html ve kosullar.html'de iletişim adresi hâlâ "yayından önce eklenecek"; avukata giden taslakta 15 Ekim değişiklikleri var (ilk oynanan gün, Zıpzıp da zıplasın) |
 
 ## 3. Bilinen sorunlar / doğrulanmayanlar (özet)
 - 🔎 Gerçek telefonda: ses, performans, kamera eşikleri, ödeme hiç denenmedi; iPhone'a hiç kurulmadı.
@@ -59,6 +63,18 @@ Onay verilmemiş, ertelenmiş ya da reddedilmiş öneriler de buraya yazılır; 
 ---
 
 ## 4. Oturum günlüğü (en yeni üstte)
+
+### 15 Ekim 2026 (gece, kullanıcı uyurken) — 4 gece işi
+**Birleşenler (hepsi `test` son hâlinde yeşil ve okunarak, K21):**
+- #118 Kamera ekranları (sadece ebeveyn: kamera denemesi, Zıpzıp da zıplasın): görüntü kesilince (iz biter/susturulur/2 sn yeni kare yok) "⏸ Kamera durdu. ⌂ ile çıkıp kamerayı yeniden açın."; görüntü geri gelirse düzelir; ekran kilidinden dönüş yanlış "durdu" saymaz. Kamera yok → "Bu cihazda kamera bulunamadı.", izin yok → "Kameraya izin verilmedi. Telefonun ayarlarından izin verin." Zıpzıp da zıplasın'da kamera durunca ritim yolu geri gelir. HareketScene ve eşikler aynı. 🔎 iPhone'da gerçek ekran kilidiyle denenmedi (bulutta sahte kamera).
+- #120 Gizlilik + beta denetimi: 11 `zipzip-` kaydı gizlilik tablosu/"Teknik ayrıntı" ile birebir. "Bu telefonda neler var?" ekranına eksik 2 kayıt (güvenlik notu, beta ayarı). **Hata:** uygulamada (Tam sürüm satırı varken) "✈️ Kendiniz deneyin" yazısı "Tamam" düğmesinin altında kalıyordu (web'de görünmüyordu) → düzeldi, test. gizlilik.html: ilk oynanan gün, Zıpzıp da zıplasın. beta-hazir-mi.md 0.9.1.
+- #119 Gerçek dokunuşla gezinme testi (K25). İlk hâli CI'da kırmızıydı: harita inişi sırasında dokunuyordu (iniş dokunuşla atlanır, tasarım böyle) ve kutlama denetimi async yazılmıştı (Playwright waitForFunction async kontrolü beklemez; sonuç hemen "false" geliyordu). Düzeltildi; yavaş işlemciyle (4-6 kat) ve bütün testlerle birlikte denendi (44/44). Oyunda hata yok.
+- #121 Kod denetimi düzeltmesi: Pasaport → ada dokun → kilit → Pasaportu hazırla → ⌂, önce Büyük Macera'dan ebeveyn köşesine girildiyse çocuğu Büyük Macera'ya götürüyordu (K3 "gelinen yere"); artık pasaporta döner. Kural: init alan EbeveynMenu'ye veri nesnesi.
+- Bu PR: KAYIT + CLAUDE.md (K29 oturum uyarısı, kamera durdu, gezinme testi).
+
+**Denetimde belirsiz kalanlar:** K26 (Hareket Kâşifi), K27 (hareket ekranında kamera durdu), K28 (test yardımcısı). Ödeme kodunda iOS satın alma durumu ve Android onaylama (acknowledge) gerçek mağazada denenmeden doğrulanamaz (zaten 🔎 listesinde).
+**Testler:** npm test 34/34; test:oyun 40+ (yeni: 4 kamera, 2 gezinme, 1 veri ekranı, 1 pasaport dönüşü); tsc temiz.
+**Arşiv:** session_01R2MaXc2uEiycTifE6DXnFk arşivlendi.
 
 ### 14 Ekim 2026 (gece) — Yağız testi öncesi çocuksuz hazırlık
 **Korunan sürüm:** main 429280b (0.9.1; #114 + #115). Geri alma yolu: PR'daki Revert düğmesi (etiket `v0.9.0` = fe37906).
