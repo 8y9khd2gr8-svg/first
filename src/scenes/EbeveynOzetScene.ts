@@ -23,7 +23,7 @@ export class EbeveynOzetScene extends Phaser.Scene {
     const durak = TUM_DURAKLAR.filter((d) => biten.has(d.id)).length;
     const bolumler = BOLUM_SIRASI.map((id) => ({ ad: KISA_AD[id], biten: BOLUMLER[id].duraklar.filter((d) => biten.has(d.id)).length, toplam: BOLUMLER[id].duraklar.length })).filter((b) => b.biten > 0);
     const dakika = Math.round(ozet.saniye / 60);
-    evDugmesi(this, () => this.scene.start('EbeveynMenu'));
+    evDugmesi(this, () => this.scene.start('EbeveynMenu', {}));
 
     this.add.text(x, 160, 'Bu hafta', { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '72px', color: '#FFC93C' }).setOrigin(0.5);
 
