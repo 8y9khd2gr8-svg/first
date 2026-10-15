@@ -915,3 +915,56 @@ test('"Bu telefonda neler var?": uygulamadaki en uzun hâlde de yazılar "Tamam"
   for (const satir of ['Tam sürüm', 'Güvenlik notu · beta', 'okundu · bölümler açık', 'Uzaktan oyna', 'Kamerayla sayma']) expect(sonuc.metin).toContain(satir);
   expect(kayit.hatalar).toEqual([]);
 });
+
+// Kod denetimi (2. tur): bölüm haritasında yolculukla açılan durak tek nabızla parlar (iki nabız üst üste binmez).
+test('bölüm haritası: yolculukla açılan durakta tek nabız animasyonu', async ({ page }) => {
+  const kayit = await oyunuAc(page, { 'zipzip-ilerleme-v1': JSON.stringify(['yumurta']) });
+  await saatiHizlandir(page, 4);
+  await sahneAc(page, 'Dinozor', { yolculukDen: 'yumurta' });
+  // Yolculuk bitince ikinci durak (430, 980) açılır ve büyüme animasyonu biter.
+  await page.waitForFunction(() => {
+    const s = (window as any).oyun.scene.getScene('Dinozor');
+    const d = s.children.list.find((o: any) => o.type === 'Container' && o.x === 430 && o.y === 980);
+    return !!d && d.scale >= 1 && s.tweens.getTweensOf(d).length > 0 && s.tweens.getTweensOf(d).every((t: any) => (t.data ?? []).some((v: any) => v.repeat === -1));
+  }, null, { timeout: 20_000, polling: 100 });
+  const nabizSayisi = await page.evaluate(() => {
+    const s = (window as any).oyun.scene.getScene('Dinozor');
+    const d = s.children.list.find((o: any) => o.type === 'Container' && o.x === 430 && o.y === 980);
+    return s.tweens.getTweensOf(d).filter((t: any) => (t.data ?? []).some((v: any) => v.key === 'scaleX' && v.repeat === -1)).length;
+  });
+  expect(nabizSayisi).toBe(1);
+  expect(kayit.hatalar).toEqual([]);
+});
+
+// Dünya küresi: alttaki düğmelere art arda dokununca aynı anda tek dönüş olur; yolculuk sürerken düğme küreyi çevirmez.
+test('Dünya küresi: art arda dokunuşta tek dönüş, yolculukta dönüş bozulmaz', async ({ page }) => {
+  const kayit = await oyunuAc(page, { ...BETA, 'zipzip-ilerleme-v1': JSON.stringify(['efes']) });
+  const donusSayisi = () =>
+    page.evaluate(() => {
+      const s = (window as any).oyun.scene.getScene('Dunya');
+      return s.tweens.getTweens().filter((t: any) => t.isPlaying() && t.targets.length === 1 && Object.keys(t.targets[0]).join() === 't').length;
+    });
+  await sahneAc(page, 'Dunya', {});
+  const once = await donusSayisi(); // Zıpzıp'ın kendi dönüşü sayılmasın
+  await page.evaluate(() => {
+    const s = (window as any).oyun.scene.getScene('Dunya');
+    s.don([12, 41], 900);
+    s.don([30, 30], 900);
+    s.don([12, 41], 900);
+  });
+  expect(await donusSayisi()).toBe(once + 1);
+  // Yolculuk: düğmeye dokunmak yolculuğu bozmaz, sonunda varılan durak açılır.
+  await sahneAc(page, 'Macera'); // aynı sahneyi bu yardımcıyla doğrudan yeniden başlatmak onu durdurur
+  await sahneAc(page, 'Dunya', { yolculukDen: 'efes' });
+  await page.waitForFunction(() => (window as any).oyun.scene.getScene('Dunya').yolculukta, null, { timeout: 10_000 });
+  const yolculukDonusu = await page.evaluate(() => {
+    const s = (window as any).oyun.scene.getScene('Dunya');
+    const once = s.donus;
+    s.don([0, 0], 900);
+    return s.donus === once && once.isPlaying();
+  });
+  expect(yolculukDonusu).toBe(true);
+  await page.waitForFunction(() => !(window as any).oyun.scene.getScene('Dunya').yolculukta, null, { timeout: 15_000 });
+  expect(await page.evaluate(() => (window as any).oyun.scene.getScene('Dunya').merkez[0])).toBeGreaterThan(5); // Kolezyum'a döndü (0'a değil)
+  expect(kayit.hatalar).toEqual([]);
+});
