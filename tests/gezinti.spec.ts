@@ -14,6 +14,11 @@ async function oyunuAc(page: Page): Promise<Kayit> {
     const adres = new URL(r.url());
     if (!['localhost', '127.0.0.1'].includes(adres.hostname) && !['data:', 'blob:'].includes(adres.protocol)) kayit.disIstekler.push(r.url());
   });
+  // GEZINTI_YAVAS=4: işlemci 4 kat yavaş (CI gibi yavaş makineyi yerelde denemek için).
+  if (process.env.GEZINTI_YAVAS) {
+    const cdp = await page.context().newCDPSession(page);
+    await cdp.send('Emulation.setCPUThrottlingRate', { rate: Number(process.env.GEZINTI_YAVAS) });
+  }
   await page.goto('/');
   await page.evaluate(() => {
     localStorage.clear();
@@ -46,6 +51,8 @@ async function yerBul(page: Page, metin: string, tam = false, enCok = 15_000): P
       const yazi = (o: any): string => (o.type === 'Text' ? o.text : (o.list ?? []).map(yazi).join(' '));
       const sahneler = oyun.scene.getScenes(true).reverse();
       for (const s of sahneler) {
+        // Haritaya uzaydan iniş bitmeden dokunulmaz (inişteki dokunuş inişi atlar; yavaş makinede iniş uzun sürer).
+        if (s.harita && (s.harita.scale !== 1 || s.harita.alpha < 1)) return false;
         let bulunan: any = null;
         const gez = (o: any) => {
           if (bulunan || o.visible === false) return;
@@ -72,9 +79,20 @@ async function yerBul(page: Page, metin: string, tam = false, enCok = 15_000): P
   return (await h.jsonValue()) as { x: number; y: number; sahne: string };
 }
 
+// yerBul, bulamazsa neyi aradığını ve ekranda ne olduğunu söyler.
+async function yerBulYa(page: Page, metin: string, tam = false) {
+  return yerBul(page, metin, tam).catch(async () => {
+    const acik = await page.evaluate(() => {
+      const yazi = (o: any): string => (o.type === 'Text' ? o.text : (o.list ?? []).map(yazi).join(' '));
+      return (window as any).oyun.scene.getScenes(true).map((s: any) => `${s.scene.key}: ${s.children.list.map(yazi).join(' ').replace(/\s+/g, ' ').slice(0, 200)}`).join(' | ');
+    });
+    throw new Error(`"${metin}" bulunamadı; ekranda: ${acik}`);
+  });
+}
+
 async function dokun(page: Page, metin: string, sonraSahne: string, tam = false) {
   // Yer yarım saniye aynı kalana kadar bekle (iniş gibi animasyon arası boşluklarda kayan düğmeye dokunulmasın).
-  let yer = await yerBul(page, metin, tam);
+  let yer = await yerBulYa(page, metin, tam);
   for (let i = 0; i < 40; i++) {
     await page.waitForTimeout(500);
     const yeni = await yerBul(page, metin, tam);
@@ -82,22 +100,46 @@ async function dokun(page: Page, metin: string, sonraSahne: string, tam = false)
     yer = yeni;
     if (ayni) break;
   }
+  // Hata olursa dokunuşun neye geldiği yazılsın.
+  await page.evaluate((ad) => {
+    const w = window as any;
+    w.dokunmaLog = [];
+    const s = w.oyun.scene.getScene(ad);
+    s.input.once('pointerdown', (p: any, o: any[]) => w.dokunmaLog.push(`${Math.round(p.x)},${Math.round(p.y)} ${o.map((x: any) => `${x.type}:${x.text ?? ''}`).join('/')} fps=${Math.round(w.oyun.loop.actualFps)}`));
+  }, yer.sahne);
   await page.mouse.click(yer.x, yer.y);
   if (process.env.GEZINTI_RESIM) await page.screenshot({ path: `test-results/dokun-${metin.replace(/\W/g, '_')}.png` });
   await page
     .waitForFunction((ad) => (window as any).oyun.scene.isActive(ad), sonraSahne, { timeout: 15_000 })
-    .catch(() => {
-      throw new Error(`"${metin}" (${yer.sahne}) dokununca ${sonraSahne} açılmadı`);
+    .catch(async () => {
+      const acik = await page.evaluate(() => (window as any).oyun.scene.getScenes(true).map((s: any) => s.scene.key).join(',') + ' log=' + (window as any).dokunmaLog.join(';'));
+      throw new Error(`"${metin}" (${yer.sahne}, ${Math.round(yer.x)},${Math.round(yer.y)}) dokununca ${sonraSahne} açılmadı; açık: ${acik}`);
     });
 }
 
 // Ödül ekranında rozet/kostüm kutlaması çıkarsa çocuk gibi "Harika! ✓" ya da "Sonra"ya dokunur (perde alttaki düğmeleri örter).
+// Ödül ekranında rozet/kostüm kutlaması çıkarsa çocuk gibi "Harika! ✓" ya da "Sonra"ya dokunur (perde alttaki düğmeleri örter).
+// Kutlanmayı bekleyen rozet/kostüm kalmayana kadar sürer (kutlamalar damgadan sonra sırayla gelir; yavaş makinede geç).
 async function kutlamalariGec(page: Page) {
-  for (let i = 0; i < 10; i++) {
-    await page.waitForTimeout(1200);
-    const yer = await yerBul(page, 'Harika! ✓', true, 500).catch(() => yerBul(page, 'Sonra', true, 500)).catch(() => null);
-    if (!yer) return;
+  for (let i = 0; i < 20; i++) {
+    const durum = await page.waitForFunction(
+      async () => {
+        // Önce modüller (await arası kareler akar), sonra durum aynı anda okunur: kutlama araya girmesin.
+        const { yeniRozetler } = await import('/src/rozetler.ts');
+        const { yeniKostumler } = await import('/src/kostumler.ts');
+        const s = (window as any).oyun.scene.getScene('Odul');
+        const yazi = (o: any): string => (o.type === 'Text' ? o.text : (o.list ?? []).map(yazi).join(' '));
+        if (s.kutlamaKatmani?.list.length) return yazi(s.kutlamaKatmani).includes('Sonra') ? 'Sonra' : 'Harika! ✓';
+        return yeniRozetler().length || yeniKostumler().length ? false : 'bitti';
+      },
+      null,
+      { timeout: 30_000, polling: 200 },
+    );
+    const metin = await durum.jsonValue();
+    if (metin === 'bitti') return;
+    const yer = await yerBulYa(page, metin as string, true);
     await page.mouse.click(yer.x, yer.y);
+    await page.waitForTimeout(300);
   }
   throw new Error('kutlamalar bitmedi');
 }
