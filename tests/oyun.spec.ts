@@ -830,6 +830,31 @@ test('Zıpzıp da zıplasın: kamera durunca yazı söyler ve ritim yolu geri ge
   expect(kayit.hatalar).toEqual([]);
 });
 
+test('hareket ekranı: kamera durunca küçük kutu son sayıyı değil "Durdu" yazar, "Yaptım!" yine çıkar (K27)', async ({ page }) => {
+  test.setTimeout(120_000);
+  await sahteKamera(page);
+  const kayit = await oyunuAc(page, { 'zipzip-kamera-v1': '1' });
+  await saatiHizlandir(page, 5);
+  // Kameranın sayabildiği ilk adımı bul (ısınma/süreli hareketlerde kamera açılmaz).
+  let bulundu = false;
+  for (let adim = 0; adim < 8 && !bulundu; adim++) {
+    await sahneAc(page, 'Hareket', { durakId: 'istanbul', adim });
+    bulundu = await page.evaluate(() => !!(window as any).oyun.scene.getScene('Hareket').kamera);
+  }
+  expect(bulundu).toBe(true);
+  const kutuYazisi = () => page.evaluate(() => [...document.querySelectorAll('div')].map((d) => d.textContent ?? '').filter((t) => t.startsWith('📷')).pop() ?? '');
+  await expect.poll(kutuYazisi, { timeout: 30_000 }).toBe('📷 Geri git');
+  await page.evaluate(() => (window as any).sahteAkis.getTracks().forEach((t: MediaStreamTrack) => t.stop()));
+  await expect.poll(kutuYazisi, { timeout: 30_000 }).toBe('📷 Durdu');
+  // Kaybetmek yok: kamera dursa da süre/sayım bitince "Yaptım!" düğmesi gelir.
+  await page.waitForFunction(() => {
+    const s = (window as any).oyun.scene.getScene('Hareket');
+    const yazi = (o: any): string => (o.type === 'Text' ? o.text : (o.list ?? []).map(yazi).join(' '));
+    return s.children.list.some((o: any) => /Yaptım!/.test(yazi(o)));
+  }, null, { timeout: 90_000, polling: 250 });
+  expect(kayit.hatalar).toEqual([]);
+});
+
 test('Pasaporttaki ada dokunup kilitten geçince ⌂ pasaporta döner (önce Büyük Macera\'dan ebeveyn köşesine girilmiş olsa da)', async ({ page }) => {
   const kayit = await oyunuAc(page, BETA);
   await sahneAc(page, 'EbeveynMenu', { geri: 'Macera' }); // önceki giriş: Büyük Macera'dan
