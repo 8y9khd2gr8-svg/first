@@ -1025,3 +1025,51 @@ test('hareket ekranında ekran açık tutulur, çıkınca bırakılır', async (
   await expect.poll(() => page.evaluate(() => (window as any).ekranKilidi.acik), { timeout: 5_000 }).toBe(false);
   expect(kayit.hatalar).toEqual([]);
 });
+
+// Gerçek aile testi (15 Ekim): telefona hiç dokunmadan (Uzaktan oyna / Ailece) oynanırken ekran kararıyor, kamera izni tekrar
+// tekrar soruluyordu. Bir durak ve Ailece baştan sona dokunmadan oynanır; her yarım saniyede bakılır: hareket ekranı açıkken
+// "ekranı açık tut" hep istenmiş olmalı, kamera (açıksa) durak boyunca bir kez açılmalı.
+async function ekranKilidiSahte(page: Page) {
+  await page.addInitScript(() => {
+    const w = window as any;
+    w.ekranKilidi = { istek: 0, acik: false, kapaliIkenHareket: 0 };
+    Object.defineProperty(navigator, 'wakeLock', {
+      value: {
+        request: async () => {
+          w.ekranKilidi.istek++;
+          w.ekranKilidi.acik = true;
+          return { release: async () => void (w.ekranKilidi.acik = false), addEventListener: () => {} };
+        },
+      },
+    });
+  });
+}
+
+for (const [ad, durakId, depo] of [
+  ['Uzaktan oyna + kamera, İstanbul', 'istanbul', { 'zipzip-uzaktan-v1': '1', 'zipzip-kamera-v1': '1' }],
+  ['Ailece', 'aile', {}],
+] as const) {
+  test(`dokunmadan bütün durak (${ad}): ekran hep açık tutulur, kamera bir kez açılır`, async ({ page }) => {
+    test.setTimeout(300_000);
+    await sahteKamera(page);
+    await ekranKilidiSahte(page);
+    const kayit = await oyunuAc(page, depo);
+    await saatiHizlandir(page, 5);
+    await sahneAc(page, 'Hareket', { durakId, adim: 0 });
+    await page.evaluate(() => {
+      const w = window as any;
+      // İlk yarım saniye (kilit isteği yolda) sayılmaz; sonra hareket ekranı açıkken kilit kapalıysa sayılır.
+      setTimeout(() => setInterval(() => {
+        if (w.oyun.scene.isActive('Hareket') && !w.ekranKilidi.acik) w.ekranKilidi.kapaliIkenHareket++;
+      }, 500), 1000);
+    });
+    await page.waitForFunction(() => (window as any).oyun.scene.isActive('Odul'), null, { timeout: 280_000, polling: 500 });
+    const sonuc = await page.evaluate(() => ({ ...(window as any).ekranKilidi, kamera: (window as any).kameraAcilma ?? 0 }));
+    expect(sonuc.kapaliIkenHareket).toBe(0);
+    expect(sonuc.istek).toBeGreaterThanOrEqual(1);
+    expect(sonuc.kamera).toBeLessThanOrEqual(1);
+    if (durakId === 'aile') expect(sonuc.kamera).toBe(0); // Ailece'de kamera açılmaz
+    else expect(sonuc.kamera).toBe(1);
+    expect(kayit.hatalar).toEqual([]);
+  });
+}
