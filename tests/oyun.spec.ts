@@ -41,13 +41,17 @@ async function sahneAc(page: Page, ad: string, veri: object = {}) {
 const BETA = { 'zipzip-beta-dunya': '1' };
 
 // Giriş animasyonları bitene kadar bekler (sonsuz dönen süsler sayılmaz); en çok `enCok` ms.
+// Sonsuz animasyonlar beklenmez: Phaser 3.90'da tekrar sayısı tween'in değil her özelliğin (t.data[i].repeat) üstünde.
+// Not: Zıpzıp'ın sürekli yeniden kurulan kısa animasyonları olan ekranlarda (Uzay, Spor, Okyanus, Kostüm) yine en çok süre beklenir.
 async function sakinlesmesiniBekle(page: Page, enCok = 1500) {
   await page
     .waitForFunction(
       () =>
         (window as any).oyun.scene
           .getScenes(true)
-          .every((s: any) => s.tweens.getTweens().every((t: any) => t.repeat === -1 || t.loop === -1 || !t.isPlaying())),
+          .every((s: any) =>
+            s.tweens.getTweens().every((t: any) => t.loop === -1 || (t.data ?? []).some((d: any) => d.repeat === -1) || !t.isPlaying()),
+          ),
       null,
       { timeout: enCok, polling: 100 },
     )
@@ -827,6 +831,31 @@ test('Zıpzıp da zıplasın: kamera durunca yazı söyler ve ritim yolu geri ge
   await page.evaluate(() => (window as any).sahteAkis.getTracks().forEach((t: MediaStreamTrack) => t.stop()));
   await kameraYazisi(page, 'ZiplaDeneme', 'Kamera durdu');
   expect(await page.evaluate(() => !!(window as any).oyun.scene.getScene('ZiplaDeneme').ritim)).toBe(true);
+  expect(kayit.hatalar).toEqual([]);
+});
+
+test('hareket ekranı: kamera durunca küçük kutu son sayıyı değil "Durdu" yazar, "Yaptım!" yine çıkar (K27)', async ({ page }) => {
+  test.setTimeout(120_000);
+  await sahteKamera(page);
+  const kayit = await oyunuAc(page, { 'zipzip-kamera-v1': '1' });
+  await saatiHizlandir(page, 5);
+  // Kameranın sayabildiği ilk adımı bul (ısınma/süreli hareketlerde kamera açılmaz).
+  let bulundu = false;
+  for (let adim = 0; adim < 8 && !bulundu; adim++) {
+    await sahneAc(page, 'Hareket', { durakId: 'istanbul', adim });
+    bulundu = await page.evaluate(() => !!(window as any).oyun.scene.getScene('Hareket').kamera);
+  }
+  expect(bulundu).toBe(true);
+  const kutuYazisi = () => page.evaluate(() => [...document.querySelectorAll('div')].map((d) => d.textContent ?? '').filter((t) => t.startsWith('📷')).pop() ?? '');
+  await expect.poll(kutuYazisi, { timeout: 30_000 }).toBe('📷 Geri git');
+  await page.evaluate(() => (window as any).sahteAkis.getTracks().forEach((t: MediaStreamTrack) => t.stop()));
+  await expect.poll(kutuYazisi, { timeout: 30_000 }).toBe('📷 Durdu');
+  // Kaybetmek yok: kamera dursa da süre/sayım bitince "Yaptım!" düğmesi gelir.
+  await page.waitForFunction(() => {
+    const s = (window as any).oyun.scene.getScene('Hareket');
+    const yazi = (o: any): string => (o.type === 'Text' ? o.text : (o.list ?? []).map(yazi).join(' '));
+    return s.children.list.some((o: any) => /Yaptım!/.test(yazi(o)));
+  }, null, { timeout: 90_000, polling: 250 });
   expect(kayit.hatalar).toEqual([]);
 });
 

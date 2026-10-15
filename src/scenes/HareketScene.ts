@@ -241,8 +241,14 @@ export class HareketScene extends Phaser.Scene {
     yazi.style.cssText = 'position:absolute;left:0;right:0;bottom:0;background:#0b1430cc;color:#fff;font-weight:700;font-size:20px;text-align:center;line-height:30px;';
     yazi.textContent = '📷 Hazırlanıyor';
     const kamera = new KameraSayaci(hareket.animasyon, (sayi, durum) => {
+      // Görüntü kesilince (ekran kilidi, başka uygulama) son sayı kalmasın: ebeveyn kameranın saydığını sanmasın.
+      // Oynanış aynı: "Yaptım!" yine çıkar (K27).
       yazi.textContent =
-        durum === 'hata' ? '📷 Açılamadı' : durum === 'goremiyorum' ? '📷 Geri git' : durum === 'yukleniyor' ? '📷 Hazırlanıyor' : `📷 ${Math.min(sayi, hareket.adet)}/${hareket.adet}`;
+        durum === 'hata' ? '📷 Açılamadı'
+        : durum === 'durdu' ? '📷 Durdu'
+        : durum === 'goremiyorum' ? '📷 Geri git'
+        : durum === 'yukleniyor' ? '📷 Hazırlanıyor'
+        : `📷 ${Math.min(sayi, hareket.adet)}/${hareket.adet}`;
       this.kameraHedefe?.();
     });
     const video = kamera.onizleme;
