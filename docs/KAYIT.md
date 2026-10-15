@@ -83,6 +83,7 @@ bölümlerin toplamı (o bölümün değil); yanlış değil ama "bu bölümde" 
 `Acilis` veri nesnesiz başlatılıyor; ikisinde `init` yok, şu an zararsız.
 **Test notu:** testlerdeki `sahneAc` yardımcısı aynı sahneyi (ör. Dunya → Dunya) doğrudan yeniden başlatınca sahne durur; arada başka
 sahne açılmalı (oyunda bu yol yok, sadece test yardımcısı).
+**Testler:** npm test 34/34; test:oyun yerelde 46/46 (yeni: K27, tek nabız, Dünya küresi); tsc temiz.
 **Arşiv:** session_01KYbNnkta2jv2dM7gTitCb5 arşivlendi.
 
 ### 15 Ekim 2026 (gece, kullanıcı uyurken) — 4 gece işi
