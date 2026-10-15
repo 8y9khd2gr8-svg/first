@@ -41,13 +41,17 @@ async function sahneAc(page: Page, ad: string, veri: object = {}) {
 const BETA = { 'zipzip-beta-dunya': '1' };
 
 // Giriş animasyonları bitene kadar bekler (sonsuz dönen süsler sayılmaz); en çok `enCok` ms.
+// Sonsuz animasyonlar beklenmez: Phaser 3.90'da tekrar sayısı tween'in değil her özelliğin (t.data[i].repeat) üstünde.
+// Not: Zıpzıp'ın sürekli yeniden kurulan kısa animasyonları olan ekranlarda (Uzay, Spor, Okyanus, Kostüm) yine en çok süre beklenir.
 async function sakinlesmesiniBekle(page: Page, enCok = 1500) {
   await page
     .waitForFunction(
       () =>
         (window as any).oyun.scene
           .getScenes(true)
-          .every((s: any) => s.tweens.getTweens().every((t: any) => t.repeat === -1 || t.loop === -1 || !t.isPlaying())),
+          .every((s: any) =>
+            s.tweens.getTweens().every((t: any) => t.loop === -1 || (t.data ?? []).some((d: any) => d.repeat === -1) || !t.isPlaying()),
+          ),
       null,
       { timeout: enCok, polling: 100 },
     )
