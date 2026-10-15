@@ -34,6 +34,8 @@ export class DunyaScene extends Phaser.Scene {
   private iz: { bas: Nokta; son: Nokta; t: number } | null = null; // yolculuk sırasında çizilen altın iz
   private suruyorDen: string | null = null; // yolculuğu süren yolun başladığı durak (henüz altın değil)
   private kureResmi!: Phaser.GameObjects.Image;
+  private donus: Phaser.Tweens.Tween | null = null; // kürenin süren dönüşü (aynı anda tek dönüş)
+  private yolculukta = false;
 
   constructor() {
     super('Dunya');
@@ -44,6 +46,8 @@ export class DunyaScene extends Phaser.Scene {
     this.isaretler = new Map();
     this.iz = null;
     this.suruyorDen = null;
+    this.donus = null;
+    this.yolculukta = false;
   }
 
   create() {
@@ -188,7 +192,7 @@ export class DunyaScene extends Phaser.Scene {
         this.tweens.add({ targets: this.kureResmi, alpha: 1, duration: 600 });
         this.tweens.add({ targets: this.kureResmi, scale: 1, duration: sure * 0.8, ease: 'Cubic.easeOut' });
         const donus = { t: 0 };
-        this.tweens.add({
+        this.donus = this.tweens.add({
           targets: donus,
           t: 1,
           duration: sure,
@@ -198,6 +202,7 @@ export class DunyaScene extends Phaser.Scene {
             this.ciz();
           },
           onComplete: () => {
+            this.donus = null;
             this.merkez = hedef;
             this.ciz();
             durumuSoyle();
@@ -209,10 +214,17 @@ export class DunyaScene extends Phaser.Scene {
 
   // Küreyi yeni bir merkeze döndürür. Her karede yeniden çizer.
   private don(hedef: Nokta, sure: number, ara?: (t: number) => void, bitince?: () => void) {
+    // Yolculuk sürerken alttaki düğmeler küreyi çevirmez (iki dönüş birbirini çekiştirirdi).
+    if (this.yolculukta) return;
+    // Önceki dönüş (giriş ya da başka bir düğme) yarıda bırakılır; giriş dönüşünün sonu (durumu söyleme) yine çalışır.
+    // (Yeni eklenen dönüş ilk kareye kadar "oynuyor" sayılmaz; bu yüzden durum değil kayıt tutulur, bitince silinir.)
+    const onceki = this.donus;
+    this.donus = null;
+    onceki?.complete();
+    this.yolculukta = !!bitince;
     const ara1 = geoInterpolate(this.merkez, hedef);
     const ilerleme = { t: 0 };
-    this.tweens.killTweensOf(ilerleme);
-    this.tweens.add({
+    this.donus = this.tweens.add({
       targets: ilerleme,
       t: 1,
       duration: sure,
@@ -222,7 +234,11 @@ export class DunyaScene extends Phaser.Scene {
         ara?.(ilerleme.t);
         this.ciz();
       },
-      onComplete: () => bitince?.(),
+      onComplete: () => {
+        this.donus = null;
+        this.yolculukta = false;
+        bitince?.();
+      },
     });
   }
 
