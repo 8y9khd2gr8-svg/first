@@ -830,6 +830,41 @@ test('Zıpzıp da zıplasın: kamera durunca yazı söyler ve ritim yolu geri ge
   expect(kayit.hatalar).toEqual([]);
 });
 
+test('Pasaporttaki ada dokunup kilitten geçince ⌂ pasaporta döner (önce Büyük Macera\'dan ebeveyn köşesine girilmiş olsa da)', async ({ page }) => {
+  const kayit = await oyunuAc(page, BETA);
+  await sahneAc(page, 'EbeveynMenu', { geri: 'Macera' }); // önceki giriş: Büyük Macera'dan
+  await sahneAc(page, 'Pasaport');
+  const dokun = (sahne: string, bul: string) =>
+    page.evaluate(([sahne, bul]) => {
+      const s = (window as any).oyun.scene.getScene(sahne);
+      const yazi = (o: any): string => (o.type === 'Text' ? o.text : (o.list ?? []).map(yazi).join(' '));
+      const hepsi: any[] = [];
+      const gez = (o: any) => { hepsi.push(o); (o.list ?? []).forEach(gez); };
+      s.children.list.forEach(gez);
+      let hedef: any;
+      if (bul === 'ad') hedef = hepsi.find((o) => o.type === 'Zone' && o.input?.enabled && o.width === 330);
+      else if (bul === 'cevap') {
+        const soru = hepsi.find((o) => o.type === 'Text' && / × /.test(o.text));
+        const [a, b] = soru.text.match(/\d+/g).map(Number);
+        hedef = hepsi.find((o) => o.input?.enabled && yazi(o).trim() === String(a * b));
+      } else hedef = hepsi.find((o) => o.input?.enabled && yazi(o).includes(bul));
+      hedef.emit('pointerdown');
+    }, [sahne, bul] as const);
+  await dokun('Pasaport', 'ad');
+  await page.waitForFunction(() => (window as any).oyun.scene.isActive('Ebeveyn'));
+  await dokun('Ebeveyn', 'cevap');
+  await page.waitForFunction(() => (window as any).oyun.scene.isActive('PasaportAyar'), null, { timeout: 5000 });
+  await dokun('PasaportAyar', '🏠');
+  await page.waitForFunction(() => (window as any).oyun.scene.isActive('Pasaport'), null, { timeout: 5000 });
+  // Ebeveyn köşesinden açılan pasaport düzenlemesi köşeye döner.
+  await sahneAc(page, 'EbeveynMenu', {});
+  await dokun('EbeveynMenu', '✏️ Pasaport');
+  await page.waitForFunction(() => (window as any).oyun.scene.isActive('PasaportAyar'), null, { timeout: 5000 });
+  await dokun('PasaportAyar', '🏠');
+  await page.waitForFunction(() => (window as any).oyun.scene.isActive('EbeveynMenu'), null, { timeout: 5000 });
+  expect(kayit.hatalar).toEqual([]);
+});
+
 test('"Bu telefonda neler var?": uygulamadaki en uzun hâlde de yazılar "Tamam"ın altında kalmaz, her kayıt listede', async ({ page }) => {
   const kayit = await oyunuAc(page, { ...BETA, 'zipzip-guvenlik-notu-v1': '1' }, '/?odeme=deneme');
   await sahneAc(page, 'EbeveynVeri');

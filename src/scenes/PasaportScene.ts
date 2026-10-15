@@ -94,7 +94,7 @@ export class PasaportScene extends Phaser.Scene {
     adAlani.on('pointerdown', () => {
       bip(500, 0.08);
       sustur();
-      this.scene.start('Ebeveyn', { hedef: 'PasaportAyar', geri: 'Pasaport' });
+      this.scene.start('Ebeveyn', { hedef: 'PasaportAyar', geri: 'Pasaport', hedefVeri: { geri: 'Pasaport' } });
     });
     sayfa.add(adAlani);
     etiket(390, 'Görevi');
