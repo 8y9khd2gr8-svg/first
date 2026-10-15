@@ -60,6 +60,17 @@ test('her bölümde 7 durak; her durak 5 hareketlik antrenman', () => {
   }
 });
 
+// K30: Uzay ve ortak bölüm haritası (BolumScene) alt yazıda durağın adını yazar, sesle yerini söyler ("Sıradaki durağımız …").
+// İkisi farklıysa çocuk ekranda başka, seste başka duyar (Evde Macera'da "Oyuncak Dansı" / "Dans" böyleydi).
+test('sıralı bölüm haritasında sıradaki durağın yazısı ile sesi aynı (ad = yer)', () => {
+  for (const id of ['uzay', 'dinozor', 'evde', 'okyanus'] as const) {
+    const { duraklar, serbest } = BOLUMLER[id];
+    if (serbest) continue;
+    for (const d of duraklar) assert.equal(d.yer, d.ad, `${d.id}: ekranda "${d.ad}", seste "${d.yer}"`);
+  }
+  assert.equal(M.siradaki(BOLUMLER.evde.duraklar.find((d) => d.id === 'dans')!.yer), 'Sıradaki durağımız Oyuncak Dansı!');
+});
+
 test('bölümler zincir hâlinde açılır (her bölümün öncesi kendinden önce gelir)', () => {
   BOLUM_SIRASI.forEach((id, i) => {
     const onceki = BOLUMLER[id].onceki;

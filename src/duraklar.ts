@@ -651,7 +651,7 @@ export const EVDE: Durak[] = [
     id: 'dans',
     bolum: 'evde',
     ad: 'Oyuncak Dansı',
-    yer: 'Dans',
+    yer: 'Oyuncak Dansı',
     simge: '🎶',
     bilgi: 'Oyuncağın da dans etmek istiyor! Müzik yoksa bir şarkı mırıldanabilirsin.',
     ozel: { hikaye: 'Oyuncağınla dans et!', baslik: 'Oyuncağına sarıl,\nsağa sola sallan!', sesli: 'Oyuncağınla dans edelim! Oyuncağına sarıl ve sağa sola sallan!', animasyon: 'sallan', tur: 'sure', saniye: 10 },
