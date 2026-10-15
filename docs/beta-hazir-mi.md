@@ -1,6 +1,6 @@
 # Beta hazır mı? (Kasım kapalı beta kontrol listesi)
 
-Son kontrol: **12 Ekim 2026, sürüm 0.9.0**. ✅ = hazır, ⬜ = bekliyor.
+Son kontrol: **14 Ekim 2026 (gece), sürüm 0.9.1**. ✅ = hazır, ⬜ = bekliyor.
 Ayrıntılı adımlar: [magaza-rehberi.md](magaza-rehberi.md), [seslendirme-rehberi.md](seslendirme-rehberi.md),
 testçilere gönderilecek metin: [beta-rehberi.md](beta-rehberi.md), Yağız testi: [yagiz-testi.md](yagiz-testi.md).
 
@@ -19,17 +19,19 @@ testçilere gönderilecek metin: [beta-rehberi.md](beta-rehberi.md), Yağız tes
 | ✅ | Betada Türkiye Turu, Dünya Harikaları ve Ailece açık; Uzay, Spor, Dinozor, Evde, Okyanus Büyük Macera'da "Yakında" (kodları duruyor; K1, 12 Ekim) | Dünya, Türkiye bitince açılır; rozet, kostüm, sertifika. Test sitesinde adres sonuna `?bolumler=hepsi` yazılırsa 7 bölüm de açılabilir |
 | ✅ | Ebeveyn kilidi, güvenlik notu (ilk açılışta), durak girişinde kısa hatırlatma | |
 | ✅ | Ebeveyn köşesi: özet, pasaport, tam sürüm, ⚙️ Ayarlar, 🔊 Sesi dene, ❓ Nasıl oynanır, kamera + 🔍 Dene, veri silme, "Bu telefonda neler var?" | |
-| ✅ | Herkes oynayabilsin: 🐢 Sakin tempo, oturarak oyna, "Uzaktan oyna", renk körlüğü (biten durakta yıldız, kapalıda kilit) | |
+| ✅ | Herkes oynayabilsin: 🐢 Sakin / 🐆 Hızlı tempo, oturarak oyna, "Uzaktan oyna" (Ailece'de hep açık), renk körlüğü (biten durakta yıldız, kapalıda kilit) | |
+| ✅ | Gerçek dokunuşla gezinme testi: Oyna → durak → ödül → ⌂ iki tur, Ailece iki kez, Ebeveyn gir/çık iki kez (14 Ekim) | Otomatik test |
 | ✅ | Okuma bilmeyen çocuk: her çocuk ekranında Zıpzıp konuşur | Otomatik test her ekranı denetler |
-| ✅ | Kamerayla sayma (isteğe bağlı): 13 hareket | Eşikler Yağız testinde ayarlanacak |
+| ✅ | Kamerayla sayma (isteğe bağlı): 13 hareket; kamera denemesi + "Zıpzıp da zıplasın"; kamera durunca / izin yokken / kamera yokken ayrı yazı (14 Ekim) | Eşikler Yağız testinde ayarlanacak (K23) |
 | ✅ | Ödeme: `tam_surum`, geri yükleme, kilidin arkasında | Gerçek mağazada denenmedi (2'de 5) |
 | ✅ | İnternetsiz çalışma, dış sunucuya bağlanmama | Otomatik testler her PR'da denetler |
 | ✅ | Okunurluk, düğme büyüklüğü, yazı taşması, renk zıtlığı | Otomatik testler |
 | ✅ | Bozuk kayıtta oyun çökmez, sağlam ilerleme kalır | Otomatik test (12 Ekim) |
 | ✅ | Açılış hızı (6 kat yavaşlatılmış telefonda ~1,9 sn) | |
-| ✅ | Gizlilik ve koşullar taslağı güncel (sesli yönlendirme, tempo, oturarak, kamera) | Avukata gösterilecek (2'de 9) |
+| ✅ | Gizlilik ve koşullar taslağı güncel (sesli yönlendirme, tempo, oturarak, kamera, Zıpzıp da zıplasın); cihazdaki 11 kaydın hepsi gizlilik tablosunda ve "Bu telefonda neler var?" ekranında (14 Ekim denetimi) | Avukata gösterilecek (2'de 9) |
+| ⬜ | Gizlilik ve koşullarda iletişim adresi yok ("yayından önce eklenecek" yazıyor) | Alan adı/e-posta sizde; mağaza gizlilik sayfasında iletişim ister (en geç mağaza başvurusunda) |
 | ✅ | Sürüm numarası ebeveyn köşesinin altında; Play paketine otomatik yazılır | |
-| ⬜ | Doğal ses: 760 cümlenin kaydı yok, şimdilik telefonun sesi okuyor | Azure hesabı açılınca `npm run seslendir` (2'de 7) |
+| ⬜ | Doğal ses: cümlelerin kaydı yok, şimdilik telefonun sesi okuyor | Azure hesabı açılınca `npm run seslendir` (2'de 7) |
 | ⬜ | Geri bildirim adresi boş; ebeveyn köşesi "beta grubuna yazın" diyor | Betada yeterli; alan adı gelince eklenir |
 | ⬜ | Android internet izni hâlâ var | İnternetsiz APK denemesinin sonucu gelince kaldırırım (2'de 1) |
 
