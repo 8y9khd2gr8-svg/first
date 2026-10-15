@@ -15,7 +15,7 @@ const { tamamlananlar, tamamla } = await import('../src/ilerleme');
 const { pasaportOku } = await import('../src/pasaport');
 const { oyunAyari } = await import('../src/oyunAyari');
 const { haftalikOzet, gunAnahtari } = await import('../src/istatistik');
-const { kazanilanlar, yeniRozetler } = await import('../src/rozetler');
+const { kazanilanlar, kesfedilecekHareketler, yeniRozetler } = await import('../src/rozetler');
 const { acikKostumler, seciliKostum, yeniKostumler } = await import('../src/kostumler');
 
 const BOZUKLAR = ['{bozuk', 'null', '42', '"metin"', '[]', '{}', 'true', '[1,null,{},"x"]', '{"gunler":[1],"ad":5,"foto":"javascript:x","avatar":"x","secili":7,"kutlanan":"a","yas":3,"oturarak":"evet"}'];
@@ -64,4 +64,17 @@ test('bozuk kayıtta sağlam ilerleme kaybolmaz', () => {
   depo.set('zipzip-kostum-v1', JSON.stringify({ secili: 'yok-boyle-kostum', kutlanan: [1, null] }));
   assert.equal(seciliKostum(), undefined);
   assert.equal(yeniKostumler().length, acikKostumler().length);
+});
+
+// K26: "Hareket Kâşifi" betada kazanılabilir: sadece açık bölümlerin (ve ısınma/soğuma/Ailece'nin) hareketleri sayılır.
+test('Hareket Kâşifi: betada açık bölümlerin bütün hareketlerini deneyen rozeti kazanır, biri eksikse kazanmaz', () => {
+  const liste = kesfedilecekHareketler();
+  assert.ok(liste.length >= 20 && liste.length < 37, `betada ${liste.length} hareket türü`);
+  const sayac = (eksik?: string) => Object.fromEntries(liste.filter((a) => a !== eksik).map((a) => [a, 1]));
+  const kaydet = (s: Record<string, number>) =>
+    depo.set('zipzip-istatistik-v1', JSON.stringify({ gunler: { [gunAnahtari()]: { saniye: 60, hareket: liste.length, ziplama: 0, sayac: s } } }));
+  kaydet(sayac(liste[liste.length - 1]));
+  assert.equal(kazanilanlar().has('kasif'), false);
+  kaydet(sayac());
+  assert.equal(kazanilanlar().has('kasif'), true);
 });

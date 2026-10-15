@@ -1,4 +1,5 @@
-import { DINOZOR, DUNYA, EVDE, OKYANUS, SPOR, TUM_DURAKLAR, TURKIYE, UZAY } from './duraklar';
+import { AILE_OTURUMU } from './aile';
+import { DINOZOR, DUNYA, EVDE, OKYANUS, SPOR, TUM_DURAKLAR, TURKIYE, UZAY, bolumYakindaMi, oturum } from './duraklar';
 import { tamamlananlar } from './ilerleme';
 import { H, ISINMALAR, SOGUMALAR } from './hareketler';
 import { haftalikOzet } from './istatistik';
@@ -23,6 +24,14 @@ const toplam = (d: Durum, ...animasyonlar: string[]) => animasyonlar.reduce((t, 
 // "Hareket Kâşifi" için oyundaki bütün hareket türleri.
 // Yeni bölüm gelince liste uzar; daha önce kazanılmış rozet yine de kaybolmaz (kazanilanlar'a bakın).
 const TUM_ANIMASYONLAR = [...new Set([...Object.values(H), ...ISINMALAR, ...SOGUMALAR, ...TUM_DURAKLAR.map((x) => x.ozel)].map((h) => h.animasyon))];
+// Sadece açık bölümlerde (betada "Yakında" olmayanlar) ve ısınma/soğuma/Ailece'de gelebilen hareketler sayılır (K26, 15 Ekim):
+// betada çocuk kapalı bölümlerin hareketlerini hiç göremez, rozet yoksa asla kazanılamazdı. Bütün bölümler açılınca liste hepsi olur.
+export function kesfedilecekHareketler(): string[] {
+  const gelen = new Set(
+    [...TUM_DURAKLAR.filter((x) => !bolumYakindaMi(x.bolum)).flatMap(oturum), ...ISINMALAR, ...SOGUMALAR, ...AILE_OTURUMU].map((h) => h.animasyon),
+  );
+  return TUM_ANIMASYONLAR.filter((a) => gelen.has(a));
+}
 
 const KOSULLAR: (Rozet & { kazanildi: (d: Durum) => boolean })[] = [
   { id: 'ilkAdim', simge: '🌱', ad: 'İlk Adım', nasil: 'İlk hareketini tamamla', kazanildi: (d) => d.hareket >= 1 },
@@ -41,7 +50,7 @@ const KOSULLAR: (Rozet & { kazanildi: (d: Durum) => boolean })[] = [
   { id: 'comelme', simge: '🏋️', ad: 'Çömelme Ustası', nasil: '100 kez çömel', kazanildi: (d) => toplam(d, 'comel', 'balon', 'tasKaldir', 'basket', 'yumurta', 'topla') >= 100 },
   { id: 'diz', simge: '🦵', ad: 'Diz Ustası', nasil: '100 kez dizini kaldır', kazanildi: (d) => toplam(d, 'dizler', 'tirman', 'basUstu', 'engel') >= 100 },
   { id: 'kol', simge: '🙌', ad: 'Kol Ustası', nasil: '100 kez kollarını kaldır', kazanildi: (d) => toplam(d, 'kollar', 'uzan', 'voleybol') >= 100 },
-  { id: 'kasif', simge: '🎨', ad: 'Hareket Kâşifi', nasil: 'Her hareketi en az bir kez dene', kazanildi: (d) => TUM_ANIMASYONLAR.every((a) => (d.sayac[a] ?? 0) > 0) },
+  { id: 'kasif', simge: '🎨', ad: 'Hareket Kâşifi', nasil: 'Her hareketi en az bir kez dene', kazanildi: (d) => kesfedilecekHareketler().every((a) => (d.sayac[a] ?? 0) > 0) },
   { id: 'haftaSonu', simge: '🎉', ad: 'Hafta Sonu Sporcusu', nasil: 'Bir hafta sonu oyna', kazanildi: (d) => d.haftaSonu },
   { id: 'onDamga', simge: '📚', ad: '10 Damga', nasil: '10 damga topla', kazanildi: (d) => d.biten.size >= 10 },
   { id: 'turkiyeGezgini', simge: '🇹🇷', ad: 'Türkiye Gezgini', nasil: 'Türkiye Turu’nu bitir', bolum: true, kazanildi: (d) => TURKIYE.every((x) => d.biten.has(x.id)) },
