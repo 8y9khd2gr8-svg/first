@@ -118,19 +118,22 @@ async function dokun(page: Page, metin: string, sonraSahne: string, tam = false)
 }
 
 // Ödül ekranında rozet/kostüm kutlaması çıkarsa çocuk gibi "Harika! ✓" ya da "Sonra"ya dokunur (perde alttaki düğmeleri örter).
-// Ödül ekranında rozet/kostüm kutlaması çıkarsa çocuk gibi "Harika! ✓" ya da "Sonra"ya dokunur (perde alttaki düğmeleri örter).
 // Kutlanmayı bekleyen rozet/kostüm kalmayana kadar sürer (kutlamalar damgadan sonra sırayla gelir; yavaş makinede geç).
 async function kutlamalariGec(page: Page) {
+  // Rozet/kostüm modülleri bir kez yüklenir: waitForFunction async kontrolü beklemez (söz döner, hemen "doğru" sayılır).
+  await page.evaluate(async () => {
+    const w = window as any;
+    w.yeniRozetler = (await import('/src/rozetler.ts')).yeniRozetler;
+    w.yeniKostumler = (await import('/src/kostumler.ts')).yeniKostumler;
+  });
   for (let i = 0; i < 20; i++) {
     const durum = await page.waitForFunction(
-      async () => {
-        // Önce modüller (await arası kareler akar), sonra durum aynı anda okunur: kutlama araya girmesin.
-        const { yeniRozetler } = await import('/src/rozetler.ts');
-        const { yeniKostumler } = await import('/src/kostumler.ts');
-        const s = (window as any).oyun.scene.getScene('Odul');
+      () => {
+        const w = window as any;
+        const s = w.oyun.scene.getScene('Odul');
         const yazi = (o: any): string => (o.type === 'Text' ? o.text : (o.list ?? []).map(yazi).join(' '));
         if (s.kutlamaKatmani?.list.length) return yazi(s.kutlamaKatmani).includes('Sonra') ? 'Sonra' : 'Harika! ✓';
-        return yeniRozetler().length || yeniKostumler().length ? false : 'bitti';
+        return w.yeniRozetler().length || w.yeniKostumler().length ? false : 'bitti';
       },
       null,
       { timeout: 30_000, polling: 200 },
