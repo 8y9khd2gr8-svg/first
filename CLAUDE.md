@@ -231,13 +231,15 @@ Teknoloji: Phaser 3 + TypeScript + Vite, GitHub Pages ile yayın. İleride Capac
   başta), sonra AskUserQuestion ile en güçlü 4'ünü sun (önerilen ilk sırada, "(Önerilen)"
   etiketiyle); kullanıcı yazmadan seçebilsin. Her zaman en iyisi için kafa yor.
 - Her aşama küçük ve telefonda test edilebilir olsun; sonunda Yağız (6 yaş) test eder.
-- Onay sınırları (**15 Ekim akşamı, K32; K31'in yerine geçer**): kullanıcı "birleştir, bana sorma, biten her şeyi birleştir" dedi.
-  Claude değişikliği ayrı dalda yapar, test eder, PR açar; GitHub `test` kontrolü son hâlinde yeşil ve okunmuşsa **sormadan birleştirir**
-  (main'e giren test sitesinde yayınlanır). Tek tek açık onay gerekenler yine: oynanışı ya da ürün kapsamını ciddi değiştirmek, yayın/dağıtım kararı, force push / geçmişi yeniden yazmak, geniş
+- Onay sınırları (**K33, 15 Ekim akşamı; K21/K24/K31/K32'nin yerine geçer; tam metin docs/calisma-politikasi.md**):
+  İncele → Uygula → Test et → Kaydet → Doğrula → Raporla. Küçük, geri alınabilir işler (inceleme, düzeltme + regresyon testi,
+  test çalıştırma, belge güncelleme, ayrı dalda commit, PR açma) sorulmadan yapılır; görev sonunda tek rapor.
+  **main'e birleştirmek kullanıcı onayı ister** (testler yeşil olsa bile; main'e giren test sitesinde yayınlanır). Onay bekleyen
+  adım beklerken diğer güvenli işler sürer. Ayrıca açık onay gerekenler: oynanışı ya da ürün kapsamını ciddi değiştirmek, yayın/dağıtım kararı, force push / geçmişi yeniden yazmak, geniş
   silme, GitHub güvenlik/erişim ayarı, para harcamak, çocuğa ait kamera/görüntü/ses/hareket verisini saklamak ya da göndermek.
   Proje sahibi şu an sadece iPhone kullanıyor (Claude ve GitHub uygulamaları; terminal yok): bilgisayar gerektiren işler açıkça
   söylenir ve Mac'e ertelenip ertelenemeyeceği belirtilir. ChatGPT tasarım/sanat yönü ve görev promptları hazırlar; kodu Claude yazar.
-- Değişiklikler PR olarak açılır; testleri geçince PR'ı Claude sormadan birleştirir (K32). Ama GitHub'daki `test`
+- Değişiklikler PR olarak açılır; kullanıcı onaylayınca PR'ı Claude birleştirir (K33). Ama GitHub'daki `test`
   kontrolü (iş akışı "Testler") PR'ın son hâlinde yeşil olmadan ve sonucu okunmadan birleştirilmez; kırmızıysa önce
   düzeltilir (12 Ekim: #94 kırmızıyken birleşti, ders). Oyunda neyin değişeceğine kullanıcıyla birlikte karar verilir.
 - Çalışan sürüm etiketlenir (ilk: `v0.9.0` = fe37906, 12 Ekim). main'e giren her şey test sitesinde (GitHub Pages)
@@ -251,8 +253,8 @@ Teknoloji: Phaser 3 + TypeScript + Vite, GitHub Pages ile yayın. İleride Capac
   yerine iş listesi bitince yeni sohbet; istekler toplu; uygun olunca sabah otomatik başlangıç.
 - "Yeni oturuma geçelim" denildiğinde: önce iş seçenekleri (tablo + AskUserQuestion, çoklu seçim), sonra Claude yeni oturumu
   kendisi açar (claude-code-remote create_session; ilk mesaj hazır: CLAUDE.md'yi ve docs/KAYIT.md'yi oku, son durum, seçilen işler, "onaylı,
-  sormadan yap; testler geçince PR'ı birleştir (K32); büyük ürün kararlarını sabaha bırak"). Önce açık PR birleştirilir ki yeni
-  oturum güncel main'den başlasın.
+  sormadan yap; testler geçince PR aç, birleştirmek için onay iste (K33); büyük ürün kararlarını sabaha bırak"). Açık PR varsa
+  kullanıcı onaylarsa önce birleştirilir ki yeni oturum güncel main'den başlasın.
 - Oturum uzayınca Claude kendisi uyarır (14 Ekim, kullanıcı istedi): bağlam yaklaşık 300 bin token'ı geçince (get_session →
   context_usage.used_tokens) ya da iş listesi bitince, cevabın sonunda tek satırla "Yeni oturuma geçelim mi? (kota için)" diye sorar;
   kullanıcı evet derse "Yeni oturuma geçelim" adımları uygulanır. Ortada yarım iş/açık PR varsa önce o bitirilir.

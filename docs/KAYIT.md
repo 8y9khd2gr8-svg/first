@@ -43,7 +43,8 @@ Onay verilmemiş, ertelenmiş ya da reddedilmiş öneriler de buraya yazılır; 
 | K29 | ✅ Oturum uzayınca uyarı | **14 Ekim, kullanıcı istedi:** bağlam ~300 bin token'ı geçince ya da iş listesi bitince Claude cevabın sonunda "Yeni oturuma geçelim mi? (kota için)" diye sorar; yarım iş/açık PR varsa önce o biter. CLAUDE.md'ye yazıldı | Kota | 14 Ekim |
 | K30 | ✅ Evde Macera: sıradaki durak yazısı ile sesi farklı | **15 Ekim akşamı kullanıcı seçti:** ses "Sıradaki durağımız Oyuncak Dansı!" desin. Yapıldı (#128, birleşti): durağın `yer`'i "Oyuncak Dansı" (giriş, damga, pasaport, ödül ekranı da aynı adı söyler/yazar); seslendirme listesi yenilendi (3 cümle; kayıt yoktu, kaybolan ses yok); test: sıralı bölüm haritalarında ad = yer | Çocuk ekranda başka, seste başka duyar | 15 Ekim |
 | K31 | ✖️ Birleştirme onayı (K32 ile kalktı) (K21/K24'ün yerine) | **15 Ekim akşamı kullanıcı:** testler yeşil olsa bile birleştirme, yayınlama, güvenlik/izin değişikliği ve kapsamlı oynanış değişikliği için onay beklenir. Claude değişikliği ayrı dalda yapar, test eder, PR açar ve onay ister. Kamera ve çocuk verileriyle ilgili yeni işlem başlatılmaz. CLAUDE.md güncellendi | Çalışma kuralı | 15 Ekim |
-| K32 | ✅ Biten her şey birleşir | **15 Ekim akşamı kullanıcı:** "Birleştir, bana sorma, biten her şeyi birleştir." `test` son hâlinde yeşil ve okunmuş PR'ı Claude sormadan birleştirir. Oynanış/kapsamı ciddi değiştiren, yayın/dağıtım kararı, force push, geniş silme, GitHub güvenlik/erişim, para, çocuk verisi için tek tek onay sürer. #127 ve #128 bu kararla birleşti | Çalışma kuralı | 15 Ekim |
+| K32 | ✖️ Biten her şey birleşir (aynı akşam K33 ile kalktı) | **15 Ekim akşamı kullanıcı:** "Birleştir, bana sorma, biten her şeyi birleştir." `test` son hâlinde yeşil ve okunmuş PR'ı Claude sormadan birleştirir. Oynanış/kapsamı ciddi değiştiren, yayın/dağıtım kararı, force push, geniş silme, GitHub güvenlik/erişim, para, çocuk verisi için tek tek onay sürer. #127 ve #128 bu kararla birleşti | Çalışma kuralı | 15 Ekim |
+| K33 | ✅ Otonom çalışma ve onay politikası | **15 Ekim akşamı kullanıcı** (K32'den hemen sonra): küçük, geri alınabilir işler sorulmadan yapılır, görev sonunda tek rapor; **main'e birleştirme, yayın, güvenlik/izin, para, çocuk/kamera verisi, gizlilik, büyük mimari/oynanış değişikliği, geri dönüşsüz silme için onay**. Tam metin `docs/calisma-politikasi.md`; CLAUDE.md güncellendi | Çalışma kuralı | 15 Ekim |
 
 ## 2. Kullanıcıda bekleyenler
 
@@ -70,7 +71,7 @@ Onay verilmemiş, ertelenmiş ya da reddedilmiş öneriler de buraya yazılır; 
 ### 15 Ekim 2026 (akşam) — kullanıcı kararları, K30
 **Kararlar:** K30 → ses "Oyuncak Dansı" desin · K26 beklet · K23 sonuç gelmeden algılama doğrulanmış sayılmaz · **K31: birleştirme
 artık onayla** (testler yeşil olsa da) · kamera/çocuk verisiyle yeni işlem yok.
-**Birleşenler:** #127 Yağız testi protokolünde "Kamera durdu" satırı · #128 K30 + K31 kaydı. Sonra kullanıcı K32 dedi (biten her şey sormadan birleşir).
+**Birleşenler:** #127 Yağız testi protokolünde "Kamera durdu" satırı · #128 K30 + K31 kaydı. Sonra kullanıcı K32 dedi (biten her şey sormadan birleşir), hemen ardından K33 politikasını verdi: main'e birleştirme yine onayla. `TEKNIK_DURUM.md` politikada geçiyor ama depoda yok (oluşturulmadı).
 
 ### 15 Ekim 2026 (öğleden sonra) — K27, K28, kod denetimi 2. tur
 **Birleşenler (`test` son hâlinde yeşil ve okunarak, K21):**
