@@ -246,7 +246,8 @@ export class BolumScene extends Phaser.Scene {
           },
           () => {
             isaretler.get(hedef.id)!.destroy();
-            const yeni = this.durakIsareti(hedef, son, true, false, true);
+            // Parlama (nabız) büyüme bitince başlar; burada da başlatılırsa iki nabız üst üste biner.
+            const yeni = this.durakIsareti(hedef, son, true, false, false);
             yeni.setScale(0);
             this.tweens.add({ targets: yeni, scale: 1, duration: 450, ease: 'Back.easeOut', onComplete: () => this.nabiz(yeni) });
             zaferMuzigi();
