@@ -68,8 +68,8 @@ Ekranın altında **✅ Görüyorum: zıpla!** yazmadan başlamayın. Ekrana kim
 **Takılırsa:** "✅ Görüyorum" yazdığı hâlde Zıpzıp zıplamayı bırakırsa: ⌂ → 🌍 Zıpzıp da zıplasın → 📷 Kamerayla zıpla (sayaç
 sıfırdan başlar). Not alın: hangi adımda, takılmadan hemen önce Yağız ne yaptı (çömeldi, telefona yaklaştı, eğildi…)?
 Çocuksuz denemede bulunan "çömelince takılma" düzeltildi (sayaç en geç 1 sn'de kendini toparlar; gerçek çocukla adım 10 doğrular).
-Ekran kilitlenir ya da başka uygulamaya geçilirse kamera durabilir ama yazı "Görüyorum"da kalır:
-yine ⌂ ile çıkıp yeniden açın.
+Ekran kilitlenir ya da başka uygulamaya geçilirse kamera durabilir; o zaman ekranın altında "⏸ Kamera durdu" yazar (#118):
+⌂ ile çıkıp yeniden açın. Böyle olduysa hangi adımda olduğunu not alın.
 
 Sonuçları `docs/yagiz-zipla-sonuc.md` şablonuna yazın (Notlar uygulamasına kopyalanabilir).
 
