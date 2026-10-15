@@ -783,6 +783,7 @@ async function sahteKamera(page: Page, hata?: string) {
       setInterval(() => { c.fillStyle = `hsl(${(i += 20) % 360},60%,50%)`; c.fillRect(0, 0, 160, 120); }, 50);
       const akis = t.captureStream(20);
       (window as any).sahteAkis = akis;
+      (window as any).kameraAcilma = ((window as any).kameraAcilma ?? 0) + 1;
       return akis;
     };
   }, hata);
@@ -966,5 +967,61 @@ test('Dünya küresi: art arda dokunuşta tek dönüş, yolculukta dönüş bozu
   expect(yolculukDonusu).toBe(true);
   await page.waitForFunction(() => !(window as any).oyun.scene.getScene('Dunya').yolculukta, null, { timeout: 15_000 });
   expect(await page.evaluate(() => (window as any).oyun.scene.getScene('Dunya').merkez[0])).toBeGreaterThan(5); // Kolezyum'a döndü (0'a değil)
+  expect(kayit.hatalar).toEqual([]);
+});
+
+// Yağız testi (15 Ekim): iPhone her harekette kamera izni soruyordu. Kamera aynı duraktaki hareketler arasında bir kez açılır,
+// hareket ekranından çıkınca kapanır.
+test('hareket ekranı: kamera hareketler arasında yeniden açılmaz (izin bir kez), hareket ekranından çıkınca kapanır', async ({ page }) => {
+  await sahteKamera(page);
+  const kayit = await oyunuAc(page, { 'zipzip-kamera-v1': '1' });
+  const kameraliAdimlar: number[] = [];
+  await sahneAc(page, 'Hareket', { durakId: 'istanbul', adim: 0 });
+  const uzunluk = await page.evaluate(() => (window as any).oyun.scene.getScene('Hareket').liste().length);
+  for (let adim = 0; adim < uzunluk && kameraliAdimlar.length < 2; adim++) {
+    // Oyundaki gibi sıradaki harekete geçiş (sahneAc aynı sahneyi yeniden başlatamaz).
+    if (adim > 0) {
+      await page.evaluate((adim) => (window as any).oyun.scene.getScene('Hareket').scene.restart({ durakId: 'istanbul', adim }), adim);
+      await page.waitForTimeout(700);
+    }
+    if (await page.evaluate(() => !!(window as any).oyun.scene.getScene('Hareket').kamera)) {
+      kameraliAdimlar.push(adim);
+      await expect.poll(() => page.evaluate(() => (window as any).sahteAkis?.getVideoTracks()[0]?.readyState), { timeout: 30_000 }).toBe('live');
+    }
+  }
+  expect(kameraliAdimlar.length).toBe(2);
+  expect(await page.evaluate(() => (window as any).kameraAcilma)).toBe(1);
+  await sahneAc(page, 'Macera');
+  await expect.poll(() => page.evaluate(() => (window as any).sahteAkis.getVideoTracks()[0].readyState), { timeout: 5_000 }).toBe('ended');
+  expect(kayit.hatalar).toEqual([]);
+});
+
+// Yağız testi (15 Ekim): 3-2-1 ile kendiliğinden geçmeyi beklerken ekran kararıyordu. Hareket ekranında "ekranı açık tut" istenir,
+// haritaya dönünce bırakılır.
+test('hareket ekranında ekran açık tutulur, çıkınca bırakılır', async ({ page }) => {
+  await page.addInitScript(() => {
+    const w = window as any;
+    w.ekranKilidi = { istek: 0, birakma: 0, acik: false };
+    Object.defineProperty(navigator, 'wakeLock', {
+      value: {
+        request: async () => {
+          w.ekranKilidi.istek++;
+          w.ekranKilidi.acik = true;
+          return { release: async () => { w.ekranKilidi.birakma++; w.ekranKilidi.acik = false; }, addEventListener: () => {} };
+        },
+      },
+    });
+  });
+  const kayit = await oyunuAc(page, BETA);
+  await sahneAc(page, 'Macera');
+  expect(await page.evaluate(() => (window as any).ekranKilidi.acik)).toBe(false);
+  await sahneAc(page, 'Hareket', { durakId: 'istanbul', adim: 0 });
+  await expect.poll(() => page.evaluate(() => (window as any).ekranKilidi.acik), { timeout: 5_000 }).toBe(true);
+  // Sıradaki hareket (oyundaki gibi sahne yeniden başlar): kilit bırakılmaz.
+  await page.evaluate(() => (window as any).oyun.scene.getScene('Hareket').scene.restart({ durakId: 'istanbul', adim: 1 }));
+  await page.waitForTimeout(1500);
+  expect(await page.evaluate(() => (window as any).ekranKilidi)).toMatchObject({ istek: 1, birakma: 0, acik: true });
+  await sahneAc(page, 'Macera');
+  await expect.poll(() => page.evaluate(() => (window as any).ekranKilidi.acik), { timeout: 5_000 }).toBe(false);
   expect(kayit.hatalar).toEqual([]);
 });
