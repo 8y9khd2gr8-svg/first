@@ -38,9 +38,10 @@ Onay verilmemiş, ertelenmiş ya da reddedilmiş öneriler de buraya yazılır; 
 | K24 | ✅ Birleştirme kuralı çelişkisi | **14 Ekim, kullanıcı seçti: K21 geçerli.** "Ana talimat"taki her birleştirmeye açık onay isteği yerine K21 uygulanır (testi yeşil, küçük, geri alınabilir PR'ı Claude birleştirir; K21'deki istisnalar için tek tek onay). #103-#107'nin sormadan birleşmesi bu kurala uygun sayıldı; #108 bu kararla birleşti | Çalışma kuralı | 14 Ekim |
 | K25 | ✅ Gerçek çocuk gibi gezinme testi | **Yapıldı (#119, 15 Ekim gecesi):** `tests/gezinti.spec.ts` düğmelere ekrandaki yerinden fareyle dokunur; Oyna → Türkiye → durak → ödül → ⌂ → ⌂ iki tur, Ailece iki kez, 🔒 Ebeveyn gir/çık iki kez. #110 hatası geri konunca kırmızı oluyor. İşlemci 4-6 kat yavaşken de geçiyor (`GEZINTI_YAVAS=4`). Oyunda hata bulmadı | | 14 Ekim |
 | K26 | ⏳ "Hareket Kâşifi" rozeti betada kazanılamaz | Koşul "her hareketi en az bir kez dene" bütün bölümlerin (Uzay, Spor, Dinozor, Evde, Okyanus) hareketlerini istiyor; betada açık Türkiye + Dünya + Ailece ile 30'dan fazla hareket hiç gelmiyor. Seçenekler: (a) koşul sadece açık bölümlerin hareketlerine bakar (önerilen; kazanılan rozet kaybolmaz) (b) betada rozeti gizle (c) böyle kalsın ("?" görünür). Ürün kararı, kod değişmedi | Çocuk asla kazanamayacağı bir rozet görür | 15 Ekim |
-| K27 | ⏳ Oyundaki hareket ekranında kamera durursa | Ebeveyn ekranlarında artık "⏸ Kamera durdu" yazıyor (#118). Hareket ekranındaki küçük kamera kutusu (HareketScene) onaysız değiştirilmedi: kamera durunca son sayıyı göstermeye devam eder, "Yaptım!" yine çıkar (kaybetmek yok). Öneri: kutuda "📷 Durdu" yazsın (tek satır, oynanış aynı) | Ebeveyn kameranın saydığını sanabilir | 15 Ekim |
-| K28 | ⏳ Testlerdeki "sakinleşmesini bekle" yardımcısı | `tests/oyun.spec.ts` sakinlesmesiniBekle Phaser 3.90'da olmayan `t.repeat` alanına bakıyor; Zıpzıp'ın sürekli küçük animasyonları yüzünden hep 1,5 sn'nin sonuna kadar bekliyor. Hata değil (testler doğru), sadece yavaşlık; düzeltmek testlerin zamanlamasını değiştirir | Test süresi | 15 Ekim |
+| K27 | ✅ Oyundaki hareket ekranında kamera durursa | **Yapıldı (#123, 15 Ekim):** küçük kamera kutusu görüntü kesilince son sayı yerine "📷 Durdu" yazar. Sadece yazı: "Yaptım!", eşikler, oynanış aynı. Sahte kamerayla test (eski kodda "📷 0/8" kalıyordu). 🔎 iPhone'da gerçek ekran kilidiyle denenmedi | | 15 Ekim |
+| K28 | ✅ Testlerdeki "sakinleşmesini bekle" yardımcısı | **Yapıldı (#124, 15 Ekim):** sonsuz animasyon artık doğru tanınıyor (`t.data[i].repeat === -1`). Ölçüm: Açılış ve Büyük Macera ~0,3 sn'de sakin (önce hep 1,5 sn), Dünya 2,5 sn; Uzay, Spor, Okyanus, Kostüm'de Zıpzıp'ın kısa animasyonları yüzünden yine 1,5 sn. Renk zıtlığı + örtme testleri 3'er tekrar: 3,1 → 2,7 dk, 6/6 geçti | Test süresi | 15 Ekim |
 | K29 | ✅ Oturum uzayınca uyarı | **14 Ekim, kullanıcı istedi:** bağlam ~300 bin token'ı geçince ya da iş listesi bitince Claude cevabın sonunda "Yeni oturuma geçelim mi? (kota için)" diye sorar; yarım iş/açık PR varsa önce o biter. CLAUDE.md'ye yazıldı | Kota | 14 Ekim |
+| K30 | ⏳ Evde Macera: sıradaki durak yazısı ile sesi farklı | Bölüm haritasında alt yazı durağın adını ("Oyuncak Dansı"), ses yerini ("Sıradaki durağımız Dans!") söylüyor; sadece bu durakta ad ≠ yer. Seçenekler: (a) durağın `yer`'i "Oyuncak Dansı" olsun (önerilen; tek satır, yeni ses kaydı gerekir) (b) alt yazı da yeri yazsın (c) böyle kalsın. Evde Macera betada kapalı, acele yok | Çocuk ekranda başka, seste başka duyar | 15 Ekim |
 
 ## 2. Kullanıcıda bekleyenler
 
@@ -63,6 +64,27 @@ Onay verilmemiş, ertelenmiş ya da reddedilmiş öneriler de buraya yazılır; 
 ---
 
 ## 4. Oturum günlüğü (en yeni üstte)
+
+### 15 Ekim 2026 (öğleden sonra) — K27, K28, kod denetimi 2. tur
+**Birleşenler (`test` son hâlinde yeşil ve okunarak, K21):**
+- #123 K27: hareket ekranındaki küçük kamera kutusu kamera durunca "📷 Durdu" (sahte kamerayla test; eski kodda kırmızı).
+- #124 K28: test yardımcısı sonsuz animasyonu doğru tanır; ölçüm K28 satırında.
+- #125 Kod denetimi 2. tur (BolumScene, DunyaScene, UzayScene, HaritaScene, SertifikaScene, PasaportScene, MaceraScene, DurakScene,
+  uyarla.ts, hiz.ts). **Hata 1:** bölüm haritasında (Spor/Dinozor/Evde/Okyanus) yolculukla açılan durak iki nabız animasyonu alıyordu
+  (üst üste). **Hata 2:** Dünya küresinde önceki dönüşü durdurma satırı yanlış nesneye bakıyordu; art arda dokunuşta dönüşler
+  birikiyor, yolculukta düğme küreyi çekiştiriyordu → aynı anda tek dönüş, yolculukta düğme küreyi çevirmez. İki test, eski kodda kırmızı.
+- Bu PR: kayıt.
+
+**Denetimde bakılıp sorun görülmeyenler:** uyarla.ts (Sakin/Hızlı tempo, oturarak; soğuma hikâyeleri hep dolu), hiz.ts, DurakScene
+(Ailece buraya uğramaz), Harita/Uzay yolculuğu, Sertifika kilidi, Pasaport sekmeleri, Büyük Macera.
+**Belirsiz/küçük (kod değişmedi):** K30 (Evde Macera ad/yer). Uzay haritasında Dünya→Merkür yolu Merkür bitene kadar beyaz (diğer
+haritalarda başlangıç biten durağa bağlı; görsel tutarlılık, çizer gelince bakılır). Sertifikadaki "X hareket · Y dakika" bütün
+bölümlerin toplamı (o bölümün değil); yanlış değil ama "bu bölümde" gibi okunabilir. Pasaporttan `Avatar` ve ebeveyn köşesinden
+`Acilis` veri nesnesiz başlatılıyor; ikisinde `init` yok, şu an zararsız.
+**Test notu:** testlerdeki `sahneAc` yardımcısı aynı sahneyi (ör. Dunya → Dunya) doğrudan yeniden başlatınca sahne durur; arada başka
+sahne açılmalı (oyunda bu yol yok, sadece test yardımcısı).
+**Testler:** npm test 34/34; test:oyun yerelde 46/46 (yeni: K27, tek nabız, Dünya küresi); tsc temiz.
+**Arşiv:** session_01KYbNnkta2jv2dM7gTitCb5 arşivlendi.
 
 ### 15 Ekim 2026 (gece, kullanıcı uyurken) — 4 gece işi
 **Birleşenler (hepsi `test` son hâlinde yeşil ve okunarak, K21):**
