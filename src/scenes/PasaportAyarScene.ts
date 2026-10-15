@@ -9,8 +9,15 @@ export class PasaportAyarScene extends Phaser.Scene {
   private foto?: string;
   private onizleme?: Phaser.GameObjects.Image;
 
+  // Pasaport → ✏️ ile gelindiyse ⌂ pasaporta döner (gelinen yer); ebeveyn köşesinden gelindiyse köşeye.
+  private geri = 'EbeveynMenu';
+
   constructor() {
     super('PasaportAyar');
+  }
+
+  init(veri: { geri?: string }) {
+    this.geri = veri.geri ?? 'EbeveynMenu';
   }
 
   create() {
@@ -19,7 +26,7 @@ export class PasaportAyarScene extends Phaser.Scene {
     const pasaport = pasaportOku();
     this.foto = pasaport.foto;
 
-    evDugmesi(this, () => this.scene.start('EbeveynMenu'));
+    evDugmesi(this, () => this.scene.start(this.geri, {}));
     this.add.text(x, 150, 'Pasaportu hazırla', { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '64px', color: '#FFC93C' }).setOrigin(0.5);
 
     const cerceve = this.add.graphics();

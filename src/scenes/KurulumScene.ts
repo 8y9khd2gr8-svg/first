@@ -12,7 +12,7 @@ export class KurulumScene extends Phaser.Scene {
   create() {
     yildizliArkaPlan(this);
     const x = this.scale.gameSize.width / 2;
-    evDugmesi(this, () => this.scene.start('EbeveynMenu'));
+    evDugmesi(this, () => this.scene.start('EbeveynMenu', {}));
     this.add.text(x, 190, 'Telefona yükle', { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '72px', color: '#FFC93C' }).setOrigin(0.5);
     this.add.image(x, 400, 'ikon').setDisplaySize(200, 200);
 

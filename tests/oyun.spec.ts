@@ -764,3 +764,125 @@ test('sertifika: kaydet/paylaş sadece ebeveyn kilidinden sonra; vazgeçince ayn
   expect(await htmlDugme()).toBe(true);
   expect(kayit.hatalar).toEqual([]);
 });
+
+// Kamera denemesi: kamera yok / izin yok ayrı yazılır; açıldıktan sonra görüntü kesilirse "Görüyorum"da kalmaz.
+// Gerçek kamera yerine sahte getUserMedia (hata ya da boyanan bir tuvalin görüntüsü).
+async function sahteKamera(page: Page, hata?: string) {
+  await page.addInitScript((hata) => {
+    (navigator.mediaDevices as any).getUserMedia = async () => {
+      if (hata) throw new DOMException('deneme', hata);
+      const t = document.createElement('canvas');
+      t.width = 160;
+      t.height = 120;
+      const c = t.getContext('2d')!;
+      let i = 0;
+      setInterval(() => { c.fillStyle = `hsl(${(i += 20) % 360},60%,50%)`; c.fillRect(0, 0, 160, 120); }, 50);
+      const akis = t.captureStream(20);
+      (window as any).sahteAkis = akis;
+      return akis;
+    };
+  }, hata);
+}
+
+async function kameraYazisi(page: Page, sahne: string, icerir: string) {
+  await page.waitForFunction(
+    ([sahne, icerir]) => (window as any).oyun.scene.getScene(sahne).children.list.some((c: any) => c.type === 'Text' && c.text.includes(icerir)),
+    [sahne, icerir] as const,
+    { timeout: 30_000 },
+  );
+}
+
+for (const [hata, yazi] of [['NotFoundError', 'kamera bulunamadı'], ['NotAllowedError', 'Kameraya izin verilmedi']]) {
+  test(`kamera denemesi: ${hata} kendi yazısıyla gösterilir`, async ({ page }) => {
+    await sahteKamera(page, hata);
+    const kayit = await oyunuAc(page, BETA);
+    await sahneAc(page, 'EbeveynKamera');
+    const r = (await page.locator('canvas').boundingBox())!;
+    await page.mouse.click(r.x + r.width / 2, r.y + (r.height * 635) / 1280); // 📷 Kamerayı aç
+    await kameraYazisi(page, 'EbeveynKamera', yazi);
+    expect(kayit.hatalar).toEqual([]);
+  });
+}
+
+test('kamera denemesi: görüntü kesilince "Kamera durdu" yazar', async ({ page }) => {
+  await sahteKamera(page);
+  const kayit = await oyunuAc(page, BETA);
+  await sahneAc(page, 'EbeveynKamera');
+  const r = (await page.locator('canvas').boundingBox())!;
+  await page.mouse.click(r.x + r.width / 2, r.y + (r.height * 635) / 1280);
+  await kameraYazisi(page, 'EbeveynKamera', 'Baştan ayağa görünmeli');
+  await page.evaluate(() => (window as any).sahteAkis.getTracks().forEach((t: MediaStreamTrack) => t.stop()));
+  await kameraYazisi(page, 'EbeveynKamera', 'Kamera durdu');
+  expect(kayit.hatalar).toEqual([]);
+});
+
+test('Zıpzıp da zıplasın: kamera durunca yazı söyler ve ritim yolu geri gelir', async ({ page }) => {
+  await sahteKamera(page);
+  const kayit = await oyunuAc(page, BETA);
+  await sahneAc(page, 'ZiplaDeneme');
+  const r = (await page.locator('canvas').boundingBox())!;
+  await page.mouse.click(r.x + r.width / 2, r.y + (r.height * 925) / 1280); // 📷 Kamerayla zıpla
+  await kameraYazisi(page, 'ZiplaDeneme', 'Baştan ayağa görünmeli');
+  expect(await page.evaluate(() => !!(window as any).oyun.scene.getScene('ZiplaDeneme').ritim)).toBe(false);
+  await page.evaluate(() => (window as any).sahteAkis.getTracks().forEach((t: MediaStreamTrack) => t.stop()));
+  await kameraYazisi(page, 'ZiplaDeneme', 'Kamera durdu');
+  expect(await page.evaluate(() => !!(window as any).oyun.scene.getScene('ZiplaDeneme').ritim)).toBe(true);
+  expect(kayit.hatalar).toEqual([]);
+});
+
+test('Pasaporttaki ada dokunup kilitten geçince ⌂ pasaporta döner (önce Büyük Macera\'dan ebeveyn köşesine girilmiş olsa da)', async ({ page }) => {
+  const kayit = await oyunuAc(page, BETA);
+  await sahneAc(page, 'EbeveynMenu', { geri: 'Macera' }); // önceki giriş: Büyük Macera'dan
+  await sahneAc(page, 'Pasaport');
+  const dokun = (sahne: string, bul: string) =>
+    page.evaluate(([sahne, bul]) => {
+      const s = (window as any).oyun.scene.getScene(sahne);
+      const yazi = (o: any): string => (o.type === 'Text' ? o.text : (o.list ?? []).map(yazi).join(' '));
+      const hepsi: any[] = [];
+      const gez = (o: any) => { hepsi.push(o); (o.list ?? []).forEach(gez); };
+      s.children.list.forEach(gez);
+      let hedef: any;
+      if (bul === 'ad') hedef = hepsi.find((o) => o.type === 'Zone' && o.input?.enabled && o.width === 330);
+      else if (bul === 'cevap') {
+        const soru = hepsi.find((o) => o.type === 'Text' && / × /.test(o.text));
+        const [a, b] = soru.text.match(/\d+/g).map(Number);
+        hedef = hepsi.find((o) => o.input?.enabled && yazi(o).trim() === String(a * b));
+      } else hedef = hepsi.find((o) => o.input?.enabled && yazi(o).includes(bul));
+      hedef.emit('pointerdown');
+    }, [sahne, bul] as const);
+  await dokun('Pasaport', 'ad');
+  await page.waitForFunction(() => (window as any).oyun.scene.isActive('Ebeveyn'));
+  await dokun('Ebeveyn', 'cevap');
+  await page.waitForFunction(() => (window as any).oyun.scene.isActive('PasaportAyar'), null, { timeout: 5000 });
+  await dokun('PasaportAyar', '🏠');
+  await page.waitForFunction(() => (window as any).oyun.scene.isActive('Pasaport'), null, { timeout: 5000 });
+  // Ebeveyn köşesinden açılan pasaport düzenlemesi köşeye döner.
+  await sahneAc(page, 'EbeveynMenu', {});
+  await dokun('EbeveynMenu', '✏️ Pasaport');
+  await page.waitForFunction(() => (window as any).oyun.scene.isActive('PasaportAyar'), null, { timeout: 5000 });
+  await dokun('PasaportAyar', '🏠');
+  await page.waitForFunction(() => (window as any).oyun.scene.isActive('EbeveynMenu'), null, { timeout: 5000 });
+  expect(kayit.hatalar).toEqual([]);
+});
+
+test('"Bu telefonda neler var?": uygulamadaki en uzun hâlde de yazılar "Tamam"ın altında kalmaz, her kayıt listede', async ({ page }) => {
+  const kayit = await oyunuAc(page, { ...BETA, 'zipzip-guvenlik-notu-v1': '1' }, '/?odeme=deneme');
+  await sahneAc(page, 'EbeveynVeri');
+  const sonuc = await page.evaluate(() => {
+    const s = (window as any).oyun.scene.getScene('EbeveynVeri');
+    const yazi = (o: any): string => (o.type === 'Text' ? o.text : (o.list ?? []).map(yazi).join(' '));
+    const tamam = s.children.list.find((o: any) => o.type === 'Container' && yazi(o).includes('Tamam'));
+    const tb = tamam.getBounds();
+    const yazilar = s.children.list.filter((o: any) => o.type === 'Text');
+    return {
+      ortulen: yazilar.filter((t: any) => {
+        const b = t.getBounds();
+        return b.bottom > tb.top && b.top < tb.bottom && b.right > tb.left && b.left < tb.right;
+      }).map((t: any) => t.text),
+      metin: yazilar.map((t: any) => t.text).join('|'),
+    };
+  });
+  expect(sonuc.ortulen).toEqual([]);
+  for (const satir of ['Tam sürüm', 'Güvenlik notu · beta', 'okundu · bölümler açık', 'Uzaktan oyna', 'Kamerayla sayma']) expect(sonuc.metin).toContain(satir);
+  expect(kayit.hatalar).toEqual([]);
+});
