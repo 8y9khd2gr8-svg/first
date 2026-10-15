@@ -170,6 +170,8 @@ Teknoloji: Phaser 3 + TypeScript + Vite, GitHub Pages ile yayın. İleride Capac
   Kamera denemesi (EbeveynKameraScene, ebeveyn köşesinde kamera ayarının yanında "🔍 Dene"): canlı görüntü + vücut noktaları,
   6 sayma yolundan biri seçilir, sayı ve "görüyorum/geri git" durumu görünür; kamera dokununca açılır, sayılar özete eklenmez.
   Yağız testinde eşik ayarı için kullanılır.
+  Ebeveyn kamera ekranlarında kamera akışı durursa (iz biter/susturulur/2 sn yeni kare yok) "⏸ Kamera durdu" yazar; kamera yok ve
+  izin yok ayrı yazılır (kamera.ts kameraDurumYazisi). Oyundaki hareket ekranı bundan etkilenmez (K27).
   Kamera denemesinde ölçüm satırı (tanıma ms, tanıma/sn, oyunun kare hızı, son sayımın gecikmesi; kaydedilmez). Zıplama inişte
   sayılır, 400 ms içindeki ikinci iniş sayılmaz (ZIPLAMA_EN_AZ_ARA_MS);
   1 sn'den uzun "havada" kalma sayılmaz, taban yeniden ölçülür (çömel-kalk takılması, ZIPLAMA_EN_UZUN_HAVA_MS). "🌍 Zıpzıp da zıplasın" (ZiplaDenemeScene, zıplama
@@ -216,6 +218,7 @@ Teknoloji: Phaser 3 + TypeScript + Vite, GitHub Pages ile yayın. İleride Capac
   `npm test`: veri/kural testleri (tests/veri.test.ts: tekil kimlikler, zincir, "gibi" yok, her cümle
   seslendirme listesinde, kayıt anahtarı zipzip-, kodda dış adres yok). `npm run test:oyun`: Playwright ile
   bütün ekranlar, her hareket, dış sunucu isteği yok, internetsiz açılış.
+  `tests/gezinti.spec.ts`: ana yollar gerçek fare dokunuşuyla (ekrandaki yerinden) en az iki kez dolaşılır (K25).
   Yerleşim testi: yazı ekrandan taşmaz, çocuk ekranlarındaki yazı düğmeleri en az 72 nokta (küçük görünen
   düğmeye `arayuz.genisDokunma` ile geniş dokunma alanı verilir). PR'larda Actions → "Testler" çalışır.
 - Yeni bölüm eklemek: duraklar.ts'e durak listesi + BOLUMLER satırı, BolumScene AYARLAR'a ayar,
@@ -249,6 +252,9 @@ Teknoloji: Phaser 3 + TypeScript + Vite, GitHub Pages ile yayın. İleride Capac
   kendisi açar (claude-code-remote create_session; ilk mesaj hazır: CLAUDE.md'yi ve docs/KAYIT.md'yi oku, son durum, seçilen işler, "onaylı,
   sormadan yap; testler geçince PR'ı birleştir; büyük ürün kararlarını sabaha bırak"). Önce açık PR birleştirilir ki yeni
   oturum güncel main'den başlasın. Kullanıcı bir şey yazmaz.
+- Oturum uzayınca Claude kendisi uyarır (14 Ekim, kullanıcı istedi): bağlam yaklaşık 300 bin token'ı geçince (get_session →
+  context_usage.used_tokens) ya da iş listesi bitince, cevabın sonunda tek satırla "Yeni oturuma geçelim mi? (kota için)" diye sorar;
+  kullanıcı evet derse "Yeni oturuma geçelim" adımları uygulanır. Ortada yarım iş/açık PR varsa önce o bitirilir.
 - "Yeni sohbet aç" denildiğinde, cevabın sonunda yeni sohbete aynen yapıştırılacak hazır bir başlangıç mesajı
   (kod bloğu içinde) verilir: "CLAUDE.md'yi oku", son birleşen PR'lar, kullanıcıda bekleyenler, sıradaki iş
   seçenekleri (önerilen başta). Kullanıcı kopyalayıp yapıştırır, başka bir şey yazmasına gerek kalmaz.
