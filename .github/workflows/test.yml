@@ -1,5 +1,7 @@
 # Her PR'da oyunu derler ve testleri çalıştırır (Actions sekmesinden elle de başlatılabilir).
 # Testler geçmeden PR birleştirilmez.
+# Hız (16 Ekim): oyun testleri 5 parçaya bölünüp aynı anda 5 makinede koşar (önce tek makinede ~16 dk).
+# Dal koruması "test" adlı kontrole bakar: en sondaki "test" işi, bütün parçalar ve veri testleri geçtiyse yeşil olur.
 name: Testler
 
 on:
@@ -10,7 +12,8 @@ permissions:
   contents: read
 
 jobs:
-  test:
+  veri:
+    name: Derleme ve veri testleri
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -23,9 +26,47 @@ jobs:
         run: npm run build
       - name: Veri ve kural testleri
         run: npm test
+
+  # Parçalar süreye göre elle dengelenir (her biri ~2-3 dk, 2 işçi): uzun dosyalar kendi içinde ikiye bölünür.
+  # Yeni bir test dosyası eklenince buraya da eklenmeli (npm test, unutulan dosyayı yakalar).
+  oyun:
+    name: Oyun testleri (${{ matrix.ad }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - ad: bütün duraklar 1/2
+            secim: tests/butun-duraklar.spec.ts --shard=1/2
+          - ad: bütün duraklar 2/2
+            secim: tests/butun-duraklar.spec.ts --shard=2/2
+          - ad: gezinti + internetsiz
+            secim: tests/gezinti.spec.ts tests/cevrimdisi.spec.ts
+          - ad: ekranlar 1/2
+            secim: tests/oyun.spec.ts --shard=1/2
+          - ad: ekranlar 2/2
+            secim: tests/oyun.spec.ts --shard=2/2
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
       - name: Tarayıcı kur
         run: npx playwright install --with-deps chromium
       - name: Oyun testleri (gerçek tarayıcıda)
-        run: npm run test:oyun
+        run: npx vite build && npx playwright test ${{ matrix.secim }}
         env:
           CI: '1'
+
+  # Dal korumasındaki zorunlu kontrol bu iş ("test"); adını değiştirmeyin.
+  test:
+    runs-on: ubuntu-latest
+    needs: [veri, oyun]
+    if: always()
+    steps:
+      - name: Bütün testler geçti mi?
+        run: |
+          echo "Veri testleri: ${{ needs.veri.result }} · Oyun testleri: ${{ needs.oyun.result }}"
+          test "${{ needs.veri.result }}" = success && test "${{ needs.oyun.result }}" = success

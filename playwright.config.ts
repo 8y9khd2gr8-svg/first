@@ -8,8 +8,9 @@ export default defineConfig({
   testDir: 'tests',
   testMatch: '*.spec.ts',
   timeout: 60_000,
-  // Dosyalar ayrı işçilerde aynı anda koşar (butun-duraklar uzun sürer); bir dosyanın testleri kendi içinde sırayla.
-  fullyParallel: false,
+  // Testler birbirinden bağımsız (her biri kendi sayfasında, kendi cihaz kaydıyla): uzun dosyaların testleri de
+  // işçilere dağılır. CI'da ayrıca 5 parçaya bölünür (.github/workflows/test.yml).
+  fullyParallel: true,
   workers: 2,
   reporter: 'list',
   use: {

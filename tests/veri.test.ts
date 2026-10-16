@@ -290,3 +290,9 @@ test('derlemedeki hafif Phaser, kodda kullanılan her oyun nesnesini içerir (sr
     assert.ok((tur === 'add' ? fabrika : yapici).has(ad(m)), `hafif Phaser'da yok: this.${tur}.${m} → src/phaserNesneleri.cjs'e ekleyin`);
   }
 });
+
+test('CI her oyun testi dosyasını çalıştırır (.github/workflows/test.yml parçaları)', () => {
+  // Oyun testleri CI'da elle dengelenmiş parçalarda koşar; yeni dosya parçalara eklenmezse hiç çalışmazdı.
+  const is = fs.readFileSync('.github/workflows/test.yml', 'utf8');
+  for (const f of fs.readdirSync('tests').filter((f) => f.endsWith('.spec.ts'))) assert.ok(is.includes(`tests/${f}`), `${f} CI parçalarında yok`);
+});
