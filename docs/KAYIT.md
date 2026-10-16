@@ -47,8 +47,10 @@ Onay verilmemiş, ertelenmiş ya da reddedilmiş öneriler de buraya yazılır; 
 | K33 | ✅ Otonom çalışma ve onay politikası | **15 Ekim akşamı kullanıcı** (K32'den hemen sonra): küçük, geri alınabilir işler sorulmadan yapılır, görev sonunda tek rapor; **main'e birleştirme, yayın, güvenlik/izin, para, çocuk/kamera verisi, gizlilik, büyük mimari/oynanış değişikliği, geri dönüşsüz silme için onay**. Tam metin `docs/calisma-politikasi.md`; CLAUDE.md güncellendi | Çalışma kuralı | 15 Ekim |
 | K34 | ✅ Yağız testi bulguları (15 Ekim akşamı) | (1) Kamera açıkken iPhone 2-3 harekette bir yeniden kamera izni soruyordu (her kamera hareketinde kamera kapanıp yeniden açılıyordu). (2) "Uzaktan oyna" ile 3-2-1 beklerken ekran kararıyordu (otomatik kilit). **Düzeltildi (#131, 16 Ekim birleşti; dokunmadan bütün durak/Ailece testi eski kodda 63/51 kez kilitsiz):** kamera aynı durakta hareketler arasında açık kalır, hareket ekranından çıkınca kapanır (arada görüntü işlenmez; gizlilik.html cümlesi güncellendi); Durak/Hareket/kamera deneme ekranlarında Wake Lock ile ekran açık. 🔎 Wake Lock iPhone ana ekran uygulamasında iOS 18.4'ten önce çalışmayabilir; Android/iPhone mağaza paketinde (Capacitor) ayrı eklenti gerekebilir; gerçek telefonda denenmeli. Kullanıcı yeğenlerine test sitesi bağlantısını gönderecek | Çocuk testi | 15 Ekim |
 | K35 | ✅ Birleştirme yine otomatik | **16 Ekim kullanıcı:** "Neden birleştir diyorum, otomatik niye birleştirmiyorsun?" → seçti: testler yeşilse Claude sormadan birleştirir. Oynanışı ciddi değiştiren, yayın/dağıtım (mağaza), güvenlik/izin, para, çocuk/kamera verisi, geri dönüşsüz silme için onay sürer. #129-#131 bu kararla birleşti | Çalışma kuralı | 16 Ekim |
-| K36 | ⏳ Ebeveyn özetinde "toplam durak" 50 üzerinden | Betada sadece 14 durak açık; özet "2 / 50 durak" gösteriyor, ebeveyn "çok az" sanabilir. Seçenekler: (a) betada açık durakların sayısı ("2 / 14") (önerilen) (b) böyle kalsın (c) bölüm satırları yeterli, toplam kutusu kalksın. Kod değişmedi | Ebeveyn yanlış anlamasın | 16 Ekim |
-| K37 | ⏳ Oturarak oynayan çocuk Hareket Kâşifi'ni kazanamaz | Oturarak oyunda ayakta yapılan hareketler hiç gelmez. Seçenekler: (a) oturarak ayarı açıkken sadece oturarak gelen hareketler sayılsın (b) böyle kalsın. Kod değişmedi | Hareket kısıtı olan çocuk | 16 Ekim |
+| K36 | ✅ Ebeveyn özetinde "toplam durak" | **16 Ekim, kullanıcı seçti (a). Yapıldı (#136):** toplam açık bölümlerin durakları üzerinden (betada "2 / 14", `?bolumler=hepsi` ile "2 / 50"; `duraklar.ts acikDuraklar`). Test eski kodda kırmızı | Ebeveyn yanlış anlamasın | 16 Ekim |
+| K37 | ✅ Oturarak oynayan çocuk Hareket Kâşifi'ni kazanamazdı | **16 Ekim, kullanıcı seçti (a). Yapıldı (#136):** oturarak oyna açıkken sadece oturarak hâlde gelebilen hareketler sayılır (oyunun kurabileceği her liste `uyarla`'dan geçirilir; Ailece sayılmaz, orada hareketler ayakta kalır). Kutlanan rozet kaybolmaz. Test: sayılanlar = oyunun gerçekten kurduğu listelerde gelenler (iki yönde) | Hareket kısıtı olan çocuk | 16 Ekim |
+| K38 | ⏳ Oyundaki kamera: model yüklenemezse | Hareket ekranının ortak kamerası (izin bir kez sorulsun diye durak boyunca açık) vücut tanıma modeli yüklenemezse durak bitene kadar açık kalır (ışık yanık, sayma yok; çıkınca kapanır). Seçenekler: (a) model hatasında ortak kamerayı da kapat, o durakta bir daha deneme (önerilen) (b) böyle kalsın (sonraki harekette model yeniden denenir). Ebeveyn kamera ekranlarındaki aynı sorun #139'da düzeltildi | Gizlilik algısı (kamera ışığı) | 16 Ekim |
+| K39 | ⏳ Kesintide yarım kalan cümle | Arama/kilitten dönünce, gizlenirken yarıda kesilen komut cümlesi yeniden söylenmez (ekranda yazı duruyor; sayma sürer). Seçenekler: (a) böyle kalsın (önerilen; telefonda bakılır) (b) dönüşte hareket komutunu bir kez yeniden söyle | Okuma bilmeyen çocuk | 16 Ekim |
 
 ## 2. Kullanıcıda bekleyenler
 
@@ -66,11 +68,25 @@ Onay verilmemiş, ertelenmiş ya da reddedilmiş öneriler de buraya yazılır; 
 - 🔎 Gerçek telefonda: ses, performans, kamera eşikleri, ödeme hiç denenmedi; iPhone'a hiç kurulmadı.
 - Doğal ses kaydı yok (760 cümle); telefonda Türkçe ses yoksa Zıpzıp konuşamaz.
 - Süreye bağlı tarayıcı testleri yavaş CI'da ara sıra zaman aşımına düşebilir (12 Ekim'de bir kez; #95).
+- ⏳ Doğal ses kayıtları gelince: `ses.ts kaydiYukle` bir kez yüklenemeyen kaydı oturum boyunca "yok" sayar (telefonun sesine düşer). Şu an kayıt yok, etkisi yok; kayıtlar eklenirken düzeltilmeli (başarısızsa önbellekten sil).
 - Ayrıntılı fotoğraf: `docs/rapor-2026-10-12/` (12 Ekim anlık görüntüsü).
 
 ---
 
 ## 4. Oturum günlüğü (en yeni üstte)
+
+### 16 Ekim 2026 (sabah) — K36, K37, testler 3 kat hızlı, kesinti testleri, kod denetimi 4. tur
+**Birleşenler (`test` son hâlinde yeşil ve okunarak, K35):**
+- #136 K36 + K37 (yukarıda). Testler eski kodda kırmızı, yenide yeşil.
+- #137 Testler hızlandı: GitHub "Testler" **~16,5 dk → ~5 dk**. Oyun testleri 5 makinede aynı anda (süreye göre elle dengelenmiş parçalar: bütün duraklar 1/2-2/2, gezinti + internetsiz, ekranlar 1/2-2/2); derleme + veri testleri ayrı iş; dal korumasının baktığı **`test`** adlı iş en sonda, hepsi geçince yeşil. `fullyParallel: true`. Yeni test dosyası eklenince `.github/workflows/test.yml` parçalarına da eklenir (`npm test` denetler). Hiçbir test atlanmadı/gevşetilmedi (52 test). Ölçüm: tek makine 15,6 dk (oyun testleri) → en uzun parça ~5 dk, toplam iş 5 dk 4 sn.
+- #138 Kesinti (kontrol listesi T4, T10): sayfa gizlenince konuşma susar; dönüşte iPhone'da duraklatılmış konuşma sürdürülür; ses bağlamı iPhone'un aramadan sonraki "interrupted" durumunda da yeniden açılır (önce sessiz kalabilirdi). Test: sayma ve "Uzaktan oyna" 3-2-1 gizliyken ilerlemez, yeni cümle yok, dönünce kaldığı yerden bir kez devam, hareket bir kez kaydedilir. Eski kodda kırmızı.
+- #139 Kod denetimi 4. tur (kamera, zipzip, zipzipYuz, zipzipKure, arayuz, pasaport, ses, ekranAcik): vücut tanıma modeli yüklenemezse ebeveyn kamera ekranlarında kamera kapanmıyordu (ışık yanık kalırdı) → kapanır, "Kamera açılamadı" yazar. Eski kodda kırmızı.
+
+**Bilgi:** Phaser sayfa gizlenince kendi saatini durdurmaz; telefon kare çizmediği için oyun durur. Kesinti testi bu yüzden gizliyken kareleri de durdurur. Üstten inen bildirim sayfayı gizlemez (oyun sürer, sorun değil).
+**Denetimde belirsiz kalanlar:** K38 (oyundaki kamera, model hatası), K39 (yarım kalan cümle), ses kaydı önbelleği (bölüm 3). zipzip/zipzipYuz/zipzipKure/arayuz/pasaport/ekranAcik'te kesin hata bulunmadı.
+**Telefonda denenecek (kontrol listesi):** T10 gerçek arama: oyun konuşurken arama gelince ses susuyor mu, dönünce Zıpzıp yine konuşuyor mu, sayma kaldığı yerden mi (iPhone Safari + ana ekran uygulaması). T3 aynı yol.
+**Kendi hatam (ders):** iki kez kaydedilmemiş değişikliği `git checkout -- dosya` ile sildim (yeniden yazıldı, kayıp yok). Kural: "eski kodda kırmızı" denetiminde önce yedek, `git show origin/main:dosya > dosya`, sonra yedeği geri koy.
+**Arşiv:** session_01PpLgb8apS9jWBKniuh6AoQ arşivlendi.
 
 ### 16 Ekim 2026 (gece) — aile testi düzeltmeleri, onay kuralı, kod denetimi 3. tur
 **Birleşenler:** #129 (K33 politika + kayıt), #130 (K26 Hareket Kâşifi: açık bölümler sayılır), #131 (aile testi: kamera izni bir kez,
