@@ -1130,3 +1130,15 @@ test('kilitten dönüş: ekran açık tutma ve kamera yeniden gelir', async ({ p
   }
   expect(kayit.hatalar).toEqual([]);
 });
+
+// K36: özetteki "toplam durak" açık bölümlerin durakları üzerinden: betada 14, ?bolumler=hepsi ile 50.
+test('ebeveyn özeti: toplam durak betada 14, bütün bölümler açıkken 50 üzerinden', async ({ page }) => {
+  const ilerleme = { 'zipzip-ilerleme-v1': JSON.stringify(['istanbul', 'truva']) };
+  const yazilar = () => page.evaluate(() => (window as any).oyun.scene.getScene('EbeveynOzet').children.list.filter((o: any) => o.type === 'Text').map((o: any) => o.text));
+  for (const [adres, toplam] of [['/', 14], ['/?bolumler=hepsi', 50]] as const) {
+    const kayit = await oyunuAc(page, ilerleme, adres);
+    await sahneAc(page, 'EbeveynOzet');
+    expect(await yazilar()).toContain(`2 / ${toplam}`);
+    expect(kayit.hatalar).toEqual([]);
+  }
+});

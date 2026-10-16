@@ -15,7 +15,7 @@ const { tamamlananlar, tamamla } = await import('../src/ilerleme');
 const { pasaportOku } = await import('../src/pasaport');
 const { oyunAyari } = await import('../src/oyunAyari');
 const { haftalikOzet, gunAnahtari } = await import('../src/istatistik');
-const { kazanilanlar, kesfedilecekHareketler, yeniRozetler } = await import('../src/rozetler');
+const { kazanilanlar, kesfedilecekHareketler, rozetleriKutla, yeniRozetler } = await import('../src/rozetler');
 const { acikKostumler, seciliKostum, yeniKostumler } = await import('../src/kostumler');
 
 const BOZUKLAR = ['{bozuk', 'null', '42', '"metin"', '[]', '{}', 'true', '[1,null,{},"x"]', '{"gunler":[1],"ad":5,"foto":"javascript:x","avatar":"x","secili":7,"kutlanan":"a","yas":3,"oturarak":"evet"}'];
@@ -77,4 +77,45 @@ test('Hareket Kâşifi: betada açık bölümlerin bütün hareketlerini deneyen
   assert.equal(kazanilanlar().has('kasif'), false);
   kaydet(sayac());
   assert.equal(kazanilanlar().has('kasif'), true);
+});
+
+// K37: oturarak oyna açıkken ayakta yapılan hareketler hiç gelmez; Hareket Kâşifi sadece oturarak gelebilenleri sayar.
+test('Hareket Kâşifi: oturarak oynayan çocuk, oturarak gelebilen bütün hareketleri deneyince rozeti kazanır', async () => {
+  const { oturumListesi } = await import('../src/oturum');
+  const { acikDuraklar } = await import('../src/duraklar');
+  depo.set('zipzip-oyun-ayar-v1', JSON.stringify({ yas: 'buyuk', oturarak: true }));
+  const liste = kesfedilecekHareketler();
+  // Oyunun gerçekten kurduğu listeler (rastgele ısınma/sürpriz/soğuma, çok kez): sayılan her hareket bunlarda gelmeli.
+  const gelen = new Set<string>();
+  for (let i = 0; i < 150; i++) for (const d of acikDuraklar()) oturumListesi(d.id, 0).forEach((h) => gelen.add(h.animasyon));
+  for (let i = 0; i < 20; i++) oturumListesi('soguma', 0).forEach((h) => gelen.add(h.animasyon));
+  assert.ok(liste.length > 0);
+  assert.deepEqual(liste.filter((a) => !gelen.has(a)), [], 'oturarak hâlde hiç gelmeyen hareket sayılıyor');
+  assert.deepEqual([...gelen].filter((a) => !liste.includes(a)), [], 'oturarak gelen hareket listede yok');
+  assert.ok(!liste.includes('zipla') && !liste.includes('comel'));
+
+  const kaydet = (s: Record<string, number>) =>
+    depo.set('zipzip-istatistik-v1', JSON.stringify({ gunler: { [gunAnahtari()]: { saniye: 60, hareket: liste.length, ziplama: 0, sayac: s } } }));
+  kaydet(Object.fromEntries(liste.slice(1).map((a) => [a, 1])));
+  assert.equal(kazanilanlar().has('kasif'), false);
+  kaydet(Object.fromEntries(liste.map((a) => [a, 1])));
+  assert.equal(kazanilanlar().has('kasif'), true);
+  // Kazanılan (kutlanan) rozet, oturarak kapatılınca liste uzasa da kaybolmaz.
+  rozetleriKutla(yeniRozetler());
+  depo.set('zipzip-oyun-ayar-v1', JSON.stringify({ yas: 'buyuk', oturarak: false }));
+  assert.ok(kesfedilecekHareketler().length > liste.length);
+  assert.equal(kazanilanlar().has('kasif'), true);
+});
+
+// K36: ebeveyn özetindeki "toplam durak" açık bölümlerin durakları üzerinden (betada 14, ?bolumler=hepsi ile 50).
+test('açık duraklar: betada 14, bütün bölümler açılınca 50', async () => {
+  const { acikDuraklar, TUM_DURAKLAR } = await import('../src/duraklar');
+  assert.equal(acikDuraklar().length, 14);
+  (globalThis as any).location = { search: '?bolumler=hepsi' };
+  try {
+    assert.equal(acikDuraklar().length, TUM_DURAKLAR.length);
+    assert.equal(TUM_DURAKLAR.length, 50);
+  } finally {
+    delete (globalThis as any).location;
+  }
 });

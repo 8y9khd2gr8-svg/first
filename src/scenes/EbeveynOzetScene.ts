@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import { RENK, YAZI_TIPI } from '../ayarlar';
 import { evDugmesi, yildizliArkaPlan } from '../arayuz';
-import { BOLUM_SIRASI, BOLUMLER, TUM_DURAKLAR } from '../duraklar';
+import { BOLUM_SIRASI, BOLUMLER, acikDuraklar } from '../duraklar';
 import { tamamlananlar } from '../ilerleme';
 import { haftalikOzet } from '../istatistik';
 import { pasaportOku } from '../pasaport';
@@ -20,7 +20,9 @@ export class EbeveynOzetScene extends Phaser.Scene {
     const ozet = haftalikOzet();
     // İlerleme bütün bölümlerden sayılır (sadece Türkiye değil); bölüm satırında başlananlar görünür.
     const biten = new Set(tamamlananlar());
-    const durak = TUM_DURAKLAR.filter((d) => biten.has(d.id)).length;
+    // Toplam, açık bölümlerin durakları üzerinden (K36): betada "2 / 14"; 50 yazınca ebeveyn "çok az" sanıyordu.
+    const acik = acikDuraklar();
+    const durak = acik.filter((d) => biten.has(d.id)).length;
     const bolumler = BOLUM_SIRASI.map((id) => ({ ad: KISA_AD[id], biten: BOLUMLER[id].duraklar.filter((d) => biten.has(d.id)).length, toplam: BOLUMLER[id].duraklar.length })).filter((b) => b.biten > 0);
     const dakika = Math.round(ozet.saniye / 60);
     evDugmesi(this, () => this.scene.start('EbeveynMenu', {}));
@@ -32,7 +34,7 @@ export class EbeveynOzetScene extends Phaser.Scene {
       [`${dakika}`, 'dakika hareket'],
       [`${ozet.hareket}`, 'hareket'],
       [`${ozet.ziplama}`, 'zıplama'],
-      [`${durak} / ${TUM_DURAKLAR.length}`, 'toplam durak'],
+      [`${durak} / ${acik.length}`, 'toplam durak'],
     ];
     kutular.forEach(([deger, etiket], i) => {
       const kx = x + ((i % 2) - 0.5) * 320;
