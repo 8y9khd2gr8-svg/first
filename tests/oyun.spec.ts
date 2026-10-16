@@ -1545,7 +1545,12 @@ test('kilitli durağa art arda dokununca işaret yerinden kaymaz', async ({ page
     await page.mouse.click(r.x + (r.width * kilitli.ex) / 720, r.y + (r.height * kilitli.ey) / 1280);
     await page.waitForTimeout(70);
   }
-  await page.waitForTimeout(1200);
+  // Sallanma bitene kadar beklenir (yüklü makinede oyunun saati yavaş akar; sabit bekleme yetmiyordu).
+  await page.waitForFunction(() => {
+    const s = (window as any).oyun.scene.getScene('Harita');
+    const k = s.harita.list.find((o: any) => o.type === 'Container' && o.input?.enabled && o.list.some((c: any) => c.text === '🔒'));
+    return s.tweens.getTweensOf(k).length === 0;
+  }, null, { timeout: 30_000 });
   const sonra = await page.evaluate(() => {
     const s = (window as any).oyun.scene.getScene('Harita');
     return s.harita.list.find((o: any) => o.type === 'Container' && o.input?.enabled && o.list.some((c: any) => c.text === '🔒')).x;

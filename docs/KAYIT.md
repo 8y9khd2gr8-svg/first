@@ -87,7 +87,7 @@ Onay verilmemiş, ertelenmiş ya da reddedilmiş öneriler de buraya yazılır; 
 - #143 K40 "önce büyük ayna" (yukarıda). Yeni 3 test (her hâlde örtme yok, sesler, ≤6 sn, kamerasız aynı). Yerelde tam testte gerçek bulgu: küçük kutu uzun hikâye satırına değiyordu → kısaltıldı. CI'da bir ayna testi yük altında sahte kamera "durdu" sayıldığı için aynayı açmadı (oyun doğru davrandı) → test kamera durumunu sabitliyor.
 - #145 T5/T7: düşük güç modunda Wake Lock reddedilince istek her yarım saniyede yineleniyordu (30 sn'de 49) → 10 sn ara, dokununca hemen; yavaş telefon testi (6 kat yavaş, kameralı hareket biter ve ilerler).
 
-- #146 (bu kayıt): T5 testi CI'da yük altında 60 sn'de bitmedi (kendi testim) → oyun saati 4 kat hızlı, süre 120 sn, dokunma denetimi 1,5 sn içinde artış; yerelde 4 işçide 8/8.
+- #146 (bu kayıt): T5 testi CI'da yük altında 60 sn'de bitmedi (kendi testim); ayrıca "art arda dokunma" testi sallanma bitmeden ölçüyordu → bitmesini bekler → oyun saati 4 kat hızlı, süre 120 sn, dokunma denetimi 1,5 sn içinde artış; yerelde 4 işçide 8/8.
 
 **Telefon kontrol listesi:** T2 (izin bir kez) korunur; T5 taklitle ✅; T7 kısmen (bulgu bölüm 3); T1/T9 değişmedi.
 **Telefonda denenecek:** büyük ayna (çocuk kendini görüyor mu, "Hazırsın!" geliyor mu, kutu yazısı 2-3 m'den okunuyor mu); düşük güç modunda bir durak (ekran kararıyor mu); Yağız testinde kutuda ne yazdığı (madde 19).
