@@ -1280,3 +1280,123 @@ test('kamera denemesi: model yüklenemezse kamera kapanır, "Kamera açılamadı
   await expect.poll(() => page.evaluate(() => (window as any).sahteAkis?.getVideoTracks()[0]?.readyState), { timeout: 5_000 }).toBe('ended');
   expect(kayit.hatalar.filter((h) => !h.startsWith('Failed to load resource'))).toEqual([]); // engellenen model dosyaları
 });
+
+// K40 "önce büyük ayna": kamerayla sayılan harekette geri sayımdan önce büyük canlı görüntü ve "baştan ayağa" çerçevesi;
+// kamera görünce yeşil + "Hazırsın!"; hareket başlayınca sağ alta küçülür (eskisinin ~3 katı), "Yaptım!"da sağ üst köşeye.
+// Hiçbir hâlde kutu yazıları ya da düğmeleri örtmez.
+async function konusmaKaydi(page: Page) {
+  await page.addInitScript(() => {
+    const soylenen: string[] = ((window as any).__soylenen = []);
+    const sahte = { speak: (s: SpeechSynthesisUtterance) => soylenen.push(s.text), cancel: () => {}, pause: () => {}, resume: () => {}, getVoices: () => [], addEventListener: () => {}, onvoiceschanged: null, speaking: false, paused: false };
+    Object.defineProperty(window, 'speechSynthesis', { value: sahte, configurable: true });
+  });
+}
+
+async function kameraliAdimaGit(page: Page, durakId = 'istanbul') {
+  for (let adim = 0; adim < 8; adim++) {
+    await sahneAc(page, 'Hareket', { durakId, adim });
+    if (await page.evaluate(() => !!(window as any).oyun.scene.getScene('Hareket').kamera)) return adim;
+  }
+  throw new Error('kameralı adım yok');
+}
+
+// Kutunun tuval noktasındaki yeri ve kutunun örttüğü yazılar/düğmeler (Phaser nesneleri).
+const kutuDurumu = (page: Page) =>
+  page.evaluate(() => {
+    const oyun = (window as any).oyun;
+    const r = oyun.canvas.getBoundingClientRect();
+    const k = r.width / 720;
+    const el = document.querySelector('.kamera-kutusu');
+    if (!el) return null;
+    const b = el.getBoundingClientRect();
+    const kutu = { x: (b.left - r.left) / k, y: (b.top - r.top) / k, g: b.width / k, y2: b.height / k };
+    const s = oyun.scene.getScene('Hareket');
+    const yazi = (o: any): string => (o.type === 'Text' ? o.text : (o.list ?? []).map(yazi).join(' '));
+    const ortulen: string[] = [];
+    for (const o of s.children.list) {
+      if (o.visible === false || o.type === 'DOMElement' || !(o.type === 'Text' ? o.text.trim() : o.input?.enabled)) continue;
+      const n = o.getBounds();
+      if (n.width * n.height === 0) continue;
+      const kesisir = n.x < kutu.x + kutu.g && n.x + n.width > kutu.x && n.y < kutu.y + kutu.y2 && n.y + n.height > kutu.y;
+      if (kesisir) ortulen.push(yazi(o).trim().slice(0, 30));
+    }
+    return { kutu, ortulen, yazi: el.textContent ?? '' };
+  });
+
+test('büyük ayna (K40): önce büyük görüntü, görünce "Hazırsın!", sonra köşeye küçülür; yazı/düğme örtülmez', async ({ page }) => {
+  test.setTimeout(120_000);
+  await konusmaKaydi(page);
+  await sahteKamera(page);
+  const kayit = await oyunuAc(page, { 'zipzip-kamera-v1': '1' });
+  await kameraliAdimaGit(page);
+  const bilgi = () => page.evaluate(() => (window as any).oyun.scene.getScene('Hareket').bilgi.text);
+  // Gösterim: kutu sağ altta, Zıpzıp görünür.
+  let d = (await kutuDurumu(page))!;
+  expect(d.kutu.g).toBeGreaterThan(200);
+  expect(d.kutu.x).toBeGreaterThan(400);
+  expect(d.ortulen).toEqual([]);
+  // Büyük ayna: ekranın yarısına yakın, yönlendirme sesli.
+  await expect.poll(bilgi, { timeout: 30_000 }).toBe('Ekranda kendine bak!');
+  await page.waitForTimeout(600);
+  d = (await kutuDurumu(page))!;
+  expect(d.kutu.g * d.kutu.y2).toBeGreaterThan(0.35 * 720 * 1280);
+  expect(d.ortulen).toEqual([]);
+  expect(await page.evaluate(() => (window as any).__soylenen)).toContain('Ekranda kendine bak! Başından ayağına kadar görün.');
+  // Kamera görür (sahte görüntüde insan yok: durumu elle veriyoruz) → yeşil çerçeve, "Hazırsın!".
+  await page.evaluate(() => (window as any).oyun.scene.getScene('Hareket').kamera.bildir('goruyorum'));
+  await expect.poll(bilgi).toBe('Hazırsın!');
+  expect(await page.evaluate(() => (window as any).__soylenen)).toContain('Hazırsın! Seni görüyorum.');
+  expect(await page.evaluate(() => (document.querySelector('.kamera-kutusu') as HTMLElement).style.borderColor)).toBe('rgb(63, 191, 95)');
+  // Geri sayım ve hareket: kutu sağ altta, sayı ve yazı örtülmez ("Başla!" dahil).
+  await page.waitForFunction(() => (window as any).oyun.scene.getScene('Hareket').sayac.text === 'Başla!', null, { timeout: 15_000, polling: 30 });
+  await page.waitForTimeout(300);
+  d = (await kutuDurumu(page))!;
+  expect(d.kutu.g).toBeLessThan(300);
+  expect(d.kutu.g * d.kutu.y2).toBeGreaterThan(2 * 150 * 140);
+  expect(d.ortulen).toEqual([]);
+  // Aynada yerleşirken sayılanlar silinir: sayım hareketle başlar.
+  expect(await page.evaluate(() => (window as any).oyun.scene.getScene('Hareket').kamera.sayi)).toBe(0);
+  await page.waitForTimeout(1500);
+  expect((await kutuDurumu(page))!.ortulen).toEqual([]);
+  // "Yaptım!": kutu sağ üst köşede, düğmeyi örtmez.
+  await page.waitForFunction(() => (window as any).oyun.scene.getScene('Hareket').children.list.some((o: any) => (o.list ?? []).some((c: any) => c.text === 'Yaptım!')), null, { timeout: 60_000 });
+  await page.waitForTimeout(600);
+  d = (await kutuDurumu(page))!;
+  expect(d.kutu.y).toBeLessThan(100);
+  expect(d.ortulen).toEqual([]);
+  expect(kayit.hatalar).toEqual([]);
+});
+
+test('büyük ayna (K40): kamera görmezse oyun beklemez, birkaç saniye sonra geri sayım başlar', async ({ page }) => {
+  await sahteKamera(page);
+  const kayit = await oyunuAc(page, { 'zipzip-kamera-v1': '1' });
+  await kameraliAdimaGit(page);
+  // Süre sayfanın içinde, her karede ölçülür (test makinesi yüklüyken dışarıdan ölçüm gecikir).
+  await page.evaluate(() => {
+    const s = (window as any).oyun.scene.getScene('Hareket');
+    const w = window as any;
+    s.events.on('postupdate', () => {
+      if (!w.aynaBas && s.bilgi.text === 'Ekranda kendine bak!') w.aynaBas = performance.now();
+      if (w.aynaBas && !w.aynaSon && s.bilgi.text === 'Hazır ol!') w.aynaSon = performance.now();
+    });
+  });
+  await page.waitForFunction(() => !!(window as any).aynaSon, null, { timeout: 40_000 });
+  // En çok 6 sn (gerçek saat; yavaş karede de uzamaz; ölçüm payı 1,5 sn).
+  expect(await page.evaluate(() => (window as any).aynaSon - (window as any).aynaBas)).toBeLessThan(7_500);
+  expect(kayit.hatalar).toEqual([]);
+});
+
+test('büyük ayna (K40): kamera kapalıyken hareket ekranı aynen (ayna yok, sayı ortada)', async ({ page }) => {
+  const kayit = await oyunuAc(page, BETA);
+  await sahneAc(page, 'Hareket', { durakId: 'istanbul', adim: 2 });
+  // Her karede bakılır: ayna yazısı hiç görünmemeli, geri sayım normal gelmeli.
+  await page.evaluate(() => {
+    const s = (window as any).oyun.scene.getScene('Hareket');
+    (window as any).gorulen = [];
+    s.events.on('postupdate', () => (window as any).gorulen.push(s.bilgi.text));
+  });
+  await page.waitForFunction(() => (window as any).gorulen.includes('Hazır ol!'), null, { timeout: 30_000 });
+  expect(await page.evaluate(() => (window as any).gorulen.includes('Ekranda kendine bak!'))).toBe(false);
+  expect(await page.evaluate(() => [(window as any).oyun.scene.getScene('Hareket').sayac.x, document.querySelector('.kamera-kutusu')])).toEqual([360, null]);
+  expect(kayit.hatalar).toEqual([]);
+});

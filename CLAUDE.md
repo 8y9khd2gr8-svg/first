@@ -165,6 +165,10 @@ Teknoloji: Phaser 3 + TypeScript + Vite, GitHub Pages ile yayın. İleride Capac
   Kameranın saydığı hareketler src/kamera.ts SAYMA_YOLU'nda (13 hareket, 6 sayma yolu: kollar, çömel, zıpla, dizler,
   ayak aç-kapa, yana adım); süreli hareketlerde kamera açılmaz. Yavaş telefonda tanıma her seferinde sürdüğü kadar ara verir (oyun takılmasın). Yapay vücut noktalarıyla testi: tests/kamera.test.ts.
   Eşikler gerçek çocukla denenmedi; Yağız testinde ayarlanacak.
+  Oyundaki görünüm (K40, 16 Ekim, "önce büyük ayna"): kameralı harekette Zıpzıp gösterdikten sonra ekranın yarısına yakın canlı
+  görüntü + "baştan ayağa" çerçevesi (görünce yeşil, "Hazırsın!"); görmezse en çok 6 sn (Sakin 8 sn, gerçek saatle) sonra normal
+  geri sayım. Hareket boyunca kutu sağ altta (eskisinin ~3 katı; sayı/yazı sola kayar), "Yaptım!"da sağ üst köşede. Sayım hareketle
+  başlar (aynadakiler sayılmaz). Kamerasız oyun aynen.
   Pakette MediaPipe'in sadece hızlı (SIMD) hâli var (~15 MB; yavaş kopya 9 MB'tı, çıkarıldı): SIMD'siz eski telefonda
   (iOS 16.4 öncesi) kamera seçeneği görünmez (kamera.ts kameraDesteklenir), oyun aynen çalışır.
   Kamera denemesi (EbeveynKameraScene, ebeveyn köşesinde kamera ayarının yanında "🔍 Dene"): canlı görüntü + vücut noktaları,
