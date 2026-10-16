@@ -37,6 +37,7 @@ Oyunu ilk kez açıyorsanız ebeveyn köşesinden **🗑️ Tüm verileri sil** 
 | 16 | 🐢 **Sakin tempo** ile bir durak: daha rahat mı yetişti, yoksa sıkıldı mı? | |
 | 17 | **Oturarak oyna** ile bir durak (sandalyede ya da yerde): kol/gövde hareketlerini anladı mı? Ayağa kalkmak istedi mi? | |
 | 18 | **Kamera denemesi** (kamera ayarının yanında 🔍 Dene): Yağız zıplarken/çömelirken sayı doğru arttı mı? "Geri git" uyarısı çıktı mı? Hangi hareket yanlış sayıldı? (Eşikler buna göre ayarlanacak; bu sayılar özete eklenmez.) | |
+| 19 | **Oyunda kamerayla sayma** (⚙️ Ayarlar → 📷 Kamerayla sayma açık; telefon dik, sabit, 2-3 m uzakta, Yağız'ın başından ayağına kadar görünecek yükseklikte). Kameranın saydığı harekette (kollar, çömel, zıpla, dizler, aç-kapa, yana adım) Zıpzıp gösterdikten sonra **büyük ayna** açılır (K40). **Kutuda ne yazdığına bakın:** "🧍 Baştan ayağa görün: biraz geri git" mi, "✅ Hazırsın!" mı? Hareket sırasında sağ alttaki kutu "📷 Geri git" mi, "📷 3/10" gibi sayı mı yazıyor? "Açılamadı" / "Durdu" yazdıysa not edin. Yeşil "Hazırsın!" gelmeden geri sayım başladıysa: telefon nerede duruyordu, ayaklar görünüyor muydu? (Kamera ayakları görmezse hiç saymaz.) | |
 
 ## Zıplama denemesi (kamera, 10 dk) — K23
 **Yol:** Büyük Macera → sağ alttaki **🔒 Ebeveyn** (çarpma sorusu) → 📷 Kamerayla sayma yanındaki **🔍 Dene** →
