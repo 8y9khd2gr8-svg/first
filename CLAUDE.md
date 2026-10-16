@@ -60,7 +60,7 @@ Teknoloji: Phaser 3 + TypeScript + Vite, GitHub Pages ile yayın. İleride Capac
   çökme/ekran görüntüsü) + kendi otomatik testlerimiz + Yağız testi. Beta sonrası gerekirse yeniden bakılır.
 - Ebeveyn köşesine giriş (K3, 12 Ekim): Büyük Macera'nın sağ altındaki küçük "🔒 Ebeveyn" ya da Pasaport → ✏️ (ikisi de kilitli);
   ev düğmesi gelinen yere döner.
-- Ebeveyn köşesi (kilitli): haftalık hareket özeti (bütün bölümlerdeki durak ilerlemesiyle) + paylaş, pasaport düzenleme. Özet dürüst:
+- Ebeveyn köşesi (kilitli): haftalık hareket özeti (bütün bölümlerdeki durak ilerlemesiyle; "toplam durak" açık bölümlerin durakları üzerinden, K36) + paylaş, pasaport düzenleme. Özet dürüst:
   sayılar çocuğun "Yaptım!" dediği hareketler; oyun gerçekten yapıldığını algılayamaz. Kamera açıkken yapılan hareketlerden
   kaçını kameranın gördüğü ayrıca yazılır (zipzip-istatistik-v1: kameraAcik / kameraGordu). Kamera ile
   algılama (cihaz içinde, görüntü gönderilmeden) bu yüzden önemli bir sonraki adım.
@@ -122,7 +122,7 @@ Teknoloji: Phaser 3 + TypeScript + Vite, GitHub Pages ile yayın. İleride Capac
   bölüm) → İstanbul'un 7 Tepesi (Şehir Turları; çizer gelince) → Spor Kampı → Dinozorlar →
   Evde Macera → Okyanus → mevsim/bayram bölümleri. Bölüm bitince rozet (pasaport + sertifika).
 - Rozetler (src/rozetler.ts, 26 adet): kayıtlardan hesaplanır; cihazda sadece kutlananlar
-  tutulur (kutlanan rozet, koşulu sonradan zorlaşsa da kaybolmaz). "Üst üste gün" gibi baskı yaratan rozet yok. Durak sonunda yeni rozet kutlanır.
+  tutulur (kutlanan rozet, koşulu sonradan zorlaşsa da kaybolmaz). "Üst üste gün" gibi baskı yaratan rozet yok. Durak sonunda yeni rozet kutlanır. Hareket Kâşifi sadece açık bölümlerin hareketlerini, oturarak oyna açıksa sadece oturarak gelebilenleri sayar (K26, K37).
 - Uzay Yolculuğu (3. bölüm, UzayScene): dikey Güneş Sistemi; Merkür → Venüs → Ay → Mars →
   Jüpiter → Satürn → Uranüs → Neptün. Dünya Harikaları bitince açılır. Rozet: Uzay Yolcusu.
 - Spor Kampı, Dinozorlar Diyarı, Evde Macera (4-6. bölümler): ortak harita BolumScene (src/scenes/BolumScene.ts;
@@ -205,7 +205,7 @@ Teknoloji: Phaser 3 + TypeScript + Vite, GitHub Pages ile yayın. İleride Capac
   Play kapalı test (imzalı AAB): Actions → "Play kapalı test paketi" (yükleme anahtarı android/yukleme-anahtari.jks.enc içinde kilitli, parolası tek gizli değer PLAY_ANAHTAR_PAROLASI; sürüm kodu = çalıştırma numarası).
   Kullanıcı rehberi: docs/magaza-rehberi.md.
 - `npm run harita`: harita SVG'sini ve durak konumlarını yeniden üretir (scripts/harita-uret.mjs).
-- `src/hareketler.ts`: hareket listesi. `src/ses.ts`: sesler. Kaydı olmayan cümle: uygulamada telefonun konuşma
+- `src/hareketler.ts`: hareket listesi. `src/ses.ts`: sesler. Sayfa gizlenince (arama, kilit) konuşma susar, dönüşte ses yeniden açılır (oyunun saati telefon kare çizmediği için durur). Kaydı olmayan cümle: uygulamada telefonun konuşma
   motoru (@capacitor-community/text-to-speech; Android uygulama içi tarayıcısında tarayıcı konuşması çalışmaz),
   tarayıcıda speechSynthesis. Ses seçimi src/sesSecimi.ts (önce internetsiz çalışan Türkçe ses).
 - Açılış hızı: derlemede Phaser'ın hafif hâli (src/phaserHafif.cjs: fizik motorları ve karo haritası yok; oyun nesneleri
@@ -220,7 +220,7 @@ Teknoloji: Phaser 3 + TypeScript + Vite, GitHub Pages ile yayın. İleride Capac
   bütün ekranlar, her hareket, dış sunucu isteği yok, internetsiz açılış.
   `tests/gezinti.spec.ts`: ana yollar gerçek fare dokunuşuyla (ekrandaki yerinden) en az iki kez dolaşılır (K25).
   Yerleşim testi: yazı ekrandan taşmaz, çocuk ekranlarındaki yazı düğmeleri en az 72 nokta (küçük görünen
-  düğmeye `arayuz.genisDokunma` ile geniş dokunma alanı verilir). PR'larda Actions → "Testler" çalışır.
+  düğmeye `arayuz.genisDokunma` ile geniş dokunma alanı verilir). PR'larda Actions → "Testler" çalışır (16 Ekim'den beri 5 parçada aynı anda, ~5 dk; dal korumasının baktığı `test` işi en sonda hepsini toplar, adı değişmez; yeni test dosyası `.github/workflows/test.yml` parçalarına eklenir, `npm test` denetler).
 - Yeni bölüm eklemek: duraklar.ts'e durak listesi + BOLUMLER satırı, BolumScene AYARLAR'a ayar,
   main.ts'e `new BolumScene('id')`, metinler.ts'e cümleler, rozet ve SertifikaScene UNVAN.
   Sonra `npm run seslendirme-metni` ve katalog (scripts/katalog/README.md).
