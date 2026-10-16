@@ -1104,7 +1104,15 @@ test('kilitten dönüş: ekran açık tutma ve kamera yeniden gelir', async ({ p
   };
   while (adim < uzunluk - 1 && !(await page.evaluate(() => !!(window as any).oyun.scene.getScene('Hareket').kamera))) await sonraki();
   await expect.poll(() => page.evaluate(() => (window as any).sahteAkis?.getVideoTracks()[0]?.readyState), { timeout: 30_000 }).toBe('live');
-  await expect.poll(() => page.evaluate(() => (window as any).ekranKilidi.acik), { timeout: 5_000 }).toBe(true);
+  // CI'da iki kez (16 Ekim) burada kırmızı oldu, yerelde tekrarlanmadı: başarısız olursa durum yazılsın.
+  const durum = () =>
+    page.evaluate(() => {
+      const w = window as any;
+      return JSON.stringify({ ...w.ekranKilidi, gizli: document.hidden, sahneler: w.oyun.scene.getScenes(true).map((x: any) => x.sys.settings.key) });
+    });
+  await expect.poll(() => page.evaluate(() => (window as any).ekranKilidi.acik), { timeout: 5_000, message: 'ekran kilidi açık olmalı' }).toBe(true).catch(async (e) => {
+    throw new Error(`${e.message}\nDurum: ${await durum()}`);
+  });
   // Kilit: sayfa gizlenir, telefon kamerayı kapatır.
   await page.evaluate(() => {
     const w = window as any;
