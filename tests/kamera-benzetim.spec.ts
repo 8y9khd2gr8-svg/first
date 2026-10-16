@@ -93,7 +93,10 @@ async function benzetimKur(page: Page, ayar: Ayar = {}) {
         const kutu = document.querySelector('.kamera-kutusu') as HTMLElement | null;
         if (kutu) {
           const cerceve = kutu.children[1] as HTMLElement;
-          ekle('kutu', kutu.lastElementChild?.textContent ?? '');
+          const yazi = kutu.lastElementChild as HTMLElement;
+          ekle('kutu', yazi.textContent ?? '');
+          // Yazı kutuya sığıyor mu (yana taşmaz, kutudan uzun değil)? Kutu büyüyüp küçülürken de her karede bakılır.
+          if (yazi.scrollWidth > yazi.clientWidth + 1 || yazi.offsetHeight > kutu.clientHeight) ekle('tasma', `${yazi.textContent} ${yazi.offsetHeight}/${kutu.clientHeight}`);
           ekle('renk', `${kutu.style.borderColor} ${cerceve.style.display} ${cerceve.style.borderStyle}`);
         }
         const ayna = s.bilgi?.text === 'Ekranda kendine bak!' || s.bilgi?.text === 'Hazırsın!';
@@ -236,12 +239,14 @@ test('benzetim: her üç karenin birinde kimse bulunmasa da (kesik/gecikmiş son
 
 // K41 en olası neden: telefon masada, baş ve omuzlar görünüyor ama ayaklar kadraj dışında. Kamera hiç saymaz, "Geri git" der;
 // oyun beklemez (ayna en çok 6 sn), "Yaptım!" çıkar, kaybettirmez.
-for (const [ad, gizli] of [
-  ['iki topuk görünmez (telefon masada)', [SOL_TOPUK, SAG_TOPUK]],
-  ['bir topuk görünmez', [SAG_TOPUK]],
-  ['omuzlar görünmez', [SOL_OMUZ, SAG_OMUZ]],
+// K41 (c): yazı ve ses neyin eksik olduğunu söyler; sesli ipucu aynada bir kez (sayılar söylenirken araya girmez).
+for (const [ad, gizli, aynaYazisi, kutuYazisi, sesli] of [
+  ['iki topuk görünmez (telefon masada)', [SOL_TOPUK, SAG_TOPUK], '🦶 Ayakların görünmüyor: biraz geri git', '🦶 Ayakların görünmüyor', 'Ayakların görünmüyor. Biraz geri git.'],
+  ['bir topuk görünmez', [SAG_TOPUK], '🦶 Ayakların görünmüyor: biraz geri git', '🦶 Ayakların görünmüyor', 'Ayakların görünmüyor. Biraz geri git.'],
+  ['omuzlar görünmez', [SOL_OMUZ, SAG_OMUZ], '🙋 Çok yakınsın: biraz geri git', '📷 Çok yakınsın', 'Çok yakınsın. Biraz geri git.'],
+  ['kimse görünmez', [SOL_OMUZ, SAG_OMUZ, SOL_TOPUK, SAG_TOPUK], '🧍 Seni göremiyorum: kameranın önüne gel', '📷 Seni göremiyorum', 'Seni göremiyorum. Kameranın önüne gel.'],
 ] as const) {
-  test(`benzetim: ${ad} → ayna "geri git" der, ~6 sn sonra geri sayım; hareket sayılmaz, "Yaptım!" bekler`, async ({ page }) => {
+  test(`benzetim: ${ad} → ayna eksik yeri söyler, ~6 sn sonra geri sayım; hareket sayılmaz, "Yaptım!" bekler`, async ({ page }) => {
     test.setTimeout(240_000);
     await benzetimKur(page);
     const k0 = await oyunuAc(page);
@@ -251,7 +256,7 @@ for (const [ad, gizli] of [
     await page.waitForFunction(() => (window as any).kayit.aynaSon, null, { timeout: 150_000 });
     let k = await kayit(page);
     expect(degerler(k, 'bilgi')).not.toContain('Hazırsın!');
-    expect(degerler(k, 'kutu')).toContain('🧍 Baştan ayağa görün: biraz geri git');
+    expect(degerler(k, 'kutu')).toContain(aynaYazisi);
     expect(degerler(k, 'renk')).not.toContain('rgb(63, 191, 95) block solid');
     // Gerçek saatle 6 sn (ölçüm payı).
     expect(k.aynaSon - k.aynaBas).toBeGreaterThan(5_500);
@@ -260,13 +265,64 @@ for (const [ad, gizli] of [
     // Çocuk bütün hareket boyunca yaptı; kamera saymadı, kutu "Geri git" dedi. Kendiliğinden geçilmez (Uzaktan oyna kapalı).
     await page.waitForTimeout(2_500);
     k = await kayit(page);
-    expect(degerler(k, 'kutu')).toContain('📷 Geri git');
+    expect(degerler(k, 'kutu')).toContain(kutuYazisi);
     expect(degerler(k, 'kutu').filter((y) => /^📷 \d/.test(y))).toEqual([]);
+    expect(degerler(k, 'tasma')).toEqual([]);
     expect(await page.evaluate(() => (window as any).oyun.scene.getScene('Hareket').kamera.sayi)).toBe(0);
     expect(await yaptimVar(page)).toBe(true);
+    // Sesli ipucu: "Ekranda kendine bak"tan sonra bir kez, bütün hareket boyunca yinelenmez.
+    const soylenen: string[] = await page.evaluate(() => (window as any).__soylenen);
+    expect(soylenen.filter((c) => c === sesli)).toHaveLength(1);
+    expect(soylenen.indexOf(sesli)).toBeGreaterThan(soylenen.indexOf('Ekranda kendine bak! Başından ayağına kadar görün.'));
+    expect(soylenen.indexOf(sesli)).toBeLessThan(soylenen.indexOf('Başla!'));
     expect(k0.hatalar).toEqual([]);
   });
 }
+
+// Ebeveynin kamera denemesi: tanı satırı hangi noktanın görünmediğini yazar (K41); satır ekrana sığar, kutuyu ve sayıyı örtmez.
+test('benzetim: kamera denemesinde tanı satırı eksik noktayı yazar (topuklar, omuzlar, kimse, kenar), sığar', async ({ page }) => {
+  test.setTimeout(240_000);
+  await benzetimKur(page);
+  const k0 = await oyunuAc(page);
+  await page.evaluate(() => {
+    const oyun = (window as any).oyun;
+    oyun.scene.getScenes(true).forEach((s: any) => s.scene.stop());
+    oyun.scene.start('EbeveynKamera', {});
+  });
+  await page.waitForTimeout(500);
+  const r = (await page.locator('canvas').boundingBox())!;
+  await page.mouse.click(r.x + r.width / 2, r.y + (r.height * 635) / 1280); // 📷 Kamerayı aç
+  const satir = () =>
+    page.evaluate(() => {
+      const s = (window as any).oyun.scene.getScene('EbeveynKamera');
+      const yazilar = s.children.list.filter((c: any) => c.type === 'Text');
+      const durum = yazilar.find((c: any) => c.y === 595);
+      const sayi = yazilar.find((c: any) => c.y === 650);
+      const b = durum.getBounds();
+      return { yazi: durum.text as string, sol: b.x, sag: b.x + b.width, alt: b.y + b.height, ust: b.y, sayiUst: sayi.getBounds().y };
+    });
+  for (const [gizli, beklenen] of [
+    [[], '✅ Bütün vücut görünüyor'],
+    [[SOL_TOPUK, SAG_TOPUK], 'Topuklar görünmüyor: biraz geri gidin'],
+    [[SAG_TOPUK], 'Sağ topuk görünmüyor: biraz geri gidin'],
+    [[SOL_OMUZ, SAG_OMUZ], 'Omuzlar görünmüyor: biraz geri gidin'],
+    [[SAG_OMUZ, SOL_TOPUK, SAG_TOPUK], 'Sağ omuz ve topuklar görünmüyor: ortaya gelin'],
+    [[SOL_OMUZ, SAG_OMUZ, SOL_TOPUK, SAG_TOPUK], 'Kimse görünmüyor'],
+    [[], '✅ Bütün vücut görünüyor'],
+  ] as const) {
+    await durumYaz(page, { gizli });
+    await expect.poll(async () => (await satir()).yazi, { timeout: 60_000 }).toBe(beklenen);
+    const s = await satir();
+    expect(s.sol).toBeGreaterThanOrEqual(10);
+    expect(s.sag).toBeLessThanOrEqual(710);
+    expect(s.alt).toBeLessThanOrEqual(s.sayiUst);
+    expect(s.ust).toBeGreaterThanOrEqual(395 + 165 + 4); // kamera kutusunun altı
+  }
+  // Tanı satırı kaydedilmez: cihaz kaydında yok.
+  const depo = await page.evaluate(() => Object.keys(localStorage).join(','));
+  expect(depo).not.toMatch(/tani|eksik/);
+  expect(k0.hatalar).toEqual([]);
+});
 
 test('benzetim: "Yaptım!"a dokununca özet dürüst: kamera açık, görmedi', async ({ page }) => {
   test.setTimeout(240_000);

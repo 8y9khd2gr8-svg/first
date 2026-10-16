@@ -47,6 +47,28 @@ export const GEREKEN_NOKTALAR = [SOL_OMUZ, SAG_OMUZ, SOL_TOPUK, SAG_TOPUK] as co
 // Sadece görünürlüğe bakılır: model kadraj dışındaki bir noktayı tahminle "görünür" sayarsa (kenarda) o da kullanılır.
 export const eksikNoktalar = (n: NormalizedLandmark[] | undefined): number[] =>
   GEREKEN_NOKTALAR.filter((i) => !((n?.[i]?.visibility ?? 0) > GORUNUR_ESIK));
+// Eksik noktalardan çocuğa söylenecek yön: kimse yok / ayaklar (topuklar) kadraj dışı / çok yakın (omuzlar kesik) /
+// bir yanı kesik (hem omuz hem topuk eksik). Hepsi görünüyorsa null. Sayma şartı aynı (K41 c: sadece yazı ve ses).
+export type EksikYer = 'kimse' | 'ayaklar' | 'omuzlar' | 'kenar';
+export const eksikYeri = (eksik: readonly number[]): EksikYer | null => {
+  if (!eksik.length) return null;
+  if (eksik.length === GEREKEN_NOKTALAR.length) return 'kimse';
+  const topuk = eksik.some((i) => i === SOL_TOPUK || i === SAG_TOPUK);
+  const omuz = eksik.some((i) => i === SOL_OMUZ || i === SAG_OMUZ);
+  return topuk && omuz ? 'kenar' : topuk ? 'ayaklar' : 'omuzlar';
+};
+// Ebeveynin kamera denemesindeki tanı satırı: hangi nokta görünmüyor (sol/sağ, çocuğun kendi solu/sağı). Kaydedilmez.
+export const eksikTaniYazisi = (eksik: readonly number[]): string => {
+  const yer = eksikYeri(eksik);
+  if (!yer) return '';
+  if (yer === 'kimse') return 'Kimse görünmüyor';
+  const ikili = (sol: number, sag: number, cogul: string, tekil: string) =>
+    eksik.includes(sol) && eksik.includes(sag) ? cogul : eksik.includes(sol) ? `Sol ${tekil}` : eksik.includes(sag) ? `Sağ ${tekil}` : '';
+  const omuz = ikili(SOL_OMUZ, SAG_OMUZ, 'Omuzlar', 'omuz');
+  const topuk = ikili(SOL_TOPUK, SAG_TOPUK, 'Topuklar', 'topuk');
+  const ad = [omuz, topuk].filter(Boolean).map((a, i) => (i ? a.toLocaleLowerCase('tr') : a)).join(' ve ');
+  return yer === 'kenar' ? `${ad} görünmüyor: ortaya gelin` : `${ad} görünmüyor: biraz geri gidin`;
+};
 
 let modelSozu: Promise<PoseLandmarker> | null = null;
 
@@ -276,6 +298,8 @@ export function ortakKamerayiKapat(durakBitti = true) {
 export class KameraSayaci {
   durum: KameraDurumu = 'yukleniyor';
   hata: KameraHatasi | null = null;
+  // Son tanımada görünmeyen gerekli noktalar (eksikNoktalar); "görüyorum"da boş. Ekranlar neyin eksik olduğunu yazar (K41 c).
+  eksik: number[] = [];
   private sureler: number[] = [];
   private tanimaZamanlari: number[] = [];
   private sonSayimMs: number | null = null;
@@ -354,10 +378,12 @@ export class KameraSayaci {
           const n = sonuc.landmarks[0];
           this.noktalarGelince?.(n);
           const once = this.sayici.sayi;
+          const eksikOnce = this.eksik.join();
+          this.eksik = eksikNoktalar(n);
           if (this.sayici.kare(n, simdi) === 'goruyorum') {
             if (once !== this.sayici.sayi) this.sonSayimMs = performance.now() - simdi;
             if (this.durum !== 'goruyorum' || once !== this.sayici.sayi) this.bildir('goruyorum');
-          } else if (this.durum !== 'goremiyorum') this.bildir('goremiyorum');
+          } else if (this.durum !== 'goremiyorum' || eksikOnce !== this.eksik.join()) this.bildir('goremiyorum');
         }
         this.kare = requestAnimationFrame(dongu);
       };

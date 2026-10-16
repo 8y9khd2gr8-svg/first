@@ -3,7 +3,7 @@ import type { NormalizedLandmark } from '@mediapipe/tasks-vision';
 import { RENK, YAZI_TIPI } from '../ayarlar';
 import { buyukDugme, evDugmesi, genisDokunma, yildizliArkaPlan } from '../arayuz';
 import type { Animasyon } from '../hareketler';
-import { KameraSayaci, kameraDurumYazisi } from '../kamera';
+import { KameraSayaci, eksikTaniYazisi, kameraDurumYazisi } from '../kamera';
 import { bip } from '../ses';
 
 // Kamera denemesi (ebeveyn köşesi): kameranın neyi gördüğünü ve nasıl saydığını canlı gösterir.
@@ -71,7 +71,8 @@ export class EbeveynKameraScene extends Phaser.Scene {
       const kamera = new KameraSayaci(
         this.secili,
         (n, d) => {
-          durum.setText(kameraDurumYazisi(d, kamera.hata, '✅ Bütün vücut görünüyor'));
+          // Tanı satırı: görmüyorsa hangi nokta eksik (topuklar, omuzlar, kimse yok). Kaydedilmez (K41).
+          durum.setText(kameraDurumYazisi(d, kamera.hata, '✅ Bütün vücut görünüyor', eksikTaniYazisi(kamera.eksik) || undefined));
           sayi.setText(`Sayı: ${n}`);
           if (n > sonSayi) bip(990, 0.12);
           sonSayi = n;

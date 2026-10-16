@@ -815,7 +815,8 @@ test('kamera denemesi: görüntü kesilince "Kamera durdu" yazar', async ({ page
   await sahneAc(page, 'EbeveynKamera');
   const r = (await page.locator('canvas').boundingBox())!;
   await page.mouse.click(r.x + r.width / 2, r.y + (r.height * 635) / 1280);
-  await kameraYazisi(page, 'EbeveynKamera', 'Baştan ayağa görünmeli');
+  // Kimse yok (sahte kamera): "Baştan ayağa görünmeli", ilk tanımadan sonra "Kimse görünmüyor" (K41 c).
+  await kameraYazisi(page, 'EbeveynKamera', 'görün');
   await page.evaluate(() => (window as any).sahteAkis.getTracks().forEach((t: MediaStreamTrack) => t.stop()));
   await kameraYazisi(page, 'EbeveynKamera', 'Kamera durdu');
   expect(kayit.hatalar).toEqual([]);
@@ -848,7 +849,8 @@ test('hareket ekranı: kamera durunca küçük kutu son sayıyı değil "Durdu" 
   }
   expect(bulundu).toBe(true);
   const kutuYazisi = () => page.evaluate(() => [...document.querySelectorAll('div')].map((d) => d.textContent ?? '').filter((t) => t.startsWith('📷')).pop() ?? '');
-  await expect.poll(kutuYazisi, { timeout: 30_000 }).toBe('📷 Geri git');
+  // Kimse yok (sahte kamera): ilk tanımaya kadar "Geri git", sonra "Seni göremiyorum" (K41 c).
+  await expect.poll(kutuYazisi, { timeout: 30_000 }).toMatch(/^📷 (Geri git|Seni göremiyorum)$/);
   await page.evaluate(() => (window as any).sahteAkis.getTracks().forEach((t: MediaStreamTrack) => t.stop()));
   await expect.poll(kutuYazisi, { timeout: 30_000 }).toBe('📷 Durdu');
   // Kaybetmek yok: kamera dursa da süre/sayım bitince "Yaptım!" düğmesi gelir.
