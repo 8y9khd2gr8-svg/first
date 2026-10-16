@@ -14,10 +14,15 @@ type Kilit = { release: () => Promise<void>; addEventListener: (ad: 'release', f
 let kilit: Kilit | null = null;
 let isteniyor = false;
 let istekSuruyor = false;
+// Telefon reddettiyse (düşük güç modu, izin yok) her yarım saniyede yeniden sorulmaz: 10 sn beklenir (T5).
+// Dokununca ya da sayfa geri gelince hemen yeniden denenir.
+const RED_SONRA_BEKLE_MS = 10_000;
+let sonRed = -Infinity;
 
-async function kilitAl() {
+async function kilitAl(hemen = false) {
   const wl = (navigator as Navigator & { wakeLock?: { request: (tur: 'screen') => Promise<Kilit> } }).wakeLock;
   if (!isteniyor || kilit || istekSuruyor || document.hidden || !wl) return;
+  if (!hemen && performance.now() - sonRed < RED_SONRA_BEKLE_MS) return;
   istekSuruyor = true;
   try {
     const k = await wl.request('screen');
@@ -26,6 +31,7 @@ async function kilitAl() {
     else void k.release();
   } catch {
     // Düşük güç modu ya da izin yok: ekran telefonun ayarına göre kararır, oyun etkilenmez.
+    sonRed = performance.now();
   } finally {
     istekSuruyor = false;
   }
@@ -68,6 +74,6 @@ export function ekranIzle(oyun: Phaser.Game) {
   };
   setInterval(bak, 500);
   // Sayfa geri gelince (ekran kilidinden dönüş) ya da dokununca kilit yeniden istenir (bazı tarayıcılar dokunuş ister).
-  document.addEventListener('visibilitychange', () => void kilitAl());
-  document.addEventListener('pointerdown', () => void kilitAl());
+  document.addEventListener('visibilitychange', () => void kilitAl(true));
+  document.addEventListener('pointerdown', () => void kilitAl(true));
 }

@@ -1316,3 +1316,51 @@ test('hareket ekranı: model yüklenemezse ortak kamera hemen kapanır, o durakt
   expect(modelIstegi).toBe(ilkIstekler);
   expect(kayit.hatalar.filter((h) => !h.startsWith('Failed to load resource'))).toEqual([]); // engellenen model dosyaları
 });
+
+// Telefon kontrol listesi T5: düşük güç modunda telefon "ekranı açık tut" isteğini reddeder. Oyun bozulmamalı (hata yok,
+// "Uzaktan oyna" ile dokunmadan ilerler) ve istek her yarım saniyede bir yinelenmemeli (10 sn ara; dokununca hemen).
+test('düşük güç modu (T5): ekranı açık tutma reddedilse de durak dokunmadan ilerler, istek seyrek yinelenir', async ({ page }) => {
+  await page.addInitScript(() => {
+    const w = window as any;
+    w.ekranIstek = 0;
+    Object.defineProperty(navigator, 'wakeLock', {
+      value: {
+        request: async () => {
+          w.ekranIstek++;
+          throw new DOMException('Düşük güç modu', 'NotAllowedError');
+        },
+      },
+    });
+  });
+  const kayit = await oyunuAc(page, { ...BETA, 'zipzip-uzaktan-v1': '1' });
+  await sahneAc(page, 'Hareket', { durakId: 'istanbul', adim: 0 });
+  const basla = Date.now();
+  await page.waitForFunction(() => (window as any).oyun.scene.getScene('Hareket').adim >= 1, null, { timeout: 60_000 });
+  const sure = Date.now() - basla;
+  const istek = await page.evaluate(() => (window as any).ekranIstek);
+  expect(istek).toBeGreaterThan(0);
+  // 10 sn'de bir: geçen sürede en çok (süre / 10 sn) + 1 istek (eskiden saniyede 2).
+  expect(istek).toBeLessThanOrEqual(Math.ceil(sure / 10_000) + 1);
+  // Dokununca hemen yeniden denenir.
+  await page.mouse.click(5, 5);
+  await expect.poll(() => page.evaluate(() => (window as any).ekranIstek)).toBe(istek + 1);
+  expect(kayit.hatalar).toEqual([]);
+});
+
+// Telefon kontrol listesi T7: yavaş/eski telefon (işlemci 6 kat yavaş). Kameralı hareket ekranı takılmadan sonuna gelir,
+// "Uzaktan oyna" ile sıradaki harekete geçer; hata yok.
+test('yavaş telefon (T7): kameralı hareket ekranı işlemci 6 kat yavaşken de biter ve ilerler', async ({ page }) => {
+  test.setTimeout(180_000);
+  await sahteKamera(page);
+  const kayit = await oyunuAc(page, { 'zipzip-kamera-v1': '1', 'zipzip-uzaktan-v1': '1' });
+  let adim = 0;
+  for (; adim < 8; adim++) {
+    await sahneAc(page, 'Hareket', { durakId: 'istanbul', adim });
+    if (await page.evaluate(() => !!(window as any).oyun.scene.getScene('Hareket').kamera)) break;
+  }
+  const cdp = await page.context().newCDPSession(page);
+  await cdp.send('Emulation.setCPUThrottlingRate', { rate: 6 });
+  await page.waitForFunction((adim) => (window as any).oyun.scene.getScene('Hareket').adim > adim, adim, { timeout: 150_000, polling: 1000 });
+  await cdp.send('Emulation.setCPUThrottlingRate', { rate: 1 });
+  expect(kayit.hatalar).toEqual([]);
+});
