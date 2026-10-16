@@ -123,7 +123,7 @@ export class HaritaScene extends Phaser.Scene {
     kapi.setSize(560, 140).setInteractive({ useHandCursor: true });
     kapi.on('pointerdown', () => {
       if (!dunyaAcilmis) {
-        this.tweens.add({ targets: kapi, x: x + 8, duration: 50, yoyo: true, repeat: 3 });
+        this.tweens.add({ targets: kapi, x: { from: x, to: x + 8 }, duration: 50, yoyo: true, repeat: 3 });
         kilitliBolumeDokun(this, 'dunya');
         return;
       }
@@ -204,7 +204,7 @@ export class HaritaScene extends Phaser.Scene {
     isaret.on('pointerdown', () => {
       if (!acik) {
         bip(220, 0.15, 'square', 0.12);
-        this.tweens.add({ targets: isaret, x: dx + 8, duration: 50, yoyo: true, repeat: 3 });
+        this.tweens.add({ targets: isaret, x: { from: dx, to: dx + 8 }, duration: 50, yoyo: true, repeat: 3 });
         konus(M.oncekiniBitir);
         return;
       }

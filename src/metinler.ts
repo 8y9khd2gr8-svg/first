@@ -25,6 +25,9 @@ export const M = {
   bugunlukBitti: 'Bugün çok güzel hareket ettin! Yine bekleriz!',
   aferin: 'Aferin!',
   kameraGordu: 'Kamera gördü, harikasın!',
+  // Büyük ayna (K40): kamerayla sayılan hareketten önce çocuk kendini ekranda görüp yerleşir.
+  aynaBak: 'Ekranda kendine bak! Başından ayağına kadar görün.',
+  hazirsin: 'Hazırsın! Seni görüyorum.',
   aileBitti: 'Ailece süpersiniz! Birlikte çok güzel hareket ettiniz!',
   yolaCikiyoruz: 'Yola çıkıyoruz!',
   oncekiniBitir: 'Önce sıradaki durağı bitirelim!',
@@ -99,6 +102,8 @@ export function tumMetinler(): string[] {
     M.rozetDolabi,
     M.aileBitti,
     M.kameraGordu,
+    M.aynaBak,
+    M.hazirsin,
     M.sesDeneme,
     M.ziplaRitim,
     M.ziplaKamera,

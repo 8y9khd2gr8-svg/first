@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { RENK, YAZI_TIPI } from '../ayarlar';
+import { RENK, YAZI_TIPI, hareketiAzalt } from '../ayarlar';
 import { buyukDugme, evDugmesi, yildizliArkaPlan } from '../arayuz';
 import { AILE_ID } from '../aile';
 import { durakBul, haritaSahnesi } from '../duraklar';
@@ -7,13 +7,30 @@ import { SOGUMA_ID, hareketYapildi, oturumListesi } from '../oturum';
 import { uzaktanAcikMi } from '../ayarlar';
 import { AYNA, Animasyon, DONMA, Hareket } from '../hareketler';
 import { hareketKaydet } from '../istatistik';
-import { KAMERA_HAREKETLERI, KameraSayaci, kameraAcikMi, kameraDesteklenir } from '../kamera';
+import { KAMERA_HAREKETLERI, KameraDurumu, KameraSayaci, kameraAcikMi, kameraDesteklenir } from '../kamera';
+import { oyunAyari } from '../oyunAyari';
 import { GERI_SAYIM, M, SAYILAR } from '../metinler';
 import { bip, konus, sustur, zaferMuzigi } from '../ses';
 import { Zipzip } from '../zipzip';
 import { durakYonu, zipzipYonunuAyarla } from '../zipzipKure';
 
 const MASKOT_Y = 640;
+
+// Kamera kutusunun üç hâli (tuval noktası; K40 "önce büyük ayna"):
+// ayna: geri sayımdan önce ekranın yarısına yakın canlı görüntü, çocuk 2-3 m uzaktan kendini görüp kadraja yerleşir.
+// hareket: gösterim ve hareket boyunca sağ altta (eski küçük kutunun ~3 katı), sayı büyük; sayı ve yazı biraz sola kayar.
+// kucuk: "Yaptım!" düğmesi çıkınca sağ üst köşede (düğmeyi örtmesin).
+type KutuHali = 'ayna' | 'hareket' | 'kucuk';
+const KUTU: Record<KutuHali, { x: number; y: number; g: number; y2: number; yazi: number }> = {
+  ayna: { x: 60, y: 380, g: 600, y2: 620, yazi: 34 },
+  hareket: { x: 470, y: 910, g: 234, y2: 260, yazi: 40 },
+  kucuk: { x: 551, y: 6, g: 150, y2: 126, yazi: 20 }, // hikâye satırının (y 170) üstünde kalır
+};
+// Kamera açıkken sayı ve alt yazı kutunun solunda ortalanır.
+const KAMERALI_YAZI_X = 250;
+// Ayna en çok bu kadar bekler (görmese de oyun bekletmez, kaybettirmez); Sakin tempoda biraz daha uzun.
+const AYNA_EN_COK_MS = 6000;
+const AYNA_SAKIN_MS = 8000;
 
 // Hareket ekranı. Bir durağın 5 hareketini sırayla oynatır.
 // Her hareket: Zıpzıp gösterir → 3-2-1 → çocuk yapar (sayaç) → "Yaptım!" → sıradaki.
@@ -26,6 +43,11 @@ export class HareketScene extends Phaser.Scene {
   // Kamera ile sayma (ebeveyn açtıysa ve hareket destekleniyorsa).
   private kamera: KameraSayaci | null = null;
   private kameraHedefe: (() => void) | null = null;
+  // Büyük ayna açıkken kamera durumu değişince haber alır.
+  private aynaDinle: (() => void) | null = null;
+  private kutuHali: (hal: KutuHali) => void = () => {};
+  // Ayna "Hazırsın!" dedikten sonra çerçeve yeşil kalır (tanıma bir an kaçırsa da yanıp sönmesin).
+  private kutuHazir: () => void = () => {};
   // Bu adımda kullanılan oturum listesi (create'te bir kez alınır).
   private oturum: Hareket[] = [];
 
@@ -116,7 +138,58 @@ export class HareketScene extends Phaser.Scene {
 
     // Uzun cümlelerde seslendirme bitmeden geri sayım başlamasın.
     const bekleme = Math.max(gosterimSuresi + 600, hareket.sesli.length * 70);
-    this.time.delayedCall(bekleme, () => this.geriSay(() => this.basla(hareket)));
+    this.time.delayedCall(bekleme, () => this.aynaEvresi(() => this.geriSay(() => this.basla(hareket))));
+  }
+
+  // Önce büyük ayna (K40): kamerayla sayılan harekette geri sayımdan önce çocuk kendini büyük görür ve "baştan ayağa"
+  // çerçeveye yerleşir. Kamera görünce çerçeve yeşil olur, "Hazırsın!" denir. Görmezse en çok birkaç saniye sonra
+  // normal geri sayım başlar (oyun beklemez, kaybettirmez). Kamera yoksa, açılamadıysa ya da durduysa hemen geçilir.
+  private aynaEvresi(devam: () => void) {
+    const kamera = this.kamera;
+    if (!kamera || kamera.durum === 'hata' || kamera.durum === 'durdu') return devam();
+    let bitti = false;
+    let gordu = false;
+    const bitir = () => {
+      if (bitti) return;
+      bitti = true;
+      this.aynaDinle = null;
+      sure.remove();
+      this.kutuHali('hareket');
+      devam();
+    };
+    // Süre gerçek saatle sayılır: yavaş telefonda (kare 200 ms'yi aşınca) Phaser'ın saati geri kalır, ayna uzamasın (T7).
+    // Sayfa gizliyken (arama, kilit) Phaser durur, o süre sayılmaz.
+    const enCok = oyunAyari().yas === 'kucuk' ? AYNA_SAKIN_MS : AYNA_EN_COK_MS;
+    let gecen = 0;
+    let son = performance.now();
+    const sure = this.time.addEvent({
+      delay: 100,
+      loop: true,
+      callback: () => {
+        const simdi = performance.now();
+        gecen += Math.min(simdi - son, 1500);
+        son = simdi;
+        if (gecen >= enCok) bitir();
+      },
+    });
+    this.kutuHali('ayna');
+    this.bilgi.setText('Ekranda kendine bak!');
+    const hazir = (sesli: boolean) => {
+      gordu = true;
+      sure.remove();
+      this.kutuHazir();
+      this.bilgi.setText('Hazırsın!');
+      if (sesli) konus(M.hazirsin);
+      this.time.delayedCall(sesli ? 1600 : 900, bitir);
+    };
+    this.aynaDinle = () => {
+      if (bitti || gordu) return;
+      if (kamera.durum === 'hata' || kamera.durum === 'durdu') bitir();
+      else if (kamera.durum === 'goruyorum') hazir(true);
+    };
+    // Önceki harekette de görünüyorduysa (aynı durak) kısa geçilir, uzun yönlendirme söylenmez.
+    if (kamera.durum === 'goruyorum') hazir(false);
+    else konus(M.aynaBak);
   }
 
   private geriSay(bitince: () => void) {
@@ -134,6 +207,8 @@ export class HareketScene extends Phaser.Scene {
 
   private basla(hareket: Hareket) {
     this.bilgi.setText('Sen de yap!');
+    // Aynada yerleşirken yapılan hareketler sayılmasın: kamera sayımı hareketle birlikte baştan başlar.
+    this.kamera?.yolDegistir(hareket.animasyon);
     if (hareket.tur === 'sayi') {
       for (let k = 1; k <= hareket.adet; k++) {
         this.time.delayedCall((k - 1) * hareket.tempoMs, () => {
@@ -179,6 +254,8 @@ export class HareketScene extends Phaser.Scene {
       dugme.destroy();
       this.sonraki();
     };
+    // Kamera kutusu "Yaptım!" düğmesini örtmesin: sağ üst köşeye küçülür (sayı görünmeye devam eder).
+    this.kutuHali('kucuk');
     const dugme = buyukDugme(this, x, 1080, 'Yaptım!', RENK.yesil, yaptim, { genislik: 500, yukseklik: 170, yaziBoyu: 84 });
     // Kamera hedef sayıyı gördüyse kendiliğinden geçer; görmediyse düğme bekler
     // (kaybetmek yok) ve kamera saymaya devam eder.
@@ -231,36 +308,87 @@ export class HareketScene extends Phaser.Scene {
     this.time.delayedCall(1300, () => this.scene.restart({ durakId: this.durakId, adim: this.adim + 1 }));
   }
 
-  // Sağ üstte küçük kamera önizlemesi ve sayı. Görüntü sadece ekranda gösterilir.
+  // Kamera önizlemesi ve sayı (üç hâli: KUTU). Görüntü sadece ekranda gösterilir; kaydedilmez, gönderilmez.
   private kameraKur(hareket: Hareket) {
     // Ailece'de kamera açılmaz: iki kişiyi saymak güvenilir değil (karar, 14 Ekim'de yeniden onaylandı).
     if (this.durakId === AILE_ID || !kameraAcikMi() || !kameraDesteklenir() || hareket.tur !== 'sayi' || hareket.dizi || !KAMERA_HAREKETLERI.includes(hareket.animasyon)) return;
     const kutu = document.createElement('div');
-    kutu.style.cssText = 'width:150px;height:140px;border-radius:16px;overflow:hidden;background:#0b1430;border:4px solid #FFC93C;position:relative;font-family:"Baloo 2",sans-serif;';
+    kutu.className = 'kamera-kutusu';
+    kutu.style.cssText = 'border-radius:16px;overflow:hidden;background:#0b1430;border:4px solid #FFC93C;position:relative;box-sizing:border-box;font-family:"Baloo 2",sans-serif;';
+    // "Baştan ayağa" çerçevesi (sadece büyük aynada): sarı kesik çizgi, kamera görünce yeşil.
+    const cerceve = document.createElement('div');
+    cerceve.style.cssText = 'position:absolute;left:12%;right:12%;top:4%;bottom:15%;border:6px dashed #FFC93C;border-radius:24px;pointer-events:none;';
     const yazi = document.createElement('div');
-    yazi.style.cssText = 'position:absolute;left:0;right:0;bottom:0;background:#0b1430cc;color:#fff;font-weight:700;font-size:20px;text-align:center;line-height:30px;';
+    yazi.style.cssText = 'position:absolute;left:0;right:0;bottom:0;background:#0b1430cc;color:#fff;font-weight:700;text-align:center;';
     yazi.textContent = '📷 Hazırlanıyor';
-    const kamera = new KameraSayaci(hareket.animasyon, (sayi, durum) => {
+    let hal: KutuHali = 'hareket';
+    let durum: KameraDurumu = 'yukleniyor';
+    let sayi = 0;
+    let hazir = false;
+    const yaz = () => {
+      const goruyor = durum === 'goruyorum' || (hal === 'ayna' && hazir && durum !== 'durdu' && durum !== 'hata');
       // Görüntü kesilince (ekran kilidi, başka uygulama) son sayı kalmasın: ebeveyn kameranın saydığını sanmasın.
       // Oynanış aynı: "Yaptım!" yine çıkar (K27).
       yazi.textContent =
         durum === 'hata' ? '📷 Açılamadı'
         : durum === 'durdu' ? '📷 Durdu'
-        : durum === 'goremiyorum' ? '📷 Geri git'
         : durum === 'yukleniyor' ? '📷 Hazırlanıyor'
+        : hal === 'ayna' ? (goruyor ? '✅ Hazırsın!' : '🧍 Baştan ayağa görün: biraz geri git')
+        : durum === 'goremiyorum' ? '📷 Geri git'
         : `📷 ${Math.min(sayi, hareket.adet)}/${hareket.adet}`;
+      const renk = goruyor ? '#3FBF5F' : '#FFC93C';
+      kutu.style.borderColor = renk;
+      cerceve.style.borderColor = renk;
+      cerceve.style.borderStyle = goruyor ? 'solid' : 'dashed';
+      cerceve.style.display = hal === 'ayna' ? 'block' : 'none';
+    };
+    const kamera = new KameraSayaci(hareket.animasyon, (s, d) => {
+      sayi = s;
+      durum = d;
+      yaz();
+      this.aynaDinle?.();
       this.kameraHedefe?.();
     }, undefined, true);
     const video = kamera.onizleme;
-    video.style.cssText = 'width:100%;height:110px;object-fit:cover;transform:scaleX(-1);display:block;';
-    kutu.append(video, yazi);
-    this.add.dom(626, 78, kutu);
+    video.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transform:scaleX(-1);display:block;';
+    kutu.append(video, cerceve, yazi);
+    const dom = this.add.dom(0, 0, kutu).setOrigin(0, 0);
+    const boyut = { ...KUTU.hareket };
+    const uygula = () => {
+      dom.setPosition(boyut.x, boyut.y);
+      kutu.style.width = `${boyut.g}px`;
+      kutu.style.height = `${boyut.y2}px`;
+      yazi.style.fontSize = `${boyut.yazi}px`;
+      yazi.style.lineHeight = `${Math.round(boyut.yazi * 1.5)}px`;
+    };
+    uygula();
+    this.kutuHali = (yeni) => {
+      if (yeni === hal) return;
+      hal = yeni;
+      yaz();
+      this.tweens.killTweensOf(boyut);
+      // Büyüme/küçülme bir işe yarar (çocuk nereye bakacağını görür); hareketi azalt'ta hemen.
+      if (hareketiAzalt()) {
+        Object.assign(boyut, KUTU[yeni]);
+        uygula();
+      } else this.tweens.add({ targets: boyut, ...KUTU[yeni], duration: 350, ease: 'Sine.easeInOut', onUpdate: uygula, onComplete: uygula });
+    };
+    this.kutuHazir = () => {
+      hazir = true;
+      yaz();
+    };
+    // Sayı ve alt yazı kutunun solunda (kutu onları örtmesin).
+    this.sayac.setX(KAMERALI_YAZI_X);
+    this.bilgi.setX(KAMERALI_YAZI_X);
     this.kamera = kamera;
     kamera.baslat();
     this.events.once('shutdown', () => {
       kamera.durdur();
       this.kamera = null;
       this.kameraHedefe = null;
+      this.aynaDinle = null;
+      this.kutuHali = () => {};
+      this.kutuHazir = () => {};
     });
   }
 
@@ -321,7 +449,10 @@ export class HareketScene extends Phaser.Scene {
   }
 
   private sayacGoster(metin: string, renk = '#ffffff') {
-    this.sayac.setText(metin).setColor(renk).setScale(0.3);
-    this.tweens.add({ targets: this.sayac, scale: 1, duration: 250, ease: 'Back.easeOut' });
+    this.sayac.setText(metin).setColor(renk).setScale(1);
+    // Kamera açıkken sayı kutunun solundaki alana sığar ("Başla!" kutunun altına girmesin; büyüme animasyonu ~%10 taşar, pay bırakılır).
+    const olcek = this.kamera ? Math.min(1, (2 * (KUTU.hareket.x - KAMERALI_YAZI_X) - 60) / this.sayac.width) : 1;
+    this.sayac.setScale(0.3 * olcek);
+    this.tweens.add({ targets: this.sayac, scale: olcek, duration: 250, ease: 'Back.easeOut' });
   }
 }
