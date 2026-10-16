@@ -1,4 +1,6 @@
 import type Phaser from 'phaser';
+import { Capacitor } from '@capacitor/core';
+import { KeepAwake } from '@capacitor-community/keep-awake';
 import { ortakKamerayiKapat } from './kamera';
 
 // Hareket yapılırken telefonun ekranı kararmasın (Yağız testi, 15 Ekim): çocuk ekrana dokunmadan 3-2-1 ile
@@ -29,7 +31,18 @@ async function kilitAl() {
   }
 }
 
+// Mağaza paketinde (Android/iPhone uygulaması) tarayıcının Wake Lock'ı her telefonda çalışmayabilir (Android uygulama içi
+// tarayıcısı desteklemiyor); orada telefonun kendi "ekranı açık tut" ayarı eklentiyle açılır.
+const uygulamada = Capacitor.isNativePlatform();
+let uygulamadaAcik = false;
+
 export function ekraniAcikTut(acik: boolean) {
+  if (uygulamada) {
+    if (acik === uygulamadaAcik) return;
+    uygulamadaAcik = acik;
+    void (acik ? KeepAwake.keepAwake() : KeepAwake.allowSleep()).catch(() => {});
+    return;
+  }
   isteniyor = acik;
   if (acik) void kilitAl();
   else if (kilit) {
