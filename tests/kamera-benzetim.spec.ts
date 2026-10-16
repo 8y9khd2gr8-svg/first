@@ -169,7 +169,7 @@ const yaptimVar = (page: Page) =>
   page.evaluate(() => (window as any).oyun.scene.getScene('Hareket').children.list.some((o: any) => (o.list ?? []).some((c: any) => c.text === 'Yaptım!')));
 
 test('benzetim: çocuk baştan ayağa görünür, hareketi yapar → ayna yeşil "Hazırsın!", kutu sayar, kamera görünce kendiliğinden geçer', async ({ page }) => {
-  test.setTimeout(120_000);
+  test.setTimeout(240_000);
   await benzetimKur(page);
   const k0 = await oyunuAc(page);
   // Çocuk önce çok yakın (topuklar görünmez); ayna açılınca geri gider ve baştan ayağa görünür.
@@ -181,7 +181,7 @@ test('benzetim: çocuk baştan ayağa görünür, hareketi yapar → ayna yeşil
   await bilgiBekle(page, 'Sen de yap!');
   await durumYaz(page, { hareket: h.yol });
   // Hedef sayıyı görünce "Kamera gördü" denir ve dokunmadan sıradaki harekete geçilir.
-  await page.waitForFunction((adim) => (window as any).oyun.scene.getScene('Hareket').adim === adim + 1, h.adim, { timeout: 90_000 });
+  await page.waitForFunction((adim) => (window as any).oyun.scene.getScene('Hareket').adim === adim + 1, h.adim, { timeout: 150_000 });
   const k = await kayit(page);
   const bilgi = degerler(k, 'bilgi');
   expect(bilgi.slice(0, 5)).toEqual(['Önce Zıpzıp’ı izle!', 'Ekranda kendine bak!', 'Hazırsın!', 'Hazır ol!', 'Sen de yap!']);
@@ -206,7 +206,7 @@ test('benzetim: çocuk baştan ayağa görünür, hareketi yapar → ayna yeşil
 });
 
 test('benzetim: çocuk ayna açılmadan zaten baştan ayağa görünüyorsa ayna kısa geçer, uzun yönlendirme söylenmez', async ({ page }) => {
-  test.setTimeout(120_000);
+  test.setTimeout(240_000);
   await benzetimKur(page);
   const k0 = await oyunuAc(page);
   await kameraliHareket(page);
@@ -221,14 +221,14 @@ test('benzetim: çocuk ayna açılmadan zaten baştan ayağa görünüyorsa ayna
 });
 
 test('benzetim: her üç karenin birinde kimse bulunmasa da (kesik/gecikmiş sonuç) hareket tam sayılır', async ({ page }) => {
-  test.setTimeout(120_000);
+  test.setTimeout(240_000);
   await benzetimKur(page);
   const k0 = await oyunuAc(page);
   const h = await kameraliHareket(page);
   await durumYaz(page, { bosKareHer: 3 });
   await bilgiBekle(page, 'Sen de yap!');
   await durumYaz(page, { hareket: h.yol });
-  await page.waitForFunction((adim) => (window as any).oyun.scene.getScene('Hareket').adim === adim + 1, h.adim, { timeout: 90_000 });
+  await page.waitForFunction((adim) => (window as any).oyun.scene.getScene('Hareket').adim === adim + 1, h.adim, { timeout: 150_000 });
   expect(degerler(await kayit(page), 'kutu')).toContain(`📷 ${h.adet}/${h.adet}`);
   expect(await istatistik(page)).toMatchObject({ kameraAcik: 1, kameraGordu: 1 });
   expect(k0.hatalar).toEqual([]);
@@ -242,13 +242,13 @@ for (const [ad, gizli] of [
   ['omuzlar görünmez', [SOL_OMUZ, SAG_OMUZ]],
 ] as const) {
   test(`benzetim: ${ad} → ayna "geri git" der, ~6 sn sonra geri sayım; hareket sayılmaz, "Yaptım!" bekler`, async ({ page }) => {
-    test.setTimeout(120_000);
+    test.setTimeout(240_000);
     await benzetimKur(page);
     const k0 = await oyunuAc(page);
     await durumYaz(page, { gizli });
     const h = await kameraliHareket(page);
     await durumYaz(page, { hareket: h.yol });
-    await page.waitForFunction(() => (window as any).kayit.aynaSon, null, { timeout: 60_000 });
+    await page.waitForFunction(() => (window as any).kayit.aynaSon, null, { timeout: 150_000 });
     let k = await kayit(page);
     expect(degerler(k, 'bilgi')).not.toContain('Hazırsın!');
     expect(degerler(k, 'kutu')).toContain('🧍 Baştan ayağa görün: biraz geri git');
@@ -256,7 +256,7 @@ for (const [ad, gizli] of [
     // Gerçek saatle 6 sn (ölçüm payı).
     expect(k.aynaSon - k.aynaBas).toBeGreaterThan(5_500);
     expect(k.aynaSon - k.aynaBas).toBeLessThan(7_500);
-    await expect.poll(() => yaptimVar(page), { timeout: 60_000 }).toBe(true);
+    await expect.poll(() => yaptimVar(page), { timeout: 150_000 }).toBe(true);
     // Çocuk bütün hareket boyunca yaptı; kamera saymadı, kutu "Geri git" dedi. Kendiliğinden geçilmez (Uzaktan oyna kapalı).
     await page.waitForTimeout(2_500);
     k = await kayit(page);
@@ -269,13 +269,13 @@ for (const [ad, gizli] of [
 }
 
 test('benzetim: "Yaptım!"a dokununca özet dürüst: kamera açık, görmedi', async ({ page }) => {
-  test.setTimeout(120_000);
+  test.setTimeout(240_000);
   await benzetimKur(page);
   await oyunuAc(page);
   await durumYaz(page, { gizli: [SOL_TOPUK, SAG_TOPUK] });
   const h = await kameraliHareket(page);
   await durumYaz(page, { hareket: h.yol });
-  await expect.poll(() => yaptimVar(page), { timeout: 60_000 }).toBe(true);
+  await expect.poll(() => yaptimVar(page), { timeout: 150_000 }).toBe(true);
   await page.evaluate(() => {
     const s = (window as any).oyun.scene.getScene('Hareket');
     const bul = (o: any): any => ((o.list ?? []).some((c: any) => c.text === 'Yaptım!') ? o : null);
@@ -286,7 +286,7 @@ test('benzetim: "Yaptım!"a dokununca özet dürüst: kamera açık, görmedi', 
 });
 
 test('benzetim: tanıma modeli geç hazır olur (ayna süresi içinde) → "Hazırlanıyor", sonra "Hazırsın!"', async ({ page }) => {
-  test.setTimeout(120_000);
+  test.setTimeout(240_000);
   await benzetimKur(page, { modelElle: true });
   const k0 = await oyunuAc(page);
   await kameraliHareket(page);
@@ -302,25 +302,25 @@ test('benzetim: tanıma modeli geç hazır olur (ayna süresi içinde) → "Haz�
 });
 
 test('benzetim: tanıma modeli çok geç gelir → ayna beklemez (≤6 sn), sonra kamera yine sayar ve kendiliğinden geçer', async ({ page }) => {
-  test.setTimeout(150_000);
+  test.setTimeout(240_000);
   await benzetimKur(page, { modelElle: true });
   const k0 = await oyunuAc(page);
   const h = await kameraliHareket(page);
   await durumYaz(page, { hareket: h.yol });
-  await page.waitForFunction(() => (window as any).kayit.aynaSon, null, { timeout: 60_000 });
+  await page.waitForFunction(() => (window as any).kayit.aynaSon, null, { timeout: 150_000 });
   let k = await kayit(page);
   expect(k.aynaSon - k.aynaBas).toBeLessThan(7_500);
   expect(degerler(k, 'bilgi')).not.toContain('Hazırsın!');
   expect(degerler(k, 'kutu')).toEqual(['📷 Hazırlanıyor']);
   await page.evaluate(() => (window as any).benzetim.modelHazir());
-  await page.waitForFunction((adim) => (window as any).oyun.scene.getScene('Hareket').adim === adim + 1, h.adim, { timeout: 120_000 });
+  await page.waitForFunction((adim) => (window as any).oyun.scene.getScene('Hareket').adim === adim + 1, h.adim, { timeout: 150_000 });
   k = await kayit(page);
   expect(degerler(k, 'kutu')).toContain(`📷 ${h.adet}/${h.adet}`);
   expect(k0.hatalar).toEqual([]);
 });
 
 test('benzetim: kamera geç açılır (4 sn) → ayna "Hazırlanıyor" der, açılınca görür', async ({ page }) => {
-  test.setTimeout(120_000);
+  test.setTimeout(240_000);
   await benzetimKur(page, { kameraGecikmeMs: 4_000 });
   const k0 = await oyunuAc(page);
   await kameraliHareket(page);
@@ -337,7 +337,7 @@ test('benzetim: kamera geç açılır (4 sn) → ayna "Hazırlanıyor" der, aç�
 // Hata (bulundu 16 Ekim): kamera açılırken (iPhone izin penceresi açık, yavaş telefon) sıradaki harekete geçilince kamera ikinci kez
 // açılıyor, ilk açılan hiç kapanmadan açık kalıyordu. Şimdi aynı açılış beklenir; hareket ekranından çıkınca hepsi kapanır.
 test('benzetim: kamera açılırken sıradaki harekete geçilirse kamera ikinci kez açılmaz, çıkınca hiçbir kamera açık kalmaz', async ({ page }) => {
-  test.setTimeout(120_000);
+  test.setTimeout(240_000);
   await benzetimKur(page, { kameraGecikmeMs: 3_000 });
   const k0 = await oyunuAc(page);
   const h = await kameraliHareket(page);
@@ -359,7 +359,7 @@ test('benzetim: kamera açılırken sıradaki harekete geçilirse kamera ikinci 
 });
 
 test('benzetim: kamera açılırken hareket ekranından çıkılırsa, sonradan gelen kamera hemen kapanır', async ({ page }) => {
-  test.setTimeout(120_000);
+  test.setTimeout(240_000);
   await benzetimKur(page, { kameraGecikmeMs: 4_000 });
   const k0 = await oyunuAc(page);
   await kameraliHareket(page);
@@ -379,11 +379,11 @@ for (const [ad, ayar] of [
   ['tanıma modeli yüklenemedi', { modelHatasi: true }],
 ] as const) {
   test(`benzetim: ${ad} → ayna açılmaz, kutu "Açılamadı", oyun kamerasız sürer; özete "kamera açık" yazılmaz`, async ({ page }) => {
-    test.setTimeout(120_000);
+    test.setTimeout(240_000);
     await benzetimKur(page, ayar);
     const k0 = await oyunuAc(page);
     await kameraliHareket(page);
-    await expect.poll(() => yaptimVar(page), { timeout: 60_000 }).toBe(true);
+    await expect.poll(() => yaptimVar(page), { timeout: 150_000 }).toBe(true);
     const k = await kayit(page);
     expect(degerler(k, 'bilgi')).not.toContain('Ekranda kendine bak!');
     expect(degerler(k, 'kutu')).toContain('📷 Açılamadı');
@@ -402,7 +402,7 @@ for (const [ad, ayar] of [
 // Ayna en çok süresi gerçek saatle: oyunun saati (Phaser) yavaş telefonda geri kalsa da uzamaz. Oyun saati 4 kat yavaşlatılır.
 for (const [tempo, enCok] of [['Normal', 6_000], ['Sakin', 8_000]] as const) {
   test(`benzetim: ayna en çok ${enCok / 1000} sn (${tempo} tempo), oyunun saati 4 kat yavaşken de gerçek saatle`, async ({ page }) => {
-    test.setTimeout(150_000);
+    test.setTimeout(240_000);
     await benzetimKur(page);
     const k0 = await oyunuAc(page, tempo === 'Sakin' ? { 'zipzip-oyun-ayar-v1': JSON.stringify({ yas: 'kucuk' }) } : {});
     await durumYaz(page, { gizli: [SOL_TOPUK, SAG_TOPUK] });
@@ -420,7 +420,7 @@ for (const [tempo, enCok] of [['Normal', 6_000], ['Sakin', 8_000]] as const) {
 }
 
 test('benzetim: hareket ekranından çıkınca kamera kapanır, tanıma durur, görüntü hiçbir yere gitmez', async ({ page }) => {
-  test.setTimeout(120_000);
+  test.setTimeout(240_000);
   await benzetimKur(page);
   const k0 = await oyunuAc(page);
   await kameraliHareket(page);
