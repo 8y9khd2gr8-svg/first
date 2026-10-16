@@ -87,6 +87,8 @@ async function benzetimKur(page: Page, ayar: Ayar = {}) {
       w.oyun.events.on('postrender', () => {
         const s = w.oyun.scene.getScene('Hareket');
         if (!s?.sys.isActive()) return;
+        // Oyunun saati: her karenin oyun süresi (Phaser zamanlayıcıları bununla ilerler; yavaş makinede gerçek saatten geri kalır).
+        kayit.oyunSaati = (kayit.oyunSaati ?? 0) + w.oyun.loop.delta;
         ekle('bilgi', s.bilgi?.text ?? '');
         const kutu = document.querySelector('.kamera-kutusu') as HTMLElement | null;
         if (kutu) {
@@ -96,10 +98,10 @@ async function benzetimKur(page: Page, ayar: Ayar = {}) {
         }
         const ayna = s.bilgi?.text === 'Ekranda kendine bak!' || s.bilgi?.text === 'Hazırsın!';
         if (ayna) kayit.aynaBas ??= performance.now();
-        if (ayna) kayit.aynaOyunBas ??= s.time.now;
+        if (ayna) kayit.aynaOyunBas ??= kayit.oyunSaati;
         if (kayit.aynaBas && !kayit.aynaSon && !ayna) {
           kayit.aynaSon = performance.now();
-          kayit.aynaOyunSon = s.time.now;
+          kayit.aynaOyunSon = kayit.oyunSaati;
         }
       });
     };
