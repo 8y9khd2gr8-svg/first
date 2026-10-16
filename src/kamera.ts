@@ -200,6 +200,25 @@ export type KameraOlcumu = {
 const OLCUM_PENCERESI = 30;
 
 // Hareket ekranında açılan kamera: küçük önizleme ve sayma.
+// Oyundaki hareket ekranının kamerası hareketler arasında açık kalır (görüntü işlenmez): her harekette kamera yeniden
+// açılınca iPhone (özellikle ana ekrana eklenen uygulama) her seferinde izin soruyordu (Yağız testi, 15 Ekim).
+// Hareket ekranından çıkınca ekranAcik.ts en geç ~1 sn içinde kapatır. Ebeveyn kamera ekranları bunu kullanmaz.
+let ortakAkis: MediaStream | null = null;
+const KAMERA_AYARI: MediaStreamConstraints = { video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } }, audio: false };
+
+async function kameraAc(ortak: boolean): Promise<MediaStream> {
+  if (!ortak) return navigator.mediaDevices.getUserMedia(KAMERA_AYARI);
+  if (ortakAkis && ortakAkis.getVideoTracks().every((t) => t.readyState === 'live')) return ortakAkis;
+  ortakKamerayiKapat();
+  ortakAkis = await navigator.mediaDevices.getUserMedia(KAMERA_AYARI);
+  return ortakAkis;
+}
+
+export function ortakKamerayiKapat() {
+  ortakAkis?.getTracks().forEach((t) => t.stop());
+  ortakAkis = null;
+}
+
 export class KameraSayaci {
   durum: KameraDurumu = 'yukleniyor';
   hata: KameraHatasi | null = null;
@@ -217,6 +236,8 @@ export class KameraSayaci {
     animasyon: Animasyon,
     private degisince: (sayi: number, durum: KameraDurumu) => void,
     private noktalarGelince?: (n: NormalizedLandmark[] | undefined) => void,
+    // ortak: oyundaki hareket ekranı; kamera hareketler arasında kapanmaz (ortakKamerayiKapat kapatır).
+    private ortak = false,
   ) {
     this.sayici = new Sayici(animasyon);
     this.video.muted = true;
@@ -237,10 +258,10 @@ export class KameraSayaci {
     try {
       const [model, akis] = await Promise.all([
         modelYukle(),
-        navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } }, audio: false }),
+        kameraAc(this.ortak),
       ]);
       if (this.bitti) {
-        akis.getTracks().forEach((t) => t.stop());
+        if (!this.ortak) akis.getTracks().forEach((t) => t.stop());
         return;
       }
       this.akis = akis;
@@ -318,7 +339,7 @@ export class KameraSayaci {
   durdur() {
     this.bitti = true;
     cancelAnimationFrame(this.kare);
-    this.akis?.getTracks().forEach((t) => t.stop());
+    if (!this.ortak) this.akis?.getTracks().forEach((t) => t.stop());
     this.video.srcObject = null;
   }
 

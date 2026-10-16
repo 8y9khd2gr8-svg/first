@@ -250,7 +250,7 @@ export class HareketScene extends Phaser.Scene {
         : durum === 'yukleniyor' ? '📷 Hazırlanıyor'
         : `📷 ${Math.min(sayi, hareket.adet)}/${hareket.adet}`;
       this.kameraHedefe?.();
-    });
+    }, undefined, true);
     const video = kamera.onizleme;
     video.style.cssText = 'width:100%;height:110px;object-fit:cover;transform:scaleX(-1);display:block;';
     kutu.append(video, yazi);
