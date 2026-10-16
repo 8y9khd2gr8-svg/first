@@ -1177,14 +1177,23 @@ test('kesinti (bildirim/arama): ses susar, sayaç ve "Uzaktan oyna" durur; dön�
       return { aktif: s.scene.isActive(), adim: s.adim, sayac: s.sayac?.text, bilgi: s.bilgi?.text, agiz: s.zipzip?.yuz?.aciklik ?? 0 };
     });
   // Sayma başlayınca (ilk sayılar söylendi) bildirim gelir.
-  await expect.poll(async () => { const d = await durum(); return d.bilgi === 'Sen de yap!' && Number(d.sayac) > 1; }, { timeout: 30_000 }).toBe(true);
-  // Ölçüm ve gizleme aynı anda (arada bir kare geçip bir sayı daha söylenmesin).
-  const once = await page.evaluate(() => {
-    const w = window as any;
-    const o = { susturma: w.konusma.susturma, soylenen: w.konusma.soylenen.length };
-    w.sayfayiGizle(true);
-    return o;
-  });
+  // Ölçüm ve gizleme aynı karede, sadece arkasından aynı harekette bir sayı daha gelecekse (son sayıda gizlenirse dönüşte
+  // değişen ilk sayı sıradaki hareketin geri sayımı olurdu).
+  const gizleme = await page.waitForFunction(
+    () => {
+      const w = window as any;
+      const s = w.oyun.scene.getScene('Hareket');
+      const h = s.liste?.()[s.adim];
+      const n = Number(s.sayac?.text);
+      if (!h || s.bilgi?.text !== 'Sen de yap!' || !(n > 1) || (h.tur === 'sayi' && n >= h.adet)) return false;
+      const o = { susturma: w.konusma.susturma, soylenen: w.konusma.soylenen.length };
+      w.sayfayiGizle(true);
+      return o;
+    },
+    null,
+    { timeout: 30_000, polling: 'raf' },
+  );
+  const once = (await gizleme.jsonValue()) as { susturma: number; soylenen: number };
   const gizliyken = await durum();
   expect(await page.evaluate(() => (window as any).konusma.susturma)).toBeGreaterThan(once.susturma); // yarım cümle susturuldu
   await page.waitForTimeout(4000);
@@ -1256,4 +1265,18 @@ test('ebeveyn özeti: toplam durak betada 14, bütün bölümler açıkken 50 ü
     expect(await yazilar()).toContain(`2 / ${toplam}`);
     expect(kayit.hatalar).toEqual([]);
   }
+});
+
+// Kod denetimi 4. tur: kamera açıldı ama vücut tanıma modeli yüklenemedi (eski/zayıf telefon). Kamera kapanmalı
+// (ışığı yanık kalmamalı) ve ebeveyn "Kamera açılamadı" görmeli.
+test('kamera denemesi: model yüklenemezse kamera kapanır, "Kamera açılamadı" yazar', async ({ page }) => {
+  await sahteKamera(page);
+  await page.route('**/mediapipe/**', (r) => r.abort());
+  const kayit = await oyunuAc(page, BETA);
+  await sahneAc(page, 'EbeveynKamera');
+  const r = (await page.locator('canvas').boundingBox())!;
+  await page.mouse.click(r.x + r.width / 2, r.y + (r.height * 635) / 1280); // 📷 Kamerayı aç
+  await kameraYazisi(page, 'EbeveynKamera', 'Kamera açılamadı');
+  await expect.poll(() => page.evaluate(() => (window as any).sahteAkis?.getVideoTracks()[0]?.readyState), { timeout: 5_000 }).toBe('ended');
+  expect(kayit.hatalar.filter((h) => !h.startsWith('Failed to load resource'))).toEqual([]); // engellenen model dosyaları
 });
