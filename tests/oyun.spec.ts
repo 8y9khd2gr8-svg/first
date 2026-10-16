@@ -1131,6 +1131,121 @@ test('kilitten dönüş: ekran açık tutma ve kamera yeniden gelir', async ({ p
   expect(kayit.hatalar).toEqual([]);
 });
 
+// Bildirim/arama, ekran kilidi ya da başka uygulama (kontrol listesi T3, T4, T10): sayfa gizlenir, sonra geri gelir.
+// Sahte konuşma: söylenenler ve susturmalar sayılır; iPhone gibi gizlenince konuşma "duraklatılmış" kalır.
+async function kesintiSahte(page: Page) {
+  await page.addInitScript(() => {
+    const w = window as any;
+    w.sayfaGizli = false;
+    w.konusma = { soylenen: [] as string[], susturma: 0, surdurme: 0, duraklatildi: false };
+    Object.defineProperty(document, 'hidden', { get: () => w.sayfaGizli });
+    Object.defineProperty(document, 'visibilityState', { get: () => (w.sayfaGizli ? 'hidden' : 'visible') });
+    const ss = window.speechSynthesis as any;
+    ss.speak = (u: SpeechSynthesisUtterance) => w.konusma.soylenen.push(u.text); // telefondaki gibi hemen bitmez
+    ss.cancel = () => w.konusma.susturma++;
+    Object.defineProperty(ss, 'paused', { get: () => w.konusma.duraklatildi });
+    ss.resume = () => {
+      w.konusma.surdurme++;
+      w.konusma.duraklatildi = false;
+    };
+    // Telefon gibi: sayfa gizliyken tarayıcı kare çizmez (oyunun saati bununla durur; Phaser kendisi durdurmaz).
+    const kare = window.requestAnimationFrame.bind(window);
+    let bekleyen: FrameRequestCallback[] = [];
+    // Gizlenmeden önce istenmiş kare de gizliyken çizilmez.
+    window.requestAnimationFrame = (f) => kare((t) => (w.sayfaGizli ? bekleyen.push(f) : f(t)));
+    w.sayfayiGizle = (gizli: boolean) => {
+      w.sayfaGizli = gizli;
+      if (gizli) w.konusma.duraklatildi = true;
+      document.dispatchEvent(new Event('visibilitychange'));
+      if (!gizli) {
+        bekleyen.forEach((f) => kare(f));
+        bekleyen = [];
+      }
+    };
+  });
+}
+
+test('kesinti (bildirim/arama): ses susar, sayaç ve "Uzaktan oyna" durur; dönünce kaldığı yerden bir kez devam eder', async ({ page }) => {
+  test.setTimeout(90_000);
+  await kesintiSahte(page);
+  const kayit = await oyunuAc(page, { 'zipzip-uzaktan-v1': '1' });
+  await saatiHizlandir(page, 3);
+  await sahneAc(page, 'Hareket', { durakId: 'istanbul', adim: 0 });
+  const durum = () =>
+    page.evaluate(() => {
+      const s = (window as any).oyun.scene.getScene('Hareket');
+      return { aktif: s.scene.isActive(), adim: s.adim, sayac: s.sayac?.text, bilgi: s.bilgi?.text, agiz: s.zipzip?.yuz?.aciklik ?? 0 };
+    });
+  // Sayma başlayınca (ilk sayılar söylendi) bildirim gelir.
+  await expect.poll(async () => { const d = await durum(); return d.bilgi === 'Sen de yap!' && Number(d.sayac) > 1; }, { timeout: 30_000 }).toBe(true);
+  // Ölçüm ve gizleme aynı anda (arada bir kare geçip bir sayı daha söylenmesin).
+  const once = await page.evaluate(() => {
+    const w = window as any;
+    const o = { susturma: w.konusma.susturma, soylenen: w.konusma.soylenen.length };
+    w.sayfayiGizle(true);
+    return o;
+  });
+  const gizliyken = await durum();
+  expect(await page.evaluate(() => (window as any).konusma.susturma)).toBeGreaterThan(once.susturma); // yarım cümle susturuldu
+  await page.waitForTimeout(4000);
+  // Gizliyken oyun ilerlemez, yeni cümle söylenmez, "Uzaktan oyna" kendiliğinden geçmez.
+  expect(await durum()).toEqual(gizliyken);
+  expect(await page.evaluate((n) => (window as any).konusma.soylenen.slice(n), once.soylenen)).toEqual([]);
+  // Dönüş: duraklatılmış konuşma sürdürülür, sayma kaldığı yerden sürer, hareket bir kez kaydedilip sıradakine geçilir.
+  await page.evaluate(() => (window as any).sayfayiGizle(false));
+  expect(await page.evaluate(() => (window as any).konusma.surdurme)).toBe(1);
+  // Sayma kaldığı yerden: sıradaki sayı bir eksik/fazla (süreli hareket geri, sayılı hareket ileri sayar), atlama yok.
+  const ilkDegisen = await page.waitForFunction(
+    (eski) => {
+      const s = (window as any).oyun.scene.getScene('Hareket');
+      return s.sayac.text !== eski && s.sayac.text;
+    },
+    gizliyken.sayac,
+    { timeout: 10_000, polling: 'raf' },
+  );
+  expect(Math.abs(Number(await ilkDegisen.jsonValue()) - Number(gizliyken.sayac))).toBe(1);
+  // İkinci kesinti "Uzaktan oyna" geri sayımı (📱 3… 2… 1…) sırasında: gizliyken kendiliğinden geçmez, kayıt yapılmaz.
+  await page.waitForFunction(() => (window as any).oyun.scene.getScene('Hareket').children.list.some((o: any) => o.type === 'Text' && o.text.startsWith('📱')), null, { timeout: 60_000, polling: 'raf' });
+  const adimGizlenince = await page.evaluate(() => {
+    const w = window as any;
+    w.sayfayiGizle(true);
+    return w.oyun.scene.getScene('Hareket').adim;
+  });
+  await page.waitForTimeout(5000);
+  expect(await page.evaluate(() => [(window as any).oyun.scene.getScene('Hareket').adim, localStorage.getItem('zipzip-istatistik-v1')])).toEqual([adimGizlenince, null]);
+  await page.evaluate(() => (window as any).sayfayiGizle(false));
+  await expect.poll(async () => (await durum()).adim, { timeout: 30_000 }).toBe(1);
+  await page.waitForTimeout(1500);
+  const sonra = await page.evaluate(() => ({
+    adim: (window as any).oyun.scene.getScene('Hareket').adim,
+    hareket: Object.values<any>(JSON.parse(localStorage.getItem('zipzip-istatistik-v1')!).gunler)[0].hareket,
+  }));
+  expect(sonra).toEqual({ adim: 1, hareket: 1 });
+  expect(kayit.hatalar).toEqual([]);
+});
+
+test('kesinti: arama sonrası iPhone ses bağlamı "interrupted" kalırsa sıradaki seste yeniden açılır', async ({ page }) => {
+  const kayit = await oyunuAc(page);
+  const sonuc = await page.evaluate(async () => {
+    const { bip } = await import('/src/ses.ts');
+    const p = AudioContext.prototype as any;
+    let durum = 'running';
+    let acma = 0;
+    Object.defineProperty(p, 'state', { configurable: true, get: () => durum });
+    p.resume = async () => {
+      acma++;
+      durum = 'running';
+    };
+    bip();
+    const once = acma;
+    durum = 'interrupted'; // arama geldi
+    bip();
+    return { once, sonra: acma, durum };
+  });
+  expect(sonuc).toEqual({ once: 0, sonra: 1, durum: 'running' });
+  expect(kayit.hatalar).toEqual([]);
+});
+
 // K36: özetteki "toplam durak" açık bölümlerin durakları üzerinden: betada 14, ?bolumler=hepsi ile 50.
 test('ebeveyn özeti: toplam durak betada 14, bütün bölümler açıkken 50 üzerinden', async ({ page }) => {
   const ilerleme = { 'zipzip-ilerleme-v1': JSON.stringify(['istanbul', 'truva']) };
