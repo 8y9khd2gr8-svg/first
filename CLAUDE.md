@@ -163,7 +163,9 @@ Teknoloji: Phaser 3 + TypeScript + Vite, GitHub Pages ile yayın. İleride Capac
   Oynanış kararı (12 Ekim): kamera isteğe bağlı kalır, macerada "önerilen" olur; her yeni mekanik kamerasız da oynanır
   (kameralı ve kamerasız iki yol). Bugün kamera sadece sayar, Zıpzıp'ı/dünyayı etkilemez (docs/rapor-2026-10-12/OYNANIS_ANALIZI.md).
   Kameranın saydığı hareketler src/kamera.ts SAYMA_YOLU'nda (13 hareket, 6 sayma yolu: kollar, çömel, zıpla, dizler,
-  ayak aç-kapa, yana adım); süreli hareketlerde kamera açılmaz. Yavaş telefonda tanıma her seferinde sürdüğü kadar ara verir (oyun takılmasın). Yapay vücut noktalarıyla testi: tests/kamera.test.ts.
+  ayak aç-kapa, yana adım); süreli hareketlerde kamera açılmaz. Yavaş telefonda tanıma her seferinde sürdüğü kadar ara verir (oyun takılmasın). Yapay vücut noktalarıyla testi: tests/kamera.test.ts. Oyunun içinde benzetim: tests/kamera-benzetim.spec.ts
+  (sahte kamera + `window.zipzipBenzetim` sahte model, sadece geliştirme sunucusunda; yayın paketinde yok, test denetler; gerçek kamera doğrulaması değildir).
+  Sayma şartı: iki omuz + iki topuk görünür (kamera.ts eksikNoktalar); biri yoksa "Geri git", hiç sayılmaz (K41, docs/k41-kamera-analizi.md).
   Eşikler gerçek çocukla denenmedi; Yağız testinde ayarlanacak.
   Oyundaki görünüm (K40, 16 Ekim, "önce büyük ayna"): kameralı harekette Zıpzıp gösterdikten sonra ekranın yarısına yakın canlı
   görüntü + "baştan ayağa" çerçevesi (görünce yeşil, "Hazırsın!"); görmezse en çok 6 sn (Sakin 8 sn, gerçek saatle) sonra normal

@@ -249,7 +249,9 @@ export class HareketScene extends Phaser.Scene {
       bitti = true;
       this.kameraHedefe = null;
       sustur();
-      hareketKaydet(hareket, this.kamera && hareket.tur === 'sayi' ? { gordu: this.kamera.sayi >= hareket.adet } : undefined);
+      // Kamera açılamadıysa (izin yok, model yüklenemedi) o hareket "kamera açıkken" sayılmaz: özet dürüst kalsın.
+      const kameraCalisti = this.kamera && this.kamera.durum !== 'hata';
+      hareketKaydet(hareket, kameraCalisti && hareket.tur === 'sayi' ? { gordu: this.kamera!.sayi >= hareket.adet } : undefined);
       hareketYapildi();
       dugme.destroy();
       this.sonraki();
@@ -352,6 +354,8 @@ export class HareketScene extends Phaser.Scene {
     const video = kamera.onizleme;
     video.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transform:scaleX(-1);display:block;';
     kutu.append(video, cerceve, yazi);
+    // İlk hâl hemen yazılır: kamera hazırlanırken küçük kutuda aynanın çerçevesi görünmesin.
+    yaz();
     const dom = this.add.dom(0, 0, kutu).setOrigin(0, 0);
     const boyut = { ...KUTU.hareket };
     const uygula = () => {

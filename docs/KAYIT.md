@@ -52,7 +52,7 @@ Onay verilmemiş, ertelenmiş ya da reddedilmiş öneriler de buraya yazılır; 
 | K38 | ✅ Oyundaki kamera: model yüklenemezse | **16 Ekim, kullanıcı seçti (a). Yapıldı (#142):** model hatasında oyundaki ortak kamera hemen kapanır, hareket ekranından çıkana kadar (o durak boyunca) açılmaz, model istenmez; kutuda "📷 Açılamadı", oyun kamerasız sürer. Test eski kodda kırmızı | Gizlilik algısı (kamera ışığı) | 16 Ekim |
 | K39 | ⏳ Kesintide yarım kalan cümle | Arama/kilitten dönünce, gizlenirken yarıda kesilen komut cümlesi yeniden söylenmez (ekranda yazı duruyor; sayma sürer). Seçenekler: (a) böyle kalsın (önerilen; telefonda bakılır) (b) dönüşte hareket komutunu bir kez yeniden söyle | Okuma bilmeyen çocuk | 16 Ekim |
 | K40 | ✅ "Önce büyük ayna" kamera görünümü | **16 Ekim, kullanıcı seçti. Yapıldı (#143):** kameralı harekette Zıpzıp gösterdikten sonra ekranın ~%40'ı canlı görüntü + "baştan ayağa" çerçevesi (sesli yönlendirme); görünce yeşil + "Hazırsın! Seni görüyorum."; görmezse en çok 6 sn (Sakin 8 sn, gerçek saatle) sonra normal geri sayım. Hareket sırasında kutu sağ altta eskisinin ~3 katı, sayı büyük; "Yaptım!"da sağ üst köşe. Sayım hareketle başlar. Kamerasız oyun aynen. 🔎 Telefonda ve Yağız testinde denenecek (yagiz-testi.md madde 19) | Çocuk 2-3 m'den kendini görüp yerleşsin | 16 Ekim |
-| K41 | ⏳ Kamera neden saymadı? (inceleme, 16 Ekim) | Kod incelemesinden olası nedenler: (1) **Kadraj:** kamera sadece omuzlar VE iki topuk görünürken sayar; telefon masada/rafta dururken ayaklar çoğu zaman kadraj dışında kalır → kutu sürekli "Geri git" der, hiç saymaz (en olası; K40 aynası bunu göstermek için). (2) Kamera sadece 13 harekette sayar (kollar, çömel, zıpla, dizler, aç-kapa, yana adım ve benzerleri); süreli, birleşik ve diğer hareketlerde kutu hiç çıkmaz. (3) "Kollar" iki bileğin de burnun üstüne çıkmasını ister; çocuk kollarını baş hizasına kaldırırsa sayılmaz. (4) Eşikler gerçek çocukla denenmedi. Seçenekler: (a) önce Yağız testinde kutuda ne yazdığına bakılsın, sonra eşik ayarı (önerilen) (b) kol hareketlerinde topuk şartını kaldır (sadece üst gövde yeter) (c) eşikleri şimdiden gevşet | Kullanıcı "kamera algılamadı" dedi | 16 Ekim |
+| K41 | ⏳ Kamera neden saymadı? | **16 Ekim akşamı, kod + benzetimle kanıtlandı (`docs/k41-kamera-analizi.md`):** kamera sadece iki omuz VE iki topuk görünürken sayar (kollar dahil; eşikler boya göre). Telefon masada → topuklar kadraj dışı → bütün hareket boyunca "Geri git", sayı 0; oyun beklemez, "Yaptım!" çıkar. Benzetimde (yapay vücut noktaları; gerçek kamera değil) iki topuk / bir topuk / omuzlar görünmez → hiç saymaz. Eşik ve ayak şartı **değiştirilmedi**. Seçenekler: (a) önce gerçek telefonda kutu yazısına bakılsın (önerilen) (b) kol hareketlerinde topuk şartı kalksın (c) "Geri git" yerine eksik yere göre yazı ("Ayakların görünmüyor") (d) eşikleri gevşetmek (önerilmez). 🔎 Gerçek model kadraj dışı topuğa ne güven veriyor bilinmiyor | Kullanıcı "kamera algılamadı" dedi | 16 Ekim |
 
 ## 2. Kullanıcıda bekleyenler
 
@@ -78,6 +78,18 @@ Onay verilmemiş, ertelenmiş ya da reddedilmiş öneriler de buraya yazılır; 
 ---
 
 ## 4. Oturum günlüğü (en yeni üstte)
+
+### 16 Ekim 2026 (akşam) — K41 kamera benzetimi, Yağız testi beklenmeden
+**Görev (kullanıcı):** Yağız testi beklenmeden çocuksuz yapılabilecek her şey; eşik değiştirme yok, kol hareketlerinde ayak şartı kalmaz.
+**#147 (bu oturum):**
+- K41 kanıtlandı (kod + benzetim): sayma şartı iki omuz + iki topuk; telefon masada → "Geri git", sayı 0. Ayrıntı `docs/k41-kamera-analizi.md`. Eşikler aynı.
+- Benzetim katmanı: `window.zipzipBenzetim` sahte model, sadece geliştirme sunucusunda (yayın paketinde yok, test denetler). `tests/kamera-benzetim.spec.ts` 20 test; GitHub'da 2 parça (toplam 7 parça). `tests/kamera.test.ts` 6 yeni K41 birim testi (47 veri testi).
+- Hatalar (testleri eski kodda kırmızı): (1) kamera açılırken sıradaki harekete geçilince kamera ikinci kez açılıp ilki açık kalıyordu (T2); (2) kamera açılamadıysa özet "kamera açıkken" sayıyordu; (3) hazırlanırken küçük kutuda ayna çerçevesi görünüyordu.
+- Yerelde tam oyun testleri 82/82 (2 işçi, 15,8 dk). CI ilk turda yeni testimin biri kırmızı: ayna kısa geçişini gerçek saatle ölçüyordu (oyun saatiyle 0,9 sn; yavaş CI'da 3,4 sn) → oyun saatiyle ölçülüyor (her karenin oyun süresi toplanır; `time.now` gerçek saattir, ilk denemede yanlış seçtim). Yük altında 6 kopya: oyun saati hep ~0,91 sn, gerçek saat 0,8-5,8 sn. Oyun hatası değil. Üçüncü turda "özet dürüst" testi "Yaptım!"ı 60 sn içinde göremedi (yavaş CI oyun saati; önceki turlarda 59 sn) → bekleme süreleri uzatıldı (test 240 sn, bekleme 150 sn), beklentiler aynı.
+- Gizlilik denetimi (kod): kamera görüntüsü sadece ekrandaki video öğesine ve cihaz içindeki tanımaya gider; kopyalanmaz (toDataURL/kayıt yok), ağ isteği yok; çıkınca kamera kapanır, tanıma durur (testli). Değişiklik yapılmadı.
+- GitHub denetimi (16 Ekim akşamı): etiket yok, release yok, `main` korumalı görünmüyor → U1/U2 hâlâ kullanıcıda.
+- Zaten testli olanlar (yeni test eklenmedi): Wake Lock sıklığı ve düşük güç (T5), kesinti/kilitten dönüş (T3/T10), yavaş telefon (T7), ses önbelleği yeniden deneme (`onbellek.test.ts`, #141).
+**Telefonda denenecek:** kardeşe gönderilen test bağlantısıyla kamera: kutu yazısı ("Geri git" mi?), telefon nereye konunca ayaklar görünüyor, izin bir kez mi soruluyor.
 
 ### 16 Ekim 2026 (öğle) — K40 büyük ayna, K38, ses önbelleği, kod denetimi 5. tur, T5/T7
 **Birleşenler (`test` son hâlinde yeşil ve okunarak, K35):**
