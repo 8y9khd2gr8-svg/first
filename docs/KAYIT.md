@@ -79,6 +79,18 @@ Onay verilmemiş, ertelenmiş ya da reddedilmiş öneriler de buraya yazılır; 
 
 ## 4. Oturum günlüğü (en yeni üstte)
 
+### 16 Ekim 2026 (akşam) — K41 kamera benzetimi, Yağız testi beklenmeden
+**Görev (kullanıcı):** Yağız testi beklenmeden çocuksuz yapılabilecek her şey; eşik değiştirme yok, kol hareketlerinde ayak şartı kalmaz.
+**#147 (bu oturum):**
+- K41 kanıtlandı (kod + benzetim): sayma şartı iki omuz + iki topuk; telefon masada → "Geri git", sayı 0. Ayrıntı `docs/k41-kamera-analizi.md`. Eşikler aynı.
+- Benzetim katmanı: `window.zipzipBenzetim` sahte model, sadece geliştirme sunucusunda (yayın paketinde yok, test denetler). `tests/kamera-benzetim.spec.ts` 20 test; GitHub'da 2 parça (toplam 7 parça). `tests/kamera.test.ts` 6 yeni K41 birim testi (47 veri testi).
+- Hatalar (testleri eski kodda kırmızı): (1) kamera açılırken sıradaki harekete geçilince kamera ikinci kez açılıp ilki açık kalıyordu (T2); (2) kamera açılamadıysa özet "kamera açıkken" sayıyordu; (3) hazırlanırken küçük kutuda ayna çerçevesi görünüyordu.
+- Yerelde tam oyun testleri 82/82 (2 işçi, 15,8 dk). CI ilk turda yeni testimin biri kırmızı: ayna kısa geçişini gerçek saatle ölçüyordu (oyun saatiyle 0,9 sn; yavaş CI'da 3,4 sn) → oyun saatiyle ölçülüyor. Oyun hatası değil.
+- Gizlilik denetimi (kod): kamera görüntüsü sadece ekrandaki video öğesine ve cihaz içindeki tanımaya gider; kopyalanmaz (toDataURL/kayıt yok), ağ isteği yok; çıkınca kamera kapanır, tanıma durur (testli). Değişiklik yapılmadı.
+- GitHub denetimi (16 Ekim akşamı): etiket yok, release yok, `main` korumalı görünmüyor → U1/U2 hâlâ kullanıcıda.
+- Zaten testli olanlar (yeni test eklenmedi): Wake Lock sıklığı ve düşük güç (T5), kesinti/kilitten dönüş (T3/T10), yavaş telefon (T7), ses önbelleği yeniden deneme (`onbellek.test.ts`, #141).
+**Telefonda denenecek:** kardeşe gönderilen test bağlantısıyla kamera: kutu yazısı ("Geri git" mi?), telefon nereye konunca ayaklar görünüyor, izin bir kez mi soruluyor.
+
 ### 16 Ekim 2026 (öğle) — K40 büyük ayna, K38, ses önbelleği, kod denetimi 5. tur, T5/T7
 **Birleşenler (`test` son hâlinde yeşil ve okunarak, K35):**
 - #141 Ses kaydı önbelleği: yüklenemeyen doğal ses kaydı önbellekten silinir, sıradaki istek yeniden dener (`src/onbellek.ts`; test ilk istek düşer → ikincisi çalar; eski mantıkta kırmızı). Bölüm 3'teki not kaldırıldı.

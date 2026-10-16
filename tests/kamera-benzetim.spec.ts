@@ -96,7 +96,11 @@ async function benzetimKur(page: Page, ayar: Ayar = {}) {
         }
         const ayna = s.bilgi?.text === 'Ekranda kendine bak!' || s.bilgi?.text === 'Hazırsın!';
         if (ayna) kayit.aynaBas ??= performance.now();
-        if (kayit.aynaBas && !kayit.aynaSon && !ayna) kayit.aynaSon = performance.now();
+        if (ayna) kayit.aynaOyunBas ??= s.time.now;
+        if (kayit.aynaBas && !kayit.aynaSon && !ayna) {
+          kayit.aynaSon = performance.now();
+          kayit.aynaOyunSon = s.time.now;
+        }
       });
     };
     bagla();
@@ -207,7 +211,8 @@ test('benzetim: çocuk ayna açılmadan zaten baştan ayağa görünüyorsa ayna
   await bilgiBekle(page, 'Hazır ol!');
   const k = await kayit(page);
   expect(degerler(k, 'bilgi').slice(0, 3)).toEqual(['Önce Zıpzıp’ı izle!', 'Hazırsın!', 'Hazır ol!']);
-  expect(k.aynaSon - k.aynaBas).toBeLessThan(2_500);
+  // Kısa geçiş oyunun saatiyle 0,9 sn (yavaş makinede gerçek saatle uzayabilir; 6 sn'lik bekleme hiç başlamadı).
+  expect(k.aynaOyunSon - k.aynaOyunBas).toBeLessThan(1_500);
   const soylenen: string[] = await page.evaluate(() => (window as any).__soylenen);
   expect(soylenen).not.toContain('Ekranda kendine bak! Başından ayağına kadar görün.');
   expect(k0.hatalar).toEqual([]);
