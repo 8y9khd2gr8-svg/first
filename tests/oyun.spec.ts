@@ -1300,6 +1300,16 @@ async function kameraliAdimaGit(page: Page, durakId = 'istanbul') {
   throw new Error('kameralı adım yok');
 }
 
+// Sahte kameranın tanıma döngüsü durdurulur, durum "görmüyorum"da sabitlenir: yüklü test makinesinde sahte görüntü
+// gecikip "durdu" sayılınca ayna (doğru olarak) hiç açılmıyordu. Durum değişiklikleri testte elle verilir (bildir).
+async function kameraDurumunuSabitle(page: Page) {
+  await page.evaluate(() => {
+    const k = (window as any).oyun.scene.getScene('Hareket').kamera;
+    k.durdur();
+    k.bildir('goremiyorum');
+  });
+}
+
 // Kutunun tuval noktasındaki yeri ve kutunun örttüğü yazılar/düğmeler (Phaser nesneleri).
 const kutuDurumu = (page: Page) =>
   page.evaluate(() => {
@@ -1329,6 +1339,7 @@ test('büyük ayna (K40): önce büyük görüntü, görünce "Hazırsın!", son
   await sahteKamera(page);
   const kayit = await oyunuAc(page, { 'zipzip-kamera-v1': '1' });
   await kameraliAdimaGit(page);
+  await kameraDurumunuSabitle(page);
   const bilgi = () => page.evaluate(() => (window as any).oyun.scene.getScene('Hareket').bilgi.text);
   // Gösterim: kutu sağ altta, Zıpzıp görünür.
   let d = (await kutuDurumu(page))!;
@@ -1371,6 +1382,7 @@ test('büyük ayna (K40): kamera görmezse oyun beklemez, birkaç saniye sonra g
   await sahteKamera(page);
   const kayit = await oyunuAc(page, { 'zipzip-kamera-v1': '1' });
   await kameraliAdimaGit(page);
+  await kameraDurumunuSabitle(page);
   // Süre sayfanın içinde, her karede ölçülür (test makinesi yüklüyken dışarıdan ölçüm gecikir).
   await page.evaluate(() => {
     const s = (window as any).oyun.scene.getScene('Hareket');
