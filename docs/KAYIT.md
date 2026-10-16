@@ -49,8 +49,10 @@ Onay verilmemiş, ertelenmiş ya da reddedilmiş öneriler de buraya yazılır; 
 | K35 | ✅ Birleştirme yine otomatik | **16 Ekim kullanıcı:** "Neden birleştir diyorum, otomatik niye birleştirmiyorsun?" → seçti: testler yeşilse Claude sormadan birleştirir. Oynanışı ciddi değiştiren, yayın/dağıtım (mağaza), güvenlik/izin, para, çocuk/kamera verisi, geri dönüşsüz silme için onay sürer. #129-#131 bu kararla birleşti | Çalışma kuralı | 16 Ekim |
 | K36 | ✅ Ebeveyn özetinde "toplam durak" | **16 Ekim, kullanıcı seçti (a). Yapıldı (#136):** toplam açık bölümlerin durakları üzerinden (betada "2 / 14", `?bolumler=hepsi` ile "2 / 50"; `duraklar.ts acikDuraklar`). Test eski kodda kırmızı | Ebeveyn yanlış anlamasın | 16 Ekim |
 | K37 | ✅ Oturarak oynayan çocuk Hareket Kâşifi'ni kazanamazdı | **16 Ekim, kullanıcı seçti (a). Yapıldı (#136):** oturarak oyna açıkken sadece oturarak hâlde gelebilen hareketler sayılır (oyunun kurabileceği her liste `uyarla`'dan geçirilir; Ailece sayılmaz, orada hareketler ayakta kalır). Kutlanan rozet kaybolmaz. Test: sayılanlar = oyunun gerçekten kurduğu listelerde gelenler (iki yönde) | Hareket kısıtı olan çocuk | 16 Ekim |
-| K38 | ⏳ Oyundaki kamera: model yüklenemezse | Hareket ekranının ortak kamerası (izin bir kez sorulsun diye durak boyunca açık) vücut tanıma modeli yüklenemezse durak bitene kadar açık kalır (ışık yanık, sayma yok; çıkınca kapanır). Seçenekler: (a) model hatasında ortak kamerayı da kapat, o durakta bir daha deneme (önerilen) (b) böyle kalsın (sonraki harekette model yeniden denenir). Ebeveyn kamera ekranlarındaki aynı sorun #139'da düzeltildi | Gizlilik algısı (kamera ışığı) | 16 Ekim |
+| K38 | ✅ Oyundaki kamera: model yüklenemezse | **16 Ekim, kullanıcı seçti (a). Yapıldı (#142):** model hatasında oyundaki ortak kamera hemen kapanır, hareket ekranından çıkana kadar (o durak boyunca) açılmaz, model istenmez; kutuda "📷 Açılamadı", oyun kamerasız sürer. Test eski kodda kırmızı | Gizlilik algısı (kamera ışığı) | 16 Ekim |
 | K39 | ⏳ Kesintide yarım kalan cümle | Arama/kilitten dönünce, gizlenirken yarıda kesilen komut cümlesi yeniden söylenmez (ekranda yazı duruyor; sayma sürer). Seçenekler: (a) böyle kalsın (önerilen; telefonda bakılır) (b) dönüşte hareket komutunu bir kez yeniden söyle | Okuma bilmeyen çocuk | 16 Ekim |
+| K40 | ✅ "Önce büyük ayna" kamera görünümü | **16 Ekim, kullanıcı seçti. Yapıldı (#143):** kameralı harekette Zıpzıp gösterdikten sonra ekranın ~%40'ı canlı görüntü + "baştan ayağa" çerçevesi (sesli yönlendirme); görünce yeşil + "Hazırsın! Seni görüyorum."; görmezse en çok 6 sn (Sakin 8 sn, gerçek saatle) sonra normal geri sayım. Hareket sırasında kutu sağ altta eskisinin ~3 katı, sayı büyük; "Yaptım!"da sağ üst köşe. Sayım hareketle başlar. Kamerasız oyun aynen. 🔎 Telefonda ve Yağız testinde denenecek (yagiz-testi.md madde 19) | Çocuk 2-3 m'den kendini görüp yerleşsin | 16 Ekim |
+| K41 | ⏳ Kamera neden saymadı? (inceleme, 16 Ekim) | Kod incelemesinden olası nedenler: (1) **Kadraj:** kamera sadece omuzlar VE iki topuk görünürken sayar; telefon masada/rafta dururken ayaklar çoğu zaman kadraj dışında kalır → kutu sürekli "Geri git" der, hiç saymaz (en olası; K40 aynası bunu göstermek için). (2) Kamera sadece 13 harekette sayar (kollar, çömel, zıpla, dizler, aç-kapa, yana adım ve benzerleri); süreli, birleşik ve diğer hareketlerde kutu hiç çıkmaz. (3) "Kollar" iki bileğin de burnun üstüne çıkmasını ister; çocuk kollarını baş hizasına kaldırırsa sayılmaz. (4) Eşikler gerçek çocukla denenmedi. Seçenekler: (a) önce Yağız testinde kutuda ne yazdığına bakılsın, sonra eşik ayarı (önerilen) (b) kol hareketlerinde topuk şartını kaldır (sadece üst gövde yeter) (c) eşikleri şimdiden gevşet | Kullanıcı "kamera algılamadı" dedi | 16 Ekim |
 
 ## 2. Kullanıcıda bekleyenler
 
@@ -68,11 +70,27 @@ Onay verilmemiş, ertelenmiş ya da reddedilmiş öneriler de buraya yazılır; 
 - 🔎 Gerçek telefonda: ses, performans, kamera eşikleri, ödeme hiç denenmedi; iPhone'a hiç kurulmadı.
 - Doğal ses kaydı yok (760 cümle); telefonda Türkçe ses yoksa Zıpzıp konuşamaz.
 - Süreye bağlı tarayıcı testleri yavaş CI'da ara sıra zaman aşımına düşebilir (12 Ekim'de bir kez; #95).
+- ⏳ `kilitten dönüş` testi CI'da iki kez (16 Ekim, #142 ve #145) aynı yerde kırmızı oldu: kilitten önce "ekranı açık tut" 5 sn'de açık görünmedi. Yerelde (6 kat yavaşlatma, 4 işçi, 20+ çalıştırma) tekrarlanmadı; yeniden çalıştırmada geçti. Test artık başarısız olursa durumu (istek sayısı, sahneler, sayfa gizli mi) yazıyor (#145); bir dahaki kırmızıda nedene bakılacak.
+- `Zıpzıp konuşurken ağzı oynar` testi yerelde yük altında bir kez kırmızı (60 ms aralıklı ölçüm), tek başına geçiyor. CI'da görülmedi.
+- Yavaş telefonda (kare 200 ms'yi aşınca) Phaser oyunun saatini geri bırakır: sayaçlar/süreler uzar (test makinesinde ~12 kare/sn'de 6 sn → 11 sn). Kaybettirmez; büyük aynanın en çok süresi gerçek saatle (#143). 🔎 eski iPhone'da bakılacak.
 - Ayrıntılı fotoğraf: `docs/rapor-2026-10-12/` (12 Ekim anlık görüntüsü).
 
 ---
 
 ## 4. Oturum günlüğü (en yeni üstte)
+
+### 16 Ekim 2026 (öğle) — K40 büyük ayna, K38, ses önbelleği, kod denetimi 5. tur, T5/T7
+**Birleşenler (`test` son hâlinde yeşil ve okunarak, K35):**
+- #141 Ses kaydı önbelleği: yüklenemeyen doğal ses kaydı önbellekten silinir, sıradaki istek yeniden dener (`src/onbellek.ts`; test ilk istek düşer → ikincisi çalar; eski mantıkta kırmızı). Bölüm 3'teki not kaldırıldı.
+- #142 K38 (a): oyundaki kamera, model yüklenemezse hemen kapanır, o durakta yeniden denenmez. Eski kodda kırmızı (kamera `live` kaldı). CI'da bir kez `kilitten dönüş` kırmızı (ilgisiz), yeniden çalıştırmada yeşil.
+- #144 Kod denetimi 5. tur (Hareket, Durak, Ödül, Harita, Macera, Bölüm, Uzay, Dünya): kilitli durağa/bölüme/kapıya art arda hızlı dokununca sallanma üst üste binip işaret 8 px kaymış kalıyordu (5 yer) → sallanma hep asıl yerden. Test gerçek dokunuşla; eski kodda kırmızı. Denenip hata olmadığı görülen: uzaydan inişte saydam düğmelere dokunma (Phaser saydam nesneye dokunuşu iletmiyor; eski kod da doğru, değişiklik yapılmadı).
+- #143 K40 "önce büyük ayna" (yukarıda). Yeni 3 test (her hâlde örtme yok, sesler, ≤6 sn, kamerasız aynı). Yerelde tam testte gerçek bulgu: küçük kutu uzun hikâye satırına değiyordu → kısaltıldı. CI'da bir ayna testi yük altında sahte kamera "durdu" sayıldığı için aynayı açmadı (oyun doğru davrandı) → test kamera durumunu sabitliyor.
+- #145 T5/T7: düşük güç modunda Wake Lock reddedilince istek her yarım saniyede yineleniyordu (30 sn'de 49) → 10 sn ara, dokununca hemen; yavaş telefon testi (6 kat yavaş, kameralı hareket biter ve ilerler).
+
+**Telefon kontrol listesi:** T2 (izin bir kez) korunur; T5 taklitle ✅; T7 kısmen (bulgu bölüm 3); T1/T9 değişmedi.
+**Telefonda denenecek:** büyük ayna (çocuk kendini görüyor mu, "Hazırsın!" geliyor mu, kutu yazısı 2-3 m'den okunuyor mu); düşük güç modunda bir durak (ekran kararıyor mu); Yağız testinde kutuda ne yazdığı (madde 19).
+**Kendi hatam (ders):** (1) tam test arka planda çalışırken dal değiştirdim; o çalıştırmayı geçersiz sayıp yeniden çalıştırdım. (2) Bir belge düzenlemesinde dosyanın sonunu sildim, hemen fark edip geri aldım. (3) İki kez test dosyası birleştirmesinde ortak kapanış satırı kayboldu; test listesiyle (`--list`) yakalandı. Kural: birleştirmeden sonra `npx playwright test --list`.
+**Arşiv:** session_01S2TfjxvS8R2SAVzKDaVRZv arşivlendi.
 
 ### 16 Ekim 2026 (sabah) — K36, K37, testler 3 kat hızlı, kesinti testleri, kod denetimi 4. tur
 **Birleşenler (`test` son hâlinde yeşil ve okunarak, K35):**
