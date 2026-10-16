@@ -209,14 +209,20 @@ const KAMERA_AYARI: MediaStreamConstraints = { video: { facingMode: 'user', widt
 async function kameraAc(ortak: boolean): Promise<MediaStream> {
   if (!ortak) return navigator.mediaDevices.getUserMedia(KAMERA_AYARI);
   if (ortakAkis && ortakAkis.getVideoTracks().every((t) => t.readyState === 'live')) return ortakAkis;
-  ortakKamerayiKapat();
+  ortakKamerayiKapat(false);
   ortakAkis = await navigator.mediaDevices.getUserMedia(KAMERA_AYARI);
   return ortakAkis;
 }
 
-export function ortakKamerayiKapat() {
+// Oyundaki hareket ekranında vücut tanıma modeli yüklenemediyse (eski/zayıf telefon) ortak kamera hemen kapanır ve
+// hareket ekranından çıkana kadar (o durak boyunca) bir daha açılmaz (K38): ışık boşuna yanık kalmasın, her harekette
+// yeniden indirme denenip izin sorulmasın. Oyun kamerasız sürer ("Yaptım!" aynen).
+let ortakModelYok = false;
+
+export function ortakKamerayiKapat(durakBitti = true) {
   ortakAkis?.getTracks().forEach((t) => t.stop());
   ortakAkis = null;
+  if (durakBitti) ortakModelYok = false;
 }
 
 export class KameraSayaci {
@@ -256,9 +262,15 @@ export class KameraSayaci {
 
   async baslat() {
     let acilan: Promise<MediaStream> | undefined;
+    let modelHatasi = false;
     try {
+      if (this.ortak && ortakModelYok) throw new Error('model bu durakta yüklenemedi');
+      const modelSozu = modelYukle().catch((e) => {
+        modelHatasi = true;
+        throw e;
+      });
       acilan = kameraAc(this.ortak);
-      const [model, akis] = await Promise.all([modelYukle(), acilan]);
+      const [model, akis] = await Promise.all([modelSozu, acilan]);
       if (this.bitti) {
         if (!this.ortak) akis.getTracks().forEach((t) => t.stop());
         return;
@@ -306,9 +318,12 @@ export class KameraSayaci {
       };
       dongu();
     } catch (e) {
-      // Model yüklenemedi (eski/zayıf telefon) ama kamera açıldıysa: ebeveyn ekranlarında kamera açık (ışığı yanık) kalmasın.
-      // Oyundaki ortak kamera hareket ekranından çıkınca zaten kapanır.
-      if (!this.ortak) void acilan?.then((a) => a.getTracks().forEach((t) => t.stop()), () => undefined);
+      // Model yüklenemedi (eski/zayıf telefon) ama kamera açıldıysa: kamera açık (ışığı yanık) kalmasın.
+      // Oyundaki ortak kamera da kapanır ve bu durakta bir daha açılmaz (K38).
+      if (this.ortak && modelHatasi) {
+        ortakModelYok = true;
+        void acilan?.then(() => ortakKamerayiKapat(false), () => undefined);
+      } else if (!this.ortak) void acilan?.then((a) => a.getTracks().forEach((t) => t.stop()), () => undefined);
       this.hata = kameraHatasi(e);
       this.bildir('hata');
     }
