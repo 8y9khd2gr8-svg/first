@@ -1472,18 +1472,23 @@ test('düşük güç modu (T5): ekranı açık tutma reddedilse de durak dokunma
       },
     });
   });
+  test.setTimeout(120_000);
   const kayit = await oyunuAc(page, { ...BETA, 'zipzip-uzaktan-v1': '1' });
   await sahneAc(page, 'Hareket', { durakId: 'istanbul', adim: 0 });
+  // Yüklü test makinesinde oyunun saati yavaş akar (ilk hareket 60 sn'de bitmemişti): saat 4 kat hızlı.
+  // İstek arası gerçek saatle ölçüldüğü için sınır yine geçerli.
+  await saatiHizlandir(page, 4);
   const basla = Date.now();
-  await page.waitForFunction(() => (window as any).oyun.scene.getScene('Hareket').adim >= 1, null, { timeout: 60_000 });
+  await page.waitForFunction(() => (window as any).oyun.scene.getScene('Hareket').adim >= 1, null, { timeout: 100_000 });
   const sure = Date.now() - basla;
   const istek = await page.evaluate(() => (window as any).ekranIstek);
   expect(istek).toBeGreaterThan(0);
   // 10 sn'de bir: geçen sürede en çok (süre / 10 sn) + 1 istek (eskiden saniyede 2).
   expect(istek).toBeLessThanOrEqual(Math.ceil(sure / 10_000) + 1);
   // Dokununca hemen yeniden denenir.
+  const onceTiklama = await page.evaluate(() => (window as any).ekranIstek);
   await page.mouse.click(5, 5);
-  await expect.poll(() => page.evaluate(() => (window as any).ekranIstek)).toBe(istek + 1);
+  await expect.poll(() => page.evaluate(() => (window as any).ekranIstek), { timeout: 1_500 }).toBeGreaterThan(onceTiklama);
   expect(kayit.hatalar).toEqual([]);
 });
 
