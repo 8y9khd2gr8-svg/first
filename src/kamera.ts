@@ -255,11 +255,10 @@ export class KameraSayaci {
   }
 
   async baslat() {
+    let acilan: Promise<MediaStream> | undefined;
     try {
-      const [model, akis] = await Promise.all([
-        modelYukle(),
-        kameraAc(this.ortak),
-      ]);
+      acilan = kameraAc(this.ortak);
+      const [model, akis] = await Promise.all([modelYukle(), acilan]);
       if (this.bitti) {
         if (!this.ortak) akis.getTracks().forEach((t) => t.stop());
         return;
@@ -307,6 +306,9 @@ export class KameraSayaci {
       };
       dongu();
     } catch (e) {
+      // Model yüklenemedi (eski/zayıf telefon) ama kamera açıldıysa: ebeveyn ekranlarında kamera açık (ışığı yanık) kalmasın.
+      // Oyundaki ortak kamera hareket ekranından çıkınca zaten kapanır.
+      if (!this.ortak) void acilan?.then((a) => a.getTracks().forEach((t) => t.stop()), () => undefined);
       this.hata = kameraHatasi(e);
       this.bildir('hata');
     }

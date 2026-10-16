@@ -1142,3 +1142,17 @@ test('ebeveyn özeti: toplam durak betada 14, bütün bölümler açıkken 50 ü
     expect(kayit.hatalar).toEqual([]);
   }
 });
+
+// Kod denetimi 4. tur: kamera açıldı ama vücut tanıma modeli yüklenemedi (eski/zayıf telefon). Kamera kapanmalı
+// (ışığı yanık kalmamalı) ve ebeveyn "Kamera açılamadı" görmeli.
+test('kamera denemesi: model yüklenemezse kamera kapanır, "Kamera açılamadı" yazar', async ({ page }) => {
+  await sahteKamera(page);
+  await page.route('**/mediapipe/**', (r) => r.abort());
+  const kayit = await oyunuAc(page, BETA);
+  await sahneAc(page, 'EbeveynKamera');
+  const r = (await page.locator('canvas').boundingBox())!;
+  await page.mouse.click(r.x + r.width / 2, r.y + (r.height * 635) / 1280); // 📷 Kamerayı aç
+  await kameraYazisi(page, 'EbeveynKamera', 'Kamera açılamadı');
+  await expect.poll(() => page.evaluate(() => (window as any).sahteAkis?.getVideoTracks()[0]?.readyState), { timeout: 5_000 }).toBe('ended');
+  expect(kayit.hatalar.filter((h) => !h.startsWith('Failed to load resource'))).toEqual([]); // engellenen model dosyaları
+});
