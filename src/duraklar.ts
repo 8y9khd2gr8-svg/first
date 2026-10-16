@@ -836,6 +836,8 @@ const hepsiAcikMi = () => {
   }
 };
 export const bolumYakindaMi = (id: BolumId) => !BETA_BOLUMLERI.includes(id) && !hepsiAcikMi();
+// Açık bölümlerin ("Yakında" olmayanların) durakları: betada 14, bütün bölümler açılınca 50.
+export const acikDuraklar = () => TUM_DURAKLAR.filter((d) => !bolumYakindaMi(d.bolum));
 
 // Bölüm açık mı? Betada olmayan bölüm "yakında"; önceki bölüm bitmiş olmalı; Türkiye dışındaki bölümler ayrıca tam sürüm ister.
 // Beta düğmesi (ebeveyn köşesi) önceki/ödeme kilidini atlar (betada bu Dünya'yı açar); mağazaya çıkmadan kaldırılacak.

@@ -1,8 +1,10 @@
 import { AILE_OTURUMU } from './aile';
-import { DINOZOR, DUNYA, EVDE, OKYANUS, SPOR, TUM_DURAKLAR, TURKIYE, UZAY, bolumYakindaMi, oturum } from './duraklar';
+import { DINOZOR, DUNYA, EVDE, OKYANUS, SPOR, TUM_DURAKLAR, TURKIYE, UZAY, acikDuraklar, oturum } from './duraklar';
 import { tamamlananlar } from './ilerleme';
-import { H, ISINMALAR, SOGUMALAR } from './hareketler';
+import { AYNA, AYNA_HAVUZU, DONMA, H, ISINMALAR, SOGUMALAR, type Hareket } from './hareketler';
 import { haftalikOzet } from './istatistik';
+import { oyunAyari, type OyunAyari } from './oyunAyari';
+import { uyarla } from './uyarla';
 
 // Rozetler: kazanılıp kazanılmadığı her seferinde mevcut kayıtlardan hesaplanır.
 // Cihazda sadece "kutlaması yapılanlar" listesi tutulur (yeni rozeti bir kez kutlamak için).
@@ -26,11 +28,30 @@ const toplam = (d: Durum, ...animasyonlar: string[]) => animasyonlar.reduce((t, 
 const TUM_ANIMASYONLAR = [...new Set([...Object.values(H), ...ISINMALAR, ...SOGUMALAR, ...TUM_DURAKLAR.map((x) => x.ozel)].map((h) => h.animasyon))];
 // Sadece açık bölümlerde (betada "Yakında" olmayanlar) ve ısınma/soğuma/Ailece'de gelebilen hareketler sayılır (K26, 15 Ekim):
 // betada çocuk kapalı bölümlerin hareketlerini hiç göremez, rozet yoksa asla kazanılamazdı. Bütün bölümler açılınca liste hepsi olur.
-export function kesfedilecekHareketler(): string[] {
-  const gelen = new Set(
-    [...TUM_DURAKLAR.filter((x) => !bolumYakindaMi(x.bolum)).flatMap(oturum), ...ISINMALAR, ...SOGUMALAR, ...AILE_OTURUMU].map((h) => h.animasyon),
-  );
+export function kesfedilecekHareketler(ayar: OyunAyari = oyunAyari()): string[] {
+  const gelen = new Set((ayar.oturarak ? oturarakGelenler() : [...acikDuraklar().flatMap(oturum), ...ISINMALAR, ...SOGUMALAR, ...AILE_OTURUMU]).map((h) => h.animasyon));
   return TUM_ANIMASYONLAR.filter((a) => gelen.has(a));
+}
+
+// Oturarak oyna açıkken (K37, 16 Ekim) ayakta yapılan hareketler hiç gelmez; sadece oturarak hâlde gelebilenler sayılır.
+// oturum.ts'in kurabileceği her liste (ısınma var/yok, donma/ayna, soğuma var/yok, tek başına soğuma) uyarla'dan geçirilir.
+// Ailece sayılmaz: orada hareketler ayakta kalır (bir büyükle oynanır, ayar uygulanmaz).
+function oturarakGelenler(): Hareket[] {
+  const ayar: OyunAyari = { yas: 'buyuk', oturarak: true };
+  const sonuc: Hareket[] = SOGUMALAR.flatMap((s) => uyarla([s], ayar));
+  for (const durak of acikDuraklar()) {
+    const kendi = oturum(durak);
+    const durakta = new Set(kendi.map((h) => h.animasyon));
+    const ayna = AYNA_HAVUZU.filter((a) => !durakta.has(a));
+    // Ayna oyununun dört hareketi de kol/gövde hareketi olabilir; o zaman liste farklı dönüşür, o hâli de denenir.
+    const aynaOturarak = ayna.filter((a) => ['kollar', 'kanat', 'yanaEgil', 'belDondur'].includes(a));
+    const surprizler = [DONMA, { ...AYNA, dizi: ayna }, ...(aynaOturarak.length >= 4 ? [{ ...AYNA, dizi: aynaOturarak }] : [])];
+    for (const isinma of [undefined, ...ISINMALAR.filter((h) => !durakta.has(h.animasyon))])
+      for (const surpriz of surprizler)
+        for (const soguma of [undefined, ...SOGUMALAR])
+          sonuc.push(...uyarla([...(isinma ? [isinma] : []), ...kendi, surpriz, ...(soguma ? [soguma] : [])], ayar));
+  }
+  return sonuc;
 }
 
 const KOSULLAR: (Rozet & { kazanildi: (d: Durum) => boolean })[] = [
