@@ -47,6 +47,8 @@ Onay verilmemiş, ertelenmiş ya da reddedilmiş öneriler de buraya yazılır; 
 | K33 | ✅ Otonom çalışma ve onay politikası | **15 Ekim akşamı kullanıcı** (K32'den hemen sonra): küçük, geri alınabilir işler sorulmadan yapılır, görev sonunda tek rapor; **main'e birleştirme, yayın, güvenlik/izin, para, çocuk/kamera verisi, gizlilik, büyük mimari/oynanış değişikliği, geri dönüşsüz silme için onay**. Tam metin `docs/calisma-politikasi.md`; CLAUDE.md güncellendi | Çalışma kuralı | 15 Ekim |
 | K34 | ✅ Yağız testi bulguları (15 Ekim akşamı) | (1) Kamera açıkken iPhone 2-3 harekette bir yeniden kamera izni soruyordu (her kamera hareketinde kamera kapanıp yeniden açılıyordu). (2) "Uzaktan oyna" ile 3-2-1 beklerken ekran kararıyordu (otomatik kilit). **Düzeltildi (#131, 16 Ekim birleşti; dokunmadan bütün durak/Ailece testi eski kodda 63/51 kez kilitsiz):** kamera aynı durakta hareketler arasında açık kalır, hareket ekranından çıkınca kapanır (arada görüntü işlenmez; gizlilik.html cümlesi güncellendi); Durak/Hareket/kamera deneme ekranlarında Wake Lock ile ekran açık. 🔎 Wake Lock iPhone ana ekran uygulamasında iOS 18.4'ten önce çalışmayabilir; Android/iPhone mağaza paketinde (Capacitor) ayrı eklenti gerekebilir; gerçek telefonda denenmeli. Kullanıcı yeğenlerine test sitesi bağlantısını gönderecek | Çocuk testi | 15 Ekim |
 | K35 | ✅ Birleştirme yine otomatik | **16 Ekim kullanıcı:** "Neden birleştir diyorum, otomatik niye birleştirmiyorsun?" → seçti: testler yeşilse Claude sormadan birleştirir. Oynanışı ciddi değiştiren, yayın/dağıtım (mağaza), güvenlik/izin, para, çocuk/kamera verisi, geri dönüşsüz silme için onay sürer. #129-#131 bu kararla birleşti | Çalışma kuralı | 16 Ekim |
+| K36 | ⏳ Ebeveyn özetinde "toplam durak" 50 üzerinden | Betada sadece 14 durak açık; özet "2 / 50 durak" gösteriyor, ebeveyn "çok az" sanabilir. Seçenekler: (a) betada açık durakların sayısı ("2 / 14") (önerilen) (b) böyle kalsın (c) bölüm satırları yeterli, toplam kutusu kalksın. Kod değişmedi | Ebeveyn yanlış anlamasın | 16 Ekim |
+| K37 | ⏳ Oturarak oynayan çocuk Hareket Kâşifi'ni kazanamaz | Oturarak oyunda ayakta yapılan hareketler hiç gelmez. Seçenekler: (a) oturarak ayarı açıkken sadece oturarak gelen hareketler sayılsın (b) böyle kalsın. Kod değişmedi | Hareket kısıtı olan çocuk | 16 Ekim |
 
 ## 2. Kullanıcıda bekleyenler
 
@@ -69,6 +71,18 @@ Onay verilmemiş, ertelenmiş ya da reddedilmiş öneriler de buraya yazılır; 
 ---
 
 ## 4. Oturum günlüğü (en yeni üstte)
+
+### 16 Ekim 2026 (gece) — aile testi düzeltmeleri, onay kuralı, kod denetimi 3. tur
+**Birleşenler:** #129 (K33 politika + kayıt), #130 (K26 Hareket Kâşifi: açık bölümler sayılır), #131 (aile testi: kamera izni bir kez,
+ekran kararmaz; dokunmadan bütün durak/Ailece testi eski kodda 63/51 kez kilitsiz), #132 (K35: testler yeşilse sormadan birleştir).
+**Açık / birleşecek:** #133 (ödül ekranında da ekran açık + kilitten dönüş testi), #134 (mağaza paketinde ekran açık: keep-awake 7.1.0;
+Android deneme paketi derlemesi çalıştırıldı), bu kayıt.
+**Ders (kullanıcı haklı):** ekran kararması 14 Ekim'de kayıttaydı; "dokunmadan oyna" (Uzaktan/Ailece) eklenirken tekrar düşünülmeliydi.
+Bulut testleri ekransız tarayıcıda çalışıyor, telefon davranışlarını görmez → `docs/telefon-kontrol-listesi.md` (T1-T10); kamera/ses/
+ekran/dokunmadan oynama değişikliklerinde Claude bu listeyi kendisi gözden geçirir ve raporlar.
+**Kod denetimi 3. tur** (Ödül, Ebeveyn kilidi, Avatar, Rozet, Kostüm, Açılış, Ebeveyn ayarları, Tam sürüm, Zıpzıp da zıplasın, Ebeveyn
+özeti): kesin hata yok. Belirsiz: K36 (özette 50 durak), K37 (oturarak + Hareket Kâşifi).
+**Test bağlantısı:** https://8y9khd2gr8-svg.github.io/first/ (kullanıcı yeğenlerine gönderecek).
 
 ### 15 Ekim 2026 (akşam) — kullanıcı kararları, K30
 **Kararlar:** K30 → ses "Oyuncak Dansı" desin · K26 beklet · K23 sonuç gelmeden algılama doğrulanmış sayılmaz · **K31: birleştirme
