@@ -18,7 +18,8 @@ function sesBaglami(): AudioContext | null {
     if (!Sinif) return null;
     baglam = new Sinif();
   }
-  if (baglam.state === 'suspended') void baglam.resume();
+  // iPhone'da arama/alarmdan sonra durum "interrupted" olur (sadece "suspended" değil); çalışmıyorsa yeniden açılır.
+  if (baglam.state !== 'running' && baglam.state !== 'closed') void baglam.resume().catch(() => undefined);
   return baglam;
 }
 
@@ -166,6 +167,14 @@ export function sustur() {
   if (uygulamada) void TextToSpeech.stop().catch(() => undefined);
   else if ('speechSynthesis' in window) speechSynthesis.cancel();
 }
+
+// Bildirim/arama, ekran kilidi ya da başka uygulama (kontrol listesi T3, T4, T10): sayfa gizlenince konuşma susar.
+// Oyunun saati de durur (Phaser); cümle arkada sürüp dönüşte yenisiyle üst üste binmesin, ağız açık kalmasın.
+// Dönüşte iPhone'da "duraklatılmış" kalan tarayıcı konuşması sürdürülür (yoksa sonraki cümleler hiç okunmaz).
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) sustur();
+  else if (!uygulamada && 'speechSynthesis' in window && speechSynthesis.paused) speechSynthesis.resume();
+});
 
 // Ebeveyn köşesindeki "Sesi dene" için: oyun bu telefonda hangi sesle konuşuyor?
 export type SesDurumu = { kayitli: number; turkce: boolean; sesAdi?: string; internetsiz?: boolean };
