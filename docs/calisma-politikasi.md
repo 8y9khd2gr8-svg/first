@@ -1,4 +1,7 @@
-# Zıp Zıp Dünya — Otonom Çalışma ve Onay Politikası (K33, 15 Ekim 2026 akşamı)
+# Zıp Zıp Dünya — Otonom Çalışma ve Onay Politikası (K33, 15 Ekim 2026 akşamı; K35 ile güncellendi)
+
+> **K35 (16 Ekim, kullanıcı seçti):** GitHub `test` kontrolü PR'ın son hâlinde yeşil ve okunmuşsa Claude **sormadan birleştirir**.
+> Aşağıdaki 2. bölümün ilk maddesi (main'e birleştirme onayı) bu yüzden geçerli değil; diğer bütün onay maddeleri aynen geçerli.
 
 Kullanıcının verdiği politika (aksi açıkça belirtilmedikçe her görevde geçerli). K21, K24, K31 ve K32'nin yerine geçer.
 
