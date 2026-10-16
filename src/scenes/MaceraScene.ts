@@ -156,7 +156,7 @@ export class MaceraScene extends Phaser.Scene {
             return;
           }
           if (!acik) {
-            this.tweens.add({ targets: kap, x: nx + 8, duration: 50, yoyo: true, repeat: 3 });
+            this.tweens.add({ targets: kap, x: { from: nx, to: nx + 8 }, duration: 50, yoyo: true, repeat: 3 });
             kilitliBolumeDokun(this, s.id);
             return;
           }
