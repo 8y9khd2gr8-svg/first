@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { test } from 'node:test';
 import type { NormalizedLandmark } from '@mediapipe/tasks-vision';
-import { BURUN, KAMERA_HAREKETLERI, kameraDurumYazisi, kameraHatasi, ZIPLAMA_EN_AZ_ARA_MS, SAG_BILEK, SAG_DIZ, SAG_KALCA, SAG_OMUZ, SAG_TOPUK, SOL_BILEK, SOL_DIZ, SOL_KALCA, SOL_OMUZ, SOL_TOPUK, Sayici, simdVarMi } from '../src/kamera';
+import { BURUN, eksikNoktalar, GEREKEN_NOKTALAR, KAMERA_HAREKETLERI, kameraDurumYazisi, saymaYolu, kameraHatasi, ZIPLAMA_EN_AZ_ARA_MS, SAG_BILEK, SAG_DIZ, SAG_KALCA, SAG_OMUZ, SAG_TOPUK, SOL_BILEK, SOL_DIZ, SOL_KALCA, SOL_OMUZ, SOL_TOPUK, Sayici, simdVarMi } from '../src/kamera';
 import { K } from '../src/hareketler';
 
 type Durus = { x?: number; omuzY?: number; kalcaY?: number; bilekY?: number; solDizY?: number; sagDizY?: number; ayakAciklik?: number; topukY?: number };
@@ -144,4 +144,85 @@ test('kamera açılamayınca nedeni ayrılır: kamera yok / izin yok / başka', 
   assert.match(kameraDurumYazisi('hata', 'kameraYok', ''), /bulunamadı/);
   assert.match(kameraDurumYazisi('hata', 'izinYok', ''), /izin verilmedi/);
   assert.match(kameraDurumYazisi('durdu', null, ''), /durdu/);
+});
+
+// K41: hangi vücut noktaları görünmezse sayım durur? Kamera her karede Sayici.kare'yi çağırır (oyundaki yol aynen).
+// Mevcut davranışı belgeler; eşikler ve "omuzlar + topuklar" şartı değişmedi.
+const gizle = (n: NormalizedLandmark[], ...noktalar: number[]) => n.map((p, i) => (noktalar.includes(i) ? { ...p, visibility: 0.1 } : p));
+// Kollar hareketi: iki bilek başın üstüne çıkar, iner (her tekrar 6+6 kare). donustur her karede noktaları değiştirir.
+function kollarSay(donustur: (n: NormalizedLandmark[], kareNo: number) => NormalizedLandmark[] | undefined, adet = 5) {
+  const s = new Sayici('kollar');
+  const durumlar = new Set<string>();
+  let zaman = 0;
+  let kareNo = 0;
+  const besle = (d: Durus) => durumlar.add(s.kare(donustur(nokta(d), kareNo++), (zaman += 50)));
+  for (let k = 0; k < 10; k++) besle({});
+  for (let i = 0; i < adet; i++) for (const d of [{ bilekY: 0.1 }, {}]) for (let k = 0; k < 6; k++) besle(d);
+  return { sayi: s.sayi, durumlar: [...durumlar] };
+}
+
+test('K41: sayım için iki omuz ve iki topuk görünmeli (kollar hareketinde de)', () => {
+  assert.deepEqual(kollarSay((n) => n), { sayi: 5, durumlar: ['goruyorum'] });
+  // Telefon masada: baş, omuzlar ve kollar görünüyor, topuklar kadraj dışında → hiç sayılmaz, kutu "Geri git".
+  assert.deepEqual(kollarSay((n) => gizle(n, SOL_TOPUK, SAG_TOPUK)), { sayi: 0, durumlar: ['goremiyorum'] });
+  assert.deepEqual(kollarSay((n) => gizle(n, SAG_TOPUK)), { sayi: 0, durumlar: ['goremiyorum'] });
+  assert.deepEqual(kollarSay((n) => gizle(n, SOL_TOPUK)), { sayi: 0, durumlar: ['goremiyorum'] });
+  assert.deepEqual(kollarSay((n) => gizle(n, SOL_OMUZ, SAG_OMUZ)), { sayi: 0, durumlar: ['goremiyorum'] });
+  assert.deepEqual(kollarSay((n) => gizle(n, SOL_OMUZ)), { sayi: 0, durumlar: ['goremiyorum'] });
+  // Kimse yok (model kişi bulamadı).
+  assert.deepEqual(kollarSay(() => undefined), { sayi: 0, durumlar: ['goremiyorum'] });
+  // Dizler, kalçalar, burun görünmese de "görüyorum" denir (şart sadece omuzlar + topuklar).
+  assert.deepEqual(kollarSay((n) => gizle(n, SOL_DIZ, SAG_DIZ, SOL_KALCA, SAG_KALCA)).durumlar, ['goruyorum']);
+});
+
+test('K41: gerekli noktalar ve görünürlük sınırı (0,5)', () => {
+  const tam = nokta({});
+  assert.deepEqual(eksikNoktalar(tam), []);
+  assert.deepEqual(eksikNoktalar(undefined), [...GEREKEN_NOKTALAR]);
+  assert.deepEqual(eksikNoktalar(gizle(tam, SOL_TOPUK, SAG_TOPUK)), [SOL_TOPUK, SAG_TOPUK]);
+  const gorunurluk = (v: number) => tam.map((p, i) => (i === SAG_TOPUK ? { ...p, visibility: v } : p));
+  assert.deepEqual(eksikNoktalar(gorunurluk(0.5)), [SAG_TOPUK]); // tam 0,5 yetmez
+  assert.deepEqual(eksikNoktalar(gorunurluk(0.51)), []);
+  // Görünürlük değeri olmayan nokta görünmez sayılır.
+  assert.deepEqual(eksikNoktalar(tam.map((p, i) => (i === SOL_OMUZ ? { x: p.x, y: p.y, z: 0 } : p))), [SOL_OMUZ]);
+});
+
+test('K41: kadraj kenarı: sadece görünürlüğe bakılır, koordinat kadraj dışında olsa da görünür sayılırsa sayılır', () => {
+  // Çocuk sağ kenarda (x ~0,95): hepsi görünür → sayılır.
+  assert.equal(kollarSay((n) => n.map((p) => ({ ...p, x: p.x + 0.45 }))).sayi, 5);
+  // Topuklar kadrajın altında (y > 1) ama model onları yine "görünür" sayarsa sayım sürer (mevcut davranış;
+  // gerçek modelin kadraj dışı noktaya ne görünürlük verdiği gerçek kamerayla bakılmalı).
+  assert.equal(kollarSay((n) => n.map((p, i) => (i === SOL_TOPUK || i === SAG_TOPUK ? { ...p, y: 1.08 } : p))).sayi, 5);
+});
+
+test('K41: vücut kısmen görünür, güven değeri titrer: görünmeyen kareler sayılmaz ama sayım durumu korunur', () => {
+  // Her üç kareden biri kaçar (topuklar o karede görünmez): 5 tekrar yine 5.
+  assert.equal(kollarSay((n, k) => (k % 3 === 2 ? gizle(n, SOL_TOPUK, SAG_TOPUK) : n)).sayi, 5);
+  // Her üç kareden biri hiç kişi bulmaz (gecikmiş/boş sonuç): yine 5.
+  assert.equal(kollarSay((n, k) => (k % 3 === 2 ? undefined : n)).sayi, 5);
+  // Topukların güveni 0,45-0,55 arasında oynar: sadece görünür karelerde sayılır, tekrarlar kaybolmaz.
+  assert.equal(kollarSay((n, k) => n.map((p, i) => (i === SOL_TOPUK ? { ...p, visibility: k % 2 ? 0.45 : 0.55 } : p))).sayi, 5);
+  // Kollar hareketinde bir bilek görünmez: o kareler sayılmaz → hiç sayılmaz.
+  assert.equal(kollarSay((n) => gizle(n, SOL_BILEK)).sayi, 0);
+});
+
+test('K41: hatalı hareket: kollar beklenirken zıplamak, zıplama beklenirken kol kaldırmak sayılmaz', () => {
+  assert.equal(say('kollar', () => [HAVADA, {}], 5), 0);
+  assert.equal(say('comel', () => [{ bilekY: 0.1 }, {}], 5), 0);
+  // Eksik hareket: kollar başın üstüne değil omuz hizasına kalkar → sayılmaz (iki bilek burnun üstüne çıkmalı).
+  assert.equal(say('kollar', () => [{ bilekY: 0.3 }, {}], 5), 0);
+  // Tek kol kalkar → sayılmaz (iki bilek de yukarıda olmalı).
+  const tekKol = (d: Durus) => nokta(d).map((p, i) => (i === SAG_BILEK ? { ...p, y: 0.55 } : p));
+  const s = new Sayici('kollar');
+  for (let i = 0; i < 5; i++) for (const d of [{ bilekY: 0.1 }, {}]) for (let k = 0; k < 6; k++) s.kare(tekKol(d));
+  assert.equal(s.sayi, 0);
+});
+
+test('K41: her kameralı hareketin bir sayma yolu var; çok yakın (omuz-topuk çok kısa) görüntü sayılmaz', () => {
+  for (const a of KAMERA_HAREKETLERI) assert.ok(saymaYolu(a), a);
+  assert.equal(saymaYolu('kanat' as never), undefined);
+  // Boy (omuz-topuk) görüntünün %5'inden kısa: sayılmaz ama "görüyorum" denir.
+  const s = new Sayici('kollar');
+  for (let i = 0; i < 5; i++) for (const d of [{ bilekY: 0.1, omuzY: 0.3, topukY: 0.34 }, { omuzY: 0.3, topukY: 0.34 }]) for (let k = 0; k < 6; k++) assert.equal(s.kare(nokta(d)), 'goruyorum');
+  assert.equal(s.sayi, 0);
 });

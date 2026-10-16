@@ -1,6 +1,6 @@
 # Her PR'da oyunu derler ve testleri çalıştırır (Actions sekmesinden elle de başlatılabilir).
 # Testler geçmeden PR birleştirilmez.
-# Hız (16 Ekim): oyun testleri 5 parçaya bölünüp aynı anda 5 makinede koşar (önce tek makinede ~16 dk).
+# Hız (16 Ekim): oyun testleri 5 parçaya (kamera benzetimiyle 7) bölünüp aynı anda 5 makinede koşar (önce tek makinede ~16 dk).
 # Dal koruması "test" adlı kontrole bakar: en sondaki "test" işi, bütün parçalar ve veri testleri geçtiyse yeşil olur.
 name: Testler
 
@@ -46,6 +46,10 @@ jobs:
             secim: tests/oyun.spec.ts --shard=1/2
           - ad: ekranlar 2/2
             secim: tests/oyun.spec.ts --shard=2/2
+          - ad: kamera benzetimi 1/2
+            secim: tests/kamera-benzetim.spec.ts --shard=1/2
+          - ad: kamera benzetimi 2/2
+            secim: tests/kamera-benzetim.spec.ts --shard=2/2
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7

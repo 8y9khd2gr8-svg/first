@@ -33,14 +33,34 @@ const SAYMA_YOLU: Partial<Record<Animasyon, SaymaYolu>> = {
   yanAdim: 'yanAdim',
 };
 export const KAMERA_HAREKETLERI = Object.keys(SAYMA_YOLU) as Animasyon[];
+export const saymaYolu = (a: Animasyon): SaymaYolu | undefined => SAYMA_YOLU[a];
 
 // Vücut noktalarının numaraları (MediaPipe Pose).
 export const BURUN = 0, SOL_OMUZ = 11, SAG_OMUZ = 12, SOL_BILEK = 15, SAG_BILEK = 16, SOL_KALCA = 23, SAG_KALCA = 24, SOL_DIZ = 25, SAG_DIZ = 26, SOL_TOPUK = 27, SAG_TOPUK = 28;
 
+// Bir nokta, model onu bu olasılıktan yüksek "görünür" bulursa kullanılır.
+export const GORUNUR_ESIK = 0.5;
+// Sayma için hepsi görünmesi gereken noktalar: iki omuz ve iki topuk. Eşikler vücut boyuna (omuz-topuk) göre olduğundan
+// her sayma yolu (kollar dahil) ikisini de ister. Biri eksikse hiç sayılmaz, kutu "Geri git" der (K41).
+export const GEREKEN_NOKTALAR = [SOL_OMUZ, SAG_OMUZ, SOL_TOPUK, SAG_TOPUK] as const;
+// Görünmeyen gerekli noktalar (boşsa çocuk baştan ayağa görünüyor). Kimse yoksa hepsi eksik.
+// Sadece görünürlüğe bakılır: model kadraj dışındaki bir noktayı tahminle "görünür" sayarsa (kenarda) o da kullanılır.
+export const eksikNoktalar = (n: NormalizedLandmark[] | undefined): number[] =>
+  GEREKEN_NOKTALAR.filter((i) => !((n?.[i]?.visibility ?? 0) > GORUNUR_ESIK));
+
 let modelSozu: Promise<PoseLandmarker> | null = null;
+
+// Benzetim (sadece geliştirme sunucusunda, otomatik testler için): gerçek model yerine testin verdiği vücut noktaları.
+// Yayın paketinde import.meta.env.DEV false olduğundan bu dal derlemede tamamen çıkar (tests/kamera-benzetim.spec.ts denetler).
+// Gerçek kamera doğrulaması değildir: sadece sayma kurallarını ve ekrandaki yazıları dener.
+type Benzetim = { model?: () => Promise<Pick<PoseLandmarker, 'detectForVideo'>> };
 
 // Model ilk kullanımda yüklenir (oyunun açılışını yavaşlatmasın diye ayrı parça).
 function modelYukle(): Promise<PoseLandmarker> {
+  if (import.meta.env.DEV) {
+    const benzetim = (window as unknown as { zipzipBenzetim?: Benzetim }).zipzipBenzetim;
+    if (benzetim?.model) return benzetim.model() as Promise<PoseLandmarker>;
+  }
   modelSozu ??= (async () => {
     const { FilesetResolver, PoseLandmarker } = await import('@mediapipe/tasks-vision');
     const kok = new URL('mediapipe/', document.baseURI).href;
@@ -105,9 +125,17 @@ export class Sayici {
     this.yol = SAYMA_YOLU[animasyon];
   }
 
+  // Kameranın bir karesi: tüm vücut (omuzlar ve topuklar) görünüyorsa sayar; görünmüyorsa hiç saymaz (durum aynen kalır,
+  // ör. kollar yukarıdayken bir kare kaçsa da iniş yine sayılır). Kimse yoksa n undefined.
+  kare(n: NormalizedLandmark[] | undefined, zaman = performance.now()): 'goruyorum' | 'goremiyorum' {
+    if (!n || eksikNoktalar(n).length) return 'goremiyorum';
+    this.besle(n, zaman);
+    return 'goruyorum';
+  }
+
   // zaman: karenin zamanı (ms); testler yapay zaman verir.
   besle(n: NormalizedLandmark[], zaman = performance.now()) {
-    const gorunur = (i: number) => (n[i]?.visibility ?? 0) > 0.5;
+    const gorunur = (i: number) => (n[i]?.visibility ?? 0) > GORUNUR_ESIK;
     const orta = (a: number, b: number) => (n[a].y + n[b].y) / 2;
     const omuz = orta(SOL_OMUZ, SAG_OMUZ);
     const kalca = orta(SOL_KALCA, SAG_KALCA);
@@ -206,12 +234,31 @@ const OLCUM_PENCERESI = 30;
 let ortakAkis: MediaStream | null = null;
 const KAMERA_AYARI: MediaStreamConstraints = { video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } }, audio: false };
 
+// Kamera açılırken (izin penceresi açık, yavaş telefon) sıradaki harekete geçilirse ikinci kez açılmaz, aynı açılış beklenir.
+// Eskiden ikinci açılış ilkinin akışını ortakAkis'ten düşürüyordu; ilk kamera hiç kapanmadan açık kalıyordu.
+let ortakAcilis: Promise<MediaStream> | null = null;
+// ortakKamerayiKapat her çağrıldığında artar: açılış sürerken kamera kapatıldıysa (hareket ekranından çıkıldı) gelen akış hemen durdurulur.
+let ortakNesil = 0;
+
 async function kameraAc(ortak: boolean): Promise<MediaStream> {
   if (!ortak) return navigator.mediaDevices.getUserMedia(KAMERA_AYARI);
   if (ortakAkis && ortakAkis.getVideoTracks().every((t) => t.readyState === 'live')) return ortakAkis;
-  ortakKamerayiKapat(false);
-  ortakAkis = await navigator.mediaDevices.getUserMedia(KAMERA_AYARI);
-  return ortakAkis;
+  if (!ortakAcilis) {
+    ortakKamerayiKapat(false);
+    const nesil = ortakNesil;
+    ortakAcilis = navigator.mediaDevices
+      .getUserMedia(KAMERA_AYARI)
+      .then((akis) => {
+        if (nesil !== ortakNesil) {
+          akis.getTracks().forEach((t) => t.stop());
+          throw new Error('kamera açılırken kapatıldı');
+        }
+        ortakAkis = akis;
+        return akis;
+      })
+      .finally(() => (ortakAcilis = null));
+  }
+  return ortakAcilis;
 }
 
 // Oyundaki hareket ekranında vücut tanıma modeli yüklenemediyse (eski/zayıf telefon) ortak kamera hemen kapanır ve
@@ -222,6 +269,7 @@ let ortakModelYok = false;
 export function ortakKamerayiKapat(durakBitti = true) {
   ortakAkis?.getTracks().forEach((t) => t.stop());
   ortakAkis = null;
+  ortakNesil++;
   if (durakBitti) ortakModelYok = false;
 }
 
@@ -305,11 +353,8 @@ export class KameraSayaci {
           this.olcumEkle(simdi, bitis - simdi);
           const n = sonuc.landmarks[0];
           this.noktalarGelince?.(n);
-          // Tüm vücut (omuzlar ve topuklar) görünüyor mu?
-          const tamGorunuyor = !!n && [SOL_OMUZ, SAG_OMUZ, SOL_TOPUK, SAG_TOPUK].every((i) => (n[i]?.visibility ?? 0) > 0.5);
-          if (tamGorunuyor) {
-            const once = this.sayici.sayi;
-            this.sayici.besle(n, simdi);
+          const once = this.sayici.sayi;
+          if (this.sayici.kare(n, simdi) === 'goruyorum') {
             if (once !== this.sayici.sayi) this.sonSayimMs = performance.now() - simdi;
             if (this.durum !== 'goruyorum' || once !== this.sayici.sayi) this.bildir('goruyorum');
           } else if (this.durum !== 'goremiyorum') this.bildir('goremiyorum');
