@@ -1033,12 +1033,23 @@ async function ekranKilidiSahte(page: Page) {
   await page.addInitScript(() => {
     const w = window as any;
     w.ekranKilidi = { istek: 0, acik: false, kapaliIkenHareket: 0 };
+    // Gerçek tarayıcı gibi: sayfa gizlenince (ekran kilidi, başka uygulama) kilit kendiliğinden düşer ve "release" olayı gelir.
+    let dinleyiciler: (() => void)[] = [];
+    const birak = () => {
+      w.ekranKilidi.acik = false;
+      const d = dinleyiciler;
+      dinleyiciler = [];
+      d.forEach((f) => f());
+    };
+    w.sayfaGizli = false;
+    Object.defineProperty(document, 'hidden', { get: () => w.sayfaGizli });
+    document.addEventListener('visibilitychange', () => w.sayfaGizli && birak(), true);
     Object.defineProperty(navigator, 'wakeLock', {
       value: {
         request: async () => {
           w.ekranKilidi.istek++;
           w.ekranKilidi.acik = true;
-          return { release: async () => void (w.ekranKilidi.acik = false), addEventListener: () => {} };
+          return { release: async () => birak(), addEventListener: (_: string, f: () => void) => dinleyiciler.push(f) };
         },
       },
     });
@@ -1064,6 +1075,9 @@ for (const [ad, durakId, depo] of [
       }, 500), 1000);
     });
     await page.waitForFunction(() => (window as any).oyun.scene.isActive('Odul'), null, { timeout: 280_000, polling: 500 });
+    // Durak bitti: çocuk hâlâ uzakta, ödül ekranında da ekran kararmamalı.
+    await page.waitForTimeout(2000);
+    expect(await page.evaluate(() => (window as any).ekranKilidi.acik)).toBe(true);
     const sonuc = await page.evaluate(() => ({ ...(window as any).ekranKilidi, kamera: (window as any).kameraAcilma ?? 0 }));
     expect(sonuc.kapaliIkenHareket).toBe(0);
     expect(sonuc.istek).toBeGreaterThanOrEqual(1);
@@ -1073,3 +1087,46 @@ for (const [ad, durakId, depo] of [
     expect(kayit.hatalar).toEqual([]);
   });
 }
+
+// Telefon kilitlenip açılınca (ya da başka uygulamadan dönünce) ekran kilidi yeniden istenir; kamera kapanmışsa
+// sıradaki harekette yeniden açılır (kontrol listesi T3).
+test('kilitten dönüş: ekran açık tutma ve kamera yeniden gelir', async ({ page }) => {
+  await sahteKamera(page);
+  await ekranKilidiSahte(page);
+  const kayit = await oyunuAc(page, { 'zipzip-kamera-v1': '1' });
+  await sahneAc(page, 'Hareket', { durakId: 'istanbul', adim: 0 });
+  const uzunluk = await page.evaluate(() => (window as any).oyun.scene.getScene('Hareket').liste().length);
+  let adim = 0;
+  const sonraki = async () => {
+    adim++;
+    await page.evaluate((adim) => (window as any).oyun.scene.getScene('Hareket').scene.restart({ durakId: 'istanbul', adim }), adim);
+    await page.waitForTimeout(700);
+  };
+  while (adim < uzunluk - 1 && !(await page.evaluate(() => !!(window as any).oyun.scene.getScene('Hareket').kamera))) await sonraki();
+  await expect.poll(() => page.evaluate(() => (window as any).sahteAkis?.getVideoTracks()[0]?.readyState), { timeout: 30_000 }).toBe('live');
+  await expect.poll(() => page.evaluate(() => (window as any).ekranKilidi.acik), { timeout: 5_000 }).toBe(true);
+  // Kilit: sayfa gizlenir, telefon kamerayı kapatır.
+  await page.evaluate(() => {
+    const w = window as any;
+    w.sayfaGizli = true;
+    document.dispatchEvent(new Event('visibilitychange'));
+    w.sahteAkis.getTracks().forEach((t: MediaStreamTrack) => t.stop());
+  });
+  expect(await page.evaluate(() => (window as any).ekranKilidi.acik)).toBe(false);
+  // Açılış: sayfa görünür olur; ekran kilidi yeniden istenir.
+  await page.evaluate(() => {
+    (window as any).sayfaGizli = false;
+    document.dispatchEvent(new Event('visibilitychange'));
+  });
+  await expect.poll(() => page.evaluate(() => (window as any).ekranKilidi.acik), { timeout: 5_000 }).toBe(true);
+  expect(await page.evaluate(() => (window as any).ekranKilidi.istek)).toBe(2);
+  // Kameralı bir sonraki harekette kamera yeniden açılır.
+  const once = await page.evaluate(() => (window as any).kameraAcilma);
+  do await sonraki();
+  while (adim < uzunluk - 1 && !(await page.evaluate(() => !!(window as any).oyun.scene.getScene('Hareket').kamera)));
+  if (await page.evaluate(() => !!(window as any).oyun.scene.getScene('Hareket').kamera)) {
+    await expect.poll(() => page.evaluate(() => (window as any).kameraAcilma), { timeout: 30_000 }).toBe(once + 1);
+    await expect.poll(() => page.evaluate(() => (window as any).sahteAkis.getVideoTracks()[0].readyState), { timeout: 30_000 }).toBe('live');
+  }
+  expect(kayit.hatalar).toEqual([]);
+});

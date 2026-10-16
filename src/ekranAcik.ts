@@ -5,7 +5,8 @@ import { ortakKamerayiKapat } from './kamera';
 // kendiliğinden geçmeyi beklerken telefonun otomatik kilidi ekranı karartıyordu.
 // Tarayıcının "ekranı açık tut" özelliği (Wake Lock) bu ekranlardayken istenir, çıkınca bırakılır. Destek yoksa
 // (eski telefon, bazı uygulama içi tarayıcılar) sessizce hiçbir şey yapılmaz; oyun aynen çalışır. Hiçbir şey kaydedilmez.
-const ACIK_TUTULAN = ['Durak', 'Hareket', 'ZiplaDeneme', 'EbeveynKamera'];
+// Ödül ekranı da: durak bitince çocuk hâlâ 2-3 m uzakta olabilir, kutlamayı ve sıradaki adımı görmeli.
+const ACIK_TUTULAN = ['Durak', 'Hareket', 'Odul', 'ZiplaDeneme', 'EbeveynKamera'];
 
 type Kilit = { release: () => Promise<void>; addEventListener: (ad: 'release', f: () => void) => void };
 let kilit: Kilit | null = null;
