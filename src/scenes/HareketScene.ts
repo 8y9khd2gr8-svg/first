@@ -24,7 +24,7 @@ type KutuHali = 'ayna' | 'hareket' | 'kucuk';
 const KUTU: Record<KutuHali, { x: number; y: number; g: number; y2: number; yazi: number }> = {
   ayna: { x: 60, y: 380, g: 600, y2: 620, yazi: 34 },
   hareket: { x: 470, y: 910, g: 234, y2: 260, yazi: 40 },
-  kucuk: { x: 551, y: 8, g: 150, y2: 140, yazi: 20 },
+  kucuk: { x: 551, y: 6, g: 150, y2: 126, yazi: 20 }, // hikâye satırının (y 170) üstünde kalır
 };
 // Kamera açıkken sayı ve alt yazı kutunun solunda ortalanır.
 const KAMERALI_YAZI_X = 250;
