@@ -1399,6 +1399,8 @@ test('büyük ayna (K40): kamera kapalıyken hareket ekranı aynen (ayna yok, sa
   expect(await page.evaluate(() => (window as any).gorulen.includes('Ekranda kendine bak!'))).toBe(false);
   expect(await page.evaluate(() => [(window as any).oyun.scene.getScene('Hareket').sayac.x, document.querySelector('.kamera-kutusu')])).toEqual([360, null]);
   expect(kayit.hatalar).toEqual([]);
+});
+
 // K38: oyundaki hareket ekranında kamera açıldı ama vücut tanıma modeli yüklenemedi. Ortak kamera hemen kapanmalı (ışığı yanık
 // kalmamalı) ve o durakta bir daha açılıp model yeniden indirilmeye çalışılmamalı; oyun kamerasız sürer.
 test('hareket ekranı: model yüklenemezse ortak kamera hemen kapanır, o durakta bir daha denenmez (K38)', async ({ page }) => {
