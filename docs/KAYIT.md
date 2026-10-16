@@ -68,7 +68,6 @@ Onay verilmemiş, ertelenmiş ya da reddedilmiş öneriler de buraya yazılır; 
 - 🔎 Gerçek telefonda: ses, performans, kamera eşikleri, ödeme hiç denenmedi; iPhone'a hiç kurulmadı.
 - Doğal ses kaydı yok (760 cümle); telefonda Türkçe ses yoksa Zıpzıp konuşamaz.
 - Süreye bağlı tarayıcı testleri yavaş CI'da ara sıra zaman aşımına düşebilir (12 Ekim'de bir kez; #95).
-- ⏳ Doğal ses kayıtları gelince: `ses.ts kaydiYukle` bir kez yüklenemeyen kaydı oturum boyunca "yok" sayar (telefonun sesine düşer). Şu an kayıt yok, etkisi yok; kayıtlar eklenirken düzeltilmeli (başarısızsa önbellekten sil).
 - Ayrıntılı fotoğraf: `docs/rapor-2026-10-12/` (12 Ekim anlık görüntüsü).
 
 ---

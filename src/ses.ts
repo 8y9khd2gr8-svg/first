@@ -8,6 +8,7 @@ import { TextToSpeech } from '@capacitor-community/text-to-speech';
 import { sesAnahtari } from './sesAnahtari';
 import { enIyiSes } from './sesSecimi';
 import { SES_DOSYALARI } from './sesDosyalari';
+import { onbellekliYukle } from './onbellek';
 import { okunus } from './okunus';
 
 let baglam: AudioContext | null = null;
@@ -73,15 +74,11 @@ let calan: AudioBufferSourceNode | null = null;
 let konusmaNo = 0;
 
 function kaydiYukle(anahtar: string): Promise<AudioBuffer | null> {
-  let kayit = kayitlar.get(anahtar);
-  if (!kayit) {
-    kayit = fetch(`ses/${anahtar}.mp3`)
-      .then((c) => (c.ok ? c.arrayBuffer() : Promise.reject()))
-      .then((veri) => sesBaglami()!.decodeAudioData(veri))
-      .catch(() => null);
-    kayitlar.set(anahtar, kayit);
-  }
-  return kayit;
+  return onbellekliYukle(kayitlar, anahtar, () =>
+    fetch(`ses/${anahtar}.mp3`)
+      .then((c) => (c.ok ? c.arrayBuffer() : Promise.reject(new Error(String(c.status)))))
+      .then((veri) => sesBaglami()!.decodeAudioData(veri)),
+  );
 }
 
 // Zıpzıp konuşurken ağzını oynatsın diye: konuşma başlayınca/bitince dinleyicilere haber verilir.
