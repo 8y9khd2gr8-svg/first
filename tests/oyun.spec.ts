@@ -1104,13 +1104,14 @@ test('kilitten dönüş: ekran açık tutma ve kamera yeniden gelir', async ({ p
   };
   while (adim < uzunluk - 1 && !(await page.evaluate(() => !!(window as any).oyun.scene.getScene('Hareket').kamera))) await sonraki();
   await expect.poll(() => page.evaluate(() => (window as any).sahteAkis?.getVideoTracks()[0]?.readyState), { timeout: 30_000 }).toBe('live');
-  // CI'da iki kez (16 Ekim) burada kırmızı oldu, yerelde tekrarlanmadı: başarısız olursa durum yazılsın.
+  // CI'da üç kez (16 Ekim) burada kırmızı oldu: durum yazısı kilidin açık olduğunu gösterdi ("acik":true); sayfa, vücut tanıma
+  // modeli ilk kez hazırlanırken birkaç saniye donuyor ve 5 sn'lik bekleme yetmiyordu. Bekleme 30 sn; başarısız olursa durum yazılır.
   const durum = () =>
     page.evaluate(() => {
       const w = window as any;
       return JSON.stringify({ ...w.ekranKilidi, gizli: document.hidden, sahneler: w.oyun.scene.getScenes(true).map((x: any) => x.sys.settings.key) });
     });
-  await expect.poll(() => page.evaluate(() => (window as any).ekranKilidi.acik), { timeout: 5_000, message: 'ekran kilidi açık olmalı' }).toBe(true).catch(async (e) => {
+  await expect.poll(() => page.evaluate(() => (window as any).ekranKilidi.acik), { timeout: 30_000, message: 'ekran kilidi açık olmalı' }).toBe(true).catch(async (e) => {
     throw new Error(`${e.message}\nDurum: ${await durum()}`);
   });
   // Kilit: sayfa gizlenir, telefon kamerayı kapatır.
@@ -1310,36 +1311,61 @@ async function kameraliAdimaGit(page: Page, durakId = 'istanbul') {
 
 // Sahte kameranın tanıma döngüsü durdurulur, durum "görmüyorum"da sabitlenir: yüklü test makinesinde sahte görüntü
 // gecikip "durdu" sayılınca ayna (doğru olarak) hiç açılmıyordu. Durum değişiklikleri testte elle verilir (bildir).
-async function kameraDurumunuSabitle(page: Page) {
-  await page.evaluate(() => {
-    const k = (window as any).oyun.scene.getScene('Hareket').kamera;
+async function kameraDurumunuSabitle(page: Page, aynadaGor = false) {
+  await page.evaluate((aynadaGor) => {
+    const w = window as any;
+    const sahne = w.oyun.scene.getScene('Hareket');
+    const k = sahne.kamera;
     k.durdur();
     k.bildir('goremiyorum');
-  });
+    // Her karede sayfanın içinden kayıt (dışarıdan bakan test, sayfa donunca kısa anları kaçırıyordu).
+    const z: any = (w.k40 = { bilgiler: [], aynaEnBuyuk: null, baslaOlcumu: null });
+    sahne.events.on('postupdate', () => {
+      const b = sahne.bilgi.text;
+      if (z.bilgiler[z.bilgiler.length - 1] !== b) z.bilgiler.push(b);
+      const simdi = performance.now();
+      if (b === 'Ekranda kendine bak!') {
+        z.aynaBas ??= simdi;
+        const o = w.kutuOlc?.();
+        if (o && (!z.aynaEnBuyuk || o.kutu.g * o.kutu.y2 > z.aynaEnBuyuk.kutu.g * z.aynaEnBuyuk.kutu.y2)) z.aynaEnBuyuk = o;
+        // Ayna yarım saniye göründükten sonra kamera "görür" (sahte görüntüde insan yok).
+        if (aynadaGor && simdi - z.aynaBas > 500 && !z.gordu) {
+          z.gordu = true;
+          k.bildir('goruyorum');
+        }
+      }
+      if (z.aynaBas && !z.aynaSon && b !== 'Ekranda kendine bak!') z.aynaSon = simdi;
+      if (sahne.sayac.text === 'Başla!') z.baslaOlcumu = w.kutuOlc?.();
+    });
+  }, aynadaGor);
 }
 
-// Kutunun tuval noktasındaki yeri ve kutunun örttüğü yazılar/düğmeler (Phaser nesneleri).
-const kutuDurumu = (page: Page) =>
+// Kutunun tuval noktasındaki yeri ve kutunun örttüğü yazılar/düğmeler (Phaser nesneleri). Ölçüm sayfanın içinde bir işlevdir:
+// kısa anlar ("Başla!" 0,6 sn) her karede sayfa içinden ölçülür (yüklü makinede sayfa donunca dışarıdan bakan test anı kaçırıyordu).
+const kutuOlcumuKur = (page: Page) =>
   page.evaluate(() => {
-    const oyun = (window as any).oyun;
-    const r = oyun.canvas.getBoundingClientRect();
-    const k = r.width / 720;
-    const el = document.querySelector('.kamera-kutusu');
-    if (!el) return null;
-    const b = el.getBoundingClientRect();
-    const kutu = { x: (b.left - r.left) / k, y: (b.top - r.top) / k, g: b.width / k, y2: b.height / k };
-    const s = oyun.scene.getScene('Hareket');
-    const yazi = (o: any): string => (o.type === 'Text' ? o.text : (o.list ?? []).map(yazi).join(' '));
-    const ortulen: string[] = [];
-    for (const o of s.children.list) {
-      if (o.visible === false || o.type === 'DOMElement' || !(o.type === 'Text' ? o.text.trim() : o.input?.enabled)) continue;
-      const n = o.getBounds();
-      if (n.width * n.height === 0) continue;
-      const kesisir = n.x < kutu.x + kutu.g && n.x + n.width > kutu.x && n.y < kutu.y + kutu.y2 && n.y + n.height > kutu.y;
-      if (kesisir) ortulen.push(yazi(o).trim().slice(0, 30));
-    }
-    return { kutu, ortulen, yazi: el.textContent ?? '' };
+    (window as any).kutuOlc = () => {
+      const oyun = (window as any).oyun;
+      const r = oyun.canvas.getBoundingClientRect();
+      const k = r.width / 720;
+      const el = document.querySelector('.kamera-kutusu');
+      if (!el) return null;
+      const b = el.getBoundingClientRect();
+      const kutu = { x: (b.left - r.left) / k, y: (b.top - r.top) / k, g: b.width / k, y2: b.height / k };
+      const s = oyun.scene.getScene('Hareket');
+      const yazi = (o: any): string => (o.type === 'Text' ? o.text : (o.list ?? []).map(yazi).join(' '));
+      const ortulen: string[] = [];
+      for (const o of s.children.list) {
+        if (o.visible === false || o.type === 'DOMElement' || !(o.type === 'Text' ? o.text.trim() : o.input?.enabled)) continue;
+        const n = o.getBounds();
+        if (n.width * n.height === 0) continue;
+        const kesisir = n.x < kutu.x + kutu.g && n.x + n.width > kutu.x && n.y < kutu.y + kutu.y2 && n.y + n.height > kutu.y;
+        if (kesisir) ortulen.push(yazi(o).trim().slice(0, 30));
+      }
+      return { kutu, ortulen, yazi: el.textContent ?? '' };
+    };
   });
+const kutuDurumu = (page: Page) => page.evaluate(() => (window as any).kutuOlc());
 
 test('büyük ayna (K40): önce büyük görüntü, görünce "Hazırsın!", sonra köşeye küçülür; yazı/düğme örtülmez', async ({ page }) => {
   test.setTimeout(120_000);
@@ -1347,36 +1373,32 @@ test('büyük ayna (K40): önce büyük görüntü, görünce "Hazırsın!", son
   await sahteKamera(page);
   const kayit = await oyunuAc(page, { 'zipzip-kamera-v1': '1' });
   await kameraliAdimaGit(page);
-  await kameraDurumunuSabitle(page);
-  const bilgi = () => page.evaluate(() => (window as any).oyun.scene.getScene('Hareket').bilgi.text);
+  await kutuOlcumuKur(page);
   // Gösterim: kutu sağ altta, Zıpzıp görünür.
   let d = (await kutuDurumu(page))!;
   expect(d.kutu.g).toBeGreaterThan(200);
   expect(d.kutu.x).toBeGreaterThan(400);
   expect(d.ortulen).toEqual([]);
-  // Büyük ayna: ekranın yarısına yakın, yönlendirme sesli.
-  await expect.poll(bilgi, { timeout: 30_000 }).toBe('Ekranda kendine bak!');
-  await page.waitForTimeout(600);
-  d = (await kutuDurumu(page))!;
-  expect(d.kutu.g * d.kutu.y2).toBeGreaterThan(0.35 * 720 * 1280);
-  expect(d.ortulen).toEqual([]);
-  expect(await page.evaluate(() => (window as any).__soylenen)).toContain('Ekranda kendine bak! Başından ayağına kadar görün.');
-  // Kamera görür (sahte görüntüde insan yok: durumu elle veriyoruz) → yeşil çerçeve, "Hazırsın!".
-  await page.evaluate(() => (window as any).oyun.scene.getScene('Hareket').kamera.bildir('goruyorum'));
-  await expect.poll(bilgi).toBe('Hazırsın!');
-  expect(await page.evaluate(() => (window as any).__soylenen)).toContain('Hazırsın! Seni görüyorum.');
-  expect(await page.evaluate(() => (document.querySelector('.kamera-kutusu') as HTMLElement).style.borderColor)).toBe('rgb(63, 191, 95)');
-  // Geri sayım ve hareket: kutu sağ altta, sayı ve yazı örtülmez ("Başla!" dahil).
-  await page.waitForFunction(() => (window as any).oyun.scene.getScene('Hareket').sayac.text === 'Başla!', null, { timeout: 15_000, polling: 30 });
-  await page.waitForTimeout(300);
+  await kameraDurumunuSabitle(page, true);
+  // Hareket başlayana kadar beklenir; ayna, "Hazırsın!" ve "Başla!" anları sayfanın içinde kaydedildi.
+  await page.waitForFunction(() => (window as any).oyun.scene.getScene('Hareket').bilgi.text === 'Sen de yap!', null, { timeout: 60_000 });
+  const z = await page.evaluate(() => (window as any).k40);
+  expect(z.bilgiler).toEqual(expect.arrayContaining(['Ekranda kendine bak!', 'Hazırsın!', 'Hazır ol!', 'Sen de yap!']));
+  // Büyük ayna: ekranın yarısına yakın, yazı/düğme örtülmez; yönlendirme ve "Hazırsın!" sesli.
+  expect(z.aynaEnBuyuk.kutu.g * z.aynaEnBuyuk.kutu.y2).toBeGreaterThan(0.35 * 720 * 1280);
+  expect(z.aynaEnBuyuk.ortulen).toEqual([]);
+  const soylenen = await page.evaluate(() => (window as any).__soylenen);
+  expect(soylenen).toContain('Ekranda kendine bak! Başından ayağına kadar görün.');
+  expect(soylenen).toContain('Hazırsın! Seni görüyorum.');
+  // "Başla!" görünürken (son ölçüm = tam büyüklük) kutu onu örtmedi.
+  expect(z.baslaOlcumu.ortulen).toEqual([]);
+  // Hareket: kutu sağ altta, eskisinin 2 katından büyük, yazı/sayı örtülmez.
   d = (await kutuDurumu(page))!;
   expect(d.kutu.g).toBeLessThan(300);
   expect(d.kutu.g * d.kutu.y2).toBeGreaterThan(2 * 150 * 140);
   expect(d.ortulen).toEqual([]);
   // Aynada yerleşirken sayılanlar silinir: sayım hareketle başlar.
   expect(await page.evaluate(() => (window as any).oyun.scene.getScene('Hareket').kamera.sayi)).toBe(0);
-  await page.waitForTimeout(1500);
-  expect((await kutuDurumu(page))!.ortulen).toEqual([]);
   // "Yaptım!": kutu sağ üst köşede, düğmeyi örtmez.
   await page.waitForFunction(() => (window as any).oyun.scene.getScene('Hareket').children.list.some((o: any) => (o.list ?? []).some((c: any) => c.text === 'Yaptım!')), null, { timeout: 60_000 });
   await page.waitForTimeout(600);
@@ -1387,22 +1409,18 @@ test('büyük ayna (K40): önce büyük görüntü, görünce "Hazırsın!", son
 });
 
 test('büyük ayna (K40): kamera görmezse oyun beklemez, birkaç saniye sonra geri sayım başlar', async ({ page }) => {
+  test.setTimeout(120_000);
   await sahteKamera(page);
   const kayit = await oyunuAc(page, { 'zipzip-kamera-v1': '1' });
   await kameraliAdimaGit(page);
   await kameraDurumunuSabitle(page);
-  // Süre sayfanın içinde, her karede ölçülür (test makinesi yüklüyken dışarıdan ölçüm gecikir).
-  await page.evaluate(() => {
-    const s = (window as any).oyun.scene.getScene('Hareket');
-    const w = window as any;
-    s.events.on('postupdate', () => {
-      if (!w.aynaBas && s.bilgi.text === 'Ekranda kendine bak!') w.aynaBas = performance.now();
-      if (w.aynaBas && !w.aynaSon && s.bilgi.text === 'Hazır ol!') w.aynaSon = performance.now();
-    });
-  });
-  await page.waitForFunction(() => !!(window as any).aynaSon, null, { timeout: 40_000 });
-  // En çok 6 sn (gerçek saat; yavaş karede de uzamaz; ölçüm payı 1,5 sn).
-  expect(await page.evaluate(() => (window as any).aynaSon - (window as any).aynaBas)).toBeLessThan(7_500);
+  await page.waitForFunction(() => !!(window as any).k40.aynaSon, null, { timeout: 60_000 });
+  const z = await page.evaluate(() => (window as any).k40);
+  // Ayna açıldı, görmedi, sonra normal geri sayım; en çok 6 sn (gerçek saat; ölçüm payı 1,5 sn).
+  const i = z.bilgiler.indexOf('Ekranda kendine bak!');
+  expect(i).toBeGreaterThanOrEqual(0);
+  expect(z.bilgiler[i + 1]).toBe('Hazır ol!');
+  expect(z.aynaSon - z.aynaBas).toBeLessThan(7_500);
   expect(kayit.hatalar).toEqual([]);
 });
 

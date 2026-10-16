@@ -70,7 +70,7 @@ Onay verilmemiş, ertelenmiş ya da reddedilmiş öneriler de buraya yazılır; 
 - 🔎 Gerçek telefonda: ses, performans, kamera eşikleri, ödeme hiç denenmedi; iPhone'a hiç kurulmadı.
 - Doğal ses kaydı yok (760 cümle); telefonda Türkçe ses yoksa Zıpzıp konuşamaz.
 - Süreye bağlı tarayıcı testleri yavaş CI'da ara sıra zaman aşımına düşebilir (12 Ekim'de bir kez; #95).
-- ⏳ `kilitten dönüş` testi CI'da iki kez (16 Ekim, #142 ve #145) aynı yerde kırmızı oldu: kilitten önce "ekranı açık tut" 5 sn'de açık görünmedi. Yerelde (6 kat yavaşlatma, 4 işçi, 20+ çalıştırma) tekrarlanmadı; yeniden çalıştırmada geçti. Test artık başarısız olursa durumu (istek sayısı, sahneler, sayfa gizli mi) yazıyor (#145); bir dahaki kırmızıda nedene bakılacak.
+- ✅ `kilitten dönüş` testi CI'da üç kez (16 Ekim) aynı yerde kırmızı oldu. Eklenen durum yazısı nedeni gösterdi: kilit aslında açıktı; sayfa, vücut tanıma modeli ilk kez hazırlanırken birkaç saniye donuyor, testin 5 sn'lik beklemesi yetmiyordu (oyun hatası değil). Bekleme 30 sn (#146). Aynı donma büyük ayna testlerinin kısa anları ("Başla!" 0,6 sn) kaçırmasına da yol açtı → ölçümler artık sayfanın içinde her karede yapılıyor (#146). CI ayarıyla (2 işçi) yerelde parça 2/2 iki kez 25/25.
 - `Zıpzıp konuşurken ağzı oynar` testi yerelde yük altında bir kez kırmızı (60 ms aralıklı ölçüm), tek başına geçiyor. CI'da görülmedi.
 - Yavaş telefonda (kare 200 ms'yi aşınca) Phaser oyunun saatini geri bırakır: sayaçlar/süreler uzar (test makinesinde ~12 kare/sn'de 6 sn → 11 sn). Kaybettirmez; büyük aynanın en çok süresi gerçek saatle (#143). 🔎 eski iPhone'da bakılacak.
 - Ayrıntılı fotoğraf: `docs/rapor-2026-10-12/` (12 Ekim anlık görüntüsü).
