@@ -1177,14 +1177,23 @@ test('kesinti (bildirim/arama): ses susar, sayaç ve "Uzaktan oyna" durur; dön�
       return { aktif: s.scene.isActive(), adim: s.adim, sayac: s.sayac?.text, bilgi: s.bilgi?.text, agiz: s.zipzip?.yuz?.aciklik ?? 0 };
     });
   // Sayma başlayınca (ilk sayılar söylendi) bildirim gelir.
-  await expect.poll(async () => { const d = await durum(); return d.bilgi === 'Sen de yap!' && Number(d.sayac) > 1; }, { timeout: 30_000 }).toBe(true);
-  // Ölçüm ve gizleme aynı anda (arada bir kare geçip bir sayı daha söylenmesin).
-  const once = await page.evaluate(() => {
-    const w = window as any;
-    const o = { susturma: w.konusma.susturma, soylenen: w.konusma.soylenen.length };
-    w.sayfayiGizle(true);
-    return o;
-  });
+  // Ölçüm ve gizleme aynı karede, sadece arkasından aynı harekette bir sayı daha gelecekse (son sayıda gizlenirse dönüşte
+  // değişen ilk sayı sıradaki hareketin geri sayımı olurdu).
+  const gizleme = await page.waitForFunction(
+    () => {
+      const w = window as any;
+      const s = w.oyun.scene.getScene('Hareket');
+      const h = s.liste?.()[s.adim];
+      const n = Number(s.sayac?.text);
+      if (!h || s.bilgi?.text !== 'Sen de yap!' || !(n > 1) || (h.tur === 'sayi' && n >= h.adet)) return false;
+      const o = { susturma: w.konusma.susturma, soylenen: w.konusma.soylenen.length };
+      w.sayfayiGizle(true);
+      return o;
+    },
+    null,
+    { timeout: 30_000, polling: 'raf' },
+  );
+  const once = (await gizleme.jsonValue()) as { susturma: number; soylenen: number };
   const gizliyken = await durum();
   expect(await page.evaluate(() => (window as any).konusma.susturma)).toBeGreaterThan(once.susturma); // yarım cümle susturuldu
   await page.waitForTimeout(4000);
