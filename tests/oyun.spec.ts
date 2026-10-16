@@ -1280,3 +1280,39 @@ test('kamera denemesi: model yüklenemezse kamera kapanır, "Kamera açılamadı
   await expect.poll(() => page.evaluate(() => (window as any).sahteAkis?.getVideoTracks()[0]?.readyState), { timeout: 5_000 }).toBe('ended');
   expect(kayit.hatalar.filter((h) => !h.startsWith('Failed to load resource'))).toEqual([]); // engellenen model dosyaları
 });
+
+// K38: oyundaki hareket ekranında kamera açıldı ama vücut tanıma modeli yüklenemedi. Ortak kamera hemen kapanmalı (ışığı yanık
+// kalmamalı) ve o durakta bir daha açılıp model yeniden indirilmeye çalışılmamalı; oyun kamerasız sürer.
+test('hareket ekranı: model yüklenemezse ortak kamera hemen kapanır, o durakta bir daha denenmez (K38)', async ({ page }) => {
+  await sahteKamera(page);
+  let modelIstegi = 0;
+  await page.route('**/mediapipe/**', (r) => {
+    modelIstegi++;
+    return r.abort();
+  });
+  const kayit = await oyunuAc(page, { 'zipzip-kamera-v1': '1' });
+  const kutuYazisi = () => page.evaluate(() => [...document.querySelectorAll('div')].map((d) => d.textContent ?? '').filter((t) => t.startsWith('📷')).pop() ?? '');
+  await sahneAc(page, 'Hareket', { durakId: 'istanbul', adim: 0 });
+  const uzunluk = await page.evaluate(() => (window as any).oyun.scene.getScene('Hareket').liste().length);
+  const kameraliAdimlar: number[] = [];
+  let ilkIstekler = 0;
+  for (let adim = 0; adim < uzunluk && kameraliAdimlar.length < 2; adim++) {
+    if (adim > 0) {
+      await page.evaluate((adim) => (window as any).oyun.scene.getScene('Hareket').scene.restart({ durakId: 'istanbul', adim }), adim);
+      await page.waitForTimeout(700);
+    }
+    if (!(await page.evaluate(() => !!(window as any).oyun.scene.getScene('Hareket').kamera))) continue;
+    kameraliAdimlar.push(adim);
+    await expect.poll(kutuYazisi, { timeout: 30_000 }).toBe('📷 Açılamadı');
+    if (kameraliAdimlar.length === 1) {
+      await expect.poll(() => page.evaluate(() => (window as any).sahteAkis?.getVideoTracks()[0]?.readyState), { timeout: 5_000 }).toBe('ended');
+      ilkIstekler = modelIstegi;
+    }
+  }
+  expect(kameraliAdimlar.length).toBe(2);
+  expect(ilkIstekler).toBeGreaterThan(0);
+  // İkinci kameralı harekette kamera yeniden açılmadı, model yeniden istenmedi.
+  expect(await page.evaluate(() => (window as any).kameraAcilma)).toBe(1);
+  expect(modelIstegi).toBe(ilkIstekler);
+  expect(kayit.hatalar.filter((h) => !h.startsWith('Failed to load resource'))).toEqual([]); // engellenen model dosyaları
+});
