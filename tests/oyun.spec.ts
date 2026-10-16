@@ -1316,3 +1316,29 @@ test('hareket ekranı: model yüklenemezse ortak kamera hemen kapanır, o durakt
   expect(modelIstegi).toBe(ilkIstekler);
   expect(kayit.hatalar.filter((h) => !h.startsWith('Failed to load resource'))).toEqual([]); // engellenen model dosyaları
 });
+
+// Kod denetimi 5. tur: kilitli durağa art arda hızlı dokununca sallanma animasyonları üst üste biniyor, işaret yerinden
+// kaymış kalıyordu (her yeni sallanma o anki kaymış yerden başlayıp oraya dönüyordu). Sallanma bitince yerinde olmalı.
+test('kilitli durağa art arda dokununca işaret yerinden kaymaz', async ({ page }) => {
+  const kayit = await oyunuAc(page, BETA);
+  await sahneAc(page, 'Harita');
+  await sakinlesmesiniBekle(page);
+  const kilitli = await page.evaluate(() => {
+    const s = (window as any).oyun.scene.getScene('Harita');
+    const k = s.harita.list.find((o: any) => o.type === 'Container' && o.input?.enabled && o.list.some((c: any) => c.text === '🔒'));
+    const m = k.getWorldTransformMatrix();
+    return { x: k.x, ex: m.tx, ey: m.ty };
+  });
+  const r = (await page.locator('canvas').boundingBox())!;
+  for (let i = 0; i < 4; i++) {
+    await page.mouse.click(r.x + (r.width * kilitli.ex) / 720, r.y + (r.height * kilitli.ey) / 1280);
+    await page.waitForTimeout(70);
+  }
+  await page.waitForTimeout(1200);
+  const sonra = await page.evaluate(() => {
+    const s = (window as any).oyun.scene.getScene('Harita');
+    return s.harita.list.find((o: any) => o.type === 'Container' && o.input?.enabled && o.list.some((c: any) => c.text === '🔒')).x;
+  });
+  expect(sonra).toBe(kilitli.x);
+  expect(kayit.hatalar).toEqual([]);
+});

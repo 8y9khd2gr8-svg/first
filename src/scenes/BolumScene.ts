@@ -313,7 +313,7 @@ export class BolumScene extends Phaser.Scene {
     kap.on('pointerdown', () => {
       if (!acik) {
         bip(220, 0.15, 'square', 0.12);
-        this.tweens.add({ targets: kap, x: p.x + 8, duration: 50, yoyo: true, repeat: 3 });
+        this.tweens.add({ targets: kap, x: { from: p.x, to: p.x + 8 }, duration: 50, yoyo: true, repeat: 3 });
         konus(M.oncekiniBitir);
         return;
       }
