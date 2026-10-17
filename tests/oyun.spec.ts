@@ -541,6 +541,28 @@ test('her çocuk ekranında Zıpzıp konuşur (sesli yönlendirme)', async ({ pa
   expect(kayit.hatalar).toEqual([]);
 });
 
+// VoiceOver (K46): oyun tek bir çizim alanı; çocuk ekranlarının düğmeleri ekran okuyucuya görünmez (🔎 iPhone'da denenmedi).
+// Ebeveyn ekranlarındaki gerçek HTML parçaları ise okunur: her birinin ekran okuyucunun okuyacağı bir adı olmalı
+// (ad kutusu sadece "ör. Yağız" yer tutucusuyla okunuyordu, 17 Ekim).
+test('ebeveyn ekranlarındaki HTML düğme ve kutuların ekran okuyucu adı var', async ({ page }) => {
+  const kayit = await oyunuAc(page, { 'zipzip-pasaport-v1': JSON.stringify({ ad: '', avatar: '🐼', soruldu: true }) });
+  await sahneAc(page, 'PasaportAyar');
+  await expect(page.getByRole('textbox', { name: 'Çocuğun adı', exact: true })).toBeVisible();
+  await expect(page.getByRole('button', { name: '📷 Fotoğraf ekle (isteğe bağlı)' })).toBeVisible();
+  for (const [ad, veri] of [['PasaportAyar', {}], ['EbeveynOzet', {}], ['EbeveynMenu', {}]] as [string, object][]) {
+    await sahneAc(page, ad, veri);
+    const adsiz = await page.evaluate(() =>
+      [...document.querySelectorAll('#oyun button, #oyun input, #oyun a, #oyun select, #oyun textarea')]
+        .filter((e) => (e as HTMLElement).offsetParent !== null && (e as HTMLInputElement).type !== 'file')
+        // Kutunun yer tutucusu ad sayılmaz (yazınca kaybolur); düğme/bağlantıda yazısı ad olur.
+        .filter((e) => !(e.getAttribute('aria-label') || (e.tagName === 'INPUT' ? '' : e.textContent) || '').trim())
+        .map((e) => e.outerHTML.slice(0, 80)),
+    );
+    expect(adsiz, ad).toEqual([]);
+  }
+  expect(kayit.hatalar).toEqual([]);
+});
+
 // Telefonda "hareketi azalt" açıkken (iPhone: Ayarlar → Erişilebilirlik → Hareket) sürekli oynayan süs kalmaz (17 Ekim ölçümü:
 // normalde haritalarda ~60 yıldız pırıltısı). Sadece anlamlı olan kalır: sıradaki durağın / açılan kapının nabzı (en çok 2).
 test('hareketi azalt: çocuk ekranlarında sürekli süs animasyonu yok, sadece sıradaki işareti', async ({ page }) => {

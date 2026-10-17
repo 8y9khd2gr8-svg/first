@@ -64,6 +64,8 @@ export class PasaportAyarScene extends Phaser.Scene {
     giris.value = pasaport.ad;
     giris.maxLength = 14;
     giris.placeholder = 'ör. Yağız';
+    // Ekran okuyucu (VoiceOver) kutunun adını okusun; yer tutucu yazınca kaybolur.
+    giris.setAttribute('aria-label', 'Çocuğun adı');
     giris.autocomplete = 'off';
 
     this.add
