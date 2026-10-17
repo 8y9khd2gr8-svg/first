@@ -118,6 +118,19 @@ test('konus() ile söylenen M cümleleri seslendirme listesinde', () => {
   }
 });
 
+// CLAUDE.md: Phaser veri verilmezse önceki geçişin verisini yeniden kullanır; sahne geçişinde hep veri nesnesi verilir.
+test('sahne geçişlerinde veri nesnesi verilir (scene.start/launch/switch)', () => {
+  const eksik: string[] = [];
+  for (const f of dosyalar('src')) {
+    const kod = fs.readFileSync(f, 'utf8');
+    // Başka sahneye geçiş: start/launch/switch('Ad', veri). restart() sahneyi kendi verisiyle yeniden açar (kasıtlı), bakılmaz.
+    for (const m of kod.matchAll(/scene\.(?:start|launch|switch)\(([^()]*(?:\([^()]*\)[^()]*)*)\)/g)) {
+      if (!/,/.test(m[1])) eksik.push(`${f}: ${m[0]}`);
+    }
+  }
+  assert.deepEqual(eksik, []);
+});
+
 test('cihaz kayıt anahtarları "zipzip-" ile başlar ("Tüm verileri sil" hepsini bulsun)', () => {
   for (const f of dosyalar('src')) {
     const kod = fs.readFileSync(f, 'utf8');

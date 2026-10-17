@@ -76,7 +76,7 @@ export class EbeveynMenuScene extends Phaser.Scene {
         return;
       }
       tumVerileriSil();
-      this.scene.start('Acilis');
+      this.scene.start('Acilis', {});
     });
 
     // Beta testi için: Dünya bölümünü Türkiye Turu bitmeden açar (diğer bölümler betada "Yakında"). Mağazaya çıkmadan kaldırılacak.

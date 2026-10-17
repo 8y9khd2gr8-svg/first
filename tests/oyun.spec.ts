@@ -879,11 +879,20 @@ test('Zıpzıp da zıplasın: kamera durunca yazı söyler ve ritim yolu geri ge
   await sahneAc(page, 'ZiplaDeneme');
   const r = (await page.locator('canvas').boundingBox())!;
   await page.mouse.click(r.x + r.width / 2, r.y + (r.height * 925) / 1280); // 📷 Kamerayla zıpla
-  await kameraYazisi(page, 'ZiplaDeneme', 'Baştan ayağa görünmeli');
-  expect(await page.evaluate(() => !!(window as any).oyun.scene.getScene('ZiplaDeneme').ritim)).toBe(false);
+  // Yazı ile ritim aynı anda bakılır: yük altında sahte kamera 2 sn takılınca oyun kısa süre "durdu"ya geçip ritmi
+  // açabilir, görüntü gelince yine kapatır (doğru davranış); ayrı ayrı bakınca arada kalınıyordu (17 Ekim taraması).
+  const yaziVeRitim = (icerir: string, ritim: boolean) =>
+    page.waitForFunction(
+      ([icerir, ritim]) => {
+        const s = (window as any).oyun.scene.getScene('ZiplaDeneme');
+        return s.children.list.some((c: any) => c.type === 'Text' && c.text.includes(icerir)) && !!s.ritim === ritim;
+      },
+      [icerir, ritim] as const,
+      { timeout: 30_000 },
+    );
+  await yaziVeRitim('Baştan ayağa görünmeli', false);
   await page.evaluate(() => (window as any).sahteAkis.getTracks().forEach((t: MediaStreamTrack) => t.stop()));
-  await kameraYazisi(page, 'ZiplaDeneme', 'Kamera durdu');
-  expect(await page.evaluate(() => !!(window as any).oyun.scene.getScene('ZiplaDeneme').ritim)).toBe(true);
+  await yaziVeRitim('Kamera durdu', true);
   expect(kayit.hatalar).toEqual([]);
 });
 
