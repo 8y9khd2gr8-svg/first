@@ -4,8 +4,9 @@ const ANAHTAR = 'zipzip-ilerleme-v1';
 export function tamamlananlar(): string[] {
   try {
     const kayit = JSON.parse(localStorage.getItem(ANAHTAR) ?? '[]');
-    // Bozuk kayıtta (yanlış tür, karışık dizi) sadece geçerli durak kimlikleri kalır; ilerleme kaybolmaz.
-    return Array.isArray(kayit) ? kayit.filter((d): d is string => typeof d === 'string') : [];
+    // Bozuk kayıtta (yanlış tür, karışık dizi, aynı durak iki kez) sadece geçerli durak kimlikleri birer kez kalır;
+    // ilerleme kaybolmaz.
+    return Array.isArray(kayit) ? [...new Set(kayit.filter((d): d is string => typeof d === 'string'))] : [];
   } catch {
     return [];
   }

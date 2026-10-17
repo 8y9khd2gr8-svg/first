@@ -42,6 +42,12 @@ test('her kayıt her bozuk değerde okunur, çökmez ve varsayılana döner', ()
   }
 });
 
+// Elle bozulmuş/eski kayıtta aynı durak iki kez yazılıysa bir kez sayılır ("Biten duraklar", özet, rozetler; 17 Ekim).
+test('bozuk kayıtta aynı durak iki kez sayılmaz', () => {
+  depo.set('zipzip-ilerleme-v1', '["istanbul", "truva", "istanbul", "truva", "pamukkale"]');
+  assert.deepEqual(tamamlananlar(), ['istanbul', 'truva', 'pamukkale']);
+});
+
 test('bozuk kayıtta sağlam ilerleme kaybolmaz', () => {
   depo.set('zipzip-ilerleme-v1', '["istanbul", 5, null, "truva"]');
   assert.deepEqual(tamamlananlar(), ['istanbul', 'truva']);
