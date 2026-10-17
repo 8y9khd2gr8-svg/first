@@ -12,7 +12,7 @@ Kullanıcının verdiği politika (aksi açıkça belirtilmedikçe her görevde 
 - İlgili birim, entegrasyon ve oyun testlerini çalıştırmak.
 - Başarısız testleri incelemek, nedenini bulmak ve düzeltmeyi denemek.
 - Kod kalitesini ve test kararlılığını iyileştirmek (gerçek oyun davranışını bozmadan).
-- KAYIT.md, TEKNIK_DURUM.md ve ilgili belgeleri yapılan işlemlerle uyumlu güncellemek.
+- KAYIT.md ve ilgili belgeleri yapılan işlemlerle uyumlu güncellemek (TEKNIK_DURUM.md yok; ayrı dosya açılmaz, KAYIT.md yeter).
 - Değişiklikleri ayrı bir Git dalında kaydetmek, commit oluşturmak.
 - Görev küçük, güvenli ve bağımsızsa mevcut GitHub iş akışına uygun PR açmak.
 - Testleri ve kontrolleri tekrar çalıştırıp sonuçları doğrulamak.
