@@ -1,5 +1,7 @@
 # Yağız testi – gözlem listesi
 
+**iPhone'da doldurmak için kısa hâli:** https://claude.ai/artifact/DjZd22aR1pZNm82WUP6j8r ("Yağız" sekmesi; notlar kopyalanıp Claude'a yapıştırılır).
+
 Bu liste, Yağız (6 yaş) oyunu oynarken yanında durup not almak içindir. Yardım etmeden izleyin;
 takıldığı yerde 10 saniye bekleyin, sonra yardım edin ve "takıldı" diye not edin.
 

@@ -541,6 +541,35 @@ test('her çocuk ekranında Zıpzıp konuşur (sesli yönlendirme)', async ({ pa
   expect(kayit.hatalar).toEqual([]);
 });
 
+// Telefonda "hareketi azalt" açıkken (iPhone: Ayarlar → Erişilebilirlik → Hareket) sürekli oynayan süs kalmaz (17 Ekim ölçümü:
+// normalde haritalarda ~60 yıldız pırıltısı). Sadece anlamlı olan kalır: sıradaki durağın / açılan kapının nabzı (en çok 2).
+test('hareketi azalt: çocuk ekranlarında sürekli süs animasyonu yok, sadece sıradaki işareti', async ({ page }) => {
+  test.setTimeout(150_000);
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  const kayit = await oyunuAc(page, { ...BETA, 'zipzip-ilerleme-v1': JSON.stringify(['istanbul', 'truva']), 'zipzip-pasaport-v1': JSON.stringify({ ad: '', avatar: '🐼', soruldu: true }) });
+  const sahneler: [string, object][] = [
+    ['Acilis', {}], ['Macera', {}], ['Harita', {}], ['Dunya', {}], ['Uzay', {}], ['Spor', {}], ['Dinozor', {}], ['Evde', {}], ['Okyanus', {}],
+    ['Durak', { durakId: 'pamukkale' }], ['Hareket', { durakId: 'pamukkale', adim: 1 }], ['Odul', { durakId: 'truva' }],
+    ['Pasaport', {}], ['Rozet', {}], ['Kostum', {}], ['Avatar', {}], ['Sertifika', { bolum: 'turkiye' }],
+  ];
+  const fazla: string[] = [];
+  for (const [ad, veri] of sahneler) {
+    await sahneAc(page, ad, veri);
+    await page.waitForTimeout(1800);
+    const sonsuz = await page.evaluate((ad) => {
+      const s = (window as any).oyun.scene.getScene(ad);
+      return s.tweens
+        .getTweens()
+        .filter((t: any) => t.repeat === -1 || t.data?.some((d: any) => d.repeat === -1))
+        .map((t: any) => (t.targets ?? []).map((x: any) => x.type).join('+'));
+    }, ad);
+    if (sonsuz.length > 2 || sonsuz.some((t: string) => t.includes('Arc'))) fazla.push(`${ad}: ${sonsuz.join(', ')}`);
+  }
+  expect(fazla).toEqual([]);
+  expect(await page.evaluate(async () => (await import('/src/ayarlar.ts')).hareketiAzalt())).toBe(true);
+  expect(kayit.hatalar).toEqual([]);
+});
+
 test('ödül ekranları dolu hâlde de taşmaz: pasaport kâğıdı, uzun ad, damga yazısı', async ({ page }) => {
   await oyunuAc(page);
   const hepsi: string[] = await page.evaluate(async () => (await import('/src/duraklar.ts')).TUM_DURAKLAR.map((d) => d.id));
@@ -1148,11 +1177,15 @@ async function kesintiSahte(page: Page) {
   await page.addInitScript(() => {
     const w = window as any;
     w.sayfaGizli = false;
-    w.konusma = { soylenen: [] as string[], susturma: 0, surdurme: 0, duraklatildi: false };
+    w.konusma = { soylenen: [] as string[], zaman: [] as number[], susturma: 0, surdurme: 0, duraklatildi: false };
     Object.defineProperty(document, 'hidden', { get: () => w.sayfaGizli });
     Object.defineProperty(document, 'visibilityState', { get: () => (w.sayfaGizli ? 'hidden' : 'visible') });
     const ss = window.speechSynthesis as any;
-    ss.speak = (u: SpeechSynthesisUtterance) => w.konusma.soylenen.push(u.text); // telefondaki gibi hemen bitmez
+    // Telefondaki gibi hemen bitmez. Zaman: hareket ekranının oyun saati (yavaş makinede de doğru ölçülsün).
+    ss.speak = (u: SpeechSynthesisUtterance) => {
+      w.konusma.soylenen.push(u.text);
+      w.konusma.zaman.push(w.oyun?.scene.getScene('Hareket')?.time.now ?? 0);
+    };
     ss.cancel = () => w.konusma.susturma++;
     Object.defineProperty(ss, 'paused', { get: () => w.konusma.duraklatildi });
     ss.resume = () => {
@@ -1224,6 +1257,13 @@ test('kesinti (bildirim/arama): ses susar, sayaç ve "Uzaktan oyna" durur; dön�
     { timeout: 10_000, polling: 'raf' },
   );
   expect(Math.abs(Number(await ilkDegisen.jsonValue()) - Number(gizliyken.sayac))).toBe(1);
+  // Sayma sırasında kesilen sayı ve komut yinelenmez (K39 b sadece gösterimde yarıda kalan komutu yineler).
+  const komutYine = await page.evaluate((n) => {
+    const w = window as any;
+    const s = w.oyun.scene.getScene('Hareket');
+    return w.konusma.soylenen.slice(n).includes(s.liste()[s.adim].sesli);
+  }, once.soylenen);
+  expect(komutYine).toBe(false);
   // İkinci kesinti "Uzaktan oyna" geri sayımı (📱 3… 2… 1…) sırasında: gizliyken kendiliğinden geçmez, kayıt yapılmaz.
   await page.waitForFunction(() => (window as any).oyun.scene.getScene('Hareket').children.list.some((o: any) => o.type === 'Text' && o.text.startsWith('📱')), null, { timeout: 60_000, polling: 'raf' });
   const adimGizlenince = await page.evaluate(() => {
@@ -1241,6 +1281,40 @@ test('kesinti (bildirim/arama): ses susar, sayaç ve "Uzaktan oyna" durur; dön�
     hareket: Object.values<any>(JSON.parse(localStorage.getItem('zipzip-istatistik-v1')!).gunler)[0].hareket,
   }));
   expect(sonra).toEqual({ adim: 1, hareket: 1 });
+  expect(kayit.hatalar).toEqual([]);
+});
+
+// K39 (b), 17 Ekim: komut söylenirken arama/kilit gelirse dönüşte komut bir kez yeniden söylenir ve
+// geri sayım cümle bitecek kadar bekler (okuma bilmeyen çocuk ne yapacağını duysun). Eski kodda komut yinelenmiyordu.
+test('kesinti: gösterimde yarıda kalan hareket komutu dönüşte bir kez yeniden söylenir, geri sayım onu kesmez', async ({ page }) => {
+  test.setTimeout(90_000);
+  await kesintiSahte(page);
+  const kayit = await oyunuAc(page);
+  // sahneAc 0,7 sn bekler; komut ilk karede söylendiği için sahne doğrudan başlatılır.
+  await page.evaluate(() => (window as any).oyun.scene.start('Hareket', { durakId: 'istanbul', adim: 0 }));
+  const gizleme = await page.waitForFunction(
+    () => {
+      const w = window as any;
+      const s = w.oyun.scene.getScene('Hareket');
+      if (!s?.scene.isActive() || !s.liste) return false;
+      // Söylenen metin okunuş sözlüğünden geçmiş olabilir; süre ekrandaki cümlenin uzunluğuyla.
+      if (!w.konusma.soylenen.length || s.bilgi?.text !== 'Önce Zıpzıp’ı izle!') return false;
+      w.sayfayiGizle(true);
+      return { komut: w.konusma.soylenen.at(-1), uzunluk: s.liste()[s.adim].sesli.length, n: w.konusma.soylenen.length };
+    },
+    null,
+    { timeout: 30_000, polling: 'raf' },
+  );
+  const { komut, uzunluk, n } = (await gizleme.jsonValue()) as { komut: string; uzunluk: number; n: number };
+  await page.waitForTimeout(2000);
+  expect(await page.evaluate((k) => (window as any).konusma.soylenen.slice(k), n)).toEqual([]);
+  await page.evaluate(() => (window as any).sayfayiGizle(false));
+  // Dönüş: komut hemen bir kez söylenir; sonra geri sayım ("Üç!") gelir, ama cümle bitecek kadar sonra.
+  await expect.poll(() => page.evaluate((k) => (window as any).konusma.soylenen.slice(k).length, n), { timeout: 30_000 }).toBeGreaterThanOrEqual(2);
+  const sonra = await page.evaluate((k) => ({ soylenen: (window as any).konusma.soylenen.slice(k), zaman: (window as any).konusma.zaman.slice(k) }), n);
+  expect(sonra.soylenen[0]).toBe(komut);
+  expect(sonra.soylenen.filter((m: string) => m === komut)).toHaveLength(1);
+  expect(sonra.zaman[1] - sonra.zaman[0]).toBeGreaterThanOrEqual(uzunluk * 70 - 50);
   expect(kayit.hatalar).toEqual([]);
 });
 

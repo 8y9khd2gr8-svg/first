@@ -7,8 +7,22 @@ import type { Animasyon } from './hareketler';
 
 const ANAHTAR = 'zipzip-kamera-v1';
 
-export const kameraAcikMi = () => localStorage.getItem(ANAHTAR) === '1';
-export const kameraAyarla = (acik: boolean) => (acik ? localStorage.setItem(ANAHTAR, '1') : localStorage.removeItem(ANAHTAR));
+// Kayıt alanı kapalıysa (Safari "Tüm çerezleri engelle": dokunmak bile hata verir) kamera kapalı sayılır, oyun çökmez.
+export function kameraAcikMi() {
+  try {
+    return localStorage.getItem(ANAHTAR) === '1';
+  } catch {
+    return false;
+  }
+}
+export function kameraAyarla(acik: boolean) {
+  try {
+    if (acik) localStorage.setItem(ANAHTAR, '1');
+    else localStorage.removeItem(ANAHTAR);
+  } catch {
+    // kayıt olmazsa bu açılışta geçerli değil; sorun değil
+  }
+}
 // Pakette MediaPipe'in sadece hızlı (SIMD) hâli var; yavaş kopyası 9 MB olduğu için çıkarıldı.
 // SIMD'i olmayan eski telefonlarda (ör. iOS 16.4'ten eski) kamera seçeneği hiç görünmez, oyun aynen çalışır.
 const SIMD_DENEME = new Uint8Array([0, 97, 115, 109, 1, 0, 0, 0, 1, 5, 1, 96, 0, 1, 123, 3, 2, 1, 0, 10, 10, 1, 8, 0, 65, 0, 253, 15, 253, 98, 11]);

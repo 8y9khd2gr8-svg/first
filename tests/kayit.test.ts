@@ -119,3 +119,68 @@ test('açık duraklar: betada 14, bütün bölümler açılınca 50', async () =
     delete (globalThis as any).location;
   }
 });
+
+// Safari "Tüm çerezleri engelle" açıkken kayıt alanına (localStorage) dokunmak bile hata fırlatır.
+// Oyun kayıtsız da çalışmalı: hiçbir okuma/yazma ekranı çökertmemeli (17 Ekim: kamera ayarı korumasızdı).
+test('kayıt alanı tamamen kapalıyken (erişim hata verir) hiçbir okuma/yazma çökmez', async () => {
+  const { kameraAcikMi, kameraAyarla } = await import('../src/kamera');
+  const { guvenlikNotuGoruldu, guvenlikNotunuIsaretle, tumVerileriSil } = await import('../src/guvenlik');
+  const { hareketKaydet } = await import('../src/istatistik');
+  const { H } = await import('../src/hareketler');
+  const { kostumSec } = await import('../src/kostumler');
+  const { pasaportYaz } = await import('../src/pasaport');
+  const { oyunAyariYaz } = await import('../src/oyunAyari');
+  const onceki = Object.getOwnPropertyDescriptor(globalThis, 'localStorage')!;
+  Object.defineProperty(globalThis, 'localStorage', { configurable: true, get: () => { throw new Error('SecurityError'); } });
+  try {
+    assert.equal(kameraAcikMi(), false);
+    kameraAyarla(true);
+    kameraAyarla(false);
+    assert.equal(guvenlikNotuGoruldu(), false);
+    guvenlikNotunuIsaretle();
+    tumVerileriSil();
+    assert.deepEqual(tamamlananlar(), []);
+    tamamla('istanbul');
+    hareketKaydet(Object.values(H)[0]);
+    assert.equal(haftalikOzet().toplamHareket, 0);
+    kazanilanlar();
+    rozetleriKutla(yeniRozetler());
+    kostumSec('kaptan');
+    assert.equal(seciliKostum(), undefined);
+    yeniKostumler();
+    pasaportYaz({ ad: 'x' });
+    assert.equal(pasaportOku().ad, '');
+    oyunAyariYaz({ oturarak: true });
+    assert.deepEqual(oyunAyari(), { yas: 'buyuk', oturarak: false });
+  } finally {
+    Object.defineProperty(globalThis, 'localStorage', onceki);
+  }
+});
+
+// Haftalık özet yerel saatle gün sayar: İngiltere/Türkiye, gece yarısı ve yaz saati geçişinde 7 ayrı gün, sonuncusu bugün.
+test('haftalık özet: saat dilimi, gece yarısı ve yaz saati geçişinde 7 ayrı gün', () => {
+  const GercekDate = Date;
+  const eskiTZ = process.env.TZ;
+  try {
+    for (const tz of ['Europe/London', 'Europe/Istanbul', 'America/New_York', 'Pacific/Auckland']) {
+      process.env.TZ = tz;
+      for (const an of ['2026-10-25T00:30:00Z', '2026-10-25T01:30:00Z', '2026-10-24T23:59:59Z', '2026-03-29T00:30:00Z', '2026-03-29T01:30:00Z', '2026-03-30T00:10:00Z', '2026-04-05T13:00:00Z']) {
+        const simdi = GercekDate.parse(an);
+        (globalThis as any).Date = class extends GercekDate {
+          constructor(...a: any[]) {
+            if (a.length === 0) super(simdi);
+            else super(...(a as []));
+          }
+          static now = () => simdi;
+        };
+        const gunler = haftalikOzet().gunler.map((g) => g.gun);
+        assert.equal(new Set(gunler).size, 7, `${tz} ${an}: ${gunler}`);
+        assert.equal(gunler[6], gunAnahtari(), `${tz} ${an}`);
+        (globalThis as any).Date = GercekDate;
+      }
+    }
+  } finally {
+    (globalThis as any).Date = GercekDate;
+    process.env.TZ = eskiTZ;
+  }
+});
