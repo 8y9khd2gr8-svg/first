@@ -89,18 +89,21 @@ export class EbeveynOzetScene extends Phaser.Scene {
     // Paylaş: telefonun kendi paylaşma menüsü (WhatsApp vb.). Gerçek HTML düğmesi, çünkü
     // telefonlar paylaşma menüsünü sadece doğrudan dokunuşla açar.
     const ad = pasaportOku().ad;
-    const metin = `🌍 Zıp Zıp Dünya'da bu hafta${ad ? ` ${ad}` : ''} ${dakika} dakikalık hareket tamamladı, ${ozet.ziplama} kez zıpladı ve ${durak} durak gezdi! 🏃`;
+    // Durak sayısı bu haftanın değil toplamdır (kutudaki "toplam durak" gibi).
+    const metin = `🌍 Zıp Zıp Dünya'da bu hafta${ad ? ` ${ad}` : ''} ${dakika} dakikalık hareket tamamladı ve ${ozet.ziplama} kez zıpladı; şimdiye kadar ${durak} durak gezdi! 🏃`;
     const paylas = this.add.dom(x, 1195, 'button', PAYLAS_STILI, 'Paylaş 📤');
     paylas.addListener('click');
     paylas.on('click', async () => {
+      const kopyala = async () => {
+        await navigator.clipboard.writeText(metin);
+        (paylas.node as HTMLButtonElement).textContent = 'Kopyalandı ✓';
+      };
       try {
         if (navigator.share) await navigator.share({ text: metin });
-        else {
-          await navigator.clipboard.writeText(metin);
-          (paylas.node as HTMLButtonElement).textContent = 'Kopyalandı ✓';
-        }
-      } catch {
-        // Kullanıcı paylaşmaktan vazgeçti.
+        else await kopyala();
+      } catch (e) {
+        // Vazgeçildiyse bir şey yapılmaz; paylaşma açılamadıysa metin panoya kopyalanır.
+        if ((e as { name?: string } | null)?.name !== 'AbortError') await kopyala().catch(() => undefined);
       }
     });
   }

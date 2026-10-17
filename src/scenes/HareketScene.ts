@@ -7,7 +7,7 @@ import { SOGUMA_ID, hareketYapildi, oturumListesi } from '../oturum';
 import { uzaktanAcikMi } from '../ayarlar';
 import { AYNA, Animasyon, DONMA, Hareket } from '../hareketler';
 import { hareketKaydet } from '../istatistik';
-import { KAMERA_HAREKETLERI, KameraDurumu, KameraSayaci, kameraAcikMi, kameraDesteklenir } from '../kamera';
+import { EksikYer, KAMERA_HAREKETLERI, KameraDurumu, KameraSayaci, eksikYeri, kameraAcikMi, kameraDesteklenir } from '../kamera';
 import { oyunAyari } from '../oyunAyari';
 import { GERI_SAYIM, M, SAYILAR } from '../metinler';
 import { bip, konus, sustur, zaferMuzigi } from '../ses';
@@ -31,6 +31,27 @@ const KAMERALI_YAZI_X = 250;
 // Ayna en çok bu kadar bekler (görmese de oyun bekletmez, kaybettirmez); Sakin tempoda biraz daha uzun.
 const AYNA_EN_COK_MS = 6000;
 const AYNA_SAKIN_MS = 8000;
+
+// Kamera çocuğu tam göremiyorsa kutudaki yazı neyin eksik olduğunu söyler (K41 c). Ayna büyük, uzun yazı sığar;
+// hareket boyunca kutu küçük, kısa yazı (biraz küçük harfle). Neyin eksik olduğu henüz bilinmiyorsa (ilk kare) genel yazı.
+const AYNA_IPUCU: Record<EksikYer, string> = {
+  kimse: '🧍 Seni göremiyorum: kameranın önüne gel',
+  ayaklar: '🦶 Ayakların görünmüyor: biraz geri git',
+  omuzlar: '🙋 Çok yakınsın: biraz geri git',
+  kenar: '↔️ Ortaya gel, biraz geri git',
+};
+const KUTU_IPUCU: Record<EksikYer, string> = {
+  kimse: '📷 Seni göremiyorum',
+  ayaklar: '🦶 Ayakların görünmüyor',
+  omuzlar: '📷 Çok yakınsın',
+  kenar: '📷 Ortaya gel',
+};
+const SESLI_IPUCU: Record<EksikYer, string> = { kimse: M.ipucuKimse, ayaklar: M.ipucuAyaklar, omuzlar: M.ipucuOmuzlar, kenar: M.ipucuKenar };
+// Sesli ipucu sadece aynada söylenir (hareket sırasında Zıpzıp sayıları söylüyor), "Ekranda kendine bak!"tan sonra.
+// Aynı ipucu bu süre geçmeden yinelenmez (her harekette aynı cümle bıktırmasın); farklı eksikse söylenir.
+const IPUCU_ILK_MS = 3000;
+const IPUCU_TEKRAR_MS = 60_000;
+let sonIpucu: { yer: EksikYer; zaman: number } | null = null;
 
 // Hareket ekranı. Bir durağın 5 hareketini sırayla oynatır.
 // Her hareket: Zıpzıp gösterir → 3-2-1 → çocuk yapar (sayaç) → "Yaptım!" → sıradaki.
@@ -162,6 +183,7 @@ export class HareketScene extends Phaser.Scene {
     const enCok = oyunAyari().yas === 'kucuk' ? AYNA_SAKIN_MS : AYNA_EN_COK_MS;
     let gecen = 0;
     let son = performance.now();
+    let ipucuSoylendi = false;
     const sure = this.time.addEvent({
       delay: 100,
       loop: true,
@@ -169,7 +191,14 @@ export class HareketScene extends Phaser.Scene {
         const simdi = performance.now();
         gecen += Math.min(simdi - son, 1500);
         son = simdi;
-        if (gecen >= enCok) bitir();
+        if (gecen >= enCok) return bitir();
+        // Hâlâ göremiyorsa bir kez neyin eksik olduğunu söyler (sık tekrar etmez).
+        const yer = kamera.durum === 'goremiyorum' ? eksikYeri(kamera.eksik) : null;
+        if (!ipucuSoylendi && yer && gecen >= IPUCU_ILK_MS && (sonIpucu?.yer !== yer || simdi - sonIpucu.zaman > IPUCU_TEKRAR_MS)) {
+          ipucuSoylendi = true;
+          sonIpucu = { yer, zaman: simdi };
+          konus(SESLI_IPUCU[yer]);
+        }
       },
     });
     this.kutuHali('ayna');
@@ -327,17 +356,24 @@ export class HareketScene extends Phaser.Scene {
     let durum: KameraDurumu = 'yukleniyor';
     let sayi = 0;
     let hazir = false;
+    let ipucuYazisi = false;
+    const yaziBoyu = () => Math.round(boyut.yazi * (ipucuYazisi ? 0.7 : 1));
     const yaz = () => {
       const goruyor = durum === 'goruyorum' || (hal === 'ayna' && hazir && durum !== 'durdu' && durum !== 'hata');
+      const yer = durum === 'goremiyorum' ? eksikYeri(kamera.eksik) : null;
       // Görüntü kesilince (ekran kilidi, başka uygulama) son sayı kalmasın: ebeveyn kameranın saydığını sanmasın.
       // Oynanış aynı: "Yaptım!" yine çıkar (K27).
       yazi.textContent =
         durum === 'hata' ? '📷 Açılamadı'
         : durum === 'durdu' ? '📷 Durdu'
         : durum === 'yukleniyor' ? '📷 Hazırlanıyor'
-        : hal === 'ayna' ? (goruyor ? '✅ Hazırsın!' : '🧍 Baştan ayağa görün: biraz geri git')
-        : durum === 'goremiyorum' ? '📷 Geri git'
+        : hal === 'ayna' ? (goruyor ? '✅ Hazırsın!' : yer ? AYNA_IPUCU[yer] : '🧍 Baştan ayağa görün: biraz geri git')
+        : durum === 'goremiyorum' ? (yer ? KUTU_IPUCU[yer] : '📷 Geri git')
         : `📷 ${Math.min(sayi, hareket.adet)}/${hareket.adet}`;
+      // Küçük kutudaki ipucu iki satıra sığsın diye biraz küçük harfle.
+      ipucuYazisi = hal !== 'ayna' && !!yer;
+      yazi.style.fontSize = `${yaziBoyu()}px`;
+      yazi.style.lineHeight = `${Math.round(yaziBoyu() * 1.5)}px`;
       const renk = goruyor ? '#3FBF5F' : '#FFC93C';
       kutu.style.borderColor = renk;
       cerceve.style.borderColor = renk;
@@ -354,16 +390,16 @@ export class HareketScene extends Phaser.Scene {
     const video = kamera.onizleme;
     video.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transform:scaleX(-1);display:block;';
     kutu.append(video, cerceve, yazi);
+    const boyut = { ...KUTU.hareket };
     // İlk hâl hemen yazılır: kamera hazırlanırken küçük kutuda aynanın çerçevesi görünmesin.
     yaz();
     const dom = this.add.dom(0, 0, kutu).setOrigin(0, 0);
-    const boyut = { ...KUTU.hareket };
     const uygula = () => {
       dom.setPosition(boyut.x, boyut.y);
       kutu.style.width = `${boyut.g}px`;
       kutu.style.height = `${boyut.y2}px`;
-      yazi.style.fontSize = `${boyut.yazi}px`;
-      yazi.style.lineHeight = `${Math.round(boyut.yazi * 1.5)}px`;
+      yazi.style.fontSize = `${yaziBoyu()}px`;
+      yazi.style.lineHeight = `${Math.round(yaziBoyu() * 1.5)}px`;
     };
     uygula();
     this.kutuHali = (yeni) => {

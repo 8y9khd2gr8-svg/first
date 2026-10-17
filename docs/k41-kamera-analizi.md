@@ -56,5 +56,5 @@ Eşik ve "kollarda ayak şartı" **değiştirilmedi** (karar sizde, bölüm 5).
 |---|---|
 | (a) Önce gerçek telefonda kutu yazısına bakılsın (önerilen) | Hiçbir şey değişmez; kardeş/Yağız denemesinde "Geri git" görülüyorsa neden kesinleşir |
 | (b) Kol hareketlerinde topuk şartı kalksın (omuz + kalça yeter) | Masa senaryosunda kollar sayılır; boy ölçüsü omuz-kalçaya göre yeniden kurulmalı |
-| (c) "Geri git" yerine eksik yere göre yazı ("Ayakların görünmüyor") | Çocuk/ebeveyn neyin eksik olduğunu anlar; `eksikNoktalar` hazır |
+| (c) "Geri git" yerine eksik yere göre yazı ("Ayakların görünmüyor") | ✅ **Onaylandı, yapıldı (17 Ekim):** ayna/kutu yazısı + aynada bir kez ses; 🔍 Dene'de tanı satırı. Sayma şartı aynı |
 | (d) Eşikleri şimdiden gevşetmek | Önerilmez: yanlış sayım riski, kanıt yok |

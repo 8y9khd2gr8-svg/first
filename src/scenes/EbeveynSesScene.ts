@@ -33,8 +33,11 @@ export class EbeveynSesScene extends Phaser.Scene {
       .text(x, 600, '', { fontFamily: YAZI_TIPI, fontSize: '27px', color: '#cfe3ff', align: 'left', lineSpacing: 4, wordWrap: { width: 620 } })
       .setOrigin(0.5, 0);
 
+    // Ses listesi geç gelebilir (en çok 1,5 sn): o arada ekrandan çıkılıp geri girildiyse eski cevap yeni ekrana yazmaz.
+    let kapandi = false;
+    this.events.once('shutdown', () => (kapandi = true));
     void sesDurumu().then((durum) => {
-      if (!this.scene.isActive()) return;
+      if (kapandi) return;
       const kayit = durum.kayitli > 0 ? `✅ Doğal ses kaydı: ${durum.kayitli} cümle` : 'Doğal ses kaydı: henüz yok';
       const telefon = durum.turkce
         ? `✅ Telefonun Türkçe sesi: ${kisalt(durum.sesAdi ?? 'var')}`

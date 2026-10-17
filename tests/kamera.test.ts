@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { test } from 'node:test';
 import type { NormalizedLandmark } from '@mediapipe/tasks-vision';
-import { BURUN, eksikNoktalar, GEREKEN_NOKTALAR, KAMERA_HAREKETLERI, kameraDurumYazisi, saymaYolu, kameraHatasi, ZIPLAMA_EN_AZ_ARA_MS, SAG_BILEK, SAG_DIZ, SAG_KALCA, SAG_OMUZ, SAG_TOPUK, SOL_BILEK, SOL_DIZ, SOL_KALCA, SOL_OMUZ, SOL_TOPUK, Sayici, simdVarMi } from '../src/kamera';
+import { BURUN, eksikNoktalar, eksikTaniYazisi, eksikYeri, GEREKEN_NOKTALAR, KAMERA_HAREKETLERI, kameraDurumYazisi, saymaYolu, kameraHatasi, ZIPLAMA_EN_AZ_ARA_MS, SAG_BILEK, SAG_DIZ, SAG_KALCA, SAG_OMUZ, SAG_TOPUK, SOL_BILEK, SOL_DIZ, SOL_KALCA, SOL_OMUZ, SOL_TOPUK, Sayici, simdVarMi } from '../src/kamera';
 import { K } from '../src/hareketler';
 
 type Durus = { x?: number; omuzY?: number; kalcaY?: number; bilekY?: number; solDizY?: number; sagDizY?: number; ayakAciklik?: number; topukY?: number };
@@ -185,6 +185,29 @@ test('K41: gerekli noktalar ve görünürlük sınırı (0,5)', () => {
   assert.deepEqual(eksikNoktalar(gorunurluk(0.51)), []);
   // Görünürlük değeri olmayan nokta görünmez sayılır.
   assert.deepEqual(eksikNoktalar(tam.map((p, i) => (i === SOL_OMUZ ? { x: p.x, y: p.y, z: 0 } : p))), [SOL_OMUZ]);
+});
+
+test('K41 (c): eksik yere göre yön: kimse / ayaklar / çok yakın (omuzlar) / kenar; tanı satırı sol-sağ söyler', () => {
+  const tam = nokta({});
+  const yer = (...g: number[]) => eksikYeri(eksikNoktalar(gizle(tam, ...g)));
+  assert.equal(yer(), null);
+  assert.equal(eksikYeri(eksikNoktalar(undefined)), 'kimse');
+  assert.equal(yer(SOL_OMUZ, SAG_OMUZ, SOL_TOPUK, SAG_TOPUK), 'kimse');
+  assert.equal(yer(SOL_TOPUK, SAG_TOPUK), 'ayaklar');
+  assert.equal(yer(SAG_TOPUK), 'ayaklar');
+  assert.equal(yer(SOL_OMUZ, SAG_OMUZ), 'omuzlar');
+  assert.equal(yer(SOL_OMUZ), 'omuzlar');
+  assert.equal(yer(SOL_OMUZ, SOL_TOPUK), 'kenar');
+  assert.equal(yer(SAG_OMUZ, SOL_TOPUK, SAG_TOPUK), 'kenar');
+  const tani = (...g: number[]) => eksikTaniYazisi(eksikNoktalar(gizle(tam, ...g)));
+  assert.equal(tani(), '');
+  assert.equal(eksikTaniYazisi(eksikNoktalar(undefined)), 'Kimse görünmüyor');
+  assert.equal(tani(SOL_TOPUK, SAG_TOPUK), 'Topuklar görünmüyor: biraz geri gidin');
+  assert.equal(tani(SAG_TOPUK), 'Sağ topuk görünmüyor: biraz geri gidin');
+  assert.equal(tani(SOL_OMUZ, SAG_OMUZ), 'Omuzlar görünmüyor: biraz geri gidin');
+  assert.equal(tani(SOL_OMUZ, SOL_TOPUK), 'Sol omuz ve sol topuk görünmüyor: ortaya gelin');
+  assert.equal(tani(SAG_OMUZ, SOL_TOPUK, SAG_TOPUK), 'Sağ omuz ve topuklar görünmüyor: ortaya gelin');
+  // Sayma şartı değişmedi: eksik ne olursa olsun sayılmaz (yukarıdaki testler).
 });
 
 test('K41: kadraj kenarı: sadece görünürlüğe bakılır, koordinat kadraj dışında olsa da görünür sayılırsa sayılır', () => {
