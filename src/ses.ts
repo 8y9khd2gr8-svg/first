@@ -86,14 +86,30 @@ type KonusmaDinleyici = (konusuyor: boolean) => void;
 const dinleyiciler = new Set<KonusmaDinleyici>();
 let konusuyor = false;
 let konusmaBitisi: ReturnType<typeof setTimeout> | undefined;
+// Söylenmekte olan (ya da kaydı yüklenen) cümle; bitince boşalır. Sayfa gizlenirken doluysa yarıda kalmıştır (K39).
+let suren: string | null = null;
+let yarimKalan: string | null = null;
 
 function konusmaDurumu(durum: boolean, enFazlaMs = 0) {
   clearTimeout(konusmaBitisi);
   // Telefonun sesi bazen "bitti" demez; ağız sonsuza dek oynamasın diye cümle uzunluğuna göre üst sınır.
-  if (durum) konusmaBitisi = setTimeout(() => konusmaDurumu(false), enFazlaMs);
+  if (durum) konusmaBitisi = setTimeout(() => cumleBitti(), enFazlaMs);
   if (durum === konusuyor) return;
   konusuyor = durum;
   dinleyiciler.forEach((f) => f(durum));
+}
+
+function cumleBitti() {
+  suren = null;
+  konusmaDurumu(false);
+}
+
+// Arama/kilit/başka uygulama yüzünden yarıda kesilen cümle (dönüşte bir kez alınır, sonra boşalır).
+// Hangi cümlenin yeniden söyleneceğine ekran karar verir (ör. hareket komutu; sayılar yinelenmez).
+export function yarimKalaniAl(): string | null {
+  const m = yarimKalan;
+  yarimKalan = null;
+  return m;
 }
 
 export function konusmayiDinle(f: KonusmaDinleyici): () => void {
@@ -104,7 +120,9 @@ export function konusmayiDinle(f: KonusmaDinleyici): () => void {
 
 export function konus(metin: string) {
   sustur();
+  yarimKalan = null;
   if (!metin) return; // söylenecek cümle yoksa sessiz geç (oyun asla takılmasın)
+  suren = metin;
   const anahtar = sesAnahtari(metin);
   if (SES_DOSYALARI.has(anahtar) && sesBaglami()) {
     const no = ++konusmaNo;
@@ -115,7 +133,7 @@ export function konus(metin: string) {
       calan = b.createBufferSource();
       calan.buffer = kayit;
       calan.connect(b.destination);
-      calan.onended = () => no === konusmaNo && konusmaDurumu(false);
+      calan.onended = () => no === konusmaNo && cumleBitti();
       calan.start();
       konusmaDurumu(true, kayit.duration * 1000 + 500);
     });
@@ -133,11 +151,11 @@ function telefonSesi(metin: string) {
     const no = konusmaNo;
     TextToSpeech.speak({ text: okunus(metin), lang: 'tr-TR', rate: HIZ, pitch: TON, voice: uygulamaSesi })
       .catch(() => undefined)
-      .finally(() => no === konusmaNo && konusmaDurumu(false));
+      .finally(() => no === konusmaNo && cumleBitti());
     konusmaDurumu(true, metin.length * 90 + 1500);
     return;
   }
-  if (!('speechSynthesis' in window)) return;
+  if (!('speechSynthesis' in window)) return cumleBitti();
   if (!turkceSes) turkceSesiBul();
   speechSynthesis.cancel();
   const s = new SpeechSynthesisUtterance(okunus(metin));
@@ -146,7 +164,7 @@ function telefonSesi(metin: string) {
   s.rate = HIZ;
   s.pitch = TON;
   const no = konusmaNo;
-  s.onend = s.onerror = () => no === konusmaNo && konusmaDurumu(false);
+  s.onend = s.onerror = () => no === konusmaNo && cumleBitti();
   speechSynthesis.speak(s);
   // "Başladı" haberi bazı telefonlarda gecikir ya da hiç gelmez; ağız hemen oynamaya başlar.
   konusmaDurumu(true, metin.length * 90 + 1500);
@@ -154,6 +172,7 @@ function telefonSesi(metin: string) {
 
 export function sustur() {
   konusmaNo++;
+  suren = null;
   try {
     calan?.stop();
   } catch {
@@ -168,8 +187,13 @@ export function sustur() {
 // Bildirim/arama, ekran kilidi ya da başka uygulama (kontrol listesi T3, T4, T10): sayfa gizlenince konuşma susar.
 // Oyunun saati de durur (Phaser); cümle arkada sürüp dönüşte yenisiyle üst üste binmesin, ağız açık kalmasın.
 // Dönüşte iPhone'da "duraklatılmış" kalan tarayıcı konuşması sürdürülür (yoksa sonraki cümleler hiç okunmaz).
+// Yarıda kalan cümle hatırlanır (yarimKalaniAl); ekran isterse dönüşte bir kez yeniden söyler (K39 b).
 document.addEventListener('visibilitychange', () => {
-  if (document.hidden) sustur();
+  if (document.hidden) {
+    const kesilen = suren;
+    sustur();
+    yarimKalan = kesilen;
+  }
   else if (!uygulamada && 'speechSynthesis' in window && speechSynthesis.paused) speechSynthesis.resume();
 });
 

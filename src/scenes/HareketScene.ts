@@ -10,7 +10,7 @@ import { hareketKaydet } from '../istatistik';
 import { EksikYer, KAMERA_HAREKETLERI, KameraDurumu, KameraSayaci, eksikYeri, kameraAcikMi, kameraDesteklenir } from '../kamera';
 import { oyunAyari } from '../oyunAyari';
 import { GERI_SAYIM, M, SAYILAR } from '../metinler';
-import { bip, konus, sustur, zaferMuzigi } from '../ses';
+import { bip, konus, sustur, yarimKalaniAl, zaferMuzigi } from '../ses';
 import { Zipzip } from '../zipzip';
 import { durakYonu, zipzipYonunuAyarla } from '../zipzipKure';
 
@@ -159,7 +159,22 @@ export class HareketScene extends Phaser.Scene {
 
     // Uzun cümlelerde seslendirme bitmeden geri sayım başlamasın.
     const bekleme = Math.max(gosterimSuresi + 600, hareket.sesli.length * 70);
-    this.time.delayedCall(bekleme, () => this.aynaEvresi(() => this.geriSay(() => this.basla(hareket))));
+    const sonraki = () => this.aynaEvresi(() => this.geriSay(() => this.basla(hareket)));
+    let gosterimBitti = this.time.delayedCall(bekleme, sonraki);
+
+    // Arama/kilit/başka uygulama komutu yarıda kestiyse (K39 b, 17 Ekim): dönüşte komut bir kez yeniden söylenir
+    // (okuma bilmeyen çocuk ne yapacağını duysun) ve geri sayım cümle bitecek kadar ertelenir. Sayılar yinelenmez.
+    const donus = () => {
+      if (document.hidden) return;
+      const yarim = yarimKalaniAl();
+      if (yarim !== hareket.sesli || gosterimBitti.hasDispatched) return;
+      konus(yarim);
+      const kalan = gosterimBitti.getRemaining();
+      gosterimBitti.remove();
+      gosterimBitti = this.time.delayedCall(Math.max(kalan, yarim.length * 70), sonraki);
+    };
+    document.addEventListener('visibilitychange', donus);
+    this.events.once('shutdown', () => document.removeEventListener('visibilitychange', donus));
   }
 
   // Önce büyük ayna (K40): kamerayla sayılan harekette geri sayımdan önce çocuk kendini büyük görür ve "baştan ayağa"
