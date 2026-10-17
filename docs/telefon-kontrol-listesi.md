@@ -23,3 +23,7 @@ Yeni bir telefon davranışı fark edilirse bu tabloya eklenir.
 **Telefonda doldurulan sayfa (17 Ekim):** kardeş ve Yağız için bu tablo ve `docs/yagiz-testi.md` tek sayfada, iPhone'da işaretlenip
 notları kopyalanabilir: https://claude.ai/artifact/DjZd22aR1pZNm82WUP6j8r (özel bağlantı; başkası açacaksa sayfanın Paylaş menüsünden paylaşılır).
 Erişilebilirlik (hareketi azalt, büyük yazı, VoiceOver) de orada; hareketi azalt bulutta taklit edilir (`oyun.spec.ts` "hareketi azalt"), büyük yazı ve VoiceOver 🔎.
+
+**VoiceOver deneme sayfası (17 Ekim akşamı, K46):** https://claude.ai/artifact/AgsJCsCMZwZ3MZmw1Lf1cT . Üç yol (bugünkü tuval, adı olan tuval,
+görünmez HTML düğmeler); her birinde VoiceOver'ın ne okuduğu ve doğru düğmenin çalışıp çalışmadığı yazılır, ayrıca gerçek oyunda da bakılır.
+Bulutta sadece tarayıcının erişilebilirlik ağacı görüldü (çocuk ekranlarında adsız tek "Canvas"); iPhone davranışı 🔎.

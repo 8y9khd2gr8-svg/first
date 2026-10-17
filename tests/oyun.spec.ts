@@ -541,6 +541,28 @@ test('her çocuk ekranında Zıpzıp konuşur (sesli yönlendirme)', async ({ pa
   expect(kayit.hatalar).toEqual([]);
 });
 
+// VoiceOver (K46): oyun tek bir çizim alanı; çocuk ekranlarının düğmeleri ekran okuyucuya görünmez (🔎 iPhone'da denenmedi).
+// Ebeveyn ekranlarındaki gerçek HTML parçaları ise okunur: her birinin ekran okuyucunun okuyacağı bir adı olmalı
+// (ad kutusu sadece "ör. Yağız" yer tutucusuyla okunuyordu, 17 Ekim).
+test('ebeveyn ekranlarındaki HTML düğme ve kutuların ekran okuyucu adı var', async ({ page }) => {
+  const kayit = await oyunuAc(page, { 'zipzip-pasaport-v1': JSON.stringify({ ad: '', avatar: '🐼', soruldu: true }) });
+  await sahneAc(page, 'PasaportAyar');
+  await expect(page.getByRole('textbox', { name: 'Çocuğun adı', exact: true })).toBeVisible();
+  await expect(page.getByRole('button', { name: '📷 Fotoğraf ekle (isteğe bağlı)' })).toBeVisible();
+  for (const [ad, veri] of [['PasaportAyar', {}], ['EbeveynOzet', {}], ['EbeveynMenu', {}]] as [string, object][]) {
+    await sahneAc(page, ad, veri);
+    const adsiz = await page.evaluate(() =>
+      [...document.querySelectorAll('#oyun button, #oyun input, #oyun a, #oyun select, #oyun textarea')]
+        .filter((e) => (e as HTMLElement).offsetParent !== null && (e as HTMLInputElement).type !== 'file')
+        // Kutunun yer tutucusu ad sayılmaz (yazınca kaybolur); düğme/bağlantıda yazısı ad olur.
+        .filter((e) => !(e.getAttribute('aria-label') || (e.tagName === 'INPUT' ? '' : e.textContent) || '').trim())
+        .map((e) => e.outerHTML.slice(0, 80)),
+    );
+    expect(adsiz, ad).toEqual([]);
+  }
+  expect(kayit.hatalar).toEqual([]);
+});
+
 // Telefonda "hareketi azalt" açıkken (iPhone: Ayarlar → Erişilebilirlik → Hareket) sürekli oynayan süs kalmaz (17 Ekim ölçümü:
 // normalde haritalarda ~60 yıldız pırıltısı). Sadece anlamlı olan kalır: sıradaki durağın / açılan kapının nabzı (en çok 2).
 test('hareketi azalt: çocuk ekranlarında sürekli süs animasyonu yok, sadece sıradaki işareti', async ({ page }) => {
@@ -1185,6 +1207,11 @@ async function kesintiSahte(page: Page) {
     ss.speak = (u: SpeechSynthesisUtterance) => {
       w.konusma.soylenen.push(u.text);
       w.konusma.zaman.push(w.oyun?.scene.getScene('Hareket')?.time.now ?? 0);
+      // İstenirse sıradaki cümle söylenir söylenmez sayfa gizlenir (cümle kesin yarıda kalsın; yavaş makinede de).
+      if (w.sonrakiCumledeGizle) {
+        w.sonrakiCumledeGizle = false;
+        queueMicrotask(() => w.sayfayiGizle(true));
+      }
     };
     ss.cancel = () => w.konusma.susturma++;
     Object.defineProperty(ss, 'paused', { get: () => w.konusma.duraklatildi });
@@ -1287,30 +1314,31 @@ test('kesinti (bildirim/arama): ses susar, sayaç ve "Uzaktan oyna" durur; dön�
 // K39 (b), 17 Ekim: komut söylenirken arama/kilit gelirse dönüşte komut bir kez yeniden söylenir ve
 // geri sayım cümle bitecek kadar bekler (okuma bilmeyen çocuk ne yapacağını duysun). Eski kodda komut yinelenmiyordu.
 test('kesinti: gösterimde yarıda kalan hareket komutu dönüşte bir kez yeniden söylenir, geri sayım onu kesmez', async ({ page }) => {
-  test.setTimeout(90_000);
+  test.setTimeout(150_000);
   await kesintiSahte(page);
   const kayit = await oyunuAc(page);
-  // sahneAc 0,7 sn bekler; komut ilk karede söylendiği için sahne doğrudan başlatılır.
-  await page.evaluate(() => (window as any).oyun.scene.start('Hareket', { durakId: 'istanbul', adim: 0 }));
-  const gizleme = await page.waitForFunction(
-    () => {
-      const w = window as any;
-      const s = w.oyun.scene.getScene('Hareket');
-      if (!s?.scene.isActive() || !s.liste) return false;
-      // Söylenen metin okunuş sözlüğünden geçmiş olabilir; süre ekrandaki cümlenin uzunluğuyla.
-      if (!w.konusma.soylenen.length || s.bilgi?.text !== 'Önce Zıpzıp’ı izle!') return false;
-      w.sayfayiGizle(true);
-      return { komut: w.konusma.soylenen.at(-1), uzunluk: s.liste()[s.adim].sesli.length, n: w.konusma.soylenen.length };
-    },
-    null,
-    { timeout: 30_000, polling: 'raf' },
-  );
-  const { komut, uzunluk, n } = (await gizleme.jsonValue()) as { komut: string; uzunluk: number; n: number };
+  // Sayfa, hareket komutu söylendiği anda gizlenir (sahte konuşmada; 17 Ekim: test yük altında gizlemeyi geç yapıp
+  // komut bitmiş sayılınca kırmızı oluyordu). Açılış ekranı ilk dokunuştan önce konuşmaz; ilk cümle komuttur.
+  await page.evaluate(() => {
+    const w = window as any;
+    w.sonrakiCumledeGizle = true;
+    w.oyun.scene.getScenes(true).forEach((s: any) => s.scene.stop());
+    w.oyun.scene.start('Hareket', { durakId: 'istanbul', adim: 0 });
+  });
+  await page.waitForFunction(() => (window as any).sayfaGizli === true, null, { timeout: 30_000 });
+  const { komut, uzunluk, n, bilgi } = await page.evaluate(() => {
+    const w = window as any;
+    const s = w.oyun.scene.getScene('Hareket');
+    return { komut: w.konusma.soylenen.at(-1), uzunluk: s.liste()[s.adim].sesli.length, n: w.konusma.soylenen.length, bilgi: s.bilgi?.text };
+  });
+  expect(bilgi).toBe('Önce Zıpzıp’ı izle!');
+  expect(n).toBe(1);
   await page.waitForTimeout(2000);
   expect(await page.evaluate((k) => (window as any).konusma.soylenen.slice(k), n)).toEqual([]);
   await page.evaluate(() => (window as any).sayfayiGizle(false));
   // Dönüş: komut hemen bir kez söylenir; sonra geri sayım ("Üç!") gelir, ama cümle bitecek kadar sonra.
-  await expect.poll(() => page.evaluate((k) => (window as any).konusma.soylenen.slice(k).length, n), { timeout: 30_000 }).toBeGreaterThanOrEqual(2);
+  // Yavaş makinede oyunun saati yavaş akar (kare 200 ms'yi aşınca); bekleme gerçek saatle uzun.
+  await expect.poll(() => page.evaluate((k) => (window as any).konusma.soylenen.slice(k).length, n), { timeout: 90_000 }).toBeGreaterThanOrEqual(2);
   const sonra = await page.evaluate((k) => ({ soylenen: (window as any).konusma.soylenen.slice(k), zaman: (window as any).konusma.zaman.slice(k) }), n);
   expect(sonra.soylenen[0]).toBe(komut);
   expect(sonra.soylenen.filter((m: string) => m === komut)).toHaveLength(1);
