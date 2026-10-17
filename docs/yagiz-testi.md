@@ -41,12 +41,16 @@ Oyunu ilk kez açıyorsanız ebeveyn köşesinden **🗑️ Tüm verileri sil** 
 | 18 | **Kamera denemesi** (kamera ayarının yanında 🔍 Dene): Yağız zıplarken/çömelirken sayı doğru arttı mı? Görmediğinde altta ne yazdı ("Topuklar görünmüyor", "Omuzlar görünmüyor", "Kimse görünmüyor")? Hangi hareket yanlış sayıldı? (Eşikler buna göre ayarlanacak; bu sayılar özete eklenmez.) | |
 | 19 | **Oyunda kamerayla sayma** (⚙️ Ayarlar → 📷 Kamerayla sayma açık; telefon dik, sabit, 2-3 m uzakta, Yağız'ın başından ayağına kadar görünecek yükseklikte). Kameranın saydığı harekette (kollar, çömel, zıpla, dizler, aç-kapa, yana adım) Zıpzıp gösterdikten sonra **büyük ayna** açılır (K40). **Kutuda ne yazdığına bakın:** "🦶 Ayakların görünmüyor: biraz geri git", "🙋 Çok yakınsın", "🧍 Seni göremiyorum" mu, "✅ Hazırsın!" mı? (Zıpzıp eksik yeri bir kez sesle de söyler.) Hareket sırasında sağ alttaki kutu "🦶 Ayakların görünmüyor" gibi bir yazı mı, "📷 3/10" gibi sayı mı yazıyor? "Açılamadı" / "Durdu" yazdıysa not edin. Yeşil "Hazırsın!" gelmeden geri sayım başladıysa: telefon nerede duruyordu, ayaklar görünüyor muydu? (Kamera ayakları görmezse hiç saymaz.) | |
 
+| 20 | **Kesinti (K39 b):** bir hareketin başında, Zıpzıp komutu söylerken ekranı yan tuşla kilitleyin ya da başka uygulamaya geçin, 5 sn sonra dönün. Zıpzıp komutu **bir kez** yeniden söyledi mi? Sonra 3-2-1 geldi mi? Sayma sırasında kilitlediyseniz dönüşte sayılar yinelendi mi (yinelenmemeli)? | |
+| 21 | **Dokunmadan oyun (K34):** "Uzaktan oyna" açıkken bir durağı telefona hiç dokunmadan bitirin. Ekran karardı mı? Kamera açıksa iPhone kamera iznini durak içinde ikinci kez sordu mu (sormamalı)? | |
+
 ## Zıplama denemesi (kamera, 10 dk) — K23
 **Yol:** Büyük Macera → sağ alttaki **🔒 Ebeveyn** (çarpma sorusu) → 📷 Kamerayla sayma yanındaki **🔍 Dene** →
 **🌍 Zıpzıp da zıplasın** → **📷 Kamerayla zıpla** (izin sorulursa "İzin ver").
 
-**Hazırlık:** iPhone'da Ayarlar → Ekran ve Parlaklık → Otomatik Kilit'i test boyunca 5 dk ya da "Asla" yapın (oyun ekranı
-açık tutmaz; 30 sn hareketsizlikte ekran kilitlenirse kamera durur). Telefon dik, sabit (rafa/kitaplara yaslı, elde
+**Hazırlık:** iPhone'da Ayarlar → Ekran ve Parlaklık → Otomatik Kilit'i test boyunca 5 dk ya da "Asla" yapın (oyun bu ekranda
+ekranı açık tutmaya çalışır (#131), ama ana ekrandan açılan oyunda eski iOS'ta ya da düşük güç modunda çalışmayabilir; ekran
+kilitlenirse kamera durur. Kararma olduysa not edin). Telefon dik, sabit (rafa/kitaplara yaslı, elde
 değil: telefon oynarsa omuzlar oynamış gibi görünür). Yağız 2-3 m uzakta; başının üstünde boşluk, ayakları görünür.
 Kadrajda başka kimse olmasın (kamera tek kişiye bakar, yanlış kişiyi seçebilir). Oda aydınlık, ışık arkadan gelmesin.
 Ekranın altında **✅ Görüyorum: zıpla!** yazmadan başlamayın. Ekrana kimse dokunmasın (dokunma da Zıpzıp'ı zıplatır).

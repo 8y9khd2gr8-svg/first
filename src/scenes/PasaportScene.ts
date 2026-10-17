@@ -73,7 +73,7 @@ export class PasaportScene extends Phaser.Scene {
       alan.on('pointerdown', () => {
         bip(880, 0.08, 'square', 0.12);
         sustur();
-        this.scene.start('Avatar');
+        this.scene.start('Avatar', {});
       });
       sayfa.add(alan);
     }

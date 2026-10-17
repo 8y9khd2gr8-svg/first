@@ -85,6 +85,15 @@ Onay verilmemiş, ertelenmiş ya da reddedilmiş öneriler de buraya yazılır; 
 
 ## 4. Oturum günlüğü (en yeni üstte)
 
+### 17 Ekim 2026 (akşam, 2) — bakım: kırılgan test taraması, kod denetimi 8. tur, belgeler
+**Kullanıcı seçti (VoiceOver dışı 4 iş, yeni oturum açmadan).**
+- **Kırılgan test taraması:** bütün oyun testleri yerelde 4 işçiyle (GitHub'dakinden yoğun) iki tur: 90 testten tur 1'de 3, tur 2'de 2 kırmızı (5 farklı test, hepsi kameralı ekran). Tekrarla (4×): "Zıpzıp da zıplasın: kamera durunca" 4'te 2 kırmızı → neden test: yük altında sahte kamera 2 sn takılınca oyun doğru biçimde kısa süre "durdu"ya geçip ritmi açıyor, test yazıyla ritmi ayrı anlarda okuyordu. Düzeltme: ikisi aynı anda beklenir; yük altında 10/10, oyunun ritme dönüşü bozulunca kırmızı. **Düzeltilmeyen (sadece 4 işçi yükünde, GitHub'da görülmedi):** büyük ayna testleri (K40: "en çok 6 sn" 8,6 sn ölçüldü, sınır 8 sn; "kamera görmezse" 60 sn'de ayna bitmedi; benzetimde renk sırası). Yük altında kare 1-2 sn'ye çıkınca oyunun gerçek saat ölçümü de geç kalıyor; sınırı gevşetmek testi zayıflatır, bırakıldı. GitHub'da kırmızı olursa ilk bakılacak yer bunlar.
+- **Kod denetimi 8. tur** (ses.ts, kayıt alanı erişimleri, kamera sayımı, sahne geçişleri): hata yok; kural ihlali 2: `scene.start('Acilis')` (Tüm verileri sil sonrası) ve `scene.start('Avatar')` veri nesnesi vermiyordu (bugün zararsız, iki sahne de veri okumuyor). Düzeltildi + kalıcı test (`veri.test.ts` "sahne geçişlerinde veri nesnesi verilir"; eski kodda tam bu ikisini buluyor).
+- **İlerleme:** bozuk kayıtta aynı durak bir kez sayılır (`ilerleme.ts tamamlananlar`; 15 yerde kullanılıyor: Biten duraklar, özet, rozetler). Test eski kodda kırmızı.
+- **Belgeler:** `yagiz-testi.md` zıplama denemesinde "oyun ekranı açık tutmaz" yanlıştı (#131'den beri açık tutmaya çalışıyor) → düzeltildi; madde 20 (kesinti, K39 b) ve 21 (dokunmadan oyun, K34) eklendi. `beta-hazir-mi.md`: K39 b, K46 VoiceOver sınırı, kardeş kamera denemesi. Telefonda deneme sayfası (DjZd22…) bu iki maddeyi henüz içermiyor.
+
+**Telefon kontrol listesi:** oyunun davranışı değişmedi (sadece veri sayımı ve iki geçişe `{}`); T1-T10 etkilenmedi.
+
 ### 17 Ekim 2026 (akşam) — güvenilirlik: dallar (K8), VoiceOver (K46), mağaza durumu (K45)
 **Başlangıç:** main = acc81c4, çalışma ağacı temiz, açık PR yok. Önceki oturum (session_018vHUkeLigA9eDwHGVs2M46) arşivlendi.
 - **K8:** kanıt yeniden üretildi (tam geçmiş indirildi; GitHub'dan 150 PR'ın birleşme durumu ve uç commit'leri). Kullanıcı (a)'yı seçti; silme denendi, bulut oturumu 403 aldı (her dal için "uç hâlâ aynıysa sil" koşuluyla denendi; hiçbiri silinmedi). Kullanıcıya U8 olarak yazıldı.
