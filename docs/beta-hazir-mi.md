@@ -1,6 +1,6 @@
 # Beta hazır mı? (Kasım kapalı beta kontrol listesi)
 
-Son kontrol: **17 Ekim 2026 (gece), sürüm 0.9.1**. ✅ = hazır, ⬜ = bekliyor.
+Son kontrol: **17 Ekim 2026 (akşam), sürüm 0.9.1**. ✅ = hazır, ⬜ = bekliyor.
 Ayrıntılı adımlar: [magaza-rehberi.md](magaza-rehberi.md), [seslendirme-rehberi.md](seslendirme-rehberi.md),
 testçilere gönderilecek metin: [beta-rehberi.md](beta-rehberi.md), Yağız testi: [yagiz-testi.md](yagiz-testi.md).
 
@@ -23,6 +23,8 @@ testçilere gönderilecek metin: [beta-rehberi.md](beta-rehberi.md), Yağız tes
 | ✅ | Gerçek dokunuşla gezinme testi: Oyna → durak → ödül → ⌂ iki tur, Ailece iki kez, Ebeveyn gir/çık iki kez (14 Ekim) | Otomatik test |
 | ✅ | Okuma bilmeyen çocuk: her çocuk ekranında Zıpzıp konuşur | Otomatik test her ekranı denetler |
 | ✅ | Kamerayla sayma (isteğe bağlı): 13 hareket; kamera denemesi + "Zıpzıp da zıplasın"; kamera durunca / izin yokken / kamera yokken ayrı yazı (14 Ekim); hareketten önce büyük ayna (K40); kamera tam göremezse neyin eksik olduğunu yazar ve bir kez söyler, kamera denemesinde tanı satırı (K41 c, 17 Ekim) | Kamera sadece iki omuz + iki topuk görünürken sayar (K41). Eşikler Yağız testinde ayarlanacak (K23); kardeş denemesinin sonucu bekleniyor |
+| ✅ | Kesintide (arama, ekran kilidi, başka uygulama) yarıda kalan hareket komutu dönüşte bir kez yeniden söylenir, sayılar yinelenmez (K39 b, 17 Ekim) | 🔎 Gerçek kilitte telefonda denenmedi (yagiz-testi.md madde 20) |
+| ⬜ | **VoiceOver (ekran okuyucu)**: çocuk ekranlarının düğmeleri okunmuyor (oyun tek çizim alanı). Bulutta görüldü, 17 Ekim'de iPhone'da da çizili düğmelerin okunmadığı görüldü. Oyun sesle yönlendirdiği için VoiceOver kapalıyken oynanır; ebeveyn ekranlarındaki gerçek düğmeler okunur (ad kutusuna ad eklendi) | K46: çözüm seçeneği deneme sayfasının C yolu sonucuna bağlı; betayı engellemez ama beta rehberine not düşülebilir |
 | ✅ | Ödeme: `tam_surum`, geri yükleme, kilidin arkasında | Gerçek mağazada denenmedi (2'de 5) |
 | ✅ | İnternetsiz çalışma, dış sunucuya bağlanmama | Otomatik testler her PR'da denetler |
 | ✅ | Okunurluk, düğme büyüklüğü, yazı taşması, renk zıtlığı | Otomatik testler |
@@ -40,7 +42,7 @@ testçilere gönderilecek metin: [beta-rehberi.md](beta-rehberi.md), Yağız tes
 | Sıra | İş | Neden önemli | Rehber |
 |---|---|---|---|
 | 1 | **İnternetsiz APK'yı telefonda deneyin** (uçak modunda; 🔊 Sesi dene dahil) | Ses yoksa okuma bilmeyen çocuk oynayamaz; "internete bağlanmaz" sözünün kanıtı | Aşağıda 5 (10 dk) |
-| 2 | Yağız testi (kamerayı da açıp sayım doğru mu bakın) | Gerçek çocukla ilk sonuç | yagiz-testi.md |
+| 2 | Yağız testi (kamerayı da açıp sayım doğru mu bakın) + kardeşin kamera denemesi (K41 a) | Gerçek çocukla ilk sonuç; kamera eşikleri (K41 b, K42) bu sonuca bağlı | yagiz-testi.md, telefonda deneme sayfası |
 | 3 | Google Play geliştirici hesabı (~25 $, kimlik doğrulama birkaç gün) | Android betası buna bağlı | magaza-rehberi 3 |
 | 4 | Play formları + ilk kapalı test yüklemesi | Hazır cevaplar play-formlari.md'de | magaza-rehberi 3b, 4b |
 | 5 | Play'de `tam_surum` ürünü ve lisans testçisi | Ödemeyi gerçekten denemek için | magaza-rehberi 3c |
