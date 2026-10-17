@@ -90,6 +90,7 @@ Onay verilmemiş, ertelenmiş ya da reddedilmiş öneriler de buraya yazılır; 
 - **K8:** kanıt yeniden üretildi (tam geçmiş indirildi; GitHub'dan 150 PR'ın birleşme durumu ve uç commit'leri). Kullanıcı (a)'yı seçti; silme denendi, bulut oturumu 403 aldı (her dal için "uç hâlâ aynıysa sil" koşuluyla denendi; hiçbiri silinmedi). Kullanıcıya U8 olarak yazıldı.
 - **K46:** erişilebilirlik ağacı 9 ekranda döküldü; ad kutusuna ekran okuyucu adı (`PasaportAyarScene`), yeni test `oyun.spec.ts` "ebeveyn ekranlarındaki HTML düğme ve kutuların ekran okuyucu adı var" (eski kodda kırmızı, sonra yeşil). VoiceOver deneme sayfası yayınlandı (K46 satırı). Oyunun çocuk ekranlarında davranış değişmedi.
 - **K45:** sadece durum raporu; görseller ve metinler değiştirilmedi.
+- **Test kırılganlığı (CI'da kırmızı, #151 ilk turunda):** K39 (b) testi ("yarıda kalan hareket komutu") yük altında yerelde 12'de 6 kırmızı. Neden (oyun hatası değil): test sayfayı komut söylenirken gizlediğini varsayıyordu; yavaş makinede gizleme, oyunun "cümle bitti" tahmininden (harf × 90 ms + 1,5 sn) sonra geliyor, oyun haklı olarak komutu yinelemiyordu; ayrıca yavaş karede oyun saati yavaş aktığı için 30 sn'lik bekleme yetmiyordu. Düzeltme: sahte konuşma, istenince cümle söylenir söylenmez sayfayı gizler; bekleme 90 sn. Sonra yük altında 12/12; özellik kapatılınca hâlâ kırmızı.
 - K41 (b) / K42: kamera sonucu yok; yapılmadı, beklemede.
 - Yerel yeni dal yok; yerel `main` adı eski bir ana (f7f02d3, main'in geçmişinde) gösteriyordu, iş origin/main'den yapıldı.
 
