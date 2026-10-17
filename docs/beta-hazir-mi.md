@@ -1,6 +1,6 @@
 # Beta hazır mı? (Kasım kapalı beta kontrol listesi)
 
-Son kontrol: **14 Ekim 2026 (gece), sürüm 0.9.1**. ✅ = hazır, ⬜ = bekliyor.
+Son kontrol: **17 Ekim 2026 (gece), sürüm 0.9.1**. ✅ = hazır, ⬜ = bekliyor.
 Ayrıntılı adımlar: [magaza-rehberi.md](magaza-rehberi.md), [seslendirme-rehberi.md](seslendirme-rehberi.md),
 testçilere gönderilecek metin: [beta-rehberi.md](beta-rehberi.md), Yağız testi: [yagiz-testi.md](yagiz-testi.md).
 
@@ -22,13 +22,13 @@ testçilere gönderilecek metin: [beta-rehberi.md](beta-rehberi.md), Yağız tes
 | ✅ | Herkes oynayabilsin: 🐢 Sakin / 🐆 Hızlı tempo, oturarak oyna, "Uzaktan oyna" (Ailece'de hep açık), renk körlüğü (biten durakta yıldız, kapalıda kilit) | |
 | ✅ | Gerçek dokunuşla gezinme testi: Oyna → durak → ödül → ⌂ iki tur, Ailece iki kez, Ebeveyn gir/çık iki kez (14 Ekim) | Otomatik test |
 | ✅ | Okuma bilmeyen çocuk: her çocuk ekranında Zıpzıp konuşur | Otomatik test her ekranı denetler |
-| ✅ | Kamerayla sayma (isteğe bağlı): 13 hareket; kamera denemesi + "Zıpzıp da zıplasın"; kamera durunca / izin yokken / kamera yokken ayrı yazı (14 Ekim) | Eşikler Yağız testinde ayarlanacak (K23) |
+| ✅ | Kamerayla sayma (isteğe bağlı): 13 hareket; kamera denemesi + "Zıpzıp da zıplasın"; kamera durunca / izin yokken / kamera yokken ayrı yazı (14 Ekim); hareketten önce büyük ayna (K40); kamera tam göremezse neyin eksik olduğunu yazar ve bir kez söyler, kamera denemesinde tanı satırı (K41 c, 17 Ekim) | Kamera sadece iki omuz + iki topuk görünürken sayar (K41). Eşikler Yağız testinde ayarlanacak (K23); kardeş denemesinin sonucu bekleniyor |
 | ✅ | Ödeme: `tam_surum`, geri yükleme, kilidin arkasında | Gerçek mağazada denenmedi (2'de 5) |
 | ✅ | İnternetsiz çalışma, dış sunucuya bağlanmama | Otomatik testler her PR'da denetler |
 | ✅ | Okunurluk, düğme büyüklüğü, yazı taşması, renk zıtlığı | Otomatik testler |
 | ✅ | Bozuk kayıtta oyun çökmez, sağlam ilerleme kalır | Otomatik test (12 Ekim) |
 | ✅ | Açılış hızı (6 kat yavaşlatılmış telefonda ~1,9 sn) | |
-| ✅ | Gizlilik ve koşullar taslağı güncel (sesli yönlendirme, tempo, oturarak, kamera, Zıpzıp da zıplasın); cihazdaki 11 kaydın hepsi gizlilik tablosunda ve "Bu telefonda neler var?" ekranında (14 Ekim denetimi) | Avukata gösterilecek (2'de 9) |
+| ✅ | Gizlilik ve koşullar taslağı güncel (sesli yönlendirme, tempo, oturarak, kamera, Zıpzıp da zıplasın; 17 Ekim: büyük ayna ve "neyin görünmediği" yazısı); cihazdaki 11 kaydın hepsi gizlilik tablosunda ve "Bu telefonda neler var?" ekranında (14 Ekim denetimi) | Avukata gösterilecek (2'de 9) |
 | ⬜ | Gizlilik ve koşullarda iletişim adresi yok ("yayından önce eklenecek" yazıyor) | Alan adı/e-posta sizde; mağaza gizlilik sayfasında iletişim ister (en geç mağaza başvurusunda) |
 | ✅ | Sürüm numarası ebeveyn köşesinin altında; Play paketine otomatik yazılır | |
 | ⬜ | Doğal ses: cümlelerin kaydı yok, şimdilik telefonun sesi okuyor | Azure hesabı açılınca `npm run seslendir` (2'de 7) |

@@ -138,8 +138,10 @@ export class SertifikaScene extends Phaser.Scene {
           await navigator.share({ files: [dosya], title: `${UNVAN[this.bolum].unvan} Sertifikası` });
           return;
         }
-      } catch {
-        return; // paylaşmaktan vazgeçildi
+      } catch (e) {
+        // Vazgeçildiyse bir şey yapılmaz. Başka bir hata (ör. dokunuş izni resim hazırlanırken düştü) varsa resim indirilir:
+        // ebeveyn düğmeye basıp hiçbir şey olmadığını görmesin.
+        if ((e as { name?: string } | null)?.name === 'AbortError') return;
       }
       const baglanti = document.createElement('a');
       baglanti.href = URL.createObjectURL(blob);

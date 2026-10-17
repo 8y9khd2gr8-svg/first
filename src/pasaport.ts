@@ -59,9 +59,18 @@ export async function fotoyuHazirla(dosya: File, boyut = 320): Promise<string> {
 }
 
 // Kayıtlı fotoğrafı oyunun kullanabileceği bir resme çevirir.
+// Her yüklemede yeni bir anahtar: eski fotoğraf ekrandayken dokusu silinmez (silinirse çizim hata verir; Pasaport ayarında
+// fotoğraf değiştirilince oluyordu). Yeni fotoğraf yerine geçince eski dokular silinir. Yükleme bitmeden ekrandan
+// çıkıldıysa fotoğraf o ekrana eklenmez.
+let fotoNo = 0;
 export function fotoDokusuYukle(sahne: Phaser.Scene, foto: string, bitince: (anahtar: string) => void) {
-  const anahtar = 'cocukFoto';
-  if (sahne.textures.exists(anahtar)) sahne.textures.remove(anahtar);
-  sahne.textures.once(`addtexture-${anahtar}`, () => bitince(anahtar));
+  const anahtar = `cocukFoto${++fotoNo}`;
+  let kapandi = false;
+  sahne.events.once('shutdown', () => (kapandi = true));
+  sahne.textures.once(`addtexture-${anahtar}`, () => {
+    if (kapandi) return sahne.textures.remove(anahtar);
+    bitince(anahtar);
+    for (const eski of sahne.textures.getTextureKeys()) if (eski.startsWith('cocukFoto') && eski !== anahtar) sahne.textures.remove(eski);
+  });
   sahne.textures.addBase64(anahtar, foto);
 }

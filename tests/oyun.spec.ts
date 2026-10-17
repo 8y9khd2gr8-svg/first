@@ -1560,3 +1560,70 @@ test('kilitli durağa art arda dokununca işaret yerinden kaymaz', async ({ page
   expect(sonra).toBe(kilitli.x);
   expect(kayit.hatalar).toEqual([]);
 });
+
+// Kod denetimi 6. tur: "Sesi dene"de ses listesi geç gelir (iPhone'da ilk açılışta boş, en çok 1,5 sn beklenir). O arada ebeveyn
+// çıkıp hemen geri girerse eski cevap silinmiş yazıya yazmaya çalışıyordu (sayfa hatası).
+test('Sesi dene: ses listesi beklenirken çıkıp hemen geri girince hata olmaz, yazı bir kez', async ({ page }) => {
+  await page.addInitScript(() => {
+    const sahte = { speak: () => {}, cancel: () => {}, pause: () => {}, resume: () => {}, getVoices: () => [], addEventListener: () => {}, onvoiceschanged: null, speaking: false, paused: false };
+    Object.defineProperty(window, 'speechSynthesis', { value: sahte, configurable: true });
+  });
+  const kayit = await oyunuAc(page, BETA);
+  // sahneAc 0,7 sn bekler; burada 1,5 sn içinde çıkıp geri girilmeli.
+  const basla = (ad: string) =>
+    page.evaluate((ad) => {
+      const oyun = (window as any).oyun;
+      oyun.scene.getScenes(true).forEach((s: any) => s.scene.stop());
+      oyun.scene.start(ad, {});
+    }, ad);
+  await basla('EbeveynSes');
+  await page.waitForTimeout(300);
+  await basla('EbeveynMenu');
+  await page.waitForTimeout(200);
+  await basla('EbeveynSes');
+  await page.waitForTimeout(3_000);
+  const yazilar: string[] = await page.evaluate(() => (window as any).oyun.scene.getScene('EbeveynSes').children.list.filter((c: any) => c.type === 'Text').map((c: any) => c.text));
+  expect(yazilar.filter((y) => y.includes('Türkçe ses bulunamadı'))).toHaveLength(1);
+  expect(kayit.hatalar).toEqual([]);
+});
+
+// Kod denetimi 6. tur: fotoğraf varken yenisi seçilince eski resim ekrandayken dokusu siliniyordu (çizimde sayfa hatası).
+test('Pasaport: fotoğraf varken yenisi seçilince hata olmaz, yeni fotoğraf görünür', async ({ page }) => {
+  const kayit = await oyunuAc(page, BETA);
+  const resim = (renk: string, boy: number, tur: string) =>
+    page.evaluate(([renk, boy, tur]) => {
+      const c = document.createElement('canvas');
+      c.width = c.height = Number(boy);
+      const x = c.getContext('2d')!;
+      x.fillStyle = String(renk);
+      x.fillRect(0, 0, c.width, c.height);
+      return c.toDataURL(String(tur));
+    }, [renk, boy, tur]);
+  const eski = await resim('red', 64, 'image/jpeg');
+  await page.evaluate((f) => localStorage.setItem('zipzip-pasaport-v1', JSON.stringify({ ad: 'Deniz', foto: f, soruldu: true })), eski);
+  await sahneAc(page, 'PasaportAyar');
+  await page.waitForFunction(() => (window as any).oyun.scene.getScene('PasaportAyar').children.list.some((c: any) => c.type === 'Image' && c.visible));
+  const yeni = Buffer.from((await resim('blue', 1200, 'image/png')).split(',')[1], 'base64');
+  const [secici] = await Promise.all([page.waitForEvent('filechooser'), page.locator('button', { hasText: 'Fotoğraf ekle' }).click()]);
+  await secici.setFiles({ name: 'yeni.png', mimeType: 'image/png', buffer: yeni });
+  await page.waitForFunction(() => (window as any).oyun.scene.getScene('PasaportAyar').foto?.length < 40_000 && (window as any).oyun.scene.getScene('PasaportAyar').children.list.filter((c: any) => c.type === 'Image').length === 1, null, { timeout: 10_000 });
+  await page.waitForTimeout(1_000);
+  expect(kayit.hatalar).toEqual([]);
+});
+
+// Kod denetimi 6. tur: paylaşma menüsü açılamazsa (vazgeçmek dışında bir hata) özet metni panoya kopyalanır; metin durakları
+// "bu hafta" değil "şimdiye kadar" diye söyler (durak sayısı toplamdır).
+test('Hareket özeti: paylaşma açılamazsa metin kopyalanır, durak sayısı "şimdiye kadar"', async ({ page }) => {
+  await page.addInitScript(() => {
+    const w = window as any;
+    w.kopyalanan = [];
+    Object.defineProperty(navigator, 'share', { value: () => Promise.reject(new DOMException('izin yok', 'NotAllowedError')), configurable: true });
+    Object.defineProperty(navigator, 'clipboard', { value: { writeText: async (t: string) => w.kopyalanan.push(t) }, configurable: true });
+  });
+  const kayit = await oyunuAc(page, BETA);
+  await sahneAc(page, 'EbeveynOzet');
+  await page.locator('button', { hasText: 'Paylaş' }).click();
+  await expect.poll(() => page.evaluate(() => (window as any).kopyalanan), { timeout: 5_000 }).toEqual([expect.stringContaining('şimdiye kadar 0 durak gezdi')]);
+  await expect(page.locator('button', { hasText: 'Kopyalandı' })).toBeVisible();
+  expect(kayit.hatalar).toEqual([]);
+});
