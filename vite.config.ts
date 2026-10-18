@@ -24,6 +24,38 @@ const phaserAyarlari = (): Plugin => ({
   },
 });
 
+// Tarayıcı güvenlik kuralı (CSP, K47): "oyun hiçbir dış sunucuya bağlanmaz" sözünü testlerin yanında tarayıcı da zorlar.
+// Sadece derlemede (test sitesi ve mağaza paketi); geliştirme sunucusu kuralsız kalır (ZIPZIP_CSP=1 ile açılır, aşağıda).
+// - script-src: sadece oyunun kendi dosyaları; 'wasm-unsafe-eval' kamera tanıma modelinin (MediaPipe, WebAssembly) çalışması için
+//   (JavaScript eval'ine izin vermez). Satır içi betik yok.
+// - style-src 'unsafe-inline': index.html'deki <style> ve ebeveyn köşesi bağlantılarındaki style="..." (betik değil, yazı biçimi).
+// - img-src data: blob:: Phaser'ın kendi küçük resimleri, çocuğun fotoğrafı (cihazda), sertifika resmi.
+// - connect-src 'self': ses kayıtları ve kamera modeli oyunun içinden; başka hiçbir adrese istek gidemez.
+// - object-src/form-action 'none', base-uri 'self'. frame-ancestors <meta> ile verilemez (tarayıcı uyarı yazar), konmadı.
+// Telefonun konuşma motoru, ödeme, ekran açık tutma Capacitor köprüsüyle çalışır (ağ isteği değil); iPhone'da köprü
+// WKUserScript, yeni Android'de belge başı betiğiyle gelir, kurala takılmaz. 🔎 Gerçek telefonda denenecek (docs/KAYIT.md K47).
+const GUVENLIK_KURALI = [
+  "default-src 'self'",
+  "script-src 'self' 'wasm-unsafe-eval'",
+  "style-src 'self' 'unsafe-inline'",
+  "img-src 'self' data: blob:",
+  "font-src 'self' data:",
+  "media-src 'self' data: blob:",
+  "connect-src 'self'",
+  "worker-src 'self'",
+  "manifest-src 'self'",
+  "object-src 'none'",
+  "base-uri 'self'",
+  "form-action 'none'",
+].join('; ');
+const guvenlikKurali = (): Plugin => ({
+  name: 'guvenlik-kurali',
+  // ZIPZIP_CSP=1: bütün oyun testleri kuralla birlikte geliştirme sunucusunda da koşturulabilsin (kural bir şeyi engellerse
+  // tarayıcı hata yazar, testler kırmızı olur).
+  apply: (_, { command }) => command === 'build' || process.env.ZIPZIP_CSP === '1',
+  transformIndexHtml: () => [{ tag: 'meta', attrs: { 'http-equiv': 'Content-Security-Policy', content: GUVENLIK_KURALI }, injectTo: 'head-prepend' }],
+});
+
 export default defineConfig(({ command }) => ({
   // './' sayesinde oyun GitHub Pages'te alt klasörde (/first/) de çalışır.
   base: './',
@@ -36,6 +68,7 @@ export default defineConfig(({ command }) => ({
   resolve: command === 'build' ? { alias: [{ find: /^phaser$/, replacement: fileURLToPath(new URL('./src/phaserHafif.cjs', import.meta.url)) }] } : {},
   plugins: [
     phaserAyarlari(),
+    guvenlikKurali(),
     // Telefona uygulama gibi kurulum ve internetsiz çalışma: ilk açılışta bütün dosyalar
     // telefona kaydedilir; yeni sürüm yayınlanınca bir sonraki açılışta kendiliğinden güncellenir.
     VitePWA({
