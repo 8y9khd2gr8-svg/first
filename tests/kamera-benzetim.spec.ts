@@ -414,6 +414,43 @@ test('benzetim: kamera açılırken sıradaki harekete geçilirse kamera ikinci 
   expect(k0.hatalar).toEqual([]);
 });
 
+// Ortak kamera hareketler arasında açık kalır; her hareket ekranı kendi "kamera bitti" dinleyicisini çıkarken kaldırmalı
+// (yoksa durak boyunca eski ekranlar bellekte birikir). Hareket 5 kez yeniden başlar: izde en çok 1 dinleyici kalır.
+test('benzetim: hareketler arasında açık kalan kamerada eski ekranların dinleyicisi birikmez', async ({ page }) => {
+  test.setTimeout(240_000);
+  await page.addInitScript(() => {
+    const w = window as any;
+    w.bittiDinleyici = 0;
+    const ekle = MediaStreamTrack.prototype.addEventListener;
+    const kaldir = MediaStreamTrack.prototype.removeEventListener;
+    MediaStreamTrack.prototype.addEventListener = function (this: MediaStreamTrack, ad: string, ...a: any[]) {
+      if (ad === 'ended') w.bittiDinleyici++;
+      return (ekle as any).call(this, ad, ...a);
+    } as any;
+    MediaStreamTrack.prototype.removeEventListener = function (this: MediaStreamTrack, ad: string, ...a: any[]) {
+      if (ad === 'ended') w.bittiDinleyici--;
+      return (kaldir as any).call(this, ad, ...a);
+    } as any;
+  });
+  await benzetimKur(page);
+  const k0 = await oyunuAc(page);
+  const h = await kameraliHareket(page);
+  await bilgiBekle(page, 'Sen de yap!');
+  for (let i = 0; i < 5; i++) {
+    // Her yeniden başlayışta yeni ekranın kamerası bağlanana kadar beklenir (yeni bir "Sen de yap!" ve dinleyici).
+    const once = await page.evaluate((h) => {
+      const w = window as any;
+      const n = w.kayit.olaylar.length;
+      w.oyun.scene.getScene('Hareket').scene.restart({ durakId: 'istanbul', adim: h.adim });
+      return n;
+    }, h);
+    await page.waitForFunction((n) => (window as any).kayit.olaylar.slice(n).some((o: any) => o.tur === 'bilgi' && o.deger === 'Sen de yap!'), once, { timeout: 60_000 });
+  }
+  expect(await page.evaluate(() => (window as any).kameraAcilma)).toBe(1);
+  expect(await page.evaluate(() => (window as any).bittiDinleyici)).toBeLessThanOrEqual(1);
+  expect(k0.hatalar).toEqual([]);
+});
+
 test('benzetim: kamera açılırken hareket ekranından çıkılırsa, sonradan gelen kamera hemen kapanır', async ({ page }) => {
   test.setTimeout(240_000);
   await benzetimKur(page, { kameraGecikmeMs: 4_000 });
@@ -474,6 +511,65 @@ for (const [tempo, enCok] of [['Normal', 6_000], ['Sakin', 8_000]] as const) {
     expect(k0.hatalar).toEqual([]);
   });
 }
+
+// Sayfa ayna sırasında uzun donarsa (yük, modelin ilk hazırlanışı) donma süresi de sayılır: ayna gerçek saatle en çok 6 sn.
+// Eskiden her ölçüme en çok 1,5 sn ekleniyordu; iki 2,5 sn'lik donmada ayna ~8 sn sürüyordu (eski kodda kırmızı).
+test('benzetim: ayna sırasında sayfa iki kez 2,5 sn donsa da ayna gerçek saatle ~6 sn', async ({ page }) => {
+  test.setTimeout(240_000);
+  // Tuvalden gelen sahte görüntü, sayfa donunca "susturuldu" olur ve oyun kamerayı "durdu" sayıp aynayı o yoldan kapatır
+  // (gerçek kamera donmada susmaz). Burada sürenin kendisi denendiği için susturma görmezden gelinir; kutu "Durdu" demez.
+  await page.addInitScript(() => Object.defineProperty(MediaStreamTrack.prototype, 'muted', { configurable: true, get: () => false }));
+  await benzetimKur(page);
+  const k0 = await oyunuAc(page);
+  await durumYaz(page, { gizli: [SOL_TOPUK, SAG_TOPUK] });
+  await kameraliHareket(page);
+  await page.waitForFunction(() => (window as any).kayit.aynaBas, null, { timeout: 120_000 });
+  await page.evaluate(() => {
+    const don = (ms: number) => {
+      const bit = performance.now() + ms;
+      while (performance.now() < bit);
+    };
+    const bas = (window as any).kayit.aynaBas;
+    setTimeout(() => don(2_500), Math.max(0, bas + 1_000 - performance.now()));
+    setTimeout(() => don(2_500), Math.max(0, bas + 3_600 - performance.now()));
+  });
+  await page.waitForFunction(() => (window as any).kayit.aynaSon, null, { timeout: 120_000 });
+  const k = await kayit(page);
+  expect(degerler(k, 'kutu')).not.toContain('📷 Durdu');
+  expect(k.aynaSon - k.aynaBas).toBeGreaterThan(5_500);
+  expect(k.aynaSon - k.aynaBas).toBeLessThan(7_200);
+  expect(k0.hatalar).toEqual([]);
+});
+
+// Sayfa gizliyken (arama, kilit) geçen süre aynadan düşülür: telefon gibi Phaser de durur (sayfa gizli görünür).
+test('benzetim: ayna sırasında sayfa 4 sn gizli kalırsa o süre sayılmaz', async ({ page }) => {
+  test.setTimeout(240_000);
+  await page.addInitScript(() => {
+    const w = window as any;
+    w.sayfaGizli = false;
+    Object.defineProperty(document, 'hidden', { configurable: true, get: () => w.sayfaGizli });
+    Object.defineProperty(document, 'visibilityState', { configurable: true, get: () => (w.sayfaGizli ? 'hidden' : 'visible') });
+  });
+  await benzetimKur(page);
+  const k0 = await oyunuAc(page);
+  await durumYaz(page, { gizli: [SOL_TOPUK, SAG_TOPUK] });
+  await kameraliHareket(page);
+  await page.waitForFunction(() => (window as any).kayit.aynaBas, null, { timeout: 120_000 });
+  await page.evaluate(async () => {
+    const w = window as any;
+    await new Promise((r) => setTimeout(r, Math.max(0, w.kayit.aynaBas + 1_000 - performance.now())));
+    w.sayfaGizli = true;
+    document.dispatchEvent(new Event('visibilitychange'));
+    await new Promise((r) => setTimeout(r, 4_000));
+    w.sayfaGizli = false;
+    document.dispatchEvent(new Event('visibilitychange'));
+  });
+  await page.waitForFunction(() => (window as any).kayit.aynaSon, null, { timeout: 120_000 });
+  const k = await kayit(page);
+  expect(k.aynaSon - k.aynaBas).toBeGreaterThan(9_500);
+  expect(k.aynaSon - k.aynaBas).toBeLessThan(11_500);
+  expect(k0.hatalar).toEqual([]);
+});
 
 test('benzetim: hareket ekranından çıkınca kamera kapanır, tanıma durur, görüntü hiçbir yere gitmez', async ({ page }) => {
   test.setTimeout(240_000);

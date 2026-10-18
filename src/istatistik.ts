@@ -23,7 +23,10 @@ function oku(): Kayit {
         if (!/^\d{4}-\d{2}-\d{2}$/.test(gun) || typeof g !== 'object' || !g) continue;
         const sayac: Record<string, number> = {};
         if (typeof g.sayac === 'object' && g.sayac) for (const [a, n] of Object.entries(g.sayac)) if (sayi(n)) sayac[a] = n;
-        gunler[gun] = { saniye: sayiYa0(g.saniye), hareket: sayiYa0(g.hareket), ziplama: sayiYa0(g.ziplama), sayac, kameraAcik: sayiYa0(g.kameraAcik), kameraGordu: sayiYa0(g.kameraGordu) };
+        // Kaydederken kameraGordu ≤ kameraAcik ≤ hareket; bozuk kayıtta da özet bu sırayı aşmaz.
+        const hareket = sayiYa0(g.hareket);
+        const kameraAcik = Math.min(sayiYa0(g.kameraAcik), hareket);
+        gunler[gun] = { saniye: sayiYa0(g.saniye), hareket, ziplama: sayiYa0(g.ziplama), sayac, kameraAcik, kameraGordu: Math.min(sayiYa0(g.kameraGordu), kameraAcik) };
       }
     }
     return { gunler, ilkGun: typeof k.ilkGun === 'string' ? k.ilkGun : undefined };

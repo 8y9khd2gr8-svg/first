@@ -190,3 +190,38 @@ test('haftalık özet: saat dilimi, gece yarısı ve yaz saati geçişinde 7 ayr
     process.env.TZ = eskiTZ;
   }
 });
+
+// Eski sürümden kalan ya da elle bozulmuş rozet kaydı: listede olmayan kimlik sayılmaz ("27 / 26" görünmesin).
+test('rozet: kutlanan kayıttaki bilinmeyen kimlik kazanılmış sayılmaz', () => {
+  depo.set('zipzip-rozetler-v1', JSON.stringify(['ilkAdim', 'eskiRozet', 'eskiRozet2', '']));
+  const k = kazanilanlar();
+  assert.ok(k.has('ilkAdim'), 'kutlanmış bilinen rozet kalır');
+  assert.ok(!k.has('eskiRozet') && !k.has(''), 'bilinmeyen kimlik süzülür');
+  assert.equal(k.size, 1);
+  rozetleriKutla([]);
+  assert.deepEqual(JSON.parse(depo.get('zipzip-rozetler-v1')!), ['ilkAdim', 'eskiRozet', 'eskiRozet2', ''], 'kayıt silinmez');
+});
+
+// Kostüm kaydındaki bilinmeyen kimlik hiçbir yerde sayılmaz; seçili kostüm de açık değilse yok sayılır.
+test('kostüm: kutlanan/seçili kayıttaki bilinmeyen kimlik sayılmaz, açık kostüm kutlanmış görünmez', () => {
+  depo.set('zipzip-kostum-v1', JSON.stringify({ secili: 'eskiKostum', kutlanan: ['eskiKostum', 'x'] }));
+  assert.equal(seciliKostum(), undefined);
+  assert.deepEqual(yeniKostumler(), []);
+  assert.deepEqual(acikKostumler(), []);
+});
+
+// hareketKaydet'te kameraGordu ancak kameraAcik ile birlikte artar, kameraAcik de hareket ile: bozuk kayıtta da bu sıra korunur.
+test('istatistik: bozuk kayıtta kameranın gördüğü, kamera açık sayısını; o da hareket sayısını geçmez', () => {
+  const bugun = gunAnahtari();
+  depo.set('zipzip-istatistik-v1', JSON.stringify({ gunler: { [bugun]: { saniye: 10, hareket: 3, ziplama: 0, kameraAcik: 5, kameraGordu: 9 } } }));
+  const o = haftalikOzet();
+  assert.equal(o.hareket, 3);
+  assert.equal(o.kameraAcik, 3);
+  assert.equal(o.kameraGordu, 3);
+  depo.set('zipzip-istatistik-v1', JSON.stringify({ gunler: { [bugun]: { saniye: 10, hareket: 4, ziplama: 0, kameraAcik: 2, kameraGordu: 7 } } }));
+  const o2 = haftalikOzet();
+  assert.equal(o2.kameraAcik, 2);
+  assert.equal(o2.kameraGordu, 2);
+  depo.set('zipzip-istatistik-v1', JSON.stringify({ gunler: { [bugun]: { saniye: 10, hareket: 4, ziplama: 0, kameraAcik: 4, kameraGordu: 1 } } }));
+  assert.deepEqual([haftalikOzet().kameraAcik, haftalikOzet().kameraGordu], [4, 1], 'sağlam kayıt aynen kalır');
+});

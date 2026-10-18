@@ -190,22 +190,34 @@ export class HareketScene extends Phaser.Scene {
       bitti = true;
       this.aynaDinle = null;
       sure.remove();
+      document.removeEventListener('visibilitychange', gorunurluk);
       this.kutuHali('hareket');
       devam();
     };
     // Süre gerçek saatle sayılır: yavaş telefonda (kare 200 ms'yi aşınca) Phaser'ın saati geri kalır, ayna uzamasın (T7).
-    // Sayfa gizliyken (arama, kilit) Phaser durur, o süre sayılmaz.
+    // Sayfa gizliyken (arama, kilit) geçen süre sayılmaz. Eskiden her ölçümde en çok 1,5 sn ekleniyordu: sayfa daha uzun
+    // donunca (yük, modelin ilk hazırlanışı) süre eksik sayılıp ayna 6 sn yerine 8-9 sn sürüyordu.
     const enCok = oyunAyari().yas === 'kucuk' ? AYNA_SAKIN_MS : AYNA_EN_COK_MS;
-    let gecen = 0;
-    let son = performance.now();
+    const bas = performance.now();
+    let gizliBas: number | null = document.hidden ? bas : null;
+    let gizliToplam = 0;
+    const gorunurluk = () => {
+      if (document.hidden) gizliBas ??= performance.now();
+      else if (gizliBas !== null) {
+        gizliToplam += performance.now() - gizliBas;
+        gizliBas = null;
+      }
+    };
+    document.addEventListener('visibilitychange', gorunurluk);
+    this.events.once('shutdown', () => document.removeEventListener('visibilitychange', gorunurluk));
     let ipucuSoylendi = false;
     const sure = this.time.addEvent({
       delay: 100,
       loop: true,
       callback: () => {
+        if (gizliBas !== null) return;
         const simdi = performance.now();
-        gecen += Math.min(simdi - son, 1500);
-        son = simdi;
+        const gecen = simdi - bas - gizliToplam;
         if (gecen >= enCok) return bitir();
         // Hâlâ göremiyorsa bir kez neyin eksik olduğunu söyler (sık tekrar etmez).
         const yer = kamera.durum === 'goremiyorum' ? eksikYeri(kamera.eksik) : null;
