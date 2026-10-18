@@ -322,6 +322,7 @@ export class KameraSayaci {
   private sayici: Sayici;
   private kare = 0;
   private bitti = false;
+  private dinleyiciKaldir = () => {};
 
   // noktalarGelince: her karede bulunan vücut noktaları (kamera denemesi ekranı çizer); kimse yoksa undefined.
   constructor(
@@ -366,7 +367,10 @@ export class KameraSayaci {
       await this.video.play();
       this.bildir('goremiyorum');
       const izler = akis.getVideoTracks();
-      izler.forEach((t) => t.addEventListener('ended', () => !this.bitti && this.bildir('durdu')));
+      // Ortak kamerada iz hareketler arasında yaşar: dinleyici durdur()'da kaldırılır (eski ekranlar bellekte birikmesin).
+      const bittiDinle = () => !this.bitti && this.bildir('durdu');
+      izler.forEach((t) => t.addEventListener('ended', bittiDinle));
+      this.dinleyiciKaldir = () => izler.forEach((t) => t.removeEventListener('ended', bittiDinle));
       let sonZaman = -1;
       let sonKare = performance.now();
       let sonDongu = sonKare;
@@ -441,6 +445,7 @@ export class KameraSayaci {
   durdur() {
     this.bitti = true;
     cancelAnimationFrame(this.kare);
+    this.dinleyiciKaldir();
     if (!this.ortak) this.akis?.getTracks().forEach((t) => t.stop());
     this.video.srcObject = null;
   }

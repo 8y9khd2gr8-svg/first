@@ -97,7 +97,9 @@ export function kazanilanlar(): Set<string> {
     haftaSonu: o.haftaSonuOynadi,
   };
   // Kutlaması yapılmış rozet kazanılmış sayılır: koşul sonradan zorlaşsa da (yeni hareketler) geri alınmaz.
-  return new Set([...kutlananlar(), ...KOSULLAR.filter((k) => k.kazanildi(durum)).map((k) => k.id)]);
+  // Listede olmayan kimlik (eski sürüm, bozuk kayıt) sayılmaz; kayıtta durur, silinmez.
+  const kutlanan = kutlananlar();
+  return new Set(KOSULLAR.filter((k) => kutlanan.has(k.id) || k.kazanildi(durum)).map((k) => k.id));
 }
 
 const KUTLANAN_ANAHTAR = 'zipzip-rozetler-v1';
