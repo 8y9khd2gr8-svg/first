@@ -29,7 +29,15 @@ export class EbeveynScene extends Phaser.Scene {
     sustur();
     yildizliArkaPlan(this);
     const x = this.scale.gameSize.width / 2;
-    evDugmesi(this, () => this.scene.start(this.geri, this.geriVeri));
+    // Tek karar: yavaş telefonda (kare ~200 ms) yanlış ve doğru cevaba aynı karede dokunulursa iki düğmenin de işi
+    // çalışıyordu; kilit açılıp arkasındaki ekran ile geri dönülen ekran birlikte başlıyordu (18 Ekim). İlk dokunuş geçerli.
+    let karar = false;
+    const git = (anahtar: string, veri: object) => {
+      if (karar) return;
+      karar = true;
+      this.scene.start(anahtar, veri);
+    };
+    evDugmesi(this, () => git(this.geri, this.geriVeri));
 
     const a = Phaser.Math.Between(3, 9);
     const b = Phaser.Math.Between(3, 9);
@@ -51,10 +59,10 @@ export class EbeveynScene extends Phaser.Scene {
       const sx = x + (i % 2 === 0 ? -150 : 150);
       const sy = 700 + Math.floor(i / 2) * 190;
       buyukDugme(this, sx, sy, String(sayi), RENK.mavi, () => {
-        if (sayi === dogru) this.scene.start(this.hedef, this.hedefVeri);
+        if (sayi === dogru) git(this.hedef, this.hedefVeri);
         else {
-          bip(200, 0.2, 'square', 0.15);
-          this.scene.start(this.geri, this.geriVeri);
+          if (!karar) bip(200, 0.2, 'square', 0.15);
+          git(this.geri, this.geriVeri);
         }
       }, { genislik: 250, yukseklik: 150, yaziBoyu: 70 });
     });

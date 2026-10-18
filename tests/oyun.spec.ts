@@ -1738,3 +1738,113 @@ test('Hareket özeti: paylaşma açılamazsa metin kopyalanır, durak sayısı "
   await expect(page.locator('button', { hasText: 'Kopyalandı' })).toBeVisible();
   expect(kayit.hatalar).toEqual([]);
 });
+
+// Zıplama denemesi (ZiplaDenemeScene) arama/kilitte (T3, T10; 18 Ekim): gizliyken Zıpzıp ritimle zıplamaz,
+// dönünce gizli kalınan sürenin zıplamaları birikip bir anda gelmez (yıldızlar tek tek yanmaya devam eder).
+test('kesinti: Zıpzıp da zıplasın (kamerasız) gizliyken durur, dönünce zıplamalar bir anda gelmez', async ({ page }) => {
+  await kesintiSahte(page);
+  const kayit = await oyunuAc(page, BETA);
+  await sahneAc(page, 'ZiplaDeneme');
+  const zipla = () => page.evaluate(() => (window as any).oyun.scene.getScene('ZiplaDeneme').ziplamaSayisi as number);
+  await page.waitForFunction(() => (window as any).oyun.scene.getScene('ZiplaDeneme').ziplamaSayisi >= 1, null, { timeout: 15_000 });
+  const once = await page.evaluate(() => {
+    const w = window as any;
+    w.sayfayiGizle(true);
+    return { zipla: w.oyun.scene.getScene('ZiplaDeneme').ziplamaSayisi, soylenen: w.konusma.soylenen.length };
+  });
+  await page.waitForTimeout(4000);
+  expect(await zipla()).toBe(once.zipla);
+  expect(await page.evaluate((n) => (window as any).konusma.soylenen.slice(n), once.soylenen)).toEqual([]);
+  // Dönüş: ilk yarım saniyede en çok bir zıplama (ritim 1,3 sn), sonra ritim sürer.
+  await page.evaluate(() => (window as any).sayfayiGizle(false));
+  await page.waitForTimeout(500);
+  expect((await zipla()) - once.zipla).toBeLessThanOrEqual(1);
+  await expect.poll(zipla, { timeout: 15_000 }).toBeGreaterThanOrEqual(once.zipla + 2);
+  expect(kayit.hatalar).toEqual([]);
+});
+
+// "Uzaktan oyna" geri sayımı (📱 3… 2… 1…) sırasında sayfa uzun donarsa (yük, yavaş telefon; T7): hareket bir kez
+// kaydedilir, bir adım geçilir (çift geçiş ya da çift kayıt yok). Gizlenme hâli yukarıdaki "kesinti" testinde.
+test('"Uzaktan oyna": geri sayım sırasında sayfa 2,5 sn donsa da hareket bir kez kaydedilir, bir adım geçilir', async ({ page }) => {
+  test.setTimeout(90_000);
+  const kayit = await oyunuAc(page, { 'zipzip-uzaktan-v1': '1' });
+  await saatiHizlandir(page, 3);
+  await sahneAc(page, 'Hareket', { durakId: 'istanbul', adim: 0 });
+  const adim = () => page.evaluate(() => (window as any).oyun.scene.getScene('Hareket').adim as number);
+  await page.waitForFunction(() => (window as any).oyun.scene.getScene('Hareket').children.list.some((o: any) => o.type === 'Text' && o.text.startsWith('📱')), null, { timeout: 60_000, polling: 'raf' });
+  const donmadan = await page.evaluate(() => {
+    const a = (window as any).oyun.scene.getScene('Hareket').adim;
+    const bit = performance.now() + 2_500;
+    while (performance.now() < bit);
+    return a;
+  });
+  expect(donmadan).toBe(0);
+  await expect.poll(adim, { timeout: 30_000 }).toBe(1);
+  await page.waitForTimeout(1500);
+  const sonra = await page.evaluate(() => ({
+    adim: (window as any).oyun.scene.getScene('Hareket').adim,
+    hareket: Object.values<any>(JSON.parse(localStorage.getItem('zipzip-istatistik-v1')!).gunler)[0].hareket,
+  }));
+  expect(sonra).toEqual({ adim: 1, hareket: 1 });
+  expect(kayit.hatalar).toEqual([]);
+});
+
+// Bozuk/eski "Uzaktan oyna" kaydı (sadece "1" açık sayılır): kapalı gibi davranır, "Yaptım!" bekler, kendiliğinden geçmez.
+test('"Uzaktan oyna": bozuk kayıt değeri kapalı sayılır, "Yaptım!" bekler', async ({ page }) => {
+  test.setTimeout(90_000);
+  const kayit = await oyunuAc(page, { 'zipzip-uzaktan-v1': 'true' });
+  await saatiHizlandir(page, 3);
+  await sahneAc(page, 'Hareket', { durakId: 'istanbul', adim: 0 });
+  await page.waitForFunction(
+    () => (window as any).oyun.scene.getScene('Hareket').children.list.some((o: any) => (o.list ?? []).some((c: any) => c.text === 'Yaptım!')),
+    null,
+    { timeout: 60_000 },
+  );
+  await page.waitForTimeout(4000); // oyun saatiyle ~12 sn: geri sayım olsaydı çoktan geçerdi
+  const durum = await page.evaluate(() => {
+    const s = (window as any).oyun.scene.getScene('Hareket');
+    return { adim: s.adim, geriSayim: s.children.list.some((o: any) => o.type === 'Text' && o.text.startsWith('📱')), kayit: localStorage.getItem('zipzip-istatistik-v1'), deger: localStorage.getItem('zipzip-uzaktan-v1') };
+  });
+  expect(durum).toEqual({ adim: 0, geriSayim: false, kayit: null, deger: 'true' });
+  expect(kayit.hatalar).toEqual([]);
+});
+
+// Ebeveyn kilidi (kod denetimi 9. tur, 18 Ekim): yavaş telefonda yanlış ve doğru cevaba aynı karede dokunulursa
+// eskiden iki düğmenin işi de çalışıyordu: kilidin arkasındaki ekran (ad/fotoğraf) geri dönülen ekranla birlikte açılıyordu.
+// İlk dokunuş geçerli: önce yanlışa dokunulduysa kilit açılmaz. Eski kodda kırmızı.
+for (const sira of ['yanlış önce', 'doğru önce'] as const) {
+  test(`ebeveyn kilidi: aynı karede iki cevaba dokunulursa sadece ilki geçerli (${sira})`, async ({ page }) => {
+    const kayit = await oyunuAc(page, BETA);
+    await sahneAc(page, 'Ebeveyn', { hedef: 'PasaportAyar', geri: 'Pasaport', hedefVeri: { geri: 'Pasaport' } });
+    await page.evaluate((sira) => {
+      const s = (window as any).oyun.scene.getScene('Ebeveyn');
+      const metin = (o: any): string => o.text ?? (o.list ?? []).map(metin).join('');
+      const [a, b] = s.children.list.find((o: any) => o.type === 'Text' && / × /.test(o.text)).text.match(/\d+/g).map(Number);
+      const dugmeler = s.children.list.filter((o: any) => o.type === 'Container' && /^\d+$/.test(metin(o)));
+      const dogru = dugmeler.find((d: any) => Number(metin(d)) === a * b);
+      const yanlis = dugmeler.find((d: any) => d !== dogru);
+      const ikisi = sira === 'yanlış önce' ? [yanlis, dogru] : [dogru, yanlis];
+      ikisi.forEach((d: any) => d.emit('pointerdown'));
+    }, sira);
+    await page.waitForTimeout(1200);
+    const acik = await page.evaluate(() => (window as any).oyun.scene.getScenes(true).map((s: any) => s.sys.settings.key));
+    expect(acik).toEqual([sira === 'yanlış önce' ? 'Pasaport' : 'PasaportAyar']);
+    expect(kayit.hatalar).toEqual([]);
+  });
+}
+
+// Sahne geçişi (kod denetimi 9. tur): aynı ekranın iki büyük düğmesine aynı karede dokunulursa iki ekran birden açılmaz
+// (arayuz.buyukDugme: karede bir düğme). Eski kodda kırmızı (Hareket özeti ile Ayarlar birlikte açılıyordu).
+test('aynı karede iki büyük düğmeye dokunulursa tek ekran açılır', async ({ page }) => {
+  const kayit = await oyunuAc(page, BETA);
+  await sahneAc(page, 'EbeveynMenu', { geri: 'Macera' });
+  await page.evaluate(() => {
+    const s = (window as any).oyun.scene.getScene('EbeveynMenu');
+    const metin = (o: any): string => o.text ?? (o.list ?? []).map(metin).join('');
+    const bul = (re: RegExp) => s.children.list.find((o: any) => o.type === 'Container' && re.test(metin(o)));
+    [bul(/Hareket özeti/), bul(/Ayarlar/)].forEach((d: any) => d.emit('pointerdown'));
+  });
+  await page.waitForTimeout(1200);
+  expect(await page.evaluate(() => (window as any).oyun.scene.getScenes(true).map((s: any) => s.sys.settings.key))).toEqual(['EbeveynOzet']);
+  expect(kayit.hatalar).toEqual([]);
+});
