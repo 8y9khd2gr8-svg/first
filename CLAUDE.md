@@ -69,6 +69,8 @@ Teknoloji: Phaser 3 + TypeScript + Vite, GitHub Pages ile yayın. İleride Capac
   Beta kontrol listesi: docs/beta-hazir-mi.md.
 - "❓ Nasıl oynanır" (ebeveyn köşesi, EbeveynRehberScene): 4 adım (durağa dokun → Zıpzıp gösterir → "Yaptım!" → damga) +
   ipuçları; güvenlik notu buradan açılır (ilk açılıştaki güvenlik notu aynen kalır). Düğme yazısı uzunsa düğmeye sığacak kadar küçülür (arayuz.buyukDugme).
+- VoiceOver (K46, 18 Ekim kararı): çocuk ekranlarında desteklenmez (oyun kendi sesiyle yönlendirir); Nasıl oynanır'da "VoiceOver açıksa
+  kapatın" notu; ebeveyn ekranlarındaki HTML parçalarının ekran okuyucu adları kalır; mağazada VoiceOver işaretlenmez.
 - Türkiye Turu bitince Gezgin Sertifikası (resim olarak kaydet/paylaş). Kaydet/paylaş telefonun dışına çıktığı için sadece
   ebeveyn kilidinden sonra (çocuk "🔒 Kaydet / Paylaş"a dokununca kilit; mağaza çocuk kuralları, 12 Ekim).
 - PWA: ana ekrana yüklenir, internetsiz çalışır (vite-plugin-pwa). Yazı tipi pakette
