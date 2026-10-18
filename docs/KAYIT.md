@@ -86,7 +86,7 @@ Onay verilmemiş, ertelenmiş ya da reddedilmiş öneriler de buraya yazılır; 
 
 ## 4. Oturum günlüğü (en yeni üstte)
 
-### 18 Ekim 2026 (sabah) — kayıt denetimi, kamera dinleyici sızıntısı, büyük aynanın süresi
+### 18 Ekim 2026 (sabah) — kayıt denetimi, kamera dinleyici sızıntısı, büyük aynanın süresi (#155, birleşti)
 **Başlangıç:** main = 3e4abcd, sürüm 0.9.1, çalışma ağacı temiz, açık PR yok; `npm ci` sorunsuz. Önceki oturum (session_011onwaArF3x6k6iN9qAc1rX) denetlendi: yerel `bakim-9` dalı main ile aynıydı (fazla commit yok), son işi #154 main'de (`bakim-8` içeriği main ile birebir) → arşivlendi.
 - **Rozet (gerçek hata):** `kazanilanlar()` kutlanan kayıttaki bilinmeyen kimlikleri de sayıyordu (eski sürüm/bozuk kayıt): Rozet dolabında "27 / 26", pasaport rozet sayısı ve "Bu telefonda neler var" fazla görünebilirdi. Artık sadece `ROZETLER` listesindekiler sayılır; kayıt silinmez/değişmez. Test `kayit.test.ts` eski kodda kırmızı.
 - **Kostüm:** aynı sorun yok: kutlanan liste sadece "daha önce kutlandı mı" diye okunuyor, hiçbir yerde sayılmıyor; seçili kostüm zaten açık kostümlere göre süzülüyor. Davranışı sabitleyen test eklendi (eski kodda da yeşil, beklendiği gibi).
