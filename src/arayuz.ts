@@ -39,12 +39,18 @@ export function buyukDugme(
       yoyo: true,
       onComplete: () => {
         basildi = false;
+        // Aynı ekranın iki düğmesine aynı karede dokunulduysa (yavaş telefonda kare ~200 ms) sadece ilki çalışır:
+        // yoksa iki ekran birden açılabiliyordu (sahne geçişi sırada bekler; 18 Ekim, kod denetimi 9. tur).
+        const kare = sahne.game.loop.frame;
+        if (sonBasilanKare.get(sahne) === kare) return;
+        sonBasilanKare.set(sahne, kare);
         basinca();
       },
     });
   });
   return dugme;
 }
+const sonBasilanKare = new WeakMap<Phaser.Scene, number>();
 
 // Uzay arka planı: lacivert gökyüzü ve hafifçe parıldayan yıldızlar.
 export function yildizliArkaPlan(sahne: Phaser.Scene) {
