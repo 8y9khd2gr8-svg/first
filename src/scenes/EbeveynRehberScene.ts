@@ -14,6 +14,8 @@ const IPUCLARI = [
   '⏱️ 10-15 dakikayla başlayın; "🌙 Bitirelim" ile soğuyup bitirin.',
   '⚙️ Ayarlar: 🐢 Sakin / 🐆 Hızlı tempo, Oturarak oyna.',
   '📱 Telefonu sağlam bir yere koyun; çocuk biraz geride dursun.',
+  // K46 (18 Ekim, kullanıcı kararı): çocuk ekranlarında VoiceOver desteği yok; oyun kendi sesiyle yönlendirir.
+  '🔈 VoiceOver açıksa kapatın; oyun kendisi konuşur.',
 ];
 
 // Ebeveyn köşesi → "Nasıl oynanır": dört adım ve birkaç ipucu.

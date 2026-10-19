@@ -603,3 +603,92 @@ test('benzetim yayın paketine girmez', () => {
   expect(dosyalar.length).toBeGreaterThan(0);
   for (const d of dosyalar) expect(fs.readFileSync(`dist/assets/${d}`, 'utf8'), d).not.toContain('zipzipBenzetim');
 });
+
+// Zıplama denemesi (ZiplaDenemeScene), kameralı yol: çocuk zıplıyor (benzetim). Sayfa donunca ya da gizlenince
+// (T3, T7, T10; 18 Ekim) zıplamalar birikip bir anda gelmez, ritim yolu açık kalmaz, kamera saymayı sürdürür.
+async function kameraliZipla(page: Page) {
+  await page.evaluate(() => {
+    const oyun = (window as any).oyun;
+    oyun.scene.getScenes(true).forEach((s: any) => s.scene.stop());
+    oyun.scene.start('ZiplaDeneme', {});
+  });
+  await page.waitForTimeout(700);
+  const r = (await page.locator('canvas').boundingBox())!;
+  await page.mouse.click(r.x + r.width / 2, r.y + (r.height * 925) / 1280); // 📷 Kamerayla zıpla
+  await page.waitForFunction(() => (window as any).oyun.scene.getScene('ZiplaDeneme').kameraZiplamasi >= 2, null, { timeout: 120_000 });
+}
+const ziplaDurum = (page: Page) =>
+  page.evaluate(() => {
+    const s = (window as any).oyun.scene.getScene('ZiplaDeneme');
+    return { toplam: s.ziplamaSayisi as number, kamera: s.kameraZiplamasi as number, ritim: !!s.ritim, durum: s.kamera?.durum as string };
+  });
+
+test('benzetim: Zıpzıp da zıplasın (kamerayla): sayfa iki kez 2,5 sn donsa da zıplamalar bir anda gelmez, ritim açık kalmaz', async ({ page }) => {
+  test.setTimeout(240_000);
+  // Ayna testindeki gibi: sahte tuval görüntüsü donmada "susturuldu" olur (gerçek kamera için 🔎); burada donmanın kendisi denenir.
+  await page.addInitScript(() => Object.defineProperty(MediaStreamTrack.prototype, 'muted', { configurable: true, get: () => false }));
+  await benzetimKur(page);
+  const k0 = await oyunuAc(page, { 'zipzip-beta-dunya': '1' });
+  await durumYaz(page, { hareket: 'zipla' });
+  await kameraliZipla(page);
+  const artislar = await page.evaluate(async () => {
+    const s = (window as any).oyun.scene.getScene('ZiplaDeneme');
+    const bekle = (ms: number) => new Promise((r) => setTimeout(r, ms));
+    const sonuc: number[] = [];
+    for (let i = 0; i < 2; i++) {
+      const once = s.ziplamaSayisi;
+      const bit = performance.now() + 2_500;
+      while (performance.now() < bit);
+      await bekle(300);
+      sonuc.push(s.ziplamaSayisi - once);
+      await bekle(1_500);
+    }
+    return sonuc;
+  });
+  for (const a of artislar) expect(a).toBeLessThanOrEqual(1);
+  const sonra = await ziplaDurum(page);
+  // Yüklü makinede sahte model saniyede ~2 kez çalışır, benzetimin zıplamalarının çoğunu kaçırır: bekleme uzun.
+  await expect.poll(async () => (await ziplaDurum(page)).kamera, { timeout: 90_000 }).toBeGreaterThan(sonra.kamera);
+  await expect.poll(async () => { const d = await ziplaDurum(page); return [d.durum, d.ritim]; }, { timeout: 30_000 }).toEqual(['goruyorum', false]);
+  expect(k0.hatalar).toEqual([]);
+});
+
+test('benzetim: Zıpzıp da zıplasın (kamerayla): sayfa 4 sn gizliyken zıplama sayılmaz, dönünce kamera yine sayar', async ({ page }) => {
+  test.setTimeout(240_000);
+  // Telefon gibi: gizliyken kare çizilmez (oyunun saati ve kamera döngüsü durur).
+  await page.addInitScript(() => {
+    const w = window as any;
+    w.sayfaGizli = false;
+    Object.defineProperty(document, 'hidden', { configurable: true, get: () => w.sayfaGizli });
+    Object.defineProperty(document, 'visibilityState', { configurable: true, get: () => (w.sayfaGizli ? 'hidden' : 'visible') });
+    const kare = window.requestAnimationFrame.bind(window);
+    let bekleyen: FrameRequestCallback[] = [];
+    window.requestAnimationFrame = (f) => kare((t) => (w.sayfaGizli ? bekleyen.push(f) : f(t)));
+    w.sayfayiGizle = (gizli: boolean) => {
+      w.sayfaGizli = gizli;
+      document.dispatchEvent(new Event('visibilitychange'));
+      if (!gizli) {
+        bekleyen.forEach((f) => kare(f));
+        bekleyen = [];
+      }
+    };
+  });
+  await benzetimKur(page);
+  const k0 = await oyunuAc(page, { 'zipzip-beta-dunya': '1' });
+  await durumYaz(page, { hareket: 'zipla' });
+  await kameraliZipla(page);
+  const gizliyken = await page.evaluate(() => {
+    (window as any).sayfayiGizle(true);
+    const s = (window as any).oyun.scene.getScene('ZiplaDeneme');
+    return { toplam: s.ziplamaSayisi, kamera: s.kameraZiplamasi };
+  });
+  await page.waitForTimeout(4000);
+  const d1 = await ziplaDurum(page);
+  expect({ toplam: d1.toplam, kamera: d1.kamera }).toEqual(gizliyken);
+  await page.evaluate(() => (window as any).sayfayiGizle(false));
+  await page.waitForTimeout(300);
+  expect((await ziplaDurum(page)).toplam - gizliyken.toplam).toBeLessThanOrEqual(1);
+  await expect.poll(async () => (await ziplaDurum(page)).kamera, { timeout: 90_000 }).toBeGreaterThan(gizliyken.kamera + 1);
+  await expect.poll(async () => { const d = await ziplaDurum(page); return [d.durum, d.ritim]; }, { timeout: 30_000 }).toEqual(['goruyorum', false]);
+  expect(k0.hatalar).toEqual([]);
+});

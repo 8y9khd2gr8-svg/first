@@ -225,3 +225,40 @@ test('istatistik: bozuk kayıtta kameranın gördüğü, kamera açık sayısın
   depo.set('zipzip-istatistik-v1', JSON.stringify({ gunler: { [bugun]: { saniye: 10, hareket: 4, ziplama: 0, kameraAcik: 4, kameraGordu: 1 } } }));
   assert.deepEqual([haftalikOzet().kameraAcik, haftalikOzet().kameraGordu], [4, 1], 'sağlam kayıt aynen kalır');
 });
+
+// Açık/kapalı kayıtları (kamera, tam sürüm, beta; uzaktan oyna Phaser'a bağlı olduğu için oyun.spec.ts'de) sadece tam "1" ile açık sayılır; bozuk/eski değer kapalıdır
+// ve hiçbir okuma kaydı değiştirmez (18 Ekim denetimi: hata yoktu, davranış sabitlendi). Tam sürüm kapalı sayılınca
+// mağazadan açılışta yeniden sorulur; test sitesinde (web) zaten ödeme yok.
+test('açık/kapalı kayıtları: bozuk değer kapalı sayılır, kayıt değişmez', async () => {
+  const { kameraAcikMi } = await import('../src/kamera');
+  const { tamSurumVarMi } = await import('../src/satinAlma');
+  const { betaDunyaAcikMi } = await import('../src/ilerleme');
+  const okuyucular = { 'zipzip-kamera-v1': kameraAcikMi, 'zipzip-tam-surum-v1': tamSurumVarMi, 'zipzip-beta-dunya': betaDunyaAcikMi };
+  (globalThis as any).location = { search: '?odeme=deneme' };
+  try {
+    for (const deger of [...BOZUKLAR, '', '0', ' 1', '1 ', '01', 'evet', '"1"']) {
+      for (const [anahtar, oku] of Object.entries(okuyucular)) {
+        depo.set(anahtar, deger);
+        assert.equal(oku(), false, `${anahtar}=${deger}`);
+        assert.equal(depo.get(anahtar), deger, `${anahtar} değişmedi`);
+      }
+    }
+    for (const [anahtar, oku] of Object.entries(okuyucular)) {
+      depo.set(anahtar, '1');
+      assert.equal(oku(), true, anahtar);
+    }
+  } finally {
+    delete (globalThis as any).location;
+  }
+});
+
+// Pasaportta bir alan bozuksa diğerleri kaybolmaz; bir sonraki yazma bozuk alanı taşımaz.
+test('pasaport: bozuk alan yok sayılır, sağlam ad/karakter kalır, yazınca bozuk alan temizlenir', async () => {
+  const { pasaportYaz } = await import('../src/pasaport');
+  depo.set('zipzip-pasaport-v1', JSON.stringify({ ad: 'Yağız', avatar: '🦊', foto: 'javascript:alert(1)', soruldu: 'evet', fazla: 1 }));
+  assert.deepEqual(pasaportOku(), { ad: 'Yağız', foto: undefined, avatar: '🦊', soruldu: false });
+  pasaportYaz({ soruldu: true });
+  assert.deepEqual(JSON.parse(depo.get('zipzip-pasaport-v1')!), { ad: 'Yağız', avatar: '🦊', soruldu: true });
+  depo.set('zipzip-pasaport-v1', JSON.stringify({ ad: ['x'], avatar: '🦖' }));
+  assert.deepEqual(pasaportOku(), { ad: '', foto: undefined, avatar: undefined, soruldu: false });
+});
