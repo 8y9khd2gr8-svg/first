@@ -52,6 +52,63 @@ açık bir denemede kapalı. Yanında ikinci bir telefonun kronometresi (süre �
 | A7 (ayna süresi) | Kamera açık, telefon masada (ayaklar görünmesin), kameralı bir harekette ayna açılınca kronometreyi başlat; geri sayım ("3") görününce durdur | Normal tempoda en çok ~6 sn, Sakin tempoda ~8 sn | Ölçülen süre (3 deneme) |
 | A8 (ayna + kilit) | A7'yi tekrarla, aynanın 2. saniyesinde 5 sn kilitle, aç | Kilitte geçen süre sayılmaz; ayna ya kalan süreyi tamamlar ya da kamera durduysa hemen geri sayıma geçer | Toplam süre, "Durdu" yazdı mı |
 | A9 (T7) | Eski/yavaş bir iPhone varsa (ya da Düşük Güç Modu açık): bir durağı kamerayla baştan sona oyna | Oyun takılsa da biter; ayna en çok ~6 sn (gerçek saatle); "Yaptım!" her harekette çıkar | Hangi model/iOS, takılma oldu mu, ayna süresi |
-| A10 (ebeveyn kilidi) | Ebeveyn sorusunda önce yanlış, hemen ardından doğru cevaba çok hızlı dokun (birkaç kez; Düşük Güç Modunda da) | Kilit hiçbir zaman açılmaz, iki ekran üst üste görünmez; geri dönülür | Bir kez bile açıldı mı? (Bulutta sadece "aynı karede iki dokunuş" taklit edildi) |
+| A10 (ebeveyn kilidi) | Ebeveyn sorusunda önce yanlış, hemen ardından doğru cevaba çok hızlı dokun (birkaç kez; Düşük Güç Modunda da) | Kilit hiçbir zaman açılmaz, iki ekran üst üste görünmez; geri dönülür | Bir kez bile açıldı mı? (Bulutta sadece "aynı karede iki dokunuş" taklit edildi) Düzeltme #156 ile 19 Ekim'de test sitesinde (7ce6370) |
 
 Sonuçlar KAYIT.md'ye tarih, telefon modeli ve iOS sürümüyle yazılır; denenmeyen madde 🔎 kalır.
+
+## K47 tarayıcı güvenlik kuralı (CSP): telefonda (19 Ekim; PR #157 taslak, birleşmedi)
+
+**Durum:** hiçbiri gerçek telefonda denenmedi. Kural (#157) **test sitesinde yok**; bu yüzden aşağıdaki maddeler ancak kuralı
+taşıyan bir paketle denenebilir: Android'de `k47-csp` dalından üretilen deneme APK'sı (Actions → "Android deneme paketi" →
+dal: `k47-csp`), iPhone'da kural test sitesine çıkınca Safari'de (iPhone'a kurulabilen paket Apple hesabı ister; K49 kararı).
+
+**Bulutta kanıtlanan (Chromium, ekransız; `tests/guvenlik-kurali.spec.ts` + bütün oyun testleri kural açık):** kural derlenmiş
+sayfada betiklerden önce; dış adrese istek/resim/betik/bağlantı engellenir; oyun, yazı tipi, internetsiz açılış (hizmet çalışanı
+dış dosyadan, satır içi betik yok), ses kaydı yükleme ve çözme, fotoğraf (blob:) ve resim (data:), gerçek kamera modeli (önce
+GPU, olmazsa CPU) kural altında çalışır; `'wasm-unsafe-eval'` çıkarılırsa model çalışmaz.
+
+**Kuralın kapsamında olmayanlar (ağ isteği değil, kural engellemez):** kamera akışı (izin, canlı görüntü), telefonun konuşma
+motoru, ekran açık tutma (tarayıcının Wake Lock'ı), paylaşma menüsü, e-posta bağlantısı. Bunlar kural yüzünden bozulmaz;
+**ama uygulamada** konuşma, ödeme ve ekran açık tutma Capacitor köprüsüyle çalışır ve köprünün sayfaya nasıl girdiği telefona
+göre değişir (aşağıda A-K3).
+
+### Android (deneme APK'sı, `k47-csp` dalından)
+
+| # | Ne yapılır | Ne görülmeli (doğru) | Not edilecek |
+|---|---|---|---|
+| A-K1 | APK'yı kurup aç; Ayarlar → Uygulamalar → Android System WebView (ya da Chrome) **sürüm numarasını** yaz | Oyun açılır, yazı tipi yuvarlak (Baloo) | WebView sürümü, Android sürümü, telefon modeli |
+| A-K2 | Bir durak oyna (ses açık) | Zıpzıp konuşur (telefonun Türkçe sesi; uygulamada eklentiyle) | Ses geldi mi? |
+| A-K3 | Uzaktan oyna açık, dokunmadan bir durak bitir | Ekran kararmaz (eklentiyle ekran açık) | Karardı mı? |
+| A-K4 | 🔒 Ebeveyn → kamerayla sayma aç → 🔍 Dene | İzin bir kez sorulur, görüntü ve vücut noktaları görünür, sayı artar | Model yüklendi mi (noktalar çıktı mı)? |
+| A-K5 | 🔒 Ebeveyn köşesine gir, yeşil düğmeye bak; **⭐ Tam sürüm** varsa aç, "Satın al"a bir kez dokun | Köşede **⭐ Tam sürüm** görünür (köprü çalışıyor). Deneme APK'sı Play'den gelmediği için "Satın alma tamamlanmadı…" yazar, çökme yok (gerçek ödeme denenmez). **📲 Telefona yükle** görünürse köprü engellenmiştir (oyun kendini web sitesi sanar, bütün bölümler ücretsiz açılır) | Hangi düğme göründü? Ne yazdı? |
+| A-K6 | Uçak modu → uygulamayı kapat/aç | Oyun açılır ve oynanır | — |
+
+**En önemli risk (koddan, 🔎):** Capacitor, köprüyü yeni WebView'de "belge başı betiği" olarak ekler (kurala takılmaz). Bu özelliği
+desteklemeyen eski WebView'de (kabaca 2020 öncesi sürümler; Capacitor'ın kabul ettiği en düşük WebView 60) köprü sayfaya satır içi
+betik olarak eklenir ve **kural onu engeller**: A-K2, A-K3 bozulur; A-K5'te ödeme ekranı yerine "📲 Telefona yükle" çıkar ve oyun kendini web sitesi sandığı için **bütün bölümler ödemesiz açılır** (çocuğa zarar değil, satış açığı). Güncel telefonlarda WebView mağazadan güncellenir; eski bir
+Android varsa onda da denenmeli. Ayrıca WebView 91-96'da kamera seçeneği görünür ama `'wasm-unsafe-eval'` bilinmediği için model
+yüklenmeyebilir (K38: kamera kapanır, oyun kamerasız sürer).
+
+### iPhone (kural test sitesine çıkınca, Safari ve ana ekran uygulaması)
+
+| # | Ne yapılır | Ne görülmeli (doğru) | Not edilecek |
+|---|---|---|---|
+| I-K1 | Test sitesini Safari'de aç (sayfayı bir kez yenile: yeni sürüm gelsin) | Oyun açılır, yazı tipi yuvarlak | iPhone modeli, iOS sürümü |
+| I-K2 | 🔒 Ebeveyn → 🔊 Sesi dene; sonra bir durak | Zıpzıp konuşur | Ses geldi mi? |
+| I-K3 | Kamerayla sayma aç → 🔍 Dene | Görüntü + vücut noktaları, sayı artar (iOS 16.4 ve sonrası; öncesinde kamera seçeneği görünmez) | Noktalar çıktı mı? |
+| I-K4 | Uzaktan oyna açık, dokunmadan bir durak | Ekran kararmaz | Karardı mı? |
+| I-K5 | Uçak modu → ana ekrandaki oyunu aç | Açılır ve oynanır | — |
+| I-K6 | Sertifika ya da özet → 🔒 Kaydet / Paylaş | Paylaşma menüsü açılır | — |
+
+iPhone uygulamasında (ileride, TestFlight) köprü WKUserScript ile girer, kurala takılmaması beklenir; `capacitor://localhost`
+adresinde `'self'` eşleşmesi ve wasm izni de orada ayrıca denenmeli (🔎, Mac/Apple hesabı gerekir).
+
+### Sonuç kaydı (telefonda doldurulur; Claude doldurmaz)
+
+```
+Tarih:            Deneyen:
+Telefon modeli:   Android/iOS sürümü:      WebView/Safari sürümü:
+Paket: APK (k47-csp, commit …) / test sitesi (Safari / ana ekran)
+A-K1 … A-K6 ya da I-K1 … I-K6: Oldu / Olmadı / Denenmedi · not
+```
+Sonuçlar KAYIT.md'ye (K47 satırı ve günlük) aynen yazılır; denenmeyen madde 🔎 kalır.
