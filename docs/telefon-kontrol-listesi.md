@@ -83,11 +83,13 @@ göre değişir (aşağıda A-K3).
 | A-K5 | 🔒 Ebeveyn köşesine gir, yeşil düğmeye bak; **⭐ Tam sürüm** varsa aç, "Satın al"a bir kez dokun | Köşede **⭐ Tam sürüm** görünür (köprü çalışıyor). Deneme APK'sı Play'den gelmediği için "Satın alma tamamlanmadı…" yazar, çökme yok (gerçek ödeme denenmez). **📲 Telefona yükle** görünürse köprü engellenmiştir (oyun kendini web sitesi sanar, bütün bölümler ücretsiz açılır) | Hangi düğme göründü? Ne yazdı? |
 | A-K6 | Uçak modu → uygulamayı kapat/aç | Oyun açılır ve oynanır | — |
 
-**En önemli risk (koddan, 🔎):** Capacitor, köprüyü yeni WebView'de "belge başı betiği" olarak ekler (kurala takılmaz). Bu özelliği
-desteklemeyen eski WebView'de (kabaca 2020 öncesi sürümler; Capacitor'ın kabul ettiği en düşük WebView 60) köprü sayfaya satır içi
-betik olarak eklenir ve **kural onu engeller**: A-K2, A-K3 bozulur; A-K5'te ödeme ekranı yerine "📲 Telefona yükle" çıkar ve oyun kendini web sitesi sandığı için **bütün bölümler ödemesiz açılır** (çocuğa zarar değil, satış açığı). Güncel telefonlarda WebView mağazadan güncellenir; eski bir
-Android varsa onda da denenmeli. Ayrıca WebView 91-96'da kamera seçeneği görünür ama `'wasm-unsafe-eval'` bilinmediği için model
-yüklenmeyebilir (K38: kamera kapanır, oyun kamerasız sürer).
+**En önemli risk (koddan, 🔎; 19 Ekim akşamı düzeltildi):** Capacitor köprüyü yeni WebView'de "belge başı betiği" olarak ekler
+(kurala takılmaz). Bu özelliği desteklemeyen WebView'de köprüyü sayfaya satır içi betik olarak, `<head>`'in hemen arkasına, yani
+**kuraldan önce** ekler; sayfa içi kural kendisinden önceki betiğe uygulanmaz, köprü çalışır. Bulutta Capacitor'ın gerçek köprü
+dosyasıyla taklit edildi (Chromium; gerçek eski telefon değil). Hangi WebView sürümünün bu özelliği desteklediği bilinmiyor
+(belgede yok; telefon kendisi sorar). Köprü yine de eksik kalırsa belirti: A-K5'te "📲 Telefona yükle", ses yok, ekran kararır,
+bütün bölümler ödemesiz açık (K50). Eski bir Android varsa onda da denenmeli. Ayrıca eski WebView `'wasm-unsafe-eval'`i tanımazsa
+kamera modeli yüklenmeyebilir (K38: kamera kapanır, oyun kamerasız sürer; sürüm sınırı doğrulanmadı).
 
 ### iPhone (kural test sitesine çıkınca, Safari ve ana ekran uygulaması)
 
@@ -114,9 +116,14 @@ adresinde `'self'` eşleşmesi ve wasm izni de orada ayrıca denenmeli (🔎, Ma
    alsın diye sayfa bir kez yenilenir (hizmet çalışanı bir sonraki açılışta günceller). Nedeni KAYIT'a yazılır.
 6. Mağaza yayını bu adımlarla başlatılmaz.
 
-**Eski WebView davranışı (koddan, 🔎):** Capacitor 7 köprüyü WebView "belge başı betiği" özelliğini destekliyorsa onunla ekler
-(kurala takılmaz); desteklemiyorsa sayfaya satır içi `<script>` olarak ekler, kural bunu engeller. Belirti: ebeveyn köşesinde
-"⭐ Tam sürüm" yerine "📲 Telefona yükle", Zıpzıp'ın sesi yok, ekran kararıyor; bütün bölümler ödemesiz açık.
+**Eski WebView davranışı (koddan + Chromium taklidi, 🔎 telefonda):** belge başı betiği yoksa köprü satır içi `<script>` olarak
+`<head>`'in arkasına girer, kuraldan önce kalır ve çalışır (`guvenlik-kurali.spec.ts` "eski WebView taklidi"). `index.html`'de
+`<head>` etiketine özellik eklenirse köprü `</head>`'in önüne, kuralın arkasına düşer ve engellenir (test bunu yakalar).
+Köprü eksikse belirti: ebeveyn köşesinde "⭐ Tam sürüm" yerine "📲 Telefona yükle", Zıpzıp'ın sesi yok, ekran kararıyor; bütün
+bölümler ödemesiz açık.
+
+**19 Ekim akşamı:** Android test cihazı şimdilik yok; A-K1…A-K6 denenmedi. **iPhone:** test sitesi sadece main'den yayınlanır;
+#157 main'e girmeden Safari'de yapılan deneme K47'yi kapsamaz.
 
 ### Sonuç kaydı (telefonda doldurulur; Claude doldurmaz)
 
