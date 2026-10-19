@@ -103,6 +103,21 @@ yüklenmeyebilir (K38: kamera kapanır, oyun kamerasız sürer).
 iPhone uygulamasında (ileride, TestFlight) köprü WKUserScript ile girer, kurala takılmaması beklenir; `capacitor://localhost`
 adresinde `'self'` eşleşmesi ve wasm izni de orada ayrıca denenmeli (🔎, Mac/Apple hesabı gerekir).
 
+### Sıra ve geri dönüş yolu (K49, 19 Ekim kullanıcı kararı)
+1. Android deneme APK'sı `k47-csp` dalından üretilir (sadece indirilebilir dosya; mağazaya/test sitesine gitmez).
+2. Android telefonu olan biri A-K1…A-K6'yı dener. **Cihaz bulunamazsa KAYIT'a "bulunamadı" yazılır, hiçbir madde denenmiş sayılmaz.**
+3. Android'de A-K2, A-K3, A-K5'ten biri olmazsa (özellikle "📲 Telefona yükle" görünürse) #157 birleştirilmez; neden KAYIT'a yazılır,
+   önlem (en düşük WebView sürümü ya da başka yol) kullanıcıya seçenek olarak sunulur.
+4. Android geçerse #157'yi main'e birleştirmek için kullanıcıdan **ayrıca onay** istenir (test sitesi sadece main'den yayınlanır).
+5. Birleşince birkaç gün iPhone Safari'de I-K1…I-K6. Test sitesinde ya da iPhone'da bir şey bozulursa: birleştirme PR'ındaki
+   **Revert** düğmesi → geri alma PR'ı → `test` yeşil → birleştir (geçmiş yeniden yazılmaz, force push yok). Telefon yeni sürümü
+   alsın diye sayfa bir kez yenilenir (hizmet çalışanı bir sonraki açılışta günceller). Nedeni KAYIT'a yazılır.
+6. Mağaza yayını bu adımlarla başlatılmaz.
+
+**Eski WebView davranışı (koddan, 🔎):** Capacitor 7 köprüyü WebView "belge başı betiği" özelliğini destekliyorsa onunla ekler
+(kurala takılmaz); desteklemiyorsa sayfaya satır içi `<script>` olarak ekler, kural bunu engeller. Belirti: ebeveyn köşesinde
+"⭐ Tam sürüm" yerine "📲 Telefona yükle", Zıpzıp'ın sesi yok, ekran kararıyor; bütün bölümler ödemesiz açık.
+
 ### Sonuç kaydı (telefonda doldurulur; Claude doldurmaz)
 
 ```
