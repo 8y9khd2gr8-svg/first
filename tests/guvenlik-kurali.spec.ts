@@ -116,14 +116,17 @@ async function modeliDene(page: Page) {
       const { FilesetResolver, PoseLandmarker } = await import(`./assets/${modul}`);
       const kok = new URL('mediapipe/', document.baseURI).href;
       const dosyalar = await FilesetResolver.forVisionTasks(kok);
-      const model = await PoseLandmarker.createFromOptions(dosyalar, {
-        baseOptions: { modelAssetPath: kok + 'pose_landmarker_lite.task', delegate: 'CPU' },
-        runningMode: 'IMAGE',
-        numPoses: 1,
-      });
+      // Oyundaki gibi (kamera.ts modelYukle): önce ekran kartı (GPU), olmazsa işlemci (CPU); görüntü akışı kipi.
+      const kur = (delegate: 'GPU' | 'CPU') =>
+        PoseLandmarker.createFromOptions(dosyalar, {
+          baseOptions: { modelAssetPath: kok + 'pose_landmarker_lite.task', delegate },
+          runningMode: 'VIDEO',
+          numPoses: 1,
+        });
+      const model = await kur('GPU').catch(() => kur('CPU'));
       const tuval = document.createElement('canvas');
       tuval.width = tuval.height = 64;
-      const sonuc = model.detect(tuval);
+      const sonuc = model.detectForVideo(tuval, performance.now());
       model.close();
       return `çalıştı (${sonuc.landmarks.length} kişi)`;
     } catch (e) {
@@ -131,6 +134,47 @@ async function modeliDene(page: Page) {
     }
   }, modul!);
 }
+
+// Kural altında ses kaydı, çocuğun fotoğrafı ve sertifika resmi yolları (19 Ekim): oyunun kullandığı tarayıcı
+// özellikleri tek tek denenir. Ses kaydı aynı adresten fetch + çözme (ses.ts kaydiYukle); fotoğraf blob: adresiyle resim
+// (pasaport.ts); sertifika tuvalden PNG (SertifikaScene); Phaser'ın küçük resimleri data:. Telefonun konuşma motoru,
+// kamera akışı (getUserMedia, srcObject), ekran açık tutma (Wake Lock) ve paylaşma ağ isteği değildir, kuralın
+// kapsamında değildir; bunlar ve Capacitor köprüsü (ödeme, ses eklentisi, ekran açık eklentisi) sadece telefonda 🔎.
+test('kural varken ses kaydı yükleme, fotoğraf (blob:) ve resim (data:) yolları engellenmez', async ({ page }) => {
+  const k = await derlenmisOyunuAc(page);
+  const sonuc = await page.evaluate(async () => {
+    // Olmayan bir ses kaydı: istek gider, kural engellemez (cevap 404 ya da sunucunun yedek sayfası 200; ses.ts ikisinde de
+    // telefonun sesine döner). Engellenseydi fetch hata verirdi.
+    const ses = await fetch('ses/olmayan-cumle.mp3').then(() => 'cevap geldi', () => 'engellendi');
+    // Kısa bir WAV (yarım saniye sessizlik) çözülür: decodeAudioData kurala takılmaz.
+    const ornek = 8000;
+    const veri = new ArrayBuffer(44 + ornek);
+    const v = new DataView(veri);
+    const yaz = (i: number, m: string) => [...m].forEach((h, j) => v.setUint8(i + j, h.charCodeAt(0)));
+    yaz(0, 'RIFF'); v.setUint32(4, 36 + ornek, true); yaz(8, 'WAVE'); yaz(12, 'fmt ');
+    v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, 1, true); v.setUint32(24, 16000, true);
+    v.setUint32(28, 16000, true); v.setUint16(32, 1, true); v.setUint16(34, 8, true); yaz(36, 'data'); v.setUint32(40, ornek, true);
+    const cozum = await new OfflineAudioContext(1, 16000, 16000).decodeAudioData(veri).then((b) => `çözüldü ${b.duration.toFixed(1)} sn`, () => 'çözülemedi');
+    // Tuvalden PNG (sertifika) ve onun blob: adresiyle resim (fotoğraf).
+    const tuval = document.createElement('canvas');
+    tuval.width = tuval.height = 8;
+    tuval.getContext('2d')!.fillRect(0, 0, 8, 8);
+    const blob = await new Promise<Blob | null>((ok) => tuval.toBlob(ok, 'image/png'));
+    const resim = (adres: string) =>
+      new Promise<string>((ok) => {
+        const r = new Image();
+        r.onload = () => ok('yüklendi');
+        r.onerror = () => ok('engellendi');
+        r.src = adres;
+      });
+    const blobResim = await resim(URL.createObjectURL(blob!));
+    const dataResim = await resim(tuval.toDataURL('image/png'));
+    return { ses, cozum, blob: blob ? 'var' : 'yok', blobResim, dataResim };
+  });
+  expect(sonuc).toEqual({ ses: 'cevap geldi', cozum: 'çözüldü 0.5 sn', blob: 'var', blobResim: 'yüklendi', dataResim: 'yüklendi' });
+  expect(await ihlaller(page)).toEqual([]);
+  expect(k.disIstekler).toEqual([]);
+});
 
 test('kural varken kamera tanıma modeli (WebAssembly) yüklenir ve çalışır', async ({ page }) => {
   test.setTimeout(120_000);
