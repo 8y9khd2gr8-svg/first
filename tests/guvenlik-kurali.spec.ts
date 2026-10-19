@@ -199,3 +199,66 @@ test("kontrol: kuralda 'wasm-unsafe-eval' olmasa kamera modeli engellenirdi", as
   expect((await ihlaller(page)).some((i) => i.startsWith('script-src'))).toBe(true);
 });
 });
+
+// Eski Android WebView taklidi (K47/K49, 19 Ekim). Capacitor 7, telefonun WebView'i "belge başı betiği" özelliğini
+// desteklemiyorsa köprüyü (ödeme, ses, ekran açık eklentileri) sayfaya satır içi <script> olarak, ilk "<head>" yazısının
+// hemen arkasına ekler (JSInjector.getInjectedStream; "<head>" yoksa "</head>"in önüne). <meta> ile verilen kural sadece
+// kendisinden sonraki içeriğe uygulanır: köprü kuraldan önce kalırsa çalışır, sonra kalırsa engellenir.
+// Burada sayfa Capacitor'ın yaptığı gibi değiştirilir (Chromium, ekransız). Gerçek eski telefon denemesi DEĞİLDİR (🔎).
+// Köprü olarak Capacitor'ın gerçek native-bridge.js dosyası eklenir; telefonun yerli tarafı (androidBridge) sahte: mesajları
+// sadece toplar, cevap vermez (eklentiler çalışmaz, sadece sayfadan çıkan çağrılar görülür).
+const KOPRU = fs.readFileSync('node_modules/@capacitor/android/capacitor/src/main/assets/native-bridge.js', 'utf8');
+// Uygulamanın köprüye eklediği eklenti listesinin (JSExport.getPluginJS → PluginHeaders) oyunun kullandığı iki eklentilik kısa hâli.
+const EKLENTI_LISTESI = `window.Capacitor.PluginHeaders = ${JSON.stringify([
+  { name: 'TextToSpeech', methods: ['speak', 'stop', 'getSupportedVoices'].map((name) => ({ name, rtype: 'promise' })) },
+  { name: 'KeepAwake', methods: ['keepAwake', 'allowSleep', 'isSupported'].map((name) => ({ name, rtype: 'promise' })) },
+])};`;
+const kopruEkle = (html: string, yer: 'capacitor' | 'kuraldanSonra') => {
+  const betik = `<script type="text/javascript">window.androidBridge = { postMessage: (m) => (window.kopruMesajlari ||= []).push(m) };
+window.kopruTaklidi = 'calisti';\n\n${KOPRU}\n${EKLENTI_LISTESI}</script>`;
+  if (yer === 'kuraldanSonra') return html.replace('</head>', `\n${betik}\n</head>`);
+  // Capacitor'ın kuralı: ilk "<head>"in arkası, yoksa "</head>"in önü.
+  return html.includes('<head>') ? html.replace('<head>', `<head>\n${betik}\n`) : html.replace('</head>', `\n${betik}\n</head>`);
+};
+
+test('derlenmiş sayfada "<head>" aynen var ve kural ondan sonra: eski WebView köprüsü kuraldan önce kalır', () => {
+  const html = fs.readFileSync('dist/index.html', 'utf8');
+  // <head> etiketine özellik eklenirse (ör. <head lang>) Capacitor köprüyü </head>'in önüne, kuralın arkasına koyar.
+  expect(html.indexOf('<head>')).toBeGreaterThan(-1);
+  expect(html.indexOf('<head>')).toBeLessThan(html.indexOf('Content-Security-Policy'));
+  const degisen = kopruEkle(html, 'capacitor');
+  expect(degisen.indexOf('kopruTaklidi')).toBeLessThan(degisen.indexOf('Content-Security-Policy'));
+});
+
+test.describe('eski WebView taklidi', () => {
+  test.use({ serviceWorkers: 'block' });
+  test('eski WebView taklidi: Capacitor köprüsü satır içi eklenince kural altında çalışır, oyun kendini uygulama sanar, eklenti çağrısı köprüye gider', async ({ page }) => {
+    await page.route(ADRES, async (yol) => {
+      const cevap = await yol.fetch();
+      yol.fulfill({ response: cevap, body: kopruEkle(await cevap.text(), 'capacitor') });
+    });
+    const k = await derlenmisOyunuAc(page);
+    await page.waitForTimeout(1000);
+    expect(await page.evaluate(() => (window as any).kopruTaklidi)).toBe('calisti');
+    // Oyun kendini uygulama sanar (web sitesi değil): ödeme kipi "mağaza" olur, tam sürüm kilidi açık kalmaz.
+    expect(await page.evaluate(() => (window as any).Capacitor?.isNativePlatform?.())).toBe(true);
+    // Oyunun eklenti çağrıları (telefonun sesi) köprüye ulaşır.
+    const mesajlar: string[] = await page.evaluate(() => (window as any).kopruMesajlari ?? []);
+    expect(mesajlar.some((m) => m.includes('"pluginId":"TextToSpeech"'))).toBe(true);
+    expect(await ihlaller(page)).toEqual([]);
+    expect(k.hatalar).toEqual([]);
+  });
+
+  // Kontrol: aynı betik kuraldan sonra olsaydı tarayıcı engellerdi (taklit gerçekten kuralı sınıyor).
+  test('kontrol: köprü kuraldan sonra eklenseydi engellenirdi', async ({ page }) => {
+    await page.route(ADRES, async (yol) => {
+      const cevap = await yol.fetch();
+      yol.fulfill({ response: cevap, body: kopruEkle(await cevap.text(), 'kuraldanSonra') });
+    });
+    await derlenmisOyunuAc(page);
+    expect(await page.evaluate(() => (window as any).kopruTaklidi)).toBeUndefined();
+    // Köprü engellenince oyun kendini web sitesi sanar (odemeKipi 'web' → tam sürüm açık sayılır; KAYIT K50).
+    expect(await page.evaluate(() => (window as any).Capacitor?.isNativePlatform?.() ?? false)).toBe(false);
+    expect((await ihlaller(page)).some((i) => i.startsWith('script-src') && i.includes('inline'))).toBe(true);
+  });
+});
