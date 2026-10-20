@@ -406,6 +406,48 @@ test('Zıpla-aç-kapa: Zıpzıp yere basar, havada asılı kalmaz; aynada da say
   expect(kayit.hatalar).toEqual([]);
 });
 
+// iPhone denemesi (20 Ekim, bulgu 3): Truva'da "surlar" sadece yazıydı. Kullanıcı B'yi seçti: hareket ekranlarının altında
+// mazgallı taş sur ve kemerli kapı, Zıpzıp surun üstünde. Sadece görüntü: Zıpzıp, sayı, "Yaptım!" ve kamera kutusu önde kalır.
+test('Truva hareket ekranı: altta sur, Zıpzıp surun üstünde; sayı, "Yaptım!" ve kamera kutusu örtülmez', async ({ page }) => {
+  test.setTimeout(90_000);
+  await sahteKamera(page);
+  const kayit = await oyunuAc(page, { 'zipzip-kamera-v1': '1' });
+  await sahneAc(page, 'Hareket', { durakId: 'istanbul', adim: 0 });
+  expect(await page.evaluate(() => !!(window as any).oyun.scene.getScene('Hareket').children.getByName('truvaSuru'))).toBe(false);
+  await kameraliAdimaGit(page, 'truva');
+  const sira = () =>
+    page.evaluate(() => {
+      const s = (window as any).oyun.scene.getScene('Hareket');
+      const liste = s.children.list;
+      const sur = s.children.getByName('truvaSuru');
+      const yaptim = liste.find((o: any) => (o.list ?? []).some((c: any) => c.text === 'Yaptım!'));
+      // Zıpzıp'ın gölgesi ayaklarının altında: surun üst kenarına (mazgallar 864, sur 900) basar.
+      const golge = s.zipzip.golge.y;
+      return { sur: liste.indexOf(sur), zipzip: liste.indexOf(s.zipzip), sayac: liste.indexOf(s.sayac), bilgi: liste.indexOf(s.bilgi), yaptim: yaptim ? liste.indexOf(yaptim) : null, golge };
+    });
+  const once = await sira();
+  expect(once.sur).toBeGreaterThanOrEqual(0);
+  for (const k of [once.zipzip, once.sayac, once.bilgi]) expect(k).toBeGreaterThan(once.sur);
+  expect(once.golge).toBeGreaterThanOrEqual(864);
+  expect(once.golge).toBeLessThanOrEqual(905);
+  // Kamera kutusu (sayfanın HTML'i) tuvalin önünde: ortasına dokunulan yer kutunun kendisi, sur değil.
+  const kutuOnde = () =>
+    page.evaluate(() => {
+      const kutu = document.querySelector('.kamera-kutusu') as HTMLElement | null;
+      if (!kutu) return null;
+      const r = kutu.getBoundingClientRect();
+      return kutu.contains(document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2));
+    });
+  expect(await kutuOnde()).toBe(true);
+  // Hareketin sonuna hızlı gidilir: "Yaptım!" surun önünde, kutu yine önde.
+  await saatiHizlandir(page, 8);
+  await page.waitForFunction(() => (window as any).oyun.scene.getScene('Hareket').children.list.some((o: any) => (o.list ?? []).some((c: any) => c.text === 'Yaptım!')), null, { timeout: 60_000 });
+  const sonra = await sira();
+  expect(sonra.yaptim).toBeGreaterThan(sonra.sur);
+  expect(await kutuOnde()).toBe(true);
+  expect(kayit.hatalar).toEqual([]);
+});
+
 // Beta öncesi deneme turundan: yazı ekrandan taşmasın, çocuk ekranlarında düğmeler parmağa yetecek kadar büyük olsun
 // (88 oyun noktası ≈ telefonda 48 piksel). Ebeveyn ekranları da ölçülür (veliler de telefonda dokunur);
 // HTML düğmeleri ve bağlantıları (Paylaş, Gizlilik...) da en az 72 nokta olmalı.
@@ -501,7 +543,7 @@ test('yazılar okunur (renk zıtlığı)', async ({ page }) => {
   test.setTimeout(120_000);
   const kayit = await oyunuAc(page, { ...BETA, 'zipzip-ilerleme-v1': JSON.stringify(['istanbul', 'truva']), 'zipzip-pasaport-v1': JSON.stringify({ ad: '', avatar: '🐼', soruldu: true }) }, '/?odeme=deneme&bolumler=hepsi');
   const sahneler: [string, object][] = [
-    ['Acilis', {}], ['Macera', {}], ['Harita', {}], ['Dunya', {}], ['Uzay', {}], ['Spor', {}], ['Okyanus', {}], ['Durak', { durakId: 'efes' }], ['Hareket', { durakId: 'istanbul', adim: 1 }],
+    ['Acilis', {}], ['Macera', {}], ['Harita', {}], ['Dunya', {}], ['Uzay', {}], ['Spor', {}], ['Okyanus', {}], ['Durak', { durakId: 'efes' }], ['Hareket', { durakId: 'istanbul', adim: 1 }], ['Hareket', { durakId: 'truva', adim: 1 }],
     ['Pasaport', {}], ['Rozet', { sayfa: 1 }], ['Kostum', {}], ['Avatar', {}], ['Guvenlik', {}], ['Ebeveyn', { hedef: 'EbeveynMenu', geri: 'Pasaport' }],
     ['EbeveynMenu', {}], ['EbeveynVeri', {}], ['EbeveynRehber', {}], ['EbeveynAyar', {}], ['EbeveynSes', {}], ['EbeveynKamera', {}], ['ZiplaDeneme', {}], ['EbeveynOzet', {}], ['PasaportAyar', {}], ['TamSurum', {}], ['Sertifika', { bolum: 'turkiye' }],
   ];
