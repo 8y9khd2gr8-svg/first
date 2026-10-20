@@ -5,7 +5,7 @@ Not: Bütün testler bulut bilgisayarındaki ekransız tarayıcıda ve GitHub'da
 - #160 Kol sallama: gövde dik, sadece kollar sallanır → main 1b68a2d. PR son hâli 9/9 yeşil; main'de elle çalıştırılan Testler yeşil; test sitesine yayın başarılı.
 - #159 Kayıt (K51, K52), rapor biçimi kuralı, 20 Ekim raporu → main c42f8d1. Sadece belge; oyun kodu/testler değişmedi.
 - #161 🐢/⚡ işareti hikâye satırında → main c5d08f1. Çakışma çözüldükten sonra 9/9 yeşil; main Testler yeşil.
-- #162 Ayna: zıpla-aç-kapa yere basar, 1,5 sn, hareket adı yazar → main 4a2f3a8. İlk çalıştırmada 1 test kırmızı (aşağıda), tek yeniden çalıştırmada 9/9 yeşil; kullanıcı onayıyla birleşti. Yayın başarılı.
+- #162 Ayna: zıpla-aç-kapa yere basar, 1,5 sn, hareket adı yazar → main 4a2f3a8 (main Testler yeşil). İlk çalıştırmada 1 test kırmızı (aşağıda), tek yeniden çalıştırmada 9/9 yeşil; kullanıcı onayıyla birleşti. Yayın başarılı.
 - Her birleşmeden sonra main'deki kod, test edilen PR koduyla birebir aynı olduğu denetlendi.
 - #157 (CSP güvenlik kuralı): dokunulmadı.
 
