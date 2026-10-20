@@ -1,0 +1,56 @@
+ZIP ZIP DÜNYA — iPHONE DENEME RAPORU (20 Ekim 2026)
+Kaynak: kullanıcının iPhone Safari denemesi (test sitesi, main e20cf70). İnceleme ve düzeltmeler: Claude.
+Not: Denemeler bulut bilgisayarındaki ekransız tarayıcıda yapıldı; iPhone testi sayılmaz. Değişiklikler henüz telefonda görülmedi.
+
+ÖZET
+- 5 (kol sallama) kesin çizim hatası; 1-2 (🐢/⚡) ve 4 (Ayna) yanıltan tasarım / çizim sorunu. Üç küçük taslak PR açıldı: #160, #161, #162. Üçünün de GitHub testleri yeşil (9/9).
+- Hiçbiri ana dala birleştirilmedi; kullanıcı onayı bekleniyor.
+- 3, 6, 7 tasarım/yeni özellik: önce resimli öneri sunulacak, onaysız kod ya da görsel değişmeyecek.
+
+1-2) 🐢 YAVAŞ / ⚡ HIZLI "ÇALIŞMIYOR" — PR #161
+Tespit: Pamukkale "Sıcak sudan buhar yükseliyor" ve Nemrut'ta 🐢 Yavaş; "5 kere zıpla"da (İstanbul "Vapur düdüğü çaldı!") ⚡ Hızlı. Dokununca bir şey olmuyordu.
+Neden: Arıza değil. İşaret hiçbir zaman düğme değildi, sadece bilgi. Yavaşlık/hızlılık hareketin kendisine zaten uygulanıyor (buhar 1,4→2,1 sn, Nemrut tırmanışı 1,2→1,8 sn, vapur zıplaması 1,1→0,77 sn). İki oyun aynı işareti kullanıyor. İşaret ⌂ düğmesine benzeyen sarı çerçeveli dairedeydi ve Zıpzıp'ın eli üstüne geliyordu. Ebeveyn ayarındaki 🐢 Sakin / 🐆 Hızlı seçimi işareti dokunulur yapmıyor.
+Değişiklik: Emoji çerçevesiz olarak hikâye satırının başına alındı ("🐢 Sıcak sudan buhar yükseliyor!"). Ses, tempo, sayım, kamera aynı.
+Test: Yeni test eski kodda kırmızı, yenide yeşil. Yazı boyutu ve renk zıtlığı testleri yeşil. GitHub 9/9 yeşil.
+Açık: iPhone'da görülmedi.
+
+3) TRUVA ATI VE SURLAR — tasarım önerisi bekliyor
+Tespit: "Kalın surlara tırmanalım!"da çocuk şehir ile surlar arasında bağlantı kuramıyor.
+Neden: Hareket ekranında durağa ait görsel yok; "surlar" sadece yazı. Bütün duraklarda aynı yıldızlı gece zemini.
+Sonraki adım: Şehir, kapı ve surları anlatan kısa geçiş / arka plan için resimli öneri. Onaysız uygulanmayacak.
+
+4) SÜRPRİZ AYNA: "ZIPLA, AÇ, KAPA" — PR #162
+Tespit: Zıpzıp havada asılı kalmış gibi görünüyordu (kullanıcı: sorun hareketin zorluğu değil, görüntü).
+Neden (ölçüldü): Animasyon iki zıplama arasında hiç yere basmıyordu (sürenin ~%65'i havada, yüksek zıplama). Aynada bir tekrar 1,5 sn yerine 1 sn'deydi. Hareket değişince sadece bip + parlama vardı.
+Değişiklik: Daha alçak zıplıyor; ayaklar açık yere basıp bir an duruyor, sonra kapalı yere basıyor. Aynada da 1,5 sn. Ayna'da her yeni hareketin kısa adı altta yazıyor (sadece yazı, yeni ses yok; oturarak hâlde ayakta hareket adı çıkmaz). Kamera sayımı değişmedi.
+Test: Yeni oyun testi eski kodda kırmızı (1 sn, %65 havada), yenide yeşil (%44). Yeni veri testi: her ayna hareketinin adı var. GitHub ilk çalıştırmada ilgisiz bir yavaş-telefon testi süresinde bitmedi; yerelde geçti, tek yeniden çalıştırmada 9/9 yeşil. Kayda yazıldı.
+Açık: iPhone'da görülmedi.
+
+5) KOL SALLAMA — PR #160
+Tespit: "Kollarını kaldır, sağa sola salla"da bütün vücut sallanıyordu.
+Neden: Kollar havada sabit kalıyor, bütün gövde bacaklarla birlikte 10° yana yatıyordu. Kamera bu hareketi saymıyor; algılama sorunu değil, sadece çizim.
+Değişiklik: Gövde ve bacaklar dik; sadece kollar sağa sola yatıyor. Sayı, süre, komut aynı.
+Test: Yeni test eski kodda kırmızı (eğim 10°), yenide yeşil. GitHub 9/9 yeşil.
+Açık: iPhone'da görülmedi.
+
+6) PAMUKKALE AÇILIŞ GÖRSELİ — tasarım önerisi bekliyor
+Tespit: Mevcut görsel beğenilmedi.
+Neden: public/simge/pamukkale.svg üç beyaz kıvrımlı şerit + ince turkuaz çizgi; travertenler ve havuzlar tanınmıyor.
+Sonraki adım: Basamaklı beyaz travertenler ve turkuaz havuzlar; 4-9 yaşa uygun 2-3 seçenekli görsel öneri. Onaysız değişmeyecek.
+
+7) SÜRPRİZ DONMA İÇİN YENİ FİKİRLER — yeni özellik, ayrı tutulacak
+Tespit: Çocuklar oyunu sevdi, tekrar oynamak istedi.
+Bugün: Donmada tek dans hareketi var (bacakları sırayla yana açma); "Dur!" → donma → "Devam!".
+Sonraki adım: Donma, robot yürüyüşü, kurbağa zıplaması, tek ayak, uçak pozu, komik yüz; elenme/ceza yok, sürprizli akış önerisi. Kural: komut benzetme değil, vücut parçasını söyleyen net eylem ("robot gibi" denmez).
+
+AÇIK KALAN KONULAR
+- Üç düzeltme iPhone'da denenmedi.
+- Telefon modeli / iOS sürümü kayıtta yok.
+- #157 (CSP güvenlik kuralı) gerçek Android + iPhone denemesini bekliyor; dokunulmadı.
+- Macera Pasaportu tasarımı (K51): "başla" denmedi; iki alt karar açık (kapakta "X / 50" mi, "Yakında" sekmeleri nasıl).
+- Bulgular kayıt dosyasına yazıldı (docs/KAYIT.md, K51-K52): taslak #159.
+
+BEKLENEN KARARLAR
+1. #160, #161, #162 ana dala birleştirilsin mi? (Birleşince test sitesinde hemen yayınlanır; üçü ayrı ayrı birleştirilebilir.)
+2. Tasarım önerilerine geçilsin mi? Önerilen sıra: Pamukkale görseli → Truva surları → Donma yeni hareketler.
+3. #159 (sadece kayıt dosyası) birleştirilsin mi?
