@@ -98,6 +98,7 @@ Onay verilmemiş, ertelenmiş ya da reddedilmiş öneriler de buraya yazılır; 
 **Durum (GitHub'dan doğrulandı):** main = e20cf70; açık PR yalnızca #157 (taslak, K49: birleşmez). Önceki oturum (session_01QemUxB…) arşivlendi.
 **Kullanıcı kuralı (bu süreç için, K35'ten sıkı):** hiçbir PR sormadan main'e birleştirilmez; yayın, kamera/gizlilik ve temel oynanış kararları onay ister; önce inceleme, sonra onay.
 **Yapılan:** 7 bulgu koddan incelendi; ekransız Chromium'da (iPhone değil) Pamukkale/Nemrut/İstanbul/Truva hareket ekranları açıldı, 🐢 işaretine gerçek fare dokunuşu yapıldı (adım ve tempo değişmedi, dokunulabilir tek nesne ⌂), kol sallama iki karede çekildi. Kod değişikliği yok. Bulgular K52'de.
+**Kullanıcı seçti (20 Ekim): sıra 5 → 1-2 → 4, sonra 3/6/7 tasarım önerileri.** Ayna netleşti: hareket zor değil, Zıpzıp "havada asılı" görünüyordu (ölçüldü: iki zıplama arasında yere basmıyor, %65 havada). Açılan taslak PR'lar (hiçbiri birleştirilmedi, onay bekliyor): #160 kol sallamada gövde dik; #161 🐢/⚡ hikâye satırının başına, dairesiz; #162 zıpla-aç-kapa yere basar + aynada 1,5 sn + hareket adı yazar. Her birinin testi eski kodda kırmızı, yenide yeşil (yerelde).
 **🔎 Doğrulanmayan:** iPhone'da aynı ekranlar; Ayna'daki zor hareketin hangisi olduğu; "başlangıçta yavaş/hızlı seçimi" ebeveyn ayarındaki tempo mu (kod: tempo ayarı ⚡/🐢 işaretini dokunulur yapmaz, her iki durumda da işaret düğme değil).
 
 ### 19 Ekim 2026 (akşam) — GitHub Actions bekleme, eski WebView taklidi, ödeme yolları (K50)
