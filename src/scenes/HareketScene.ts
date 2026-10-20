@@ -102,18 +102,14 @@ export class HareketScene extends Phaser.Scene {
     });
 
     if (hareket.hikaye) {
+      // Ritim işareti (🐢 yavaş, ⚡ hızlı) hikâyenin başında: okuma bilmeyen de görsün. Sadece bilgi; eskiden sol tarafta sarı
+      // çerçeveli dairedeydi, düğme sanıldı ve Zıpzıp'ın eli üstüne geliyordu (iPhone denemesi, 20 Ekim).
+      const ritim = hareket.ritim === 'yavas' ? '🐢 ' : hareket.ritim === 'hizli' ? '⚡ ' : '';
       const hikaye = this.add
-        .text(x, 170, hareket.hikaye, { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '44px', color: hareket.surpriz ? '#FF8A3D' : '#cfe3ff' })
+        .text(x, 170, ritim + hareket.hikaye, { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '44px', color: hareket.surpriz ? '#FF8A3D' : '#cfe3ff' })
         .setOrigin(0.5);
       // Uzun hikâye tek satırda kalsın, ekrana sığsın.
       hikaye.setScale(Math.min(1, 670 / hikaye.width));
-    }
-    // Ritim işareti: okuma bilmeyen de görsün (🐢 yavaş, ⚡ hızlı).
-    if (hareket.ritim) {
-      const r = this.add.container(110, 520);
-      r.add(this.add.circle(0, 0, 62, 0xffffff, 0.12).setStrokeStyle(4, RENK.sari));
-      r.add(this.add.text(0, -8, hareket.ritim === 'yavas' ? '🐢' : '⚡', { fontSize: '62px' }).setOrigin(0.5));
-      r.add(this.add.text(0, 82, hareket.ritim === 'yavas' ? 'Yavaş' : 'Hızlı', { fontFamily: YAZI_TIPI, fontStyle: 'bold', fontSize: '30px', color: '#FFC93C' }).setOrigin(0.5));
     }
     const komut = this.add
       .text(x, hareket.hikaye ? 280 : 240, hareket.baslik, {

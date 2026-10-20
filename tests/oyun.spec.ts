@@ -327,6 +327,33 @@ test('Zıpzıp konuşurken ağzı oynar, susunca kapanır', async ({ page }) => 
   expect(kayit.hatalar).toEqual([]);
 });
 
+// iPhone denemesi (20 Ekim): Pamukkale/Nemrut'taki 🐢 ve ⚡ işareti sol tarafta sarı çerçeveli dairedeydi; düğme sanıldı ("çalışmıyor"),
+// Zıpzıp'ın eli de üstüne geliyordu. İşaret sadece bilgi: hikâye satırının başında durur, dairesi yok, dokunmayla bir şey değişmez.
+test('Ritim işareti (🐢/⚡) hikâyenin başında, düğmeye benzemez; hareket kendisi yavaş', async ({ page }) => {
+  const kayit = await oyunuAc(page);
+  await sahneAc(page, 'Hareket', { durakId: 'pamukkale', adim: 0 });
+  const adim = await page.evaluate(() => (window as any).oyun.scene.getScene('Hareket').oturum.findIndex((h: any) => /buhar/.test(h.hikaye ?? '')));
+  await page.evaluate((adim) => (window as any).oyun.scene.getScene('Hareket').scene.restart({ durakId: 'pamukkale', adim }), adim);
+  await page.waitForTimeout(700);
+  const durum = () =>
+    page.evaluate(() => {
+      const s = (window as any).oyun.scene.getScene('Hareket');
+      const isaretler = s.children.list.filter((c: any) => c.type === 'Text' && c.text.includes('🐢')).map((t: any) => t.text);
+      const kaplar = s.children.list.filter((c: any) => c.list?.some?.((t: any) => t.text === '🐢')).length;
+      return { adim: s.adim, tempoMs: s.oturum[s.adim].tempoMs, isaretler, kaplar };
+    });
+  const once = await durum();
+  expect(once.isaretler).toEqual(['🐢 Sıcak sudan buhar yükseliyor!']);
+  expect(once.kaplar).toBe(0);
+  expect(once.tempoMs).toBe(2100); // kollar 1400 ms × 1,5 (yavaş)
+  // Eski işaretin yerine dokunmak bir şey değiştirmez.
+  const kutu = (await page.locator('canvas').boundingBox())!;
+  await page.mouse.click(kutu.x + (110 * kutu.width) / 720, kutu.y + (520 * kutu.height) / 1280);
+  await page.waitForTimeout(300);
+  expect(await durum()).toEqual(once);
+  expect(kayit.hatalar).toEqual([]);
+});
+
 // Beta öncesi deneme turundan: yazı ekrandan taşmasın, çocuk ekranlarında düğmeler parmağa yetecek kadar büyük olsun
 // (88 oyun noktası ≈ telefonda 48 piksel). Ebeveyn ekranları da ölçülür (veliler de telefonda dokunur);
 // HTML düğmeleri ve bağlantıları (Paylaş, Gizlilik...) da en az 72 nokta olmalı.
@@ -409,7 +436,7 @@ test('her hareketin yazısı (oturarak ve Sakin hâlleri dahil) okunur boyutta k
         const komut = 660 / genislik(h.baslik, 72, { align: 'center', stroke: '#000', strokeThickness: 14, lineSpacing: -16 });
         if (komut < 0.7) bulunan.add(`komut çok uzun (%${Math.round(komut * 100)}): ${h.baslik}`);
         if (h.baslik.split('\n').length > 2) bulunan.add(`komut 2 satırdan uzun: ${h.baslik}`);
-        if (h.hikaye && 670 / genislik(h.hikaye, 44) < 0.6) bulunan.add(`hikâye çok uzun: ${h.hikaye}`);
+        if (h.hikaye && 670 / genislik((h.ritim ? '🐢 ' : '') + h.hikaye, 44) < 0.6) bulunan.add(`hikâye çok uzun: ${h.hikaye}`);
       }
     return [...bulunan];
   });
