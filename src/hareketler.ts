@@ -179,3 +179,10 @@ export const AYNA: Hareket = {
 };
 // Ayna oyununda Zıpzıp'ın sırayla yaptığı hareketler (dördü seçilir).
 export const AYNA_HAVUZU: Animasyon[] = ['zipla', 'kollar', 'comel', 'yanaEgil', 'tekAyak', 'acKapa', 'kanat', 'belDondur', 'dizler', 'kocaman'];
+// Ayna oyununda hareket değişince ekranın altında yazan kısa ad (sadece yazı; ses bip + Zıpzıp'ın gösterimi).
+// Oturarak oynarken gelebilen kol/gövde hareketleri de var (uyarla.ts oturarakDizi).
+export const AYNA_ADLARI: Partial<Record<Animasyon, string>> = {
+  zipla: 'Zıpla!', kollar: 'Kollarını kaldır, indir!', comel: 'Çömel, kalk!', yanaEgil: 'Yana eğil!', tekAyak: 'Tek ayağını kaldır!',
+  acKapa: 'Zıpla, aç, kapa!', kanat: 'Kollarını salla!', belDondur: 'Belini döndür!', dizler: 'Dizlerini kaldır!',
+  kocaman: 'Kollarını, bacaklarını aç!', kolSalla: 'Kollarını sağa sola salla!',
+};

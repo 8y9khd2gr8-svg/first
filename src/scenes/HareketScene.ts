@@ -5,7 +5,7 @@ import { AILE_ID } from '../aile';
 import { durakBul, haritaSahnesi } from '../duraklar';
 import { SOGUMA_ID, hareketYapildi, oturumListesi } from '../oturum';
 import { uzaktanAcikMi } from '../ayarlar';
-import { AYNA, Animasyon, DONMA, Hareket } from '../hareketler';
+import { AYNA, AYNA_ADLARI, Animasyon, DONMA, Hareket } from '../hareketler';
 import { hareketKaydet } from '../istatistik';
 import { EksikYer, KAMERA_HAREKETLERI, KameraDurumu, KameraSayaci, eksikYeri, kameraAcikMi, kameraDesteklenir } from '../kamera';
 import { oyunAyari } from '../oyunAyari';
@@ -501,9 +501,13 @@ export class HareketScene extends Phaser.Scene {
     if (h.tur !== 'sure' || !h.dizi) return;
     const dizi = h.dizi;
     const her = (h.saniye * 1000) / dizi.length;
+    // Her yeni hareketin adı altta yazar (iPhone denemesi, 20 Ekim: hareket değişince ne yapılacağı belli değildi).
+    const adiYaz = (a: Animasyon) => this.bilgi.setText(AYNA_ADLARI[a] ?? '');
+    adiYaz(dizi[0]);
     dizi.forEach((a, i) => {
       if (i === 0) return;
       this.time.delayedCall(i * her, () => {
+        adiYaz(a);
         this.zipzip.surekli(a);
         bip(700 + i * 80, 0.15, 'triangle', 0.2);
         this.cameras.main.flash(150, 255, 201, 60);
