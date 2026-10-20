@@ -1,0 +1,42 @@
+ZIP ZIP DÜNYA — BİRLEŞTİRME VE TASARIM RAPORU (20 Ekim 2026, öğleden sonra)
+Not: Bütün testler bulut bilgisayarındaki ekransız tarayıcıda ve GitHub'da yapıldı; iPhone testi sayılmaz. Düzeltmeler henüz iPhone'da görülmedi (🔎).
+
+1) BİRLEŞTİRİLEN PR'LAR (sırayla)
+- #160 Kol sallama: gövde dik, sadece kollar sallanır → main 1b68a2d. PR son hâli 9/9 yeşil; main'de elle çalıştırılan Testler yeşil; test sitesine yayın başarılı.
+- #159 Kayıt (K51, K52), rapor biçimi kuralı, 20 Ekim raporu → main c42f8d1. Sadece belge; oyun kodu/testler değişmedi.
+- #161 🐢/⚡ işareti hikâye satırında → main c5d08f1. Çakışma çözüldükten sonra 9/9 yeşil; main Testler yeşil.
+- #162 Ayna: zıpla-aç-kapa yere basar, 1,5 sn, hareket adı yazar → main 4a2f3a8. İlk çalıştırmada 1 test kırmızı (aşağıda), tek yeniden çalıştırmada 9/9 yeşil; kullanıcı onayıyla birleşti. Yayın başarılı.
+- Her birleşmeden sonra main'deki kod, test edilen PR koduyla birebir aynı olduğu denetlendi.
+- #157 (CSP güvenlik kuralı): dokunulmadı.
+
+2) ÇIKAN SORUNLAR
+a) Çakışma (#161, #162): #160 birleşince iki PR, yeni testlerini tests/oyun.spec.ts'te aynı yere eklediği için çakıştı. Oyun kodu temiz birleşiyordu. Kullanıcı "iki testi de koru" dedi: ana dal PR dallarına birleştirildi (geçmiş yeniden yazılmadı); PR farkları ilk hâlleriyle aynı kaldı.
+b) #162'de süreye bağlı test: "yazılar okunur (renk zıtlığı)" Pasaport'taki "PASAPORT" yazısında zıtlık 1,08 ölçtü.
+   Neden: Pasaport sayfası aşağıdan kayarak geliyor; test animasyonu en çok 1,5 sn bekliyor. Yavaş makinede sayfa yerine oturmadan ölçüm yapılıyor.
+   #162'nin kodu değil: Pasaport'a dokunmuyor; aynı test main'de ve #161'de yeşil; yerelde 2/2 geçti; tek yeniden çalıştırmada yeşil.
+   Öneri (karar bekliyor): testi Pasaport animasyonu bitene kadar bekleyecek şekilde sağlamlaştıran ayrı küçük PR.
+
+3) TASARIM KARARLARI
+- Pamukkale simgesi: kullanıcı A · Basamaklı havuzlar'ı seçti (önden üç kat beyaz traverten, dolu turkuaz havuzlar). Proje dosyası DEĞİŞMEDİ; oyuna eklemek ayrı onay ister.
+- Truva surları: kullanıcı B · Zıpzıp surun üstünde'yi seçti (Truva hareket ekranlarında altta mazgallı taş sur ve kemerli kapı; sadece görüntü). Uygulama ayrı onay ister.
+- Sürpriz Donma: yeni öneri hazır (karar bekliyor):
+  Akış: her turda başka bir dans → "Dur!" denince Zıpzıp bir poz söyler ve o pozda donar → başka dans → başka poz → bazen sürpriz son (Zıpzıp kıpırdar ve güler, ya da "Komik bir yüz yap!"). Elenme ve ceza yok. Kamera gerekmez.
+  Danslar: yerinde koş, dizler, el sallama (var); robot dansı, kurbağa zıplaması (yeni çizim).
+  Pozlar: tek ayak, kocaman ol, ellerini beline koy (var); uçak (küçük değişiklik); komik yüz (yeni yüz ifadesi).
+  Komutlar benzetme değil, vücut parçasını söyler ("robot gibi" denmez; hikâye adı sadece üst yazıda).
+  Yaşa göre: Sakin 2 "Dur!" ve kolay pozlar; Normal 3; Hızlı 3-4 ve daha sık sürpriz. Oturarak: kol/gövde dansları, kol ve yüz pozları.
+  İki adım: (1) mevcut çizimlerle değişen dans + söylenen poz; (2) yeni çizimler ve sürpriz.
+
+4) AÇIK KALAN KONULAR
+- 🔎 Üç düzeltme (kol sallama, 🐢/⚡, Ayna) iPhone Safari'de denenmedi. Test sitesi şu an main 4a2f3a8'i gösteriyor; kullanıcının denemesi bekleniyor.
+- Telefon modeli ve iOS sürümü kayıtta yok.
+- #157 CSP: gerçek Android + iPhone denemesi ve ayrı onay bekliyor.
+- Macera Pasaportu (K51): "başla" denmedi; iki alt karar açık.
+- Kayıt güncellemesi bu raporla birlikte yeni bir belge PR'ında (birleştirme onayı bekliyor).
+
+5) BEKLENEN KARARLAR
+1. Pamukkale A'yı oyuna ekleyeyim mi? (küçük PR: public/simge/pamukkale.svg değişir)
+2. Truva B'yi oyuna ekleyeyim mi? (Truva hareket ekranlarına alt sur görseli)
+3. Sürpriz Donma önerisi: 1. adımla başlayayım mı?
+4. Pasaport renk zıtlığı testini sağlamlaştıran küçük PR açılsın mı?
+5. Bu raporun ve kayıt güncellemesinin olduğu belge PR'ı birleştirilsin mi?
