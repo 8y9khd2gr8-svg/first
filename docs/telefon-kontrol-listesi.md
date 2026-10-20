@@ -70,7 +70,7 @@ GPU, olmazsa CPU) kural altında çalışır; `'wasm-unsafe-eval'` çıkarılır
 **Kuralın kapsamında olmayanlar (ağ isteği değil, kural engellemez):** kamera akışı (izin, canlı görüntü), telefonun konuşma
 motoru, ekran açık tutma (tarayıcının Wake Lock'ı), paylaşma menüsü, e-posta bağlantısı. Bunlar kural yüzünden bozulmaz;
 **ama uygulamada** konuşma, ödeme ve ekran açık tutma Capacitor köprüsüyle çalışır ve köprünün sayfaya nasıl girdiği telefona
-göre değişir (aşağıda A-K3).
+göre değişir (aşağıda A-K2, A-K3, A-K5 ve "En önemli risk").
 
 ### Android (deneme APK'sı, `k47-csp` dalından)
 
