@@ -67,6 +67,9 @@ const D = {
   // Dinozorlar Diyarı
   trexSol: { solKol: u(120, -100), sagKol: u(60, 100), solBacak: u(130, -40), sagBacak: u(85) },
   trexSag: { solKol: u(120, -100), sagKol: u(60, 100), solBacak: u(95), sagBacak: u(50, 40) },
+  // Kol sallama: gövde dik kalır, sadece kollar havada bir sağa bir sola yatar (önce ekranın sağı).
+  kolSalSag: { solKol: u(250, 35), sagKol: u(-60, 20), solBacak: u(100), sagBacak: u(80) },
+  kolSalSol: { solKol: u(240, -20), sagKol: u(-70, -35), solBacak: u(100), sagBacak: u(80) },
   kanatYukari: { solKol: u(215), sagKol: u(-35), solBacak: u(100), sagBacak: u(80) },
   kanatAsagi: { solKol: u(150), sagKol: u(30), solBacak: u(100), sagBacak: u(80) },
   tepinSol: { solKol: u(130, -40), sagKol: u(50, 40), solBacak: u(140, -60), sagBacak: u(85) },
@@ -158,9 +161,10 @@ const ADIMLAR: Record<Animasyon, Adim[]> = {
     { durus: D.kollarYukari, y: 0, oran: 0.3, aci: 18 },
     { durus: D.kollarYukari, y: 0, oran: 0.2, aci: 0 },
   ],
+  // Gövde eğilmez (eskiden bütün vücut ±10° sallanıyordu; iPhone denemesi, 20 Ekim): sallanan sadece kollar.
   kolSalla: [
-    { durus: D.kollarYukari, y: 0, oran: 0.5, aci: 10 },
-    { durus: D.kollarYukari, y: 0, oran: 0.5, aci: -10 },
+    { durus: D.kolSalSag, y: 0, oran: 0.5, yumusama: 'Sine.easeInOut' },
+    { durus: D.kolSalSol, y: 0, oran: 0.5, yumusama: 'Sine.easeInOut' },
   ],
   piramit: [{ durus: D.piramit, y: 0, oran: 0.3 }],
   tHarfi: [{ durus: D.yanKapali, y: -10, oran: 0.3 }],
