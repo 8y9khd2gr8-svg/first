@@ -5,7 +5,7 @@ import path from 'node:path';
 import { test } from 'node:test';
 import { AILE_OTURUMU } from '../src/aile';
 import { BOLUM_SIRASI, BOLUMLER, TUM_DURAKLAR, oturum } from '../src/duraklar';
-import { AYNA, AYNA_HAVUZU, DONMA, ISINMALAR, OTURARAK, SOGUMALAR } from '../src/hareketler';
+import { AYNA, AYNA_ADLARI, AYNA_HAVUZU, DONMA, ISINMALAR, OTURARAK, SOGUMALAR } from '../src/hareketler';
 import { H, Hareket } from '../src/hareketler';
 import { kostumNasil } from '../src/kostumler';
 import { KOSTUMLER } from '../src/kostumler';
@@ -257,6 +257,20 @@ test('Sakin tempoda kısa komut: çok adımlı komut tek eyleme iner, listedeki 
     // Normal tempoda komut değişmez.
     assert.equal(uyarla([h], { yas: 'buyuk', oturarak: false })[0].baslik, h.baslik);
   }
+});
+
+// iPhone denemesi (20 Ekim): ayna oyununda hareket değişince ne yapılacağı belli değildi; her hareketin adı altta yazar.
+test('ayna oyunu: gelebilecek her hareketin (oturarak dahil) ekranda yazan bir adı var', async () => {
+  const { uyarla } = await import('../src/uyarla');
+  const oturarakAyna = (dizi: typeof AYNA_HAVUZU) => uyarla([{ ...AYNA, dizi }], { yas: 'buyuk', oturarak: true })[0].dizi ?? [];
+  const gelebilen = new Set([...AYNA_HAVUZU, ...oturarakAyna(AYNA_HAVUZU), ...oturarakAyna(['zipla', 'comel', 'dizler', 'kocaman'])]);
+  for (const a of gelebilen) {
+    const ad = AYNA_ADLARI[a];
+    assert.ok(ad, `ayna hareketinin adı yok: ${a}`);
+    assert.ok(!/gibi/i.test(ad), `ayna adında benzetme: ${ad}`);
+  }
+  // Oturarak oynarken gelen hareketlerin adı ayakta yapılan bir şey söylemez.
+  for (const a of oturarakAyna(AYNA_HAVUZU)) assert.ok(!/zıpla|çömel|ayağını|bacaklarını|dizlerini/i.test(AYNA_ADLARI[a]!), `oturarak ayna adı: ${AYNA_ADLARI[a]}`);
 });
 
 test('oturarak oyna: her durağın her hareketi (ısınma, sürpriz, soğuma dahil) oturarak yapılabilir; Sakin tempo kısaltır', async () => {

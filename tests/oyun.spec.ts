@@ -327,6 +327,35 @@ test('Zıpzıp konuşurken ağzı oynar, susunca kapanır', async ({ page }) => 
   expect(kayit.hatalar).toEqual([]);
 });
 
+// iPhone denemesi (20 Ekim): ayna oyununda "zıpla, aç, kapa" yapan Zıpzıp havada asılı kalmış gibiydi (iki zıplama arasında
+// hiç yere basmıyordu, aynada da 1 sn'de bir, yani daha hızlı dönüyordu). Artık alçak zıplar, açık ve kapalı yere basıp bir an durur.
+test('Zıpla-aç-kapa: Zıpzıp yere basar, havada asılı kalmaz; aynada da sayılı hâlinin hızında', async ({ page }) => {
+  const kayit = await oyunuAc(page);
+  await sahneAc(page, 'Kostum');
+  const sonuc = await page.evaluate(async () => {
+    const { Zipzip } = await import('/src/zipzip.ts');
+    const sahne = (window as any).oyun.scene.getScene('Kostum');
+    // Bulut tarayıcısı yavaş çizer: zaman 5 kat yavaşlatılır ki her an örneklensin.
+    sahne.time.timeScale = 0.2;
+    sahne.tweens.timeScale = 0.2;
+    const z: any = new Zipzip(sahne, 360, 640, 1);
+    z.surekli('acKapa'); // aynadaki gibi (süre verilmeden)
+    const tempo = z.dongu.delay;
+    const yukseklik: number[] = [];
+    const t0 = performance.now();
+    while (performance.now() - t0 < 1500 * 5 * 2) {
+      await new Promise((r) => setTimeout(r, 60));
+      yukseklik.push(640 - z.y);
+    }
+    z.durdur();
+    return { tempo, enYuksek: Math.max(...yukseklik), havada: yukseklik.filter((h) => h > 20).length / yukseklik.length };
+  });
+  expect(sonuc.tempo).toBe(1500);
+  expect(sonuc.enYuksek).toBeLessThanOrEqual(45);
+  expect(sonuc.havada).toBeLessThan(0.5); // ölçüm: eskisi ~0,65, yenisi ~0,44
+  expect(kayit.hatalar).toEqual([]);
+});
+
 // Beta öncesi deneme turundan: yazı ekrandan taşmasın, çocuk ekranlarında düğmeler parmağa yetecek kadar büyük olsun
 // (88 oyun noktası ≈ telefonda 48 piksel). Ebeveyn ekranları da ölçülür (veliler de telefonda dokunur);
 // HTML düğmeleri ve bağlantıları (Paylaş, Gizlilik...) da en az 72 nokta olmalı.

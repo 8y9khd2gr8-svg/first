@@ -110,13 +110,17 @@ const ADIMLAR: Record<Animasyon, Adim[]> = {
     { durus: D.kollarYukari, y: -15, oran: 0.45 },
     { durus: D.kollarAsagi, y: 0, oran: 0.45 },
   ],
-  // Zıpla-aç-kapa: havada kollar yukarıda ve bacaklar açık; inerken dizler yumuşakça bükülür.
+  // Zıpla-aç-kapa: kısa bir zıplamayla ayaklar AÇIK yere basar, bir an durur; sonra kısa bir zıplamayla KAPALI yere basar.
+  // Eskiden iki zıplama arasında hiç yere basmıyor, bacaklarını havada açıp kapıyordu: havada asılı kalmış gibi
+  // görünüyordu (iPhone denemesi, 20 Ekim).
   acKapa: [
-    { durus: D.acikHava, y: -70, oran: 0.2, yumusama: 'Quad.easeOut' },
-    { durus: D.acikIn, y: 14, oran: 0.2, yumusama: 'Quad.easeIn' },
-    { durus: D.kapali, y: -70, oran: 0.2, yumusama: 'Quad.easeOut' },
-    { durus: D.kapaliIn, y: 14, oran: 0.2, yumusama: 'Quad.easeIn' },
-    { durus: D.kapali, y: 0, oran: 0.1 },
+    { durus: D.kapaliIn, y: 8, oran: 0.08, yumusama: 'Sine.easeOut' },
+    { durus: D.acikHava, y: -40, oran: 0.13, yumusama: 'Quad.easeOut' },
+    { durus: D.acikIn, y: 8, oran: 0.13, yumusama: 'Quad.easeIn' },
+    { durus: D.acik, y: 0, oran: 0.12 },
+    { durus: D.kapali, y: -40, oran: 0.13, yumusama: 'Quad.easeOut' },
+    { durus: D.kapaliIn, y: 8, oran: 0.13, yumusama: 'Quad.easeIn' },
+    { durus: D.kapali, y: 0, oran: 0.12 },
   ],
   uzan: [
     { durus: D.uzan, y: -45, oran: 0.45 },
@@ -279,7 +283,7 @@ const CIFT: Partial<Record<Animasyon, Adim[]>> = {
 };
 
 // Süreli hareketlerde bir tekrarın süresi (ms).
-const SUREKLI_TEMPO: Partial<Record<Animasyon, number>> = { kos: 520, horon: 380, heykel: 2000, sutun: 2000, piramit: 2000, parmakUcu: 700, kocaman: 2000, belDondur: 1600, tekAyak: 4000, tHarfi: 2000, kulac: 1400, sallan: 1600, kanat: 900 };
+const SUREKLI_TEMPO: Partial<Record<Animasyon, number>> = { acKapa: 1500, kos: 520, horon: 380, heykel: 2000, sutun: 2000, piramit: 2000, parmakUcu: 700, kocaman: 2000, belDondur: 1600, tekAyak: 4000, tHarfi: 2000, kulac: 1400, sallan: 1600, kanat: 900 };
 
 type UzuvParcasi = { kok: Phaser.GameObjects.Container; dirsek: Phaser.GameObjects.Container; durum: Uzuv };
 
