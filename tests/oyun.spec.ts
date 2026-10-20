@@ -354,6 +354,29 @@ test('Ritim işareti (🐢/⚡) hikâyenin başında, düğmeye benzemez; hareke
   expect(kayit.hatalar).toEqual([]);
 });
 
+// iPhone denemesi (20 Ekim): "Kollarını kaldır, sağa sola salla"da bütün vücut sallanıyordu. Gövde dik kalmalı, kollar sallanmalı.
+test('Kol sallamada gövde dik kalır, sadece kollar sağa sola gider', async ({ page }) => {
+  const kayit = await oyunuAc(page);
+  await sahneAc(page, 'Kostum');
+  const sonuc = await page.evaluate(async () => {
+    const { Zipzip } = await import('/src/zipzip.ts');
+    const z: any = new Zipzip((window as any).oyun.scene.getScene('Kostum'), 360, 640, 1);
+    z.surekli('kolSalla', 1200);
+    const acilar: number[] = [];
+    const elYonu: number[] = []; // sağ kolun ucunun yönü (omuz + dirsek açısı)
+    for (let i = 0; i < 30; i++) {
+      await new Promise((r) => setTimeout(r, 80));
+      acilar.push(z.angle);
+      elYonu.push(z.uzuvlar.sagKol.durum.a + z.uzuvlar.sagKol.durum.b);
+    }
+    z.durdur();
+    return { enCokEgim: Math.max(...acilar.map(Math.abs)), kolAraligi: Math.max(...elYonu) - Math.min(...elYonu) };
+  });
+  expect(sonuc.enCokEgim).toBeLessThanOrEqual(1);
+  expect(sonuc.kolAraligi).toBeGreaterThan(30);
+  expect(kayit.hatalar).toEqual([]);
+});
+
 // Beta öncesi deneme turundan: yazı ekrandan taşmasın, çocuk ekranlarında düğmeler parmağa yetecek kadar büyük olsun
 // (88 oyun noktası ≈ telefonda 48 piksel). Ebeveyn ekranları da ölçülür (veliler de telefonda dokunur);
 // HTML düğmeleri ve bağlantıları (Paylaş, Gizlilik...) da en az 72 nokta olmalı.
