@@ -41,7 +41,7 @@ jobs:
           - ad: bütün duraklar 2/2
             secim: tests/butun-duraklar.spec.ts --shard=2/2
           - ad: gezinti + internetsiz
-            secim: tests/gezinti.spec.ts tests/cevrimdisi.spec.ts
+            secim: tests/gezinti.spec.ts tests/cevrimdisi.spec.ts tests/guvenlik-kurali.spec.ts
           - ad: ekranlar 1/2
             secim: tests/oyun.spec.ts --shard=1/2
           - ad: ekranlar 2/2
