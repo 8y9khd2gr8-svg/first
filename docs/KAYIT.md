@@ -101,6 +101,7 @@ Onay verilmemiş, ertelenmiş ya da reddedilmiş öneriler de buraya yazılır; 
 **Pasaport kök nedeni (ölçüldü):** yüklü makinede oyun saniyede 2-3 kare çiziyor, Phaser saati kare başına ~16 ms → 650 ms'lik kayma gerçek saatte >4 sn; `sakinlesmesiniBekle` 1,5 sn sonra sessizce geçiyordu. Eski kodda 3'te 2 kırmızı, yeni kodla 6/6 yeşil. Not: diğer PR'larda (ör. #165 yerelde) aynı Pasaport kırmızısı #166 birleşene kadar çıkabilir.
 **#163 incelemesi:** sadece docs/, çakışma yok, yeşil, commit kimlikleri doğru; eksik: K52'den 7 bulgunun ayrıntısı çıkmıştı → rapora not eklendi.
 **Rapor:** https://claude.ai/artifact/EiBnVjuNWzdRuFqHkyyRE8 + `docs/rapor-2026-10-22/` (PDF + .txt).
+**Karar (22 Ekim, kullanıcı seçti):** rapor biçimi: küçük işte sadece .txt prompt, büyük işte sayfa + PDF + .txt (CLAUDE.md güncellendi).
 **⏳ Bekleyen kararlar:** #164, #165, #166, #163 birleştirme; Sürpriz Donma A/B/C/D/E + Hızlı'da 4 "Dur!". 🔎 Pamukkale/Truva iPhone'da görülmedi.
 
 ### 20 Ekim 2026 (öğleden sonra) — #160, #159, #161, #162 birleşti; Pamukkale ve Truva tasarım seçimleri
