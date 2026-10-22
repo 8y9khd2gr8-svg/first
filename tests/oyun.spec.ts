@@ -58,6 +58,32 @@ async function sakinlesmesiniBekle(page: Page, enCok = 1500) {
     .catch(() => {});
 }
 
+// Ölçülecek yazılar yerine oturana kadar bekler: harf içeren hiçbir yazı (ya da içinde durduğu kap) sonlu bir animasyonla
+// hareket etmiyor (sonsuz süsler, ör. nabız, sayılmaz). Süreye değil oyunun kendi animasyonunun bitişine bakar: yüklü test
+// makinesinde oyun saniyede 2-3 kare çizebiliyor, oyunun saati kare başına ~16 ms ilerliyor; Pasaport'un 650 ms'lik kayması
+// gerçek saatte 4 saniyeyi geçti (ölçüldü, 20 Ekim). Koşul gelmezse test burada düşer: yarıda kalmış ekranı ölçmez.
+async function yazilarYerindeBekle(page: Page, enCok = 30_000) {
+  await page.waitForFunction(
+    () =>
+      (window as any).oyun.scene.getScenes(true).every((s: any) => {
+        const hareketli = new Set<any>();
+        for (const t of s.tweens.getTweens()) {
+          const sonsuz = t.loop === -1 || (t.data ?? []).some((d: any) => d.repeat === -1);
+          if (!sonsuz && t.isPlaying()) (t.targets ?? []).forEach((h: any) => hareketli.add(h));
+        }
+        const yerinde = (o: any): boolean => {
+          if (o.type === 'Container') return o.list.every(yerinde);
+          if (o.type !== 'Text' || !/\p{L}/u.test(o.text)) return true;
+          for (let p = o; p; p = p.parentContainer) if (hareketli.has(p)) return false;
+          return true;
+        };
+        return s.children.list.every(yerinde);
+      }),
+    null,
+    { timeout: enCok, polling: 100 },
+  );
+}
+
 // Oyunun saatini hızlandırır: her sahnenin zamanlayıcıları ve animasyonları kat kat hızlı akar.
 // Akış (hangi ekran, hangi sırayla) aynı kalır; sadece bekleme kısalır.
 async function saatiHizlandir(page: Page, kat: number) {
@@ -377,6 +403,51 @@ test('Kol sallamada gövde dik kalır, sadece kollar sağa sola gider', async ({
   expect(kayit.hatalar).toEqual([]);
 });
 
+// Sürpriz donma (22 Ekim, seçenek A): her "Dur!"da Zıpzıp söylediği pozda donar (dans etmez), sonra başka bir dansa geçer;
+// dansın ve pozun adı altta yazar. Her tempo ve oturarak ayarında "Uzaktan oyna" ile oyun kendiliğinden biter, hata yok.
+for (const ayar of [{ yas: 'kucuk', oturarak: false }, { yas: 'buyuk', oturarak: false }, { yas: 'hizli', oturarak: false }, { yas: 'buyuk', oturarak: true }, { yas: 'hizli', oturarak: true }]) {
+  test(`donma oyunu: dans ve pozlar değişir, Zıpzıp pozda donar, uzaktan oynayınca biter (${ayar.yas}${ayar.oturarak ? ', oturarak' : ''})`, async ({ page }) => {
+    test.setTimeout(120_000);
+    const kayit = await oyunuAc(page, { 'zipzip-uzaktan-v1': '1', 'zipzip-oyun-ayar-v1': JSON.stringify(ayar) });
+    await sahneAc(page, 'Hareket', { durakId: 'istanbul', adim: 0 });
+    const adim = await page.evaluate(async () => {
+      const { oturumListesi } = await import('/src/oturum.ts');
+      return oturumListesi('istanbul', 1).findIndex((h: any) => h.surpriz === 'donma');
+    });
+    expect(adim).toBeGreaterThan(0);
+    // Çalışan sahne aynı anda durdurulup yeniden başlatılırsa kapanır: arada başka bir ekran açılır (liste durakta aynı kalır).
+    await sahneAc(page, 'Kostum');
+    await sahneAc(page, 'Hareket', { durakId: 'istanbul', adim });
+    await page.evaluate(() => {
+      const w = window as any;
+      w.donmaIzi = { yazilar: [] as string[], durlar: 0, donukDans: 0, oncekiDur: false };
+      w.oyun.events.on('poststep', () => {
+        const s = w.oyun.scene.getScene('Hareket');
+        if (!s?.sys.isActive() || !s.donmaPlani) return;
+        const iz = w.donmaIzi;
+        const yazi = s.bilgi?.text;
+        if (yazi && iz.yazilar.at(-1) !== yazi) iz.yazilar.push(yazi);
+        const dur = s.sayac?.text === '✋ DUR!' && s.donuk;
+        if (dur && !iz.oncekiDur) iz.durlar++;
+        if (s.donuk && s.zipzip.dongu) iz.donukDans++; // donarken dans döngüsü sürmemeli
+        iz.oncekiDur = dur;
+        iz.plan ??= s.donmaPlani;
+      });
+    });
+    await saatiHizlandir(page, 4);
+    await expect.poll(() => page.evaluate(() => (window as any).oyun.scene.getScene('Hareket').adim), { timeout: 90_000 }).toBe(adim + 1);
+    const iz = await page.evaluate(() => (window as any).donmaIzi);
+    const n = { kucuk: 2, buyuk: 3, hizli: 4 }[ayar.yas]!;
+    expect(iz.plan.pozlar).toHaveLength(n);
+    expect(iz.durlar).toBe(n);
+    expect(iz.donukDans).toBe(0);
+    // Her dansın ve pozun adı sırayla altta yazdı.
+    const beklenen = iz.plan.danslar.flatMap((d: any, i: number) => [d.ad, ...(iz.plan.pozlar[i] ? [iz.plan.pozlar[i].ad] : [])]);
+    expect(iz.yazilar.filter((y: string) => beklenen.includes(y))).toEqual(beklenen);
+    expect(kayit.hatalar).toEqual([]);
+  });
+}
+
 // iPhone denemesi (20 Ekim): ayna oyununda "zıpla, aç, kapa" yapan Zıpzıp havada asılı kalmış gibiydi (iki zıplama arasında
 // hiç yere basmıyordu, aynada da 1 sn'de bir, yani daha hızlı dönüyordu). Artık alçak zıplar, açık ve kapalı yere basıp bir an durur.
 test('Zıpla-aç-kapa: Zıpzıp yere basar, havada asılı kalmaz; aynada da sayılı hâlinin hızında', async ({ page }) => {
@@ -498,7 +569,8 @@ test('her hareketin yazısı (oturarak ve Sakin hâlleri dahil) okunur boyutta k
 // Erişilebilirlik: yazı ile arkasındaki zemin arasındaki renk zıtlığı (WCAG). Küçük yazı en az 4.5:1,
 // büyük yazı (telefonda ~24 piksel ve üstü) en az 3:1. Zemin, yazılar gizlenip ekran çizilerek ölçülür.
 test('yazılar okunur (renk zıtlığı)', async ({ page }) => {
-  test.setTimeout(120_000);
+  // Yüklü makinede her ekranın animasyonu bitene kadar beklenir (yazilarYerindeBekle); toplam süre buna göre.
+  test.setTimeout(180_000);
   const kayit = await oyunuAc(page, { ...BETA, 'zipzip-ilerleme-v1': JSON.stringify(['istanbul', 'truva']), 'zipzip-pasaport-v1': JSON.stringify({ ad: '', avatar: '🐼', soruldu: true }) }, '/?odeme=deneme&bolumler=hepsi');
   const sahneler: [string, object][] = [
     ['Acilis', {}], ['Macera', {}], ['Harita', {}], ['Dunya', {}], ['Uzay', {}], ['Spor', {}], ['Okyanus', {}], ['Durak', { durakId: 'efes' }], ['Hareket', { durakId: 'istanbul', adim: 1 }],
@@ -509,6 +581,7 @@ test('yazılar okunur (renk zıtlığı)', async ({ page }) => {
   for (const [ad, veri] of sahneler) {
     await sahneAc(page, ad, veri);
     await sakinlesmesiniBekle(page);
+    await yazilarYerindeBekle(page);
     sorunlar.push(
       ...(await page.evaluate(async () => {
         const oyun = (window as any).oyun;

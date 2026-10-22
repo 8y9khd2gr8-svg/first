@@ -158,7 +158,7 @@ export const DONMA: Hareket = {
   sesli: 'Sürpriz! Donma oyunu! Zıpzıp’la dans et. Dur deyince hiç kıpırdama!',
   animasyon: 'horon',
   tur: 'sure',
-  saniye: 14,
+  saniye: 15, // Normal tempo; Sakin/Hızlı süresi ve danslar/pozlar src/donma.ts'de
   surpriz: 'donma',
 };
 // Oturarak oynarken donma oyunu: ayakla dans yerine kollarla dans.
