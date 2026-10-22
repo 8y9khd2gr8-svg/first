@@ -1,4 +1,5 @@
 import { oyunAyari, type OyunAyari } from './oyunAyari';
+import { DONMA_TEMPO } from './donma';
 import { DONMA_OTURARAK, OTURARAK, SOGUMALAR, sayiYazi, type Animasyon, type Hareket } from './hareketler';
 
 // Hareket listesini ebeveynin seçtiği ayarlara uyarlar (ebeveyn köşesi → ⚙️ Ayarlar):
@@ -102,6 +103,7 @@ function kisalt(h: Hareket): Hareket {
 // Küçükler için: 5 ve üstü tekrar yaklaşık %60'a iner (en az 3), ritim %25 yavaşlar, süreli hareket %25 kısalır (en az 5 sn).
 // Hikâye sayıyı söylüyorsa ("Yedi kuleyi say") tekrar sayısı değişmez, sadece yavaşlar.
 export function kucukIcin(uzun: Hareket): Hareket {
+  if (uzun.surpriz === 'donma' && uzun.tur === 'sure') return { ...uzun, saniye: DONMA_TEMPO.kucuk.saniye }; // 2 "Dur!", uzun donma (donma.ts)
   const h = kisalt(uzun);
   if (h.tur === 'sure') return { ...h, saniye: Math.max(5, Math.round(h.saniye * 0.75)) };
   const yavas = { ...h, tempoMs: Math.round(h.tempoMs * 1.25) };
@@ -118,9 +120,10 @@ export function kucukIcin(uzun: Hareket): Hareket {
 }
 
 // Hızlı tempo: 4+ tekrar yaklaşık 1,5 katına çıkar (en çok 12), ritim %15 hızlanır (en hızlı 650 ms), süreli hareket
-// %25 uzar. Isınma (yavaş ritimli), soğuma ve sürprizler aynen kalır; hikâye sayıyı söylüyorsa tekrar sayısı değişmez.
+// %25 uzar. Isınma (yavaş ritimli), soğuma ve ayna aynen kalır (donma 4 "Dur!" olur); hikâye sayıyı söylüyorsa tekrar sayısı değişmez.
 const SOGUMA_HIKAYE = new Set(SOGUMALAR.map((h) => h.hikaye));
 export function hizliIcin(h: Hareket): Hareket {
+  if (h.surpriz === 'donma' && h.tur === 'sure') return { ...h, saniye: DONMA_TEMPO.hizli.saniye }; // 4 "Dur!" (donma.ts)
   if (h.surpriz || h.ritim === 'yavas' || SOGUMA_HIKAYE.has(h.hikaye)) return h;
   if (h.tur === 'sure') return { ...h, saniye: Math.round(h.saniye * 1.25) };
   const hizli = { ...h, tempoMs: Math.max(Math.min(650, h.tempoMs), Math.round(h.tempoMs * 0.85)) };
