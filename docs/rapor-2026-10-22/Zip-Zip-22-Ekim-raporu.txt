@@ -1,0 +1,45 @@
+ZIP ZIP DÜNYA — 20-22 EKİM GÖREV RAPORU (ChatGPT'ye yapıştırmak için)
+Not: Testler bulut bilgisayarındaki ekransız tarayıcıda ve GitHub'da yapıldı; iPhone testi sayılmaz. 🔎 = doğrulanmadı.
+Hiçbir PR birleştirilmedi. main değişmedi: 4a2f3a8. #157 (CSP) dokunulmadı.
+
+BAŞLANGIÇ DOĞRULAMASI
+- main = 4a2f3a8 (GitHub'dan okundu). "Oyunu yayınla" 4a2f3a8 için başarılı, sonra main'e gönderim yok → test sitesi büyük ihtimalle 4a2f3a8. 🔎 Site bulut bilgisayarından açılamadı (vekil sunucu 403).
+
+1) #164 PAMUKKALE SİMGESİ (A · Basamaklı havuzlar) — taslak, onay bekliyor
+- Değişen: sadece public/simge/pamukkale.svg (üç kat beyaz traverten, her katta dolu turkuaz havuz).
+- Test: npm test 58/58; GitHub Testler yeşil; harita (40 px), durak ekranı, pasaport damgası ekran görüntüsüyle bakıldı.
+- Risk: düşük. 🔎 iPhone'da görülmedi.
+
+2) #165 TRUVA SURU (B · Zıpzıp surun üstünde) — taslak, onay bekliyor
+- Değişen: src/scenes/HareketScene.ts (truvaSuru: sadece Truva hareket ekranlarında altta mazgallı taş sur, kemerli kapı, küçük bayrak), tests/oyun.spec.ts.
+- Sadece görüntü: hareket, sayım, ses, kamera, süreler aynı; animasyon yok (hareketi azalt etkilenmez). Sur ilk çizilir: Zıpzıp, sayı, "Yaptım!", kamera kutusu önde.
+- Test: yeni test (sur Truva'da var, İstanbul'da yok; sıra; gölge surun üstünde; kamera kutusu örtülmüyor) 2/2; renk zıtlığına Truva eklendi, geçti; ilgili yerleşim/hareketi azalt testleri geçti; GitHub yeşil.
+- Risk: beyaz sayı taş zeminde, koyu kenarıyla okunuyor. 🔎 iPhone'da/çocukla görülmedi.
+
+3) #166 PASAPORT TESTİ — taslak, onay bekliyor
+- Tespit: "yazılar okunur (renk zıtlığı)" ara ara Pasaport "PASAPORT" 1,08 diyordu.
+- Neden (ölçüldü): yüklü makinede oyun saniyede 2-3 kare çiziyor, oyunun saati kare başına ~16 ms ilerliyor; 650 ms'lik sayfa kayması gerçek saatte 4 sn'yi geçiyor. Test en çok 1,5 sn bekleyip sessizce yarıda ölçüyordu. Oyun hatası değil.
+- Değişen: sadece tests/oyun.spec.ts. Yeni bitiş koşulu: hiçbir yazı (ya da kabı) bitecek bir animasyonla hareket etmiyorsa ölç; 30 sn'de gelmezse test açıkça düşer. Testin toplam süre sınırı 120→180 sn. Test silinmedi, eşik gevşetilmedi.
+- Test: eski kodda 3 çalıştırmadan 2'si kırmızı; yeni kodla 6/6 yeşil; GitHub yeşil.
+
+4) #163 BELGE PR'I (inceleme)
+- Sadece docs/ (3 dosya); main'le çakışma yok; GitHub yeşil; commit kimlikleri (1b68a2d, c42f8d1, c5d08f1, 4a2f3a8) doğru.
+- Eksik: K52 satırından 7 iPhone bulgusunun ayrıntısı çıkmış; ayrıntı docs/rapor-2026-10-20/Zip-Zip-iPhone-deneme-raporu.txt'de duruyor. K52'ye o rapora not eklendi.
+- Bu görevde eklenen (ayrı commit): K52 notu, 22 Ekim günlüğü, bu rapor (docs/rapor-2026-10-22/).
+
+5) SÜRPRİZ DONMA — sadece tasarım önerisi, kod yok
+- Bugün (kod okundu): tek dans (ayakları sırayla yere vurma), donarken hep aynı duruş; Sakin 2, Normal/Hızlı 3 "Dur!"; donma 1,8 sn.
+- Öneri: her turda başka dans; her "Dur!"da Zıpzıp tek cümleyle poz söyler ve o pozda donar ("Dur! Kendine sarıl!"); donma 2,5 sn (Sakin 3); elenme/ceza/kamera yok.
+- Bugünkü çizimlerle: 6 dans, 7 poz; oturarak ve Sakin için ayrı listeler. Yeni çizim: robot dansı, uçak pozu, komik yüz ifadesi, "Ben kıpırdadım!" sürprizi. ~20 yeni cümle.
+- Seçenekler: A (önerilen) bugünkü çizimlerle değişen dans + söylenen poz / B yeni çizimlerle birlikte / C sadece pozlar / D sadece danslar / E bekle. Alt karar: Hızlı tempoda 4 "Dur!" (önerilen) mi, 3 mü.
+
+AÇIK KONULAR
+- 🔎 Pamukkale ve Truva iPhone'da görülmedi (test sitesi sadece main'den yayınlanır; görmek için birleştirmek gerekir).
+- #157 CSP telefon denemesi bekliyor. Macera Pasaportu (K51) "başla" denmedi.
+
+BEKLENEN KARARLAR
+1. #164 Pamukkale birleştirilsin mi?
+2. #165 Truva birleştirilsin mi?
+3. #166 Pasaport testi birleştirilsin mi? (önerim: önce bu)
+4. #163 belge PR'ı birleştirilsin mi?
+5. Sürpriz Donma: A/B/C/D/E ve Hızlı tempo alt kararı.
