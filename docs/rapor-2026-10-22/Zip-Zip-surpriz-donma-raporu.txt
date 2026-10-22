@@ -1,0 +1,46 @@
+Zıp Zıp Dünya — Sürpriz Donma (seçenek A) raporu, 22 Ekim 2026
+
+TESPİT
+Donma oyununda hep aynı dans vardı (ayaklarını sırayla yere vur). "Dur!" denince Zıpzıp normal duruşa dönüyordu, poz yoktu. Çocuklar oyunu sevip tekrar istedi.
+
+NEDEN
+Kullanıcı tasarımda seçenek A'yı onayladı: her turda başka bir dans, her "Dur!"da söylenen poz, sadece bugünkü çizimlerle.
+
+YAPILAN DEĞİŞİKLİK (PR #167, birleşti: main = a69c6d7)
+- Her turda başka bir dans geliyor. Her "Dur!"da Zıpzıp pozu söylüyor ("Dur! Kendine sarıl!") ve kendisi de o pozda donuyor. Sonra "Devam! <başka dans>" diyor. Dansın ya da pozun adı ekranın altında yazıyor.
+- Aynı oyunda aynı dans ya da poz iki kez gelmiyor. Elenme, ceza ve kamera yok; sonunda yine "Yaptım!".
+- Danslar: ayaklarını sırayla yere vur, yerinde koş, dizlerini sırayla kaldır, kollarını sağa sola salla, kollarını yukarı aşağı salla. Oturarak oyunda bunlara kollarını sırayla öne çevir de ekleniyor.
+- Pozlar: kollarını yukarı uzat, kollarını yana aç, ellerini başının üstüne koy, kendine sarıl, çömel, kollarını ve bacaklarını aç, tek ayağının üstünde dur.
+- Tempoya göre:
+  · Sakin: 2 "Dur!", donma 3 sn, danslar yavaş, tek ayak yok, toplam 14 sn.
+  · Normal: 3 "Dur!", donma 2,5 sn, toplam 15 sn.
+  · Hızlı: 4 "Dur!", donma 2,5 sn, toplam 20 sn.
+- Oturarak oyna açıkken sadece oturarak yapılabilen dans ve pozlar geliyor; cümleler "Oturduğun yerde …" diye başlıyor.
+- Tasarımdan sapmalar:
+  (1) Süreler uzadı: Normal 14 yerine 15 sn, Hızlı 16 yerine 20 sn oldu. 16 sn'ye 4 "Dur!" sığdırınca her dansa 1,2 sn kalıyordu, bu dansın adını duyup yapmaya yetmez. Normal 15 sn'yi geçemiyor, çünkü mevcut bir test bütün süreli hareketleri 15 sn ile sınırlıyor; test gevşetilmedi.
+  (2) İki dans eklendi: "Kollarını kaldır, indir!" ve "Bir yana, öbür yana eğil!". Oturarak oyunda Hızlı tempo 5 dans istiyor, oturarak yapılabilen dans ise 4 taneydi; aynı dans tekrar etmesin diye eklendi. İkisi de oyunda zaten var olan çizimler.
+- Kullanılmayan "Dur!" ve "Devam!" cümleleri listeden çıktı. Yeni cümleler metinler.ts'te; doğal kayıt gelene kadar telefonun sesiyle okunur.
+
+TEST SONUCU (kanıtlanan)
+- GitHub "Testler": son hâlde 9/9 yeşil, okundu, sonra birleştirildi (K35).
+- Veri testleri 62/62 geçti. Kontrol edilenler:
+  · Tempoya göre "Dur!" sayısı ve süre doğru.
+  · Her ayarda 300 karışımda aynı dans ya da poz tekrar etmiyor.
+  · Oturarak oyunda ayakta dans, poz ya da söz çıkmıyor.
+  · Sakin tempoda tek ayak yok.
+  · Donmalar üst üste binmiyor, her dans en az 1,6 sn sürüyor.
+  · Her cümle seslendirme listesinde, "gibi" yok.
+  · Hareket Kâşifi rozeti hesabı değişmedi.
+- Oyun içi test 5 ayarın hepsinde geçti (Sakin, Normal, Hızlı, Normal+oturarak, Hızlı+oturarak). "Uzaktan oyna" ile oyun baştan sona kendiliğinden bitiyor; "Dur!" sayısı doğru, Zıpzıp donarken dans etmiyor, adlar sırayla yazıyor, hata yok.
+- 7 pozun hepsi ekran görüntüsüyle kontrol edildi (ekransız tarayıcıda).
+
+AÇIK KALAN KONULAR
+- 🔎 iPhone'da ve Yağız'la denenmedi. Bakılacaklar: 2,5 sn donma yetiyor mu; uzun "Oturduğun yerde …" cümleleri dansın süresine sığıyor mu (cümle bitmeden sıradaki komut gelebilir); hangi pozlar komik geliyor.
+- 🔎 "Çömel" pozunda Zıpzıp'ın kolları yana açık duruyor (bugünkü çömelme çizimi böyle). Telefonda bakılmalı.
+- KAYIT.md: #163 birleşince ayrı küçük PR ile güncellendi.
+
+BEKLENEN KARAR
+- KAYIT.md: kullanıcı "önce #163" seçti; #163 birleşti (e82c50c), kayıt ayrı PR'la yazıldı.
+- Süre sapması: kullanıcı "böyle kalsın" dedi.
+- Açık PR'lar #157, #164, #165 değiştirilmedi, onay bekliyor.
+- Öneri (onay bekliyor): CI'da bir kez kırmızı çıkan "ayna donma" süre testini sağlamlaştırmak (gevşetmeden).
