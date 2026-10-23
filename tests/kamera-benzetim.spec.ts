@@ -522,22 +522,46 @@ test('benzetim: ayna sırasında sayfa iki kez 2,5 sn donsa da ayna gerçek saat
   await benzetimKur(page);
   const k0 = await oyunuAc(page);
   await durumYaz(page, { gizli: [SOL_TOPUK, SAG_TOPUK] });
-  await kameraliHareket(page);
-  await page.waitForFunction(() => (window as any).kayit.aynaBas, null, { timeout: 120_000 });
+  // Donmalar ayna başlamadan sayfanın içinde kurulur: ayna başlayınca 20 ms içinde zamanlanır. Eskiden test aynanın
+  // başladığını görüp sonra kuruyordu; yavaş makinede bu gidip gelme gecikince donmalar geç başlıyor, ikinci donma
+  // 6 sn'yi aşıp ayna onunla birlikte geç bitiyordu (22 Ekim CI: 7329,8 ms). Gerçek başlangıç/bitiş zamanları da yazılır.
   await page.evaluate(() => {
+    const w = window as any;
+    w.donmalar = [];
     const don = (ms: number) => {
-      const bit = performance.now() + ms;
-      while (performance.now() < bit);
+      const bas = performance.now();
+      while (performance.now() < bas + ms);
+      w.donmalar.push({ bas, son: performance.now() });
     };
-    const bas = (window as any).kayit.aynaBas;
-    setTimeout(() => don(2_500), Math.max(0, bas + 1_000 - performance.now()));
-    setTimeout(() => don(2_500), Math.max(0, bas + 3_600 - performance.now()));
+    const bekle = setInterval(() => {
+      const bas = w.kayit.aynaBas;
+      if (!bas) return;
+      clearInterval(bekle);
+      setTimeout(() => don(2_500), Math.max(0, bas + 1_000 - performance.now()));
+      setTimeout(() => don(2_500), Math.max(0, bas + 3_600 - performance.now()));
+    }, 20);
   });
+  await kameraliHareket(page);
   await page.waitForFunction(() => (window as any).kayit.aynaSon, null, { timeout: 120_000 });
   const k = await kayit(page);
+  const donmalar: { bas: number; son: number }[] = await page.evaluate(() => (window as any).donmalar);
   expect(degerler(k, 'kutu')).not.toContain('📷 Durdu');
+  // İki donma da gerçekten oldu: her biri en az 2,5 sn, ikincisi birincisi bittikten sonra, ikisi de ayna sürerken.
+  expect(donmalar, 'iki donma da olmalı').toHaveLength(2);
+  for (const d of donmalar) expect(d.son - d.bas).toBeGreaterThanOrEqual(2_500);
+  expect(donmalar[1].bas).toBeGreaterThanOrEqual(donmalar[0].son);
+  expect(donmalar[0].bas).toBeGreaterThan(k.aynaBas);
+  // Süre ikinci donma sırasında dolar (denenen yol bu); ayna donma bitmeden kapanmaz.
+  expect(donmalar[1].son - k.aynaBas).toBeGreaterThan(6_000);
+  expect(donmalar[1].son).toBeLessThan(k.aynaSon);
   expect(k.aynaSon - k.aynaBas).toBeGreaterThan(5_500);
-  expect(k.aynaSon - k.aynaBas).toBeLessThan(7_200);
+  // Ayna en çok 6 sn; süre donma sırasında dolduysa donma bitince ilk karelerde kapanır. Ölçü, ikinci donmanın planlanan
+  // (6,1 sn) değil gerçek bitişinden alınır: yükte testin kendi sayacı 0,5-0,9 sn geç tetikleniyor (23 Ekim ölçümü; eski
+  // 7,2 sn'lik toplam sınırını aşan buydu, oyun donma bitince 4-10 ms içinde kapatıyordu). Eski kodda (her ölçüme en çok
+  // 1,5 sn) ayna gerçek saatle ~8 sn'de kapanır: eski davranış taklidinde 1,75-1,97 sn sonra, kırmızı. Yeni kodda yükte
+  // en çok 0,31 sn ölçüldü. Sınır 1 sn (eskiden fiilen 1,1 sn: planlı bitiş 6,1 + 1,1 = 7,2 sn).
+  const enGec = Math.max(k.aynaBas + 6_000, donmalar[1].son);
+  expect(k.aynaSon - enGec, 'ayna donma bitince hemen kapanmalı').toBeLessThan(1_000);
   expect(k0.hatalar).toEqual([]);
 });
 
