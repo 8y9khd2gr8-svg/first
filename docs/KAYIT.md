@@ -86,7 +86,7 @@ Onay verilmemiş, ertelenmiş ya da reddedilmiş öneriler de buraya yazılır; 
 - ✅ `kilitten dönüş` testi CI'da üç kez (16 Ekim) aynı yerde kırmızı oldu. Eklenen durum yazısı nedeni gösterdi: kilit aslında açıktı; sayfa, vücut tanıma modeli ilk kez hazırlanırken birkaç saniye donuyor, testin 5 sn'lik beklemesi yetmiyordu (oyun hatası değil). Bekleme 30 sn (#146). Aynı donma büyük ayna testlerinin kısa anları ("Başla!" 0,6 sn) kaçırmasına da yol açtı → ölçümler artık sayfanın içinde her karede yapılıyor (#146). CI ayarıyla (2 işçi) yerelde parça 2/2 iki kez 25/25.
 - `Zıpzıp konuşurken ağzı oynar` testi yerelde yük altında bir kez kırmızı (60 ms aralıklı ölçüm), tek başına geçiyor. CI'da görülmedi.
 - Yavaş telefonda (kare 200 ms'yi aşınca) Phaser oyunun saatini geri bırakır: sayaçlar/süreler uzar (test makinesinde ~12 kare/sn'de 6 sn → 11 sn). Kaybettirmez; büyük aynanın en çok süresi gerçek saatle (#143). 🔎 eski iPhone'da bakılacak.
-- `ayna sırasında sayfa iki kez 2,5 sn donsa da` testi yerelde 4 çekirdekte 3 işçi + yük ~13 iken bir kez 7209,7 ms (sınır 7200) ile kırmızı (18 Ekim); tek başına yeşil, CI'da görülmedi. Sınır gevşetilmedi. **22 Ekim: CI'da da görüldü** (#163, sadece belge PR'ı: 7329,8 ms; tek yeniden çalıştırmada yeşil). ⏳ Öneri: testi sağlamlaştırmak (gevşetmeden; ayrı küçük PR, onay bekliyor).
+- ✅ `ayna sırasında sayfa iki kez 2,5 sn donsa da` testi: kök neden testin kendi sayacının yükte geç tetiklenmesiydi; #170 ile düzeltildi (23 Ekim, ayrıntı günlükte).
 - `Zıpzıp da zıplasın (kamerayla): sayfa iki kez 2,5 sn donsa da` testi yerelde tam pakette kural açık, 3 işçi, yük ~12 iken bir kez kırmızı (19 Ekim; 90 sn içinde kamera sayısı artmadı). Tek başına ve 4 kopya aynı anda (kural açık/kapalı) yeşil, CI'da görülmedi. Sınır gevşetilmedi.
 - Ayrıntılı fotoğraf: `docs/rapor-2026-10-12/` (12 Ekim anlık görüntüsü).
 
@@ -96,8 +96,11 @@ Onay verilmemiş, ertelenmiş ya da reddedilmiş öneriler de buraya yazılır; 
 
 ### 23 Ekim 2026 — Durum raporu
 **Doğrulama (GitHub):** main = 4200d7f, "Oyunu yayınla" başarılı (22 Ekim 12:47). Açık PR: #164, #165 (taslak, onay bekliyor), #157 (K49). session_01YW9mUp3gTq4B1yZxpbmVgy arşivlendi.
-**Rapor:** `docs/rapor-2026-10-23/` (PDF + .txt) ve yayınlanmış sayfa. Kod değişikliği yok.
-**⏳ Bekleyen:** sıradaki iş seçimi (önerilen: ayna donma testini gevşetmeden sağlamlaştırmak), #164/#165 onayı.
+**Rapor:** `docs/rapor-2026-10-23/` (PDF + .txt) ve https://claude.ai/artifact/7TmsgiyDB6GPXLtHskPVPN.
+**#170 (ayna donma testi, kullanıcı onayıyla birleşti → 637b6a0; GitHub Testler 9/9 yeşil okundu):** Kök neden ölçüldü: yükte testin kendi sayacı 0,5-0,9 sn geç tetikleniyor, ikinci donma 6,1 yerine 6,5-7,3 sn'de bitiyor; eski sabit 7,2 sn sınırı bunu oyunun suçu sayıyordu (eski test yükte 8 denemede 3 kırmızı). Oyun donma bitince 3-17 ms içinde (en çok 309 ms) kapatıyor. Yeni: donmaların gerçek zamanı kaydedilir, kural `tests/aynaDonmaKurali.ts` (ayna gerçek donma bitişinden en geç 1 sn sonra kapanmalı; eskiden fiilen 1,1 sn), `tests/ayna-donma.test.ts` 8 birim testi (eski hata, eksik/kısa/binen donma, erken kapanma). Eski hata taklidi (src'de geçici, geri alındı) 8/8 kırmızı; yeni test yükte 16/16, art arda 20/20 yeşil. `src/` değişmedi.
+**Kullanıcı kuralı (23 Ekim):** bu görevlerde hiçbir PR açık onay olmadan birleştirilmez.
+**🔎 Açık:** benzer "Zıpzıp da zıplasın: iki kez 2,5 sn donsa da" testi incelenmedi.
+**Sıradaki (kullanıcı seçti):** Pamukkale A (#164) + Truva B (#165): güncelle, ekran görüntüleriyle göster, onayla ekle.
 
 ### 22 Ekim 2026 (öğleden sonra) — Sürpriz Donma A (#167), #163 birleşti, eski oturumlar arşivlendi
 **Birleşenler (son hâlinde GitHub "Testler" 9/9 yeşil okunarak):** #167 → main a69c6d7 (K35, kullanıcı işi onaylamıştı) · #163 → e82c50c (kullanıcı onayıyla; önce güncel main dala birleştirildi, geçmiş yeniden yazılmadı).
