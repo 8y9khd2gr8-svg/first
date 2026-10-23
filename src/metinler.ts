@@ -1,6 +1,7 @@
 import { AILE_OTURUMU } from './aile';
 import { BOLUM_SIRASI, BOLUMLER, TUM_DURAKLAR, oturum } from './duraklar';
 import { AYNA, DONMA, ISINMALAR, SOGUMALAR } from './hareketler';
+import { donmaCumleleri } from './donma';
 import { uyarlamaCumleleri } from './uyarla';
 import { AVATARLAR } from './pasaport';
 import { ROZETLER } from './rozetler';
@@ -19,8 +20,6 @@ export const GERI_SAYIM = ['Üç!', 'İki!', 'Bir!', 'Başla!'];
 export const M = {
   yaptinMi: 'Süper! Yaptıysan, Yaptım düğmesine bas!',
   devamEdiyoruz: 'Süper! Devam ediyoruz!',
-  dur: 'Dur!',
-  devam: 'Devam!',
   uzaktanAcik: 'Uzaktan oyna açık! Hareketler kendiliğinden ilerleyecek.',
   bugunlukBitti: 'Bugün çok güzel hareket ettin! Yine bekleriz!',
   aferin: 'Aferin!',
@@ -100,7 +99,7 @@ export function tumMetinler(): string[] {
     ...SERTIFIKA_UNVANLARI.map((u) => M.sertifikaBolum(u)),
     ...ISINMALAR.map((h) => h.sesli),
     ...SOGUMALAR.map((h) => h.sesli),
-    DONMA.sesli, AYNA.sesli, M.devamEdiyoruz, M.dur, M.devam, M.uzaktanAcik, M.bugunlukBitti,
+    DONMA.sesli, ...donmaCumleleri(), AYNA.sesli, M.devamEdiyoruz, M.uzaktanAcik, M.bugunlukBitti,
     ...AVATARLAR.map((a) => M.karakterSecildi(a.ad)),
     ...ROZETLER.flatMap((r) => [M.yeniRozet(r.ad), M.rozetAdi(r.ad), M.rozetNasil(r.nasil)]),
     M.kostumDolabi,
