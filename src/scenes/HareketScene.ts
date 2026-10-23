@@ -17,6 +17,38 @@ import { durakYonu, zipzipYonunuAyarla } from '../zipzipKure';
 
 const MASKOT_Y = 640;
 
+// Truva durağının hareket ekranlarında altta mazgallı taş sur ve kemerli kapı (K52 bulgu 3, kullanıcı B'yi seçti, 20 Ekim):
+// Zıpzıp surun üstünde durur (ayakları ~y 868, mazgallar 864'te başlar). Sadece görüntü; hareket, sayım, ses aynı.
+// Sabit çizim (animasyon yok, hareketiAzalt'tan etkilenmez). İlk çizilen nesne: Zıpzıp, sayı, "Yaptım!" ve kamera kutusu
+// (sayfadaki HTML, tuvalin üstünde) hep surun önünde kalır.
+const SUR = { ust: 900, alt: 1176, mazgal: 864 };
+function truvaSuru(sahne: Phaser.Scene) {
+  const g = sahne.add.graphics().setName('truvaSuru');
+  const tas = 0xc9955c;
+  const cizgi = 0x14213d;
+  g.fillStyle(tas).lineStyle(6, cizgi).fillRect(-8, SUR.ust, 736, SUR.alt - SUR.ust).strokeRect(-8, SUR.ust, 736, SUR.alt - SUR.ust);
+  // Mazgallar (ortada kapının üstü boş): dolgu surun üst çizgisini örter, üç kenarı çizilir.
+  for (const x of [8, 88, 168, 248, 424, 504, 584, 664]) {
+    g.fillStyle(tas).fillRect(x, SUR.mazgal, 48, SUR.ust - SUR.mazgal + 3);
+    g.lineStyle(6, cizgi).beginPath().moveTo(x, SUR.ust).lineTo(x, SUR.mazgal).lineTo(x + 48, SUR.mazgal).lineTo(x + 48, SUR.ust).strokePath();
+  }
+  // Taş sıraları: yatay çizgiler + şaşırtmalı dikey derzler.
+  g.lineStyle(5, 0x8a5a36);
+  const satirlar = [SUR.ust, 968, 1036, 1104, SUR.alt];
+  for (const y of satirlar.slice(1, -1)) g.lineBetween(-8, y, 728, y);
+  satirlar.slice(0, -1).forEach((y, i) => {
+    for (const x of i % 2 === 0 ? [80, 220, 500, 640] : [150, 570]) g.lineBetween(x, y, x, satirlar[i + 1]);
+  });
+  // Kemerli kapı.
+  const kemer = new Phaser.Curves.QuadraticBezier(new Phaser.Math.Vector2(288, 1080), new Phaser.Math.Vector2(360, 1000), new Phaser.Math.Vector2(432, 1080)).getPoints(20);
+  const kapi = [{ x: 288, y: SUR.alt }, ...kemer, { x: 432, y: SUR.alt }];
+  g.fillStyle(0x3a2414).fillPoints(kapi, true).lineStyle(6, cizgi).strokePoints(kapi, true);
+  g.lineStyle(5, 0x5a3a1e).lineBetween(360, 1042, 360, SUR.alt).lineBetween(304, 1120, 416, 1120);
+  // Sağdaki mazgalda küçük altın bayrak.
+  g.lineStyle(6, 0x8a5a36).lineBetween(672, SUR.mazgal, 672, 806);
+  g.fillStyle(0xffc93c).fillTriangle(672, 808, 710, 820, 672, 834).lineStyle(4, cizgi).strokeTriangle(672, 808, 710, 820, 672, 834);
+}
+
 // Kamera kutusunun üç hâli (tuval noktası; K40 "önce büyük ayna"):
 // ayna: geri sayımdan önce ekranın yarısına yakın canlı görüntü, çocuk 2-3 m uzaktan kendini görüp kadraja yerleşir.
 // hareket: gösterim ve hareket boyunca sağ altta (eski küçük kutunun ~3 katı), sayı büyük; sayı ve yazı biraz sola kayar.
@@ -87,6 +119,7 @@ export class HareketScene extends Phaser.Scene {
   create() {
     this.donuk = false;
     yildizliArkaPlan(this);
+    if (this.durakId === 'truva') truvaSuru(this);
     const x = this.scale.gameSize.width / 2;
     // Liste adım başında bir kez alınır: "Yaptım!"dan sonra yeniden kurulursa ısınma düşer ve sıradaki (özel) hareket atlanırdı.
     this.oturum = oturumListesi(this.durakId, this.adim);
