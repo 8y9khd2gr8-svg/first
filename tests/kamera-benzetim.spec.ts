@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import { expect, Page, test } from '@playwright/test';
 import { saymaYolu } from '../src/kamera';
+import { aynaDonmaHatalari } from './aynaDonmaKurali';
 
 // Kamera benzetimi (K41): gerçek kamera ve gerçek vücut tanıma modeli YOK. Kamera, renk değiştiren bir tuvalin görüntüsü;
 // model, testin verdiği yapay vücut noktalarını döndüren sahte bir model (kamera.ts'deki zipzipBenzetim, sadece geliştirme
@@ -546,22 +547,11 @@ test('benzetim: ayna sırasında sayfa iki kez 2,5 sn donsa da ayna gerçek saat
   const k = await kayit(page);
   const donmalar: { bas: number; son: number }[] = await page.evaluate(() => (window as any).donmalar);
   expect(degerler(k, 'kutu')).not.toContain('📷 Durdu');
-  // İki donma da gerçekten oldu: her biri en az 2,5 sn, ikincisi birincisi bittikten sonra, ikisi de ayna sürerken.
-  expect(donmalar, 'iki donma da olmalı').toHaveLength(2);
-  for (const d of donmalar) expect(d.son - d.bas).toBeGreaterThanOrEqual(2_500);
-  expect(donmalar[1].bas).toBeGreaterThanOrEqual(donmalar[0].son);
-  expect(donmalar[0].bas).toBeGreaterThan(k.aynaBas);
-  // Süre ikinci donma sırasında dolar (denenen yol bu); ayna donma bitmeden kapanmaz.
-  expect(donmalar[1].son - k.aynaBas).toBeGreaterThan(6_000);
-  expect(donmalar[1].son).toBeLessThan(k.aynaSon);
-  expect(k.aynaSon - k.aynaBas).toBeGreaterThan(5_500);
-  // Ayna en çok 6 sn; süre donma sırasında dolduysa donma bitince ilk karelerde kapanır. Ölçü, ikinci donmanın planlanan
-  // (6,1 sn) değil gerçek bitişinden alınır: yükte testin kendi sayacı 0,5-0,9 sn geç tetikleniyor (23 Ekim ölçümü; eski
-  // 7,2 sn'lik toplam sınırını aşan buydu, oyun donma bitince 4-10 ms içinde kapatıyordu). Eski kodda (her ölçüme en çok
-  // 1,5 sn) ayna gerçek saatle ~8 sn'de kapanır: eski davranış taklidinde 1,75-1,97 sn sonra, kırmızı. Yeni kodda yükte
-  // en çok 0,31 sn ölçüldü. Sınır 1 sn (eskiden fiilen 1,1 sn: planlı bitiş 6,1 + 1,1 = 7,2 sn).
-  const enGec = Math.max(k.aynaBas + 6_000, donmalar[1].son);
-  expect(k.aynaSon - enGec, 'ayna donma bitince hemen kapanmalı').toBeLessThan(1_000);
+  // Kural tests/aynaDonmaKurali.ts'te (sahte kayıtlarla denenir: tests/ayna-donma.test.ts). İki donma da oldu, her biri
+  // en az 2,5 sn, sıralı, ayna sürerken; süre ikinci donma sırasında doldu; ayna, ikinci donmanın planlanan (6,1 sn)
+  // değil gerçek bitişinden en geç 1 sn sonra kapandı. Yükte testin kendi sayacı 0,5-0,9 sn geç tetikleniyor (23 Ekim
+  // ölçümü; eski sabit 7,2 sn sınırını aşan buydu, oyun donma bitince çoğunlukla 3-17 ms içinde kapatıyordu).
+  expect(aynaDonmaHatalari({ aynaBas: k.aynaBas, aynaSon: k.aynaSon, donmalar })).toEqual([]);
   expect(k0.hatalar).toEqual([]);
 });
 
