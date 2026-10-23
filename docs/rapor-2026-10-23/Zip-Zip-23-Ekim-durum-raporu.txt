@@ -1,0 +1,58 @@
+Zıp Zıp Dünya — Durum raporu, 23 Ekim 2026
+
+TESPİT (GitHub'dan bugün yeniden doğrulandı)
+- Ana dal (main) = 4200d7f. Test sitesine yayın başarılı (22 Ekim 12:47): https://8y9khd2gr8-svg.github.io/first/
+- Son birleşenler (22 Ekim; her biri GitHub "Testler" yeşil okunarak):
+  · #167 Sürpriz Donma A: her turda başka dans, her "Dur!"da Zıpzıp pozu söyleyip o pozda donar. Sakin 2 Dur / 14 sn, Normal 3 / 15 sn, Hızlı 4 / 20 sn (süreleri kullanıcı onayladı).
+  · #166 Pasaport renk zıtlığı testi sağlamlaştırıldı (sadece test).
+  · #163 ve #168: kayıt (KAYIT.md) ve raporlar; rapor biçimi kuralı.
+  · Daha önce (20 Ekim): #160 kol sallamada gövde dik, #161 🐢/⚡ işareti hikâye satırında, #162 Ayna oyununda zıpla-aç-kapa yere basıyor.
+- Açık PR'lar (üçü de taslak, hiçbiri senin onayın olmadan birleşmez):
+  · #164 Pamukkale simgesi A (basamaklı havuzlar). Testler yeşildi; main'in gerisinde. Bekleyen: senin "ekle" onayın.
+  · #165 Truva: hareket ekranının altında sur ve kemerli kapı, Zıpzıp surun üstünde (B). Testler yeşildi; main'in gerisinde. Bekleyen: senin onayın.
+  · #157 Tarayıcı güvenlik kuralı (CSP, K47/K49). Bekleyen: Android telefonda deneme (U9). Dokunulmuyor.
+- Eski oturum (Sürpriz Donma) arşivlendi; konuşması okunabilir duruyor.
+
+TELEFONDA NE DENENMELİ (iPhone, Safari, test sitesi)
+1. https://8y9khd2gr8-svg.github.io/first/ adresini aç. Eski sürüm görünürse sayfayı kapatıp yeniden aç.
+2. Oyna → Türkiye Turu → herhangi bir durak. Her durakta bir "sürpriz" var: donma oyunu ya da ayna oyunu.
+3. Donma oyunu gelince bak: her turda başka dans geliyor mu, "Dur! Kendine sarıl!" gibi pozu duyup yapabiliyor musunuz, 2,5 sn donma yetiyor mu?
+4. Ebeveyn köşesi → ⚙️ Ayarlar → "Oturarak oyna"yı aç, bir durak daha oyna: "Oturduğun yerde ..." cümleleri dans bitmeden yetişiyor mu?
+5. "Çömel" pozunda Zıpzıp'ın kolları yana açık: komik mi, garip mi?
+6. Tempo 🐢 Sakin ve 🐆 Hızlı ile birer kez dene (Sakin'de tek ayak pozu gelmemeli).
+7. Ayna oyununda zıpla-aç-kapa: Zıpzıp artık yere basıyor mu (20 Ekim düzeltmesi)?
+Not: Pamukkale ve Truva yeni görselleri test sitesinde YOK (PR'lar birleşmedi).
+
+KULLANICIDA BEKLEYENLER (KAYIT bölüm 2)
+- U1/U2/U7: v0.9.0 etiketi ve main koruması (bulut oturumu yapamıyor; Mac'e ertelenebilir).
+- U8: 145 eski dalı silmek (onaylı; GitHub → Branches; ya da "Automatically delete head branches" ayarı).
+- U9: Android telefonda #157 denemesi. U3: internetsiz APK denemesi.
+- U4: Yağız testi (+ 4-5 ve 8-9 yaştan birer çocuk), docs/yagiz-testi.md.
+- U5: Play geliştirici hesabı, sonra Apple. U6: Azure doğal ses, marka başvurusu, avukat, iletişim e-postası.
+- K4: hareket kataloğunu fizyoterapiste göndermek.
+
+BİLİNEN SORUNLAR
+- "Ayna sırasında sayfa iki kez 2,5 sn donsa da" testi 22 Ekim'de GitHub'da bir kez kırmızı (7329,8 ms, sınır 7200); yeniden çalıştırınca yeşil. Oyun hatası değil, testin yavaş makinedeki zaman ölçümü. Öneri: testi gevşetmeden sağlamlaştırmak (onay bekliyor).
+- Benzer süreye bağlı iki test daha yerelde bir kez kırmızı oldu (GitHub'da görülmedi).
+- Doğal ses kaydı yok: telefonda Türkçe ses yoksa Zıpzıp konuşamaz.
+- Yavaş telefonda oyunun saati yavaşlar (süreler uzar, kaybettirmez).
+
+DOĞRULANMAYANLAR 🔎
+- 🔎 Sürpriz Donma iPhone'da ve çocukla hiç denenmedi (süreler, oturarak cümleler, çömel pozu).
+- 🔎 #160-#162 düzeltmeleri iPhone'da görülmedi.
+- 🔎 Pamukkale ve Truva görselleri iPhone'da görülmedi (sadece ekransız tarayıcıda).
+- 🔎 Gerçek telefonda ses, performans, kamera eşikleri, ödeme hiç denenmedi.
+- 🔎 Hiçbir hareketi uzman görmedi (K4).
+- 🔎 Test sitesini bulut bilgisayarından açamıyorum (ağ izni yok); yayının başarılı olduğunu GitHub'dan okudum.
+
+SIRADAKİ İŞ SEÇENEKLERİ (önerilen başta)
+1. (Önerilen) Ayna donma testini sağlamlaştırmak (gevşetmeden). Küçük, sadece test; GitHub'daki rastgele kırmızıları azaltır.
+2. Pamukkale A (#164) ve Truva B (#165): main'e güncelle, testleri yeşille, ekran görüntüleriyle son kez göster; onaylarsan birleştir.
+3. Macera Pasaportu Aşama 1 (K51): önce iki küçük karar (kapakta "X / 50" mi, sadece açık bölümler mi; "Yakında" sekmeleri), sonra tasarım.
+4. Oturarak oynarken kamera topuk istemesin (K42 + K41 b): kol hareketlerinde topuk şartını kaldırma önerisi ve testi.
+5. Yağız testi hazırlığı: Donma ve son düzeltmeler için docs/yagiz-testi.md'ye kısa bakılacaklar listesi.
+6. Mağaza görselleri (K45): betayı mı, bütün bölümleri mi göstersin kararı.
+
+BEKLENEN KARAR
+- Sıradaki iş(ler)i seç (çoklu seçim olabilir).
+- #164 ve #165 için "ekle / bekle".
