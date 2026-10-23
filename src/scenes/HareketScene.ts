@@ -11,7 +11,8 @@ import { EksikYer, KAMERA_HAREKETLERI, KameraDurumu, KameraSayaci, eksikYeri, ka
 import { oyunAyari } from '../oyunAyari';
 import { GERI_SAYIM, M, SAYILAR } from '../metinler';
 import { bip, konus, sustur, yarimKalaniAl, zaferMuzigi } from '../ses';
-import { Zipzip } from '../zipzip';
+import { Zipzip, surekliTempoMs } from '../zipzip';
+import { type DonmaPlani, dansCumlesi, donmaPlani, pozCumlesi } from '../donma';
 import { durakYonu, zipzipYonunuAyarla } from '../zipzipKure';
 
 const MASKOT_Y = 640;
@@ -103,6 +104,8 @@ export class HareketScene extends Phaser.Scene {
   private kutuHazir: () => void = () => {};
   // Bu adımda kullanılan oturum listesi (create'te bir kez alınır).
   private oturum: Hareket[] = [];
+  // Donma oyununda bu turun dansları ve pozları (create'te bir kez kurulur; testler de okur).
+  donmaPlani: DonmaPlani | null = null;
 
   constructor() {
     super('Hareket');
@@ -122,6 +125,7 @@ export class HareketScene extends Phaser.Scene {
     this.oturum = oturumListesi(this.durakId, this.adim);
     const liste = this.oturum;
     const hareket = liste[this.adim];
+    this.donmaPlani = hareket.surpriz === 'donma' ? donmaPlani(oyunAyari()) : null;
 
     evDugmesi(this, () => {
       sustur();
@@ -181,6 +185,9 @@ export class HareketScene extends Phaser.Scene {
       if (hareket.tempoMs < gosterimSuresi) {
         this.time.delayedCall(hareket.tempoMs, () => this.zipzip.birKez(this.tekrarHareketi(hareket, 2), hareket.tempoMs, 2));
       }
+    } else if (this.donmaPlani) {
+      this.dansEt(this.donmaPlani.danslar[0].animasyon);
+      this.time.delayedCall(gosterimSuresi - 400, () => this.zipzip.durdur());
     } else {
       this.zipzip.surekli(hareket.dizi?.[0] ?? hareket.animasyon, this.surekliTempo(hareket));
       this.time.delayedCall(gosterimSuresi - 400, () => this.zipzip.durdur());
@@ -305,7 +312,8 @@ export class HareketScene extends Phaser.Scene {
       }
       this.time.delayedCall(hareket.adet * hareket.tempoMs, () => this.bitir(hareket));
     } else {
-      this.zipzip.surekli(hareket.dizi?.[0] ?? hareket.animasyon, this.surekliTempo(hareket));
+      if (this.donmaPlani) this.dansEt(this.donmaPlani.danslar[0].animasyon);
+      else this.zipzip.surekli(hareket.dizi?.[0] ?? hareket.animasyon, this.surekliTempo(hareket));
       for (let s = hareket.saniye; s >= 1; s--) {
         this.time.delayedCall((hareket.saniye - s) * 1000, () => {
           if (!this.donuk) this.sayacGoster(String(s));
@@ -507,26 +515,36 @@ export class HareketScene extends Phaser.Scene {
 
   private donuk = false;
 
-  // Donma oyunu: Zıpzıp dans eder; ara ara "Dur!" der ve donar, sonra "Devam!".
+  // Donma oyunu (donma.ts): Zıpzıp dans eder; ara ara "Dur! <poz>" der ve o pozda donar, sonra "Devam! <başka dans>".
+  // Dansın ve pozun kısa adı altta yazar (okuma bilmeyen Zıpzıp'tan görür, sesten duyar).
   private donmaOyunu(h: Hareket) {
-    if (h.tur !== 'sure') return;
-    // Her donma 1.8 sn sürer; son donma süre bitmeden biter.
-    const anlar = [3, 6.5, 10].filter((s) => s < h.saniye - 3.2).map((s) => s + Math.random() * 1.2);
-    anlar.forEach((an) => {
+    const plan = this.donmaPlani;
+    if (h.tur !== 'sure' || !plan) return;
+    const { danslar, pozlar, anlar, donmaSn, oturarak } = plan;
+    this.bilgi.setText(danslar[0].ad);
+    konus(dansCumlesi(danslar[0], oturarak, true));
+    anlar.forEach((an, i) => {
       this.time.delayedCall(an * 1000, () => {
         this.donuk = true;
-        this.zipzip.durdur();
+        this.zipzip.pozAl(pozlar[i].poz);
         this.sayac.setText('✋ DUR!').setColor('#FF8A3D');
+        this.bilgi.setText(pozlar[i].ad);
         bip(300, 0.2, 'square', 0.2);
-        konus(M.dur);
+        konus(pozCumlesi(pozlar[i], oturarak));
       });
-      this.time.delayedCall((an + 1.8) * 1000, () => {
+      this.time.delayedCall((an + donmaSn) * 1000, () => {
         this.donuk = false;
         this.sayac.setColor('#ffffff');
-        konus(M.devam);
-        this.zipzip.surekli(h.animasyon);
+        this.bilgi.setText(danslar[i + 1].ad);
+        konus(dansCumlesi(danslar[i + 1], oturarak, false));
+        this.dansEt(danslar[i + 1].animasyon);
       });
     });
+  }
+
+  // Donma dansı: Sakin tempoda Zıpzıp da yavaş dans eder.
+  private dansEt(a: Animasyon) {
+    this.zipzip.surekli(a, Math.round(surekliTempoMs(a) * (this.donmaPlani?.dansHizi ?? 1)));
   }
 
   // Ayna oyunu: Zıpzıp sırayla farklı hareketler yapar; çocuk aynısını yapar.

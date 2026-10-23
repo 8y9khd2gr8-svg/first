@@ -239,9 +239,9 @@ Teknoloji: Phaser 3 + TypeScript + Vite, GitHub Pages ile yayın. İleride Capac
   başta), sonra AskUserQuestion ile en güçlü 4'ünü sun (önerilen ilk sırada, "(Önerilen)"
   etiketiyle); kullanıcı yazmadan seçebilsin. Her zaman en iyisi için kafa yor.
 - Her aşama küçük ve telefonda test edilebilir olsun; sonunda Yağız (6 yaş) test eder.
-- Rapor biçimi (20 Ekim, kullanıcı istedi: "her zaman böyle yapalım"): her inceleme/görev raporu üç biçimde verilir:
-  yayınlanmış sayfa (Artifact, ekran görüntüleriyle), PDF ve ChatGPT'ye yapıştırılacak düz yazı (.txt); PDF ve .txt kullanıcıya
-  dosya olarak gönderilir ve depoda `docs/rapor-<tarih>/` altına konur. Başlıklar: tespit, neden, yapılan değişiklik, test sonucu,
+- Rapor biçimi (22 Ekim, kota için; 20 Ekim kuralını değiştirir): küçük işte sadece ChatGPT'ye yapıştırılacak kısa düz yazı (.txt).
+  Görsel değişiklik ya da karar gereken büyük işte üçü: yayınlanmış sayfa (Artifact, ekran görüntüleriyle), PDF ve .txt.
+  PDF ve .txt kullanıcıya dosya olarak gönderilir ve depoda `docs/rapor-<tarih>/` altına konur. Başlıklar: tespit, neden, yapılan değişiklik, test sonucu,
   açık kalan konu, beklenen karar; doğrulanmayan 🔎.
 - Karar kalitesi (K43, 17 Ekim): uzun kontrol listesi değil, gerektiğinde sorulan dört soru: (1) Bu alanın en iyi uygulaması ne?
   (2) Özet yerine hangi kaynak kod, karar kaydı ya da kanıt okunmalı? (3) Hangi test yöntemi uygun (birim, benzetim, gerçek dokunuş,

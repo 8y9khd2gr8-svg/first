@@ -286,8 +286,22 @@ const CIFT: Partial<Record<Animasyon, Adim[]>> = {
   yanaZipla: ADIMLAR.yanaZipla.map((a) => ({ ...a, x: -(a.x ?? 0) })),
 };
 
+// Donma oyununun pozları (src/donma.ts): Zıpzıp "Dur!" deyince bu duruşta kalır. Bugünkü duruşlar kullanılır.
+export type Poz = 'uzan' | 'yanaAc' | 'basUstu' | 'saril' | 'comel' | 'acik' | 'tekAyak';
+const POZLAR: Record<Poz, Omit<Adim, 'oran'>> = {
+  uzan: { durus: D.uzan, y: -20 },
+  yanaAc: { durus: D.yanKapali, y: -10 },
+  basUstu: { durus: D.basUstu, y: 0 },
+  saril: { durus: D.saril, y: 0, kollarOnde: true },
+  comel: { durus: D.comel, y: 50 },
+  acik: { durus: D.acik, y: -10 },
+  tekAyak: { durus: D.tekSol, y: -10 },
+};
+
 // Süreli hareketlerde bir tekrarın süresi (ms).
 const SUREKLI_TEMPO: Partial<Record<Animasyon, number>> = { acKapa: 1500, kos: 520, horon: 380, heykel: 2000, sutun: 2000, piramit: 2000, parmakUcu: 700, kocaman: 2000, belDondur: 1600, tekAyak: 4000, tHarfi: 2000, kulac: 1400, sallan: 1600, kanat: 900 };
+
+export const surekliTempoMs = (a: Animasyon) => SUREKLI_TEMPO[a] ?? 1000;
 
 type UzuvParcasi = { kok: Phaser.GameObjects.Container; dirsek: Phaser.GameObjects.Container; durum: Uzuv };
 
@@ -591,7 +605,8 @@ export class Zipzip extends Phaser.GameObjects.Container {
     sonraki(0);
   }
 
-  durdur() {
+  // Süren hareketi ve animasyonları bırakır (Zıpzıp olduğu yerde kalır).
+  private birak() {
     this.dongu?.remove();
     this.dongu = undefined;
     this.bekleyenler.forEach((o) => o.remove());
@@ -602,6 +617,20 @@ export class Zipzip extends Phaser.GameObjects.Container {
     this.setScale(1);
     this.esneme.sx = this.esneme.sy = 1;
     this.esnet();
+  }
+
+  // Hareketi bırakır ve pozda kalır (donma oyunu).
+  pozAl(poz: Poz, sure = 250) {
+    this.birak();
+    const p = POZLAR[poz];
+    this.kollariYerlestir(!!p.kollarOnde);
+    this.durusAl(p.durus, sure);
+    this.kay(p.y, sure);
+    if (this.x !== this.tabanX) this.scene.tweens.add({ targets: [this, this.golge], x: this.tabanX, duration: sure });
+  }
+
+  durdur() {
+    this.birak();
     this.kollariYerlestir(false);
     this.durusAl(D.normal, 200);
     this.kay(0, 200);
