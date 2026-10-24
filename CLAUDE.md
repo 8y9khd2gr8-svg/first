@@ -182,7 +182,7 @@ Teknoloji: Phaser 3 + TypeScript + Vite, GitHub Pages ile yayın. İleride Capac
   izin yok ayrı yazılır (kamera.ts kameraDurumYazisi). Oyundaki hareket ekranı bundan etkilenmez (K27).
   Kamera denemesinde ölçüm satırı (tanıma ms, tanıma/sn, oyunun kare hızı, son sayımın gecikmesi; kaydedilmez). Zıplama inişte
   sayılır, 400 ms içindeki ikinci iniş sayılmaz (ZIPLAMA_EN_AZ_ARA_MS);
-  1 sn'den uzun "havada" kalma sayılmaz, taban yeniden ölçülür (çömel-kalk takılması, ZIPLAMA_EN_UZUN_HAVA_MS). "🌍 Zıpzıp da zıplasın" (ZiplaDenemeScene, zıplama
+  1 sn'den uzun "havada" kalma sayılmaz, taban yeniden ölçülür (çömel-kalk takılması, ZIPLAMA_EN_UZUN_HAVA_MS); taban ilk karede ve takılmadan sonra tek kareden değil 1,2 sn'nin en alçak omzundan alınır, kalkış karesi tabana karışmaz (24 Ekim: sayfa havadayken donunca sayım takılıyordu; ZIPLAMA_TABAN_OLCUM_MS). "🌍 Zıpzıp da zıplasın" (ZiplaDenemeScene, zıplama
   prototipi): Zıpzıp'ın önünde kütük bekler (K22: bekleyen tek engel); kamerayla her zıplamada Zıpzıp bir kez zıplar, kütük
   altından geçer, yıldız yanar (10'da Aferin), sıradaki kütük gelip bekler; kamerasız ritim + dokunma. Henüz duraklarda yok.
 - Doğruluk: Çin Seddi uzaydan gözle GÖRÜLMEZ (efsane); Truva Atı "efsaneye göre". Ürkütücü kelime yok
