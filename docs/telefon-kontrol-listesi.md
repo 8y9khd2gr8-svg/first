@@ -28,6 +28,39 @@ Erişilebilirlik (hareketi azalt, büyük yazı, VoiceOver) de orada; hareketi a
 görünmez HTML düğmeler); her birinde VoiceOver'ın ne okuduğu ve doğru düğmenin çalışıp çalışmadığı yazılır, ayrıca gerçek oyunda da bakılır.
 Bulutta sadece tarayıcının erişilebilirlik ağacı görüldü (çocuk ekranlarında adsız tek "Canvas"); iPhone davranışı 🔎.
 
+## iPhone: Sürpriz Donma, Pamukkale, Truva (24 Ekim)
+
+**Durum:** hiçbiri gerçek telefonda ya da çocukla denenmedi (sadece bulutta ekransız tarayıcı). Denenmeyen madde 🔎 kalır.
+
+Hazırlık: test sitesi Safari'de, bir kez yenile; ebeveyn köşesinin altındaki sürüm numarasını not et; ses açık, sessiz mod
+düğmesi kapalı; ikinci telefonda kronometre. Türkiye Turu sırası: **İstanbul (1.) ve Pamukkale (3.) duraklarında Sürpriz Donma**,
+Truva'da (2.) Ayna oyunu (`oturum.ts`: durak sırası çiftse donma). Baştan üç durak hepsini kapsar.
+
+| # | Bakılacak | Doğru olan | Not edilecek |
+|---|---|---|---|
+| D1 | Dans değişimi | Her "Devam!"da başka dans; adı altta yazar ve söylenir | Aynı dans iki kez geldi mi? |
+| D2 | Söylenen poz | "Dur! Kollarını yana aç!" gibi; Zıpzıp o pozda durur, poz yazar | Çocuk duydu mu, doğru pozu yaptı mı? |
+| D3 | Donma süresi | Normal 2,5 sn × 3 "Dur!"; Sakin 3 sn × 2; Hızlı 2,5 sn × 4 | Kronometreyle 2-3 ölçüm; yetti mi, uzun mu? |
+| D4 | Toplam süre | Normal ~15 sn, Sakin ~14 sn, Hızlı ~20 sn | Sıkıldı mı, yetişti mi? |
+| D5 | Çömel pozu (oturarak kapalı) | Zıpzıp çömelir, kollar yana açık | Çizim iyi mi, çocuk anladı mı? |
+| D6 | ⚙️ Oturarak oyna | "Oturduğun yerde …" cümleleri; ayakta dans/poz yok (çömel, tek ayak yok) | Uzun cümle dansa yetişti mi, üst üste konuşma? |
+| D7 | Kamera açıkken donma | Donma süreli hareket: kamera **açılmaz** | Kamera kutusu çıktı mı? |
+| P1 | Haritada Pamukkale simgesi | Basamaklı beyaz havuzlar (#164) | Küçük ekranda tanınıyor mu? |
+| T1 | Truva hareket ekranı | Altta mazgallı sur + kemerli kapı, Zıpzıp surun üstünde (#165); sur yazı/düğme örtmez | Örtme var mı? |
+| T2 | Truva Ayna oyunu | Hareket adı yazar, çocuk takip eder | — |
+| Z1 | Zıpzıp da zıplasın, 📷 kamerayla: zıplarken ekranı 3-5 sn kilitle, aç, **zıplamayı sürdür** | Birkaç zıplamada sayı yine artar (24 Ekim düzeltmesi; eskiden uzun süre takılabiliyordu) | Kaç zıplamada yeniden saydı? |
+
+Ayrıca: kamera ("Hazırsın!", ayna süresi, "Ayakların görünmüyor"; 🔍 Dene ölçüm satırının ekran görüntüsü), ses (konuştu mu,
+kesilme/üst üste), performans (takılma, ısınma, pil), hata (donan/boş ekran, kapanma; ekran görüntüsünde çocuğun yüzü olmasın).
+
+**Yağız (6 yaş), yardım almadan:** durağa kendisi dokundu mu · "Yaptım!"ı kendisi buldu mu · kaç kez yetişkine baktı/sordu ·
+"Dur!"da durdu mu, pozu yaptı mı · dans değişince fark etti mi · yanlış yere dokundu mu (nereye) · nerede sıkıldı · bitince "bir daha" dedi mi.
+
+**Ek (ayrı):** 4-5 yaş: Sakin tempo; 3 sn donma yetiyor mu, kısa komutları anlıyor mu, çömel-kalk, sağ/sol. 8-9 yaş: Hızlı tempo;
+4 "Dur!" ve tek ayak zorlayıcı mı çocuksu mu, kaç durakta sıkılıyor.
+
+Sonuç kaydı: `Tarih / deneyen / iPhone modeli / iOS / Safari mi ana ekran mı / oyun sürümü` + her madde Oldu / Olmadı / Denenmedi · not.
+
 ## iPhone'da adım adım (18 Ekim; T3, T7, T10 ve büyük ayna süresi)
 
 **Durum:** bu adımların hiçbiri gerçek telefonda yapılmadı. Bulut testleri ekransız tarayıcıda sahte kilit/arama (sayfa gizlenir,

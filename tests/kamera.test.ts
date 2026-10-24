@@ -135,6 +135,68 @@ test('kamera zıplama: gerçek zıplamanın havası (yarım saniye) takılma kor
   assert.equal(say('zipla', () => [HAVADA, {}], 5, 12, 50), 5);
 });
 
+// 24 Ekim (benzetim testi ara sıra kırmızıydı): sayfa çocuk havadayken donunca ya da kamera çocuk havadayken açılınca taban
+// havadaki omuzdan alınıyordu; zıplamayı sürdüren çocuk uzun süre, seyrek tanımada hiç sayılmıyordu (eski kodda 120 sn'de 0).
+// [havaOrani, kareMs, periyotMs]: zıplamanın ne kadarı havada, tanıma aralığı (yavaş telefonda seyrek), bir zıplamanın süresi.
+// Her zıplamada en az bir "havada" karesi düşer (yoksa zıplama görülemez). Son durum benzetim testinin yüklü makinede ölçülen
+// hâli (1,2 sn'lik zıplama, ~575 ms'de bir tanıma).
+const ZIPLAMA_DURUMLARI = [[0.5, 150, 1000], [0.35, 100, 1000], [0.35, 250, 1000], [0.25, 200, 1000], [0.5, 575, 1200]] as const;
+function surekliZipla([havaOrani, kareMs, periyot]: readonly number[], donmaMs: number | null) {
+  const s = new Sayici('zipla');
+  const havada = (t: number) => (t % periyot) / periyot < havaOrani;
+  const besle = (t: number) => s.besle(nokta(havada(t) ? HAVADA : {}), t);
+  let t = 0; // ilk kare havada (kamera çocuk havadayken açılır)
+  if (donmaMs !== null) {
+    for (; t < 5 * periyot; t += kareMs) besle(t);
+    while (!havada(t)) t += 10;
+    besle(t); // son kare havada, sonra sayfa donar
+    t += donmaMs;
+    while (!havada(t)) t += 10; // dönüşteki ilk kare yine havada
+  }
+  const bas = t, once = s.sayi;
+  let ilk = -1;
+  for (; t < bas + 20_000; t += kareMs) {
+    besle(t);
+    if (ilk < 0 && s.sayi > once) ilk = t - bas;
+  }
+  return { ilk, sayi: s.sayi - once };
+}
+
+test('kamera zıplama: sayfa çocuk havadayken donsa da zıplamayı sürdüren çocuk hemen yine sayılır', () => {
+  for (const d of ZIPLAMA_DURUMLARI) {
+    const r = surekliZipla(d, 2500);
+    const beklenen = Math.round(20_000 / d[2]);
+    const ad = `havada %${d[0] * 100}, ${d[1]} ms'de bir tanıma`;
+    assert.ok(r.ilk >= 0 && r.ilk <= 2 * d[2] + d[1], `${ad}: donmadan sonra ilk sayım ${r.ilk} ms`);
+    assert.ok(r.sayi >= beklenen - 2 && r.sayi <= beklenen, `${ad}: ${beklenen} zıplamada ${r.sayi} sayıldı`);
+  }
+});
+
+test('kamera zıplama: kamera çocuk havadayken açılsa da sayar', () => {
+  for (const d of ZIPLAMA_DURUMLARI) {
+    const r = surekliZipla(d, null);
+    const beklenen = Math.round(20_000 / d[2]);
+    const ad = `havada %${d[0] * 100}, ${d[1]} ms'de bir tanıma`;
+    assert.ok(r.ilk >= 0 && r.ilk <= 2 * d[2] + d[1], `${ad}: ilk sayım ${r.ilk} ms`);
+    assert.ok(r.sayi >= beklenen - 2 && r.sayi <= beklenen, `${ad}: ${beklenen} zıplamada ${r.sayi} sayıldı`);
+  }
+});
+
+test('kamera zıplama: tanıma seyrekken (~1 sn) donmadan sonra taban tek havadaki kareden ölçülmez', () => {
+  // Benzetim testinde yükte kaydedilen sıra (24 Ekim): donmadan önce son kare havada; dönüşte kareler seyrek ve ilk üçü havada.
+  // Taban ölçümü sadece 1,2 sn sürseydi tek (havadaki) kareye denk geliyordu; model 4 zıplama gördü, hiçbiri sayılmadı.
+  const s = new Sayici('zipla');
+  for (let t = 0; t < 6000; t += 300) s.besle(nokta(t % 1200 < 600 ? HAVADA : {}), t);
+  s.besle(nokta(HAVADA), 6000);
+  const once = s.sayi;
+  assert.ok(once >= 3);
+  const donmaSonu = 6000 + 3200;
+  const sonra: [number, boolean][] = [[508, true], [1731, true], [2505, true], [3240, false], [3817, true], [4749, false],
+    [5343, true], [6500, true], [7584, true], [8187, false], [8889, true]];
+  for (const [t, havada] of sonra) s.besle(nokta(havada ? HAVADA : {}), donmaSonu + t);
+  assert.ok(s.sayi > once, 'model 4 zıplama gördü, hiçbiri sayılmadı');
+});
+
 test('kamera açılamayınca nedeni ayrılır: kamera yok / izin yok / başka', () => {
   assert.equal(kameraHatasi(new DOMException('', 'NotFoundError')), 'kameraYok');
   assert.equal(kameraHatasi(new DOMException('', 'OverconstrainedError')), 'kameraYok');

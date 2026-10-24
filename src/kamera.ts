@@ -144,6 +144,12 @@ export const ZIPLAMA_EN_AZ_ARA_MS = 400;
 // Bir zıplamada havada kalma en çok yarım saniye kadardır. "Havada" durumu bundan çok uzun sürerse bu bir zıplama değildir
 // (ör. çömelip kalkınca omuzlar ayakta durulan yerden yüksek görünür); sayılmadan bırakılır, taban yeniden ölçülür.
 export const ZIPLAMA_EN_UZUN_HAVA_MS = 1000;
+// Taban (ayakta durulan omuz yüksekliği) ilk karede ve takılma korumasından sonra tek kareden alınmaz: o kare çocuk havadayken
+// gelmiş olabilir (ör. sayfa havadayken donunca). Bu kadar süre görülen en alçak omuz taban olur (bir zıplamada yere mutlaka
+// basılır). Yoksa zıplamayı sürdüren çocuğun tabanı zıplamanın ortasına oturuyor, uzun süre hiç sayılmıyordu (24 Ekim).
+// Tanıma seyrekse (yavaş telefon, ~1 sn'de bir) süre tek kareye denk gelebilir: ölçüm en az bu kadar kare de sürer.
+export const ZIPLAMA_TABAN_OLCUM_MS = 1200;
+export const ZIPLAMA_TABAN_OLCUM_KARE = 4;
 
 // Bir hareketin tekrarlarını sayar. Eşikler vücut boyuna göre (omuz-topuk mesafesi)
 // oranlanır; böylece çocuğun kameraya uzaklığı önemli olmaz.
@@ -156,6 +162,8 @@ export class Sayici {
   private taraf: -1 | 0 | 1 = 0; // yana adım: gövde ortanın solunda mı sağında mı
   private sonInis = -Infinity; // zıpla: son sayılan inişin zamanı (ms)
   private havalanma = 0; // zıpla: "havada" durumuna geçilen zaman (ms)
+  private tabanOlcumSonu = -Infinity; // zıpla: bu zamana kadar taban görülen en alçak omuzdur (ZIPLAMA_TABAN_OLCUM_MS)
+  private tabanOlcumKare = 0; // zıpla: ölçümün en az kaç kare daha süreceği (ZIPLAMA_TABAN_OLCUM_KARE)
 
   constructor(animasyon: Animasyon) {
     this.yol = SAYMA_YOLU[animasyon];
@@ -167,6 +175,12 @@ export class Sayici {
     if (!n || eksikNoktalar(n).length) return 'goremiyorum';
     this.besle(n, zaman);
     return 'goruyorum';
+  }
+
+  // zıpla: tabanı yeniden ölçmeye başla (ilk kare, takılma koruması); taban o anki omuzdan başlar.
+  private tabanOlcumBaslat(zaman: number) {
+    this.tabanOlcumSonu = zaman + ZIPLAMA_TABAN_OLCUM_MS;
+    this.tabanOlcumKare = ZIPLAMA_TABAN_OLCUM_KARE;
   }
 
   // zaman: karenin zamanı (ms); testler yapay zaman verir.
@@ -199,8 +213,12 @@ export class Sayici {
     } else if (this.yol === 'zipla') {
       // Omuzlar ayakta durulan yükseklikten (taban) belirgin yükselince bir sıçrama.
       // Taban yavaşça güncellenir; sıçrama anında değişmez.
-      if (this.taban === null) this.taban = omuz;
-      if (!this.yukarida) this.taban = this.taban * 0.9 + omuz * 0.1;
+      if (this.taban === null) {
+        this.taban = omuz;
+        this.tabanOlcumBaslat(zaman);
+      }
+      // Karar tabanın önceki değeriyle verilir; kalkış karesi tabana karışmaz (seyrek tanımada her zıplamada taban
+      // biraz yükseliyor, birkaç saniyede zıplamalar sayılmaz oluyordu; 24 Ekim). Taban sadece yerdeki karelerle güncellenir.
       const yukselme = (this.taban - omuz) / boy;
       if (!this.yukarida && yukselme > 0.07) {
         this.yukarida = true;
@@ -212,10 +230,16 @@ export class Sayici {
           this.sonInis = zaman;
         }
       } else if (this.yukarida && zaman - this.havalanma > ZIPLAMA_EN_UZUN_HAVA_MS) {
-        // Takılma koruması: sayılmaz, çocuğun şimdiki duruşu yeni taban olur.
+        // Takılma koruması: sayılmaz, taban yeniden ölçülür (çömelip kalkan çocuğun şimdiki duruşu; zıplamayı sürdürenin yere bastığı an).
         this.yukarida = false;
         this.taban = omuz;
+        this.tabanOlcumBaslat(zaman);
       }
+      if (!this.yukarida) {
+        const olcumde = zaman < this.tabanOlcumSonu || this.tabanOlcumKare > 0;
+        this.taban = olcumde ? Math.max(this.taban, omuz) : this.taban * 0.9 + omuz * 0.1;
+      }
+      this.tabanOlcumKare = Math.max(0, this.tabanOlcumKare - 1);
     } else if (this.yol === 'dizler') {
       // Bir diz kalçaya yaklaşınca "kalktı", yeniden aşağı inince bir tekrar (her diz ayrı sayılır).
       // Boy yerdeki ayağa göre ölçülür (havadaki ayak boyu kısaltmasın).
