@@ -100,7 +100,8 @@ Onay verilmemiş, ertelenmiş ya da reddedilmiş öneriler de buraya yazılır; 
 **#170 (ayna donma testi, kullanıcı onayıyla birleşti → 637b6a0; GitHub Testler 9/9 yeşil okundu):** Kök neden ölçüldü: yükte testin kendi sayacı 0,5-0,9 sn geç tetikleniyor, ikinci donma 6,1 yerine 6,5-7,3 sn'de bitiyor; eski sabit 7,2 sn sınırı bunu oyunun suçu sayıyordu (eski test yükte 8 denemede 3 kırmızı). Oyun donma bitince 3-17 ms içinde (en çok 309 ms) kapatıyor. Yeni: donmaların gerçek zamanı kaydedilir, kural `tests/aynaDonmaKurali.ts` (ayna gerçek donma bitişinden en geç 1 sn sonra kapanmalı; eskiden fiilen 1,1 sn), `tests/ayna-donma.test.ts` 8 birim testi (eski hata, eksik/kısa/binen donma, erken kapanma). Eski hata taklidi (src'de geçici, geri alındı) 8/8 kırmızı; yeni test yükte 16/16, art arda 20/20 yeşil. `src/` değişmedi.
 **Kullanıcı kuralı (23 Ekim):** bu görevlerde hiçbir PR açık onay olmadan birleştirilmez.
 **🔎 Açık:** benzer "Zıpzıp da zıplasın: iki kez 2,5 sn donsa da" testi incelenmedi.
-**Sıradaki (kullanıcı seçti):** Pamukkale A (#164) + Truva B (#165): güncelle, ekran görüntüleriyle göster, onayla ekle.
+**Sonra (kullanıcı onayıyla):** #164 Pamukkale A → 6989231, #165 Truva B → 902b96f, #169 → 727d403 birleşti (her biri güncel main ile birleştirildi, GitHub Testler yeşil okundu). #164'ün CI'ı "Tarayıcı kur" adımında 70 dk takıldı (test başlamamıştı): iptal + bir kez yeniden çalıştırma, yeşil. 🔎 Pamukkale/Truva iPhone'da görülmedi.
+**24 Ekim:** ChatGPT için devam raporu `docs/rapor-2026-10-24/Zip-Zip-24-Ekim-devam-raporu.txt`; ⏳ sıradaki iş ChatGPT/kullanıcı kararıyla.
 
 ### 22 Ekim 2026 (öğleden sonra) — Sürpriz Donma A (#167), #163 birleşti, eski oturumlar arşivlendi
 **Birleşenler (son hâlinde GitHub "Testler" 9/9 yeşil okunarak):** #167 → main a69c6d7 (K35, kullanıcı işi onaylamıştı) · #163 → e82c50c (kullanıcı onayıyla; önce güncel main dala birleştirildi, geçmiş yeniden yazılmadı).
