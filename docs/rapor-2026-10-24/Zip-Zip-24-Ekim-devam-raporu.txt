@@ -1,0 +1,44 @@
+Zıp Zıp Dünya — Durum ve "nereden devam edelim?" raporu (24 Ekim 2026)
+
+Bağlam: 4-9 yaş için reklamsız, şiddetsiz, Türkçe hareket oyunu (maskot Zıpzıp). Phaser + TypeScript; test sitesi GitHub Pages. Hedef: Kasım'da 25-30 ailelik beta, Ocak sonu mağaza. Kodu Claude yazıyor; proje sahibi yazılım bilmiyor, sadece iPhone kullanıyor.
+
+1. DÜN (23 EKİM) BİTENLER — hepsi ana sürümde (main = 6989231), test sitesinde yayında
+- #170 Ayna donma testi sağlamlaştırıldı (sadece test, oyun değişmedi).
+  · Kök neden: testin kendi zamanlayıcısı yavaş makinede 0,5-0,9 sn geç çalışıyordu. Eski sabit 7,2 sn sınırı bunu oyunun hatası sayıyordu (eski test yükte 8 denemede 3 kırmızı). Oyun aynayı donma bitince 3-17 ms içinde kapatıyor, yani oyun doğru.
+  · Yeni: donmaların gerçek zamanı ölçülüyor; ayrıca 8 yeni "kural testi" var.
+  · Eski hatayı geçici olarak oyuna geri koyunca test 8 denemenin 8'inde kırmızı oldu. Yani gerçek hatayı hâlâ yakalıyor.
+  · Yeni test: yükte 16/16, art arda 20/20 yeşil. GitHub testleri 9/9 yeşil.
+- #165 Truva hareket ekranı: altta mazgallı sur ve kemerli kapı, Zıpzıp surun üstünde (tasarım B, kullanıcı seçti).
+- #164 Pamukkale simgesi: basamaklı havuzlar (tasarım A, kullanıcı seçti).
+- #169 23 Ekim durum raporu ve kayıt defteri.
+- Not: #164'ün GitHub testi "tarayıcı kur" adımında 70 dk takıldı (GitHub altyapısı, test başlamamıştı). Durdurulup bir kez yeniden çalıştırıldı, yeşil geçti.
+- Ondan önce (22 Ekim): Sürpriz Donma yenilendi (her turda başka dans, her "Dur!"da söylenen poz; Sakin 2 Dur/14 sn, Normal 3/15 sn, Hızlı 4/20 sn).
+
+2. AÇIK PR
+- Sadece #157 (tarayıcı güvenlik kuralı, CSP). Android telefonda denenmeyi bekliyor; elde Android yok.
+
+3. KULLANICININ YAPACAKLARI
+- iPhone'da test sitesinde bakmak: (a) Sürpriz Donma: dans değişiyor mu, poz duyulup yapılıyor mu, 2,5 sn donma yetiyor mu, "Oturarak oyna"da cümleler yetişiyor mu, çömel pozu nasıl; (b) Pamukkale simgesi haritada; (c) Truva hareket ekranındaki sur.
+- Yağız testi (6 yaş) + mümkünse 4-5 ve 8-9 yaştan birer çocuk.
+- Hesaplar ve başvurular: Play geliştirici hesabı (sonra Apple), Azure doğal ses anahtarı, marka başvurusu (TÜRKPATENT), avukat, iletişim e-postası.
+- Hareket kataloğunu fizyoterapiste göndermek.
+- Mac'e ertelenebilir: v0.9.0 etiketi, main dal koruması, 145 eski dalın silinmesi (GitHub ayarı).
+- Android telefon bulunursa: #157 denemesi ve internetsiz APK denemesi.
+
+4. BİLİNEN SORUNLAR / DOĞRULANMAYANLAR (🔎)
+- 🔎 Sürpriz Donma, Pamukkale, Truva ve 20 Ekim düzeltmeleri iPhone'da ve çocukla hiç denenmedi (sadece bulutta ekransız tarayıcıda).
+- 🔎 Gerçek telefonda ses, performans, kamera eşikleri ve ödeme hiç denenmedi.
+- Doğal ses kaydı yok: telefonda Türkçe ses yoksa Zıpzıp konuşamaz.
+- 🔎 Benzer "Zıpzıp da zıplasın: iki kez 2,5 sn donsa da" testinde aynı zamanlama sorunu olabilir (bir kez yerelde kırmızı, incelenmedi).
+- Kayıt defterine (KAYIT.md) #164/#165 birleşmesi henüz yazılmadı (küçük belge PR'ı gerekiyor).
+
+5. SIRADAKİ İŞ SEÇENEKLERİ (Claude'un önerisi başta)
+1) [Önerilen] Telefon + Yağız turu: kullanıcı iPhone'da bakar, Yağız oynar; bulgular gelince Claude düzeltir. Neden: son 3 değişiklik hiç gerçek telefonda görülmedi; beta Kasım'da.
+2) Macera Pasaportu Aşama 1 (çocuğun en çok baktığı ekran). Önce iki küçük karar: kapakta "X / 50" mi, sadece açık bölümler mi; "Yakında" sekmeleri nasıl görünsün.
+3) Oturarak oynarken kamera ayakları görmek zorunda kalmasın (kol hareketleri sayılsın). Hareket kısıtı olan çocuk için önemli; kamera kararı ister.
+4) "Zıpzıp da zıplasın" donma testine aynı sağlamlaştırma (küçük, sadece test).
+5) Yağız testi için kısa bakılacaklar listesi (Donma ve son görseller).
+6) Mağaza görselleri: sadece betayı mı, bütün bölümleri mi göstersin (karar + küçük iş).
+7) Beta hazırlığı: hesap/başvuru adımları için kullanıcıya adım adım rehber güncellemesi.
+
+SORU (ChatGPT'ye): Kasım betasına göre hangi sırayla devam etmeliyiz? 1-7 arasından ilk 2-3 işi seç ve kısaca nedenini yaz. Gerekirse Claude'a verilecek görev metnini (prompt) hazırla.
