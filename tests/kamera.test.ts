@@ -182,6 +182,21 @@ test('kamera zıplama: kamera çocuk havadayken açılsa da sayar', () => {
   }
 });
 
+test('kamera zıplama: tanıma seyrekken (~1 sn) donmadan sonra taban tek havadaki kareden ölçülmez', () => {
+  // Benzetim testinde yükte kaydedilen sıra (24 Ekim): donmadan önce son kare havada; dönüşte kareler seyrek ve ilk üçü havada.
+  // Taban ölçümü sadece 1,2 sn sürseydi tek (havadaki) kareye denk geliyordu; model 4 zıplama gördü, hiçbiri sayılmadı.
+  const s = new Sayici('zipla');
+  for (let t = 0; t < 6000; t += 300) s.besle(nokta(t % 1200 < 600 ? HAVADA : {}), t);
+  s.besle(nokta(HAVADA), 6000);
+  const once = s.sayi;
+  assert.ok(once >= 3);
+  const donmaSonu = 6000 + 3200;
+  const sonra: [number, boolean][] = [[508, true], [1731, true], [2505, true], [3240, false], [3817, true], [4749, false],
+    [5343, true], [6500, true], [7584, true], [8187, false], [8889, true]];
+  for (const [t, havada] of sonra) s.besle(nokta(havada ? HAVADA : {}), donmaSonu + t);
+  assert.ok(s.sayi > once, 'model 4 zıplama gördü, hiçbiri sayılmadı');
+});
+
 test('kamera açılamayınca nedeni ayrılır: kamera yok / izin yok / başka', () => {
   assert.equal(kameraHatasi(new DOMException('', 'NotFoundError')), 'kameraYok');
   assert.equal(kameraHatasi(new DOMException('', 'OverconstrainedError')), 'kameraYok');
