@@ -1,0 +1,63 @@
+Zıp Zıp Dünya — Son rapor (24-25 Ekim 2026 oturumu)
+
+Bağlam: 4-9 yaş için reklamsız, şiddetsiz, Türkçe hareket oyunu (maskot Zıpzıp). Test sitesi GitHub Pages; hedef Kasım betası.
+Kodu Claude yazıyor; proje sahibi yazılım bilmiyor, sadece iPhone kullanıyor.
+
+DURUM (GitHub'dan doğrulandı, 25 Ekim)
+- main = 385bcbf (değişmedi; bu oturumda main'e hiçbir şey girmedi).
+- Açık PR: #172 (bu oturum, taslak, onay bekliyor) ve #157 (CSP, dokunulmadı).
+- Önceki oturum (session_01VkHvyQixVxqEbzcboLGEU7) arşivlendi.
+
+1. iPhone TEST LİSTESİ (iş 1) — bitti
+- docs/telefon-kontrol-listesi.md içinde "iPhone: Sürpriz Donma, Pamukkale, Truva (24 Ekim)" bölümü (PR #172 ile gelir).
+- Maddeler: D1-D7 (dans değişimi, söylenen poz, 2,5 sn donma, toplam süre, çömel pozu, Oturarak oyna, kamera açılmaz),
+  P1 (Pamukkale simgesi), T1-T2 (Truva suru, Ayna oyunu), Z1 (zıplarken kilit + devam). Ayrıca kamera, ses, performans,
+  hata kaydı; Yağız'ın yardımsız oynaması için 8 gözlem; 4-5 ve 8-9 yaş için ayrı öneriler; sonuç kaydı şablonu.
+- İstanbul (1.) ve Pamukkale (3.) durağında Sürpriz Donma, Truva'da (2.) Ayna oyunu var (koddan).
+- 🔎 Hiçbir madde gerçek telefonda ya da çocukla denenmedi.
+
+2. "ZIPZIP DA ZIPLASIN" TESTİ (iş 2) — PR #172, onay bekliyor
+
+TESPİT
+- Test ara sıra kırmızıydı. Sayfa içine konan kayıt: yükte bir çalıştırmada donmadan sonraki ilk sayım 88,2 sn'de geldi
+  (sınır 90 sn); sahte model bu sürede çocuğu 73 kez havada gördü ama hiç sayılmadı.
+
+NEDEN (oyun kodunda; sadece testte değil)
+- Sayfa çocuk havadayken donup çocuk yine havadayken açılınca "takılma koruması" (1 sn'den uzun havada) yerde duruş
+  yüksekliğini (taban) HAVADAKİ omuzdan alıyordu. Çocuk zıplamayı sürdürdükçe taban zıplamanın ortasına oturuyor,
+  sayım uzun süre gelmiyordu (yapay noktalarla, saniyede 4 tanımada hiç).
+- Kamera çocuk havadayken açılınca da aynısı (taban ilk kareden).
+- İkinci, eskiden beri var olan zayıflık: kalkış karesi tabana karışıyordu; seyrek tanımada taban her zıplamada kayıyordu.
+
+YAPILAN DEĞİŞİKLİK (kullanıcı "sayıcıyı düzelt" seçti)
+- src/kamera.ts (sadece zıplama sayma, eşikler aynı): taban ilk karede ve takılmadan sonra en az 1,2 sn VE en az
+  4 kare boyunca görülen en alçak omuz; karar tabanın önceki değeriyle, taban sadece yerdeki karelerle güncellenir.
+- Testler: kamera.test.ts'e 3 birim testi (biri yükte kaydedilen sıranın aynısı). Benzetim testinde 90 sn bekleme
+  yerine kural (tests/ziplaDonmaKurali.ts): donmadan sonra model en çok 3 zıplama gördüyse sayım olmuş olmalı;
+  süre değil görülen zıplama sayılır (makine hızından bağımsız). Donma artık hep çocuk havadayken başlar ve biter.
+  Kuralın 5 testi: tests/zipla-donma.test.ts.
+- Belgeler: CLAUDE.md (1 satır), KAYIT.md (günlük), telefon-kontrol-listesi.md.
+- Değişen dosyalar (8): src/kamera.ts, tests/kamera.test.ts, tests/kamera-benzetim.spec.ts, tests/ziplaDonmaKurali.ts,
+  tests/zipla-donma.test.ts, CLAUDE.md, docs/KAYIT.md, docs/telefon-kontrol-listesi.md.
+
+TEST SONUCU (bulut, ekransız tarayıcı; telefon değil)
+- Yeni kod: npm test 78/78; benzetim testi 8/8; ek işlemci yükünde (yük ~14) 16/16 + 16/16; bütün kamera benzetimi 26/26.
+- Eski kod (main): yeni birim testlerinden 3'ü kırmızı; benzetim testi 8/8 kırmızı, doğru nedenle
+  ("model 4-5 zıplama gördü, hiçbiri sayılmadı"). Yani test gerçek hatayı yakalıyor.
+- Ara sürüm (sadece 1,2 sn pencere) yükte 16'da 3 kırmızıydı: bulundu, düzeltildi, o kayıt teste kondu.
+- GitHub "Testler": son commit 292eb76'da 9/9 yeşil, çakışma yok, yorum yok (okundu).
+
+AÇIK KALAN KONU
+- 🔎 Gerçek iPhone'da ve çocukla denenmedi (listede Z1). Gerçek çocuk düzenli zıplamaz; telefonda ne sıklıkla
+  takıldığı bilinmiyor.
+- 🔎 Küçük yeni risk: kamera açılınca ilk ~1 sn'de tek bir çok hatalı omuz noktası gelirse sayım ~1 sn takılabilir;
+  takılma koruması düzeltir.
+
+3. BETA HAZIRLIĞI + PASAPORT (iş 3) — başlanmadı (sıra bekliyor)
+
+BEKLENEN KARAR
+1) #172 birleştirilsin mi? (Testler yeşil; birleşince test sitesinde hemen yayında.) Önerim: evet.
+2) İş 3'e başlansın mı (beta hazırlığı kontrol listesi; Pasaport için iki ayrı karar: kapakta "X / 50" mi açık
+   bölümler mi, "Yakında" bölümler nasıl görünsün)?
+3) Kullanıcıda: iPhone listesi + Yağız testi; Play/Apple hesabı, Azure ses, marka, avukat, iletişim e-postası,
+   fizyoterapist (KAYIT U4-U6, K4).
