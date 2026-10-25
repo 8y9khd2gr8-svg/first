@@ -1,0 +1,12 @@
+{
+  "ci": {
+    "collect": {
+      "startServerCommand": "npx vite preview --port 4173 --strictPort",
+      "startServerReadyPattern": "4173",
+      "url": ["http://localhost:4173/"],
+      "numberOfRuns": 3,
+      "settings": { "chromeFlags": "--no-sandbox" }
+    },
+    "upload": { "target": "filesystem", "outputDir": "lighthouse-sonuc" }
+  }
+}
