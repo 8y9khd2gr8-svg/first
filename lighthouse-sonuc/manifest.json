@@ -1,0 +1,38 @@
+[
+  {
+    "url": "http://localhost:4173/",
+    "isRepresentativeRun": false,
+    "htmlPath": "/home/user/first/lighthouse-sonuc/localhost--2026_10_25_14_06_57.report.html",
+    "jsonPath": "/home/user/first/lighthouse-sonuc/localhost--2026_10_25_14_06_57.report.json",
+    "summary": {
+      "performance": null,
+      "accessibility": 0.76,
+      "best-practices": 1,
+      "seo": 0.91
+    }
+  },
+  {
+    "url": "http://localhost:4173/",
+    "isRepresentativeRun": false,
+    "htmlPath": "/home/user/first/lighthouse-sonuc/localhost--2026_10_25_14_08_01.report.html",
+    "jsonPath": "/home/user/first/lighthouse-sonuc/localhost--2026_10_25_14_08_01.report.json",
+    "summary": {
+      "performance": null,
+      "accessibility": 0.76,
+      "best-practices": 1,
+      "seo": 0.91
+    }
+  },
+  {
+    "url": "http://localhost:4173/",
+    "isRepresentativeRun": true,
+    "htmlPath": "/home/user/first/lighthouse-sonuc/localhost--2026_10_25_14_05_53.report.html",
+    "jsonPath": "/home/user/first/lighthouse-sonuc/localhost--2026_10_25_14_05_53.report.json",
+    "summary": {
+      "performance": null,
+      "accessibility": 0.76,
+      "best-practices": 1,
+      "seo": 0.91
+    }
+  }
+]
