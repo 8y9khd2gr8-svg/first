@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import { expect, Page, test } from '@playwright/test';
 import { saymaYolu } from '../src/kamera';
 import { aynaDonmaHatalari } from './aynaDonmaKurali';
+import { olcumBitti, ziplaDonmaHatalari, type ZiplaKaresi } from './ziplaDonmaKurali';
 
 // Kamera benzetimi (K41): gerçek kamera ve gerçek vücut tanıma modeli YOK. Kamera, renk değiştiren bir tuvalin görüntüsü;
 // model, testin verdiği yapay vücut noktalarını döndüren sahte bir model (kamera.ts'deki zipzipBenzetim, sadece geliştirme
@@ -58,7 +59,7 @@ async function benzetimKur(page: Page, ayar: Ayar = {}) {
     };
     let modelHazir = () => {};
     const modelBekle = new Promise<void>((r) => (modelHazir = r));
-    const b = (w.benzetim = { durum: { hareket: 'dur', gizli: [] as number[], bosKareHer: 0, periyotMs: 1200 }, tanima: 0, modelHazir });
+    const b = (w.benzetim = { durum: { hareket: 'dur', gizli: [] as number[], bosKareHer: 0, periyotMs: 1200 }, tanima: 0, modelHazir, kareler: [] as number[][] });
     w.zipzipBenzetim = {
       model: async () => {
         if (ayar.modelElle) await modelBekle;
@@ -70,6 +71,9 @@ async function benzetimKur(page: Page, ayar: Ayar = {}) {
             if (d.bosKareHer && b.tanima % d.bosKareHer === 0) return { landmarks: [] };
             const faz = Math.floor(performance.now() / (d.periyotMs / 2));
             const ici = d.hareket !== 'dur' && (faz % 2 === 0 || d.hareket === 'yanAdim');
+            // Zıplama denemesi açıksa her tanıma kaydedilir (ziplaDonmaKurali.ts): zaman, havada mı, oyunun o ana kadarki sayısı.
+            const zd = w.oyun?.scene?.getScene('ZiplaDeneme');
+            if (zd?.sys.isActive()) b.kareler.push([performance.now(), ici ? 1 : 0, zd.kameraZiplamasi]);
             const n = nokta(ici ? ICI[d.hareket](faz % 4 < 2) : {});
             for (const i of d.gizli) n[i] = { ...n[i], visibility: 0.1 };
             return { landmarks: [n] };
@@ -637,6 +641,9 @@ const ziplaDurum = (page: Page) =>
     return { toplam: s.ziplamaSayisi as number, kamera: s.kameraZiplamasi as number, ritim: !!s.ritim, durum: s.kamera?.durum as string };
   });
 
+// 24 Ekim: eskiden 90 sn içinde sayı artmasını bekliyordu (yükte ara sıra kırmızı). Ölçüm asıl hatayı gösterdi: sayfa çocuk
+// havadayken donunca sayıcının tabanı havadaki omuzdan alınıyor, zıplamayı sürdüren çocuk uzun süre sayılmıyordu (kamera.ts
+// ZIPLAMA_TABAN_OLCUM_MS). Şimdi donma tam o anda başlatılır ve süre yerine modelin gördüğü zıplama sayılır (ziplaDonmaKurali.ts).
 test('benzetim: Zıpzıp da zıplasın (kamerayla): sayfa iki kez 2,5 sn donsa da zıplamalar bir anda gelmez, ritim açık kalmaz', async ({ page }) => {
   test.setTimeout(240_000);
   // Ayna testindeki gibi: sahte tuval görüntüsü donmada "susturuldu" olur (gerçek kamera için 🔎); burada donmanın kendisi denenir.
@@ -645,24 +652,37 @@ test('benzetim: Zıpzıp da zıplasın (kamerayla): sayfa iki kez 2,5 sn donsa d
   const k0 = await oyunuAc(page, { 'zipzip-beta-dunya': '1' });
   await durumYaz(page, { hareket: 'zipla' });
   await kameraliZipla(page);
-  const artislar = await page.evaluate(async () => {
-    const s = (window as any).oyun.scene.getScene('ZiplaDeneme');
+  const { artislar, donmalar } = await page.evaluate(async () => {
+    const w = window as any;
+    const s = w.oyun.scene.getScene('ZiplaDeneme');
+    const kareler: number[][] = w.benzetim.kareler;
+    const periyot: number = w.benzetim.durum.periyotMs;
     const bekle = (ms: number) => new Promise((r) => setTimeout(r, ms));
-    const sonuc: number[] = [];
+    const artislar: number[] = [];
+    const donmalar: { bas: number; son: number }[] = [];
     for (let i = 0; i < 2; i++) {
+      // Donma, model çocuğu havada gördüğü anda başlar (sayıcı "havada") ve çocuk yine havadayken biter: en az 2,5 sn, sonra
+      // çocuğun havada en az 250 ms daha kalacağı ilk an (dönüşteki ilk tanıma da havaya denk gelsin; donma 2,5-3,7 sn).
+      const sayi = kareler.length;
+      const sinir = performance.now() + 30_000;
+      while (!(kareler.length > sayi && kareler[kareler.length - 1][1] === 1) && performance.now() < sinir) await bekle(2);
       const once = s.ziplamaSayisi;
-      const bit = performance.now() + 2_500;
+      const bas = performance.now();
+      let bit = bas + 2_500;
+      while (bit % periyot > periyot / 2 - 250) bit += 10;
       while (performance.now() < bit);
+      donmalar.push({ bas, son: performance.now() });
       await bekle(300);
-      sonuc.push(s.ziplamaSayisi - once);
-      await bekle(1_500);
+      artislar.push(s.ziplamaSayisi - once);
+      if (i === 0) await bekle(1_500);
     }
-    return sonuc;
+    return { artislar, donmalar };
   });
   for (const a of artislar) expect(a).toBeLessThanOrEqual(1);
-  const sonra = await ziplaDurum(page);
-  // Yüklü makinede sahte model saniyede ~2 kez çalışır, benzetimin zıplamalarının çoğunu kaçırır: bekleme uzun.
-  await expect.poll(async () => (await ziplaDurum(page)).kamera, { timeout: 90_000 }).toBeGreaterThan(sonra.kamera);
+  // Sayım gelene ya da model sınırdan fazla zıplama görene kadar (yüklü makinede sahte model saniyede ~2 kez çalışır).
+  const kareler = () => page.evaluate(() => (window as any).benzetim.kareler as ZiplaKaresi[]);
+  await expect.poll(async () => olcumBitti(await kareler(), donmalar[1]), { timeout: 120_000 }).toBe(true);
+  expect(ziplaDonmaHatalari(await kareler(), donmalar)).toEqual([]);
   await expect.poll(async () => { const d = await ziplaDurum(page); return [d.durum, d.ritim]; }, { timeout: 30_000 }).toEqual(['goruyorum', false]);
   expect(k0.hatalar).toEqual([]);
 });

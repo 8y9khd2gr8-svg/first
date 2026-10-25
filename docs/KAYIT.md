@@ -87,12 +87,21 @@ Onay verilmemiş, ertelenmiş ya da reddedilmiş öneriler de buraya yazılır; 
 - `Zıpzıp konuşurken ağzı oynar` testi yerelde yük altında bir kez kırmızı (60 ms aralıklı ölçüm), tek başına geçiyor. CI'da görülmedi.
 - Yavaş telefonda (kare 200 ms'yi aşınca) Phaser oyunun saatini geri bırakır: sayaçlar/süreler uzar (test makinesinde ~12 kare/sn'de 6 sn → 11 sn). Kaybettirmez; büyük aynanın en çok süresi gerçek saatle (#143). 🔎 eski iPhone'da bakılacak.
 - ✅ `ayna sırasında sayfa iki kez 2,5 sn donsa da` testi: kök neden testin kendi sayacının yükte geç tetiklenmesiydi; #170 ile düzeltildi (23 Ekim, ayrıntı günlükte).
-- `Zıpzıp da zıplasın (kamerayla): sayfa iki kez 2,5 sn donsa da` testi yerelde tam pakette kural açık, 3 işçi, yük ~12 iken bir kez kırmızı (19 Ekim; 90 sn içinde kamera sayısı artmadı). Tek başına ve 4 kopya aynı anda (kural açık/kapalı) yeşil, CI'da görülmedi. Sınır gevşetilmedi.
+- ✅ `Zıpzıp da zıplasın (kamerayla): sayfa iki kez 2,5 sn donsa da` testi: kök neden oyunun zıplama sayıcısındaydı (sayfa çocuk havadayken donunca taban havadaki omuzdan alınıyordu); 24 Ekim düzeltildi, ayrıntı günlükte. 🔎 gerçek telefonda/çocukla denenmedi.
 - Ayrıntılı fotoğraf: `docs/rapor-2026-10-12/` (12 Ekim anlık görüntüsü).
 
 ---
 
 ## 4. Oturum günlüğü (en yeni üstte)
+
+### 24 Ekim 2026 — iPhone test listesi, zıplama sayıcısı düzeltmesi (oturum session_01BSjsrAs7SFa81yh5MwgEuF)
+**Doğrulama (GitHub):** main = 385bcbf, açık PR sadece #157 (dokunulmadı). session_01VkHvyQixVxqEbzcboLGEU7 arşivlendi.
+**iPhone test listesi:** `docs/telefon-kontrol-listesi.md` "Sürpriz Donma, Pamukkale, Truva (24 Ekim)" (D1-D7, P1, T1-T2, Z1, Yağız gözlemi, 4-5/8-9 yaş). Hiçbiri telefonda denenmedi.
+**Zıplama sayıcısı (kullanıcı onayıyla; önce ölçüm, sonra oyun düzeltmesi, kullanıcı "sayıcıyı düzelt" seçti):**
+- Ölçüm (sayfa içi kayıt, yük altında): bir çalıştırmada donmadan sonra ilk sayım 88,2 sn'de (sınır 90 sn); model 143 tanımanın 73'ünde çocuğu havada gördü ama sayılmadı. Kök neden: ikinci donma çocuk havadayken başlayıp havadayken bitince takılma koruması (1 sn'den uzun havada) tabanı **havadaki** omuza koyuyordu; zıplamayı sürdüren çocukta taban zıplamanın ortasına oturuyor, sayım uzun süre (yapay noktalarla 4 tanıma/sn'de hiç) gelmiyordu. Aynısı kamera çocuk havadayken açılınca da (taban ilk kareden). İkinci zayıflık: kalkış karesi tabana karışıyordu, seyrek tanımada taban her zıplamada yükseliyordu.
+- Düzeltme (`src/kamera.ts`, sadece zıpla yolu, eşikler aynı): taban ilk karede ve takılmadan sonra en az 1,2 sn **ve** en az 4 kare boyunca görülen en alçak omuz (ZIPLAMA_TABAN_OLCUM_MS/_KARE); karar tabanın önceki değeriyle, taban sadece yerdeki karelerle güncellenir. İlk hâli (sadece 1,2 sn) ek yükte 16'da 3 kırmızıydı: ~1 sn'de bir tanımada pencereye tek havadaki kare düşüyordu; o kayıt birim testine aynen kondu.
+- Testler: `tests/kamera.test.ts` 3 yeni (havadayken donma; kamera havadayken açılır; 5 tanıma hızı/hava oranı; yükte kaydedilen seyrek sıra): main'deki kodda 3'ü de kırmızı (ilk sayım 5,5 sn), yeni kodda 22/22 yeşil. Benzetim testi: 90 sn bekleme yerine kural `tests/ziplaDonmaKurali.ts` (donmadan sonra model en çok 3 tam zıplama gördükten sonra sayım olmalı; süre değil görülen zıplama sayılır) + `tests/zipla-donma.test.ts` 5 kural testi; donma artık model çocuğu havada görünce başlar, çocuk havadayken biter (denenen yol garanti). Eski sayıcıyla 8/8 kırmızı ("model 4-5 zıplama gördü, hiçbiri sayılmadı"); yeni kodla 3 işçide 8/8, ek işlemci yüküyle (yük ~14) 3 işçide 16/16 + 16/16 yeşil; bütün kamera benzetim testleri ve `npm test` sonuçları PR'da.
+- 🔎 Gerçek telefonda/çocukla denenmedi; yeni risk (🔎): kamera açılınca ilk 1,2 sn'de tek bir çok hatalı omuz noktası tabanı bozarsa sayım ~1 sn takılır (takılma koruması düzeltir).
 
 ### 23 Ekim 2026 — Durum raporu
 **Doğrulama (GitHub):** main = 4200d7f, "Oyunu yayınla" başarılı (22 Ekim 12:47). Açık PR: #164, #165 (taslak, onay bekliyor), #157 (K49). session_01YW9mUp3gTq4B1yZxpbmVgy arşivlendi.
