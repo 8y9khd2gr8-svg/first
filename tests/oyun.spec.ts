@@ -1,4 +1,6 @@
 import { expect, Page, test } from '@playwright/test';
+import { ISINMALAR } from '../src/hareketler';
+import { KAMERA_HAREKETLERI } from '../src/kamera';
 
 // Oyunun ekranlarını gerçek tarayıcıda açar: hata çıkmamalı, oyun hiçbir dış sunucuya bağlanmamalı.
 // Sahneler window.oyun üzerinden başlatılır (sadece geliştirme sürümünde vardır).
@@ -1823,11 +1825,26 @@ test('yavaş telefon (T7): kameralı hareket ekranı işlemci 6 kat yavaşken de
   test.setTimeout(180_000);
   await sahteKamera(page);
   const kayit = await oyunuAc(page, { 'zipzip-kamera-v1': '1', 'zipzip-uzaktan-v1': '1' });
-  let adim = 0;
-  for (; adim < 8; adim++) {
-    await sahneAc(page, 'Hareket', { durakId: 'istanbul', adim });
-    if (await page.evaluate(() => !!(window as any).oyun.scene.getScene('Hareket').kamera)) break;
-  }
+  // Denenen hareket hareket listesinden seçilir: İstanbul'un kendi hareketlerinden kameralı ilki (oturum başındaki ısınma rastgele,
+  // atlanır). Eskiden adımlar sırayla açılıp 700 ms sonra kameraya bakılıyordu: rastgele ısınma bazen kameralıydı bazen değil,
+  // yüklü makinede ekran henüz kurulmamış oluyordu ve aynı sahne aynı anda durdurulup başlatılınca kapanıyordu; test her
+  // seferinde başka (bazen çok uzun) bir hareket deneyip 150 sn'yi aşıyordu (25 Ekim ölçümü; #162 ve #172'de kırmızı).
+  await sahneAc(page, 'Hareket', { durakId: 'istanbul', adim: 0 });
+  const liste: { animasyon: string; sesli: string; sayi: boolean; dizi: boolean }[] = await page.evaluate(() =>
+    (window as any).oyun.scene.getScene('Hareket').liste().map((h: any) => ({ animasyon: h.animasyon, sesli: h.sesli, sayi: h.tur === 'sayi', dizi: !!h.dizi })),
+  );
+  const ilk = ISINMALAR.some((h) => h.sesli === liste[0].sesli) ? 1 : 0;
+  const adim = liste.findIndex((h, i) => i >= ilk && h.sayi && !h.dizi && KAMERA_HAREKETLERI.includes(h.animasyon as never));
+  expect(adim, 'İstanbul\'da kameralı hareket olmalı').toBeGreaterThan(0);
+  // Çalışan sahne aynı anda durdurulup başlatılırsa kapanır: yeniden başlatılır (hareket listesi aynı kalır).
+  await page.evaluate((adim) => (window as any).oyun.scene.getScene('Hareket').scene.restart({ durakId: 'istanbul', adim }), adim);
+  await page.waitForFunction((adim) => {
+    const s = (window as any).oyun.scene.getScene('Hareket');
+    return s.sys.isActive() && s.adim === adim && !!s.kamera;
+  }, adim, { timeout: 30_000 });
+  // Hareketin aşamaları oyunun saatiyle sürer (yanAdim: 6 kat yavaşta tek başına ~1 dk, yüklü makinede 150 sn'yi aşıyor):
+  // "düşük güç modu (T5)" testindeki gibi saat 4 kat hızlı. İşlemci yine 6 kat yavaş; büyük aynanın sınırı gerçek saatle.
+  await saatiHizlandir(page, 4);
   const cdp = await page.context().newCDPSession(page);
   await cdp.send('Emulation.setCPUThrottlingRate', { rate: 6 });
   await page.waitForFunction((adim) => (window as any).oyun.scene.getScene('Hareket').adim > adim, adim, { timeout: 150_000, polling: 1000 });
