@@ -1,0 +1,38 @@
+Zıp Zıp Dünya — Claude Code eklentileri: değerlendirme ve soru (25 Ekim 2026)
+
+BAĞLAM
+- 4-9 yaş için reklamsız, Türkçe hareket oyunu (Phaser + TypeScript, PWA; beta Kasım, mağaza Ocak sonu).
+- Kodu Claude Code yazıyor; bulut oturumunda çalışıyor. Proje sahibi yazılım bilmiyor, sadece iPhone kullanıyor.
+- Kurallar: kota tasarrufu; oyun hiçbir dış sunucuya bağlanmaz; çocuktan veri toplanmaz; onaysız birleştirme yok.
+- Şu anki darboğaz kod yazmak değil: gerçek iPhone testi, Yağız (6 yaş) testi, hesaplar/başvurular.
+
+TEMEL KURAL
+- Her eklenti (özellikle MCP sunucusu) her mesajda bağlamdan pay alır: çok eklenti = çok kota.
+- Eklenti, Claude ile aynı yetkiyle depoda ve GitHub hesabında çalışır: bilinmeyen kod = güvenlik riski.
+
+DEĞERLENDİRİLENLER VE KARARLAR
+1) Ruflo (eski adı Claude Flow) — çok ajanlı orkestrasyon. KARAR: şimdi kurulmaz (K53).
+   Neden: aynı anda çok ajan = çok kota; bağımsız bir incelemede bazı temel özelliklerinin çalışmadığı yazılmış;
+   çok sık sürüm; geniş yetki. Mağaza sonrası, iş büyür ve kota yükseltilirse yeniden bakılır.
+2) Context7 (Upstash, MCP) — Phaser/Vite/Capacitor'ın güncel belgelerini getirir. KARAR: kurulacak (seçildi).
+   Engel: bulut ortamının ağ ayarı mcp.context7.com'u engelliyor; proje sahibi izin verince kurulacak.
+   Not: sadece belge sorguları Upstash'e gider (oyun ve kod gitmez); sadece geliştirmede kullanılır.
+3) Lighthouse CI (Google) — her PR'da hız/erişilebilirlik ölçümü. KARAR: denendi, bırakıldı.
+   Neden: oyun tek bir çizim alanı (canvas); Lighthouse ana içeriği bulamıyor, hız puanı 0 (ölçülemiyor).
+   Elde kalan: ilk görüntü 3,1 sn, indirme 456 KB, erişilebilirlik 76, iyi uygulamalar 100 (telefon taklidi).
+   Projede zaten açılış ölçümü var (scripts/acilis-olc.mjs).
+4) Serena (MCP) — kodu fonksiyon fonksiyon okur, büyük dosyalarda kota azaltabilir. KARAR: sonra (kurulumu zahmetli).
+5) Playwright MCP, Superpowers, Anthropic skills, ccusage — KARAR: gerek yok (zaten var ya da kota artırır).
+6) Sosyal medya videosundaki 4 eklenti (Ponytail, Graphify, Agent Skills, Claudex Loop) — KARAR: kurulmadı.
+   Neden: kim yazdı/ne yapıyor/güvenli mi doğrulanmadı; "loop" türü kendi kendine döngüde çalışıp kotayı en hızlı yer;
+   ihtiyacımızı karşılamıyor.
+
+DOĞRULANMAYANLAR (🔎)
+- Yıldız/kurulum sayıları doğrulanmadı (aramada güncel sayı çıkmadı; videodaki sayılar kanıt değil).
+- Context7 bulut ortamında henüz çalıştırılmadı (ağ izni yok).
+
+CHATGPT'YE SORU
+Yukarıdaki kısıtlarla (kota tasarrufu, çocuk oyunu güvenliği, iPhone'dan yönetilen bulut oturumu, Kasım betası):
+1) Bu kararlara katılıyor musun? Atladığımız, gerçekten işe yarayacak ve kotayı az yiyen bir araç var mı?
+2) Context7 için ağ izni vermek güvenli ve mantıklı mı?
+3) Bir aracı kurmadan önce hangi 3-4 şeye bakmalıyız (lisans, son güncelleme, istediği yetkiler, ...)?
