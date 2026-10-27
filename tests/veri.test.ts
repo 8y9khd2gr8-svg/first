@@ -159,6 +159,14 @@ test('iPhone ve Android sürüm numarası package.json ile aynı (npm run magaza
   assert.match(fs.readFileSync('android/app/build.gradle', 'utf8'), /package\.json"\)\)\.version/);
 });
 
+test('mağaza paketleri ödeme kilitli derlenir (K50), test sitesi ödemesiz', () => {
+  const betikler = JSON.parse(fs.readFileSync('package.json', 'utf8')).scripts;
+  assert.match(betikler.magaza, /npm run build -- --mode magaza/, 'npm run magaza mağaza işaretiyle derlemeli');
+  assert.match(fs.readFileSync('.github/workflows/ios-derleme.yml', 'utf8'), /npm run (build -- --mode magaza|magaza)/);
+  for (const f of ['android-apk.yml', 'android-play.yml']) assert.match(fs.readFileSync(`.github/workflows/${f}`, 'utf8'), /npm run magaza/, f);
+  assert.doesNotMatch(fs.readFileSync('.github/workflows/yayinla.yml', 'utf8'), /--mode magaza|npm run magaza/);
+});
+
 test('oyun kodunda dış sunucu adresi yok', () => {
   for (const f of dosyalar('src')) {
     const kod = fs.readFileSync(f, 'utf8');

@@ -266,6 +266,7 @@ Teknoloji: Phaser 3 + TypeScript + Vite, GitHub Pages ile yayın. İleride Capac
 - Kodda isimler ve yorumlar Türkçe.
 - Kota: plan yükseltilmeden tasarruflu çalışılır (yarıyıl öncesi belki yükseltilir). Uzun sohbet
   yerine iş listesi bitince yeni sohbet; istekler toplu; uygun olunca sabah otomatik başlangıç.
+  25 Ekim: kota her zaman düşünülür; kısa cevap; rapor sadece istenince ya da gerçekten gerekince; gereksiz test/okuma yok; eklenti kurulmaz.
 - "Yeni oturuma geçelim" denildiğinde: önce iş seçenekleri (tablo + AskUserQuestion, çoklu seçim), sonra Claude yeni oturumu
   kendisi açar (claude-code-remote create_session; ilk mesaj hazır: CLAUDE.md'yi ve docs/KAYIT.md'yi oku, son durum, seçilen işler, "onaylı,
   sormadan yap; testler geçince PR'ı birleştir (K35); büyük ürün kararlarını sabaha bırak"). Önce açık PR
