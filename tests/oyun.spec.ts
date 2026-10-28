@@ -479,6 +479,31 @@ test('Zıpla-aç-kapa: Zıpzıp yere basar, havada asılı kalmaz; aynada da say
   expect(kayit.hatalar).toEqual([]);
 });
 
+// Kapadokya (28 Ekim, kullanıcı A'yı seçti): peri bacaları ve iki balon sadece Kapadokya'da, Zıpzıp/sayı/bilgi önde; başka durakta yok.
+test('Kapadokya hareket ekranı: manzara sadece Kapadokya\'da ve arkada kalır', async ({ page }) => {
+  const kayit = await oyunuAc(page);
+  const bak = (durakId: string) =>
+    page.evaluate(async (durakId) => {
+      const oyun = (window as any).oyun;
+      oyun.scene.getScenes(true).forEach((x: any) => x.scene.stop());
+      oyun.scene.start('Hareket', { durakId, adim: 1 });
+      await new Promise((r) => setTimeout(r, 800));
+      const s = oyun.scene.getScene('Hareket');
+      const liste = s.children.list;
+      const m = s.children.getByName('kapadokyaManzarasi');
+      return { m: m ? liste.indexOf(m) : -1, sur: !!s.children.getByName('truvaSuru'), on: [s.zipzip, s.sayac, s.bilgi].map((o: any) => liste.indexOf(o)) };
+    }, durakId);
+  const k = await bak('kapadokya');
+  expect(k.m).toBeGreaterThanOrEqual(0);
+  expect(k.sur).toBe(false);
+  for (const i of k.on) expect(i).toBeGreaterThan(k.m);
+  for (const id of ['istanbul', 'truva', 'pamukkale', 'nemrut', 'efes']) expect((await bak(id)).m, id).toBe(-1);
+  expect((await bak('truva')).sur).toBe(true);
+  await bak('kapadokya');
+  await page.screenshot({ path: 'test-results/kapadokya-hareket.png' });
+  expect(kayit.hatalar).toEqual([]);
+});
+
 // iPhone denemesi (20 Ekim, bulgu 3): Truva'da "surlar" sadece yazıydı. Kullanıcı B'yi seçti: hareket ekranlarının altında
 // mazgallı taş sur ve kemerli kapı, Zıpzıp surun üstünde. Sadece görüntü: Zıpzıp, sayı, "Yaptım!" ve kamera kutusu önde kalır.
 test('Truva hareket ekranı: altta sur, Zıpzıp surun üstünde; sayı, "Yaptım!" ve kamera kutusu örtülmez', async ({ page }) => {
@@ -617,7 +642,7 @@ test('yazılar okunur (renk zıtlığı)', async ({ page }) => {
   test.setTimeout(180_000);
   const kayit = await oyunuAc(page, { ...BETA, 'zipzip-ilerleme-v1': JSON.stringify(['istanbul', 'truva']), 'zipzip-pasaport-v1': JSON.stringify({ ad: '', avatar: '🐼', soruldu: true }) }, '/?odeme=deneme&bolumler=hepsi');
   const sahneler: [string, object][] = [
-    ['Acilis', {}], ['Macera', {}], ['Harita', {}], ['Dunya', {}], ['Uzay', {}], ['Spor', {}], ['Okyanus', {}], ['Durak', { durakId: 'efes' }], ['Hareket', { durakId: 'istanbul', adim: 1 }], ['Hareket', { durakId: 'truva', adim: 1 }],
+    ['Acilis', {}], ['Macera', {}], ['Harita', {}], ['Dunya', {}], ['Uzay', {}], ['Spor', {}], ['Okyanus', {}], ['Durak', { durakId: 'efes' }], ['Hareket', { durakId: 'istanbul', adim: 1 }], ['Hareket', { durakId: 'truva', adim: 1 }], ['Hareket', { durakId: 'kapadokya', adim: 1 }],
     ['Pasaport', {}], ['Rozet', { sayfa: 1 }], ['Kostum', {}], ['Avatar', {}], ['Guvenlik', {}], ['Ebeveyn', { hedef: 'EbeveynMenu', geri: 'Pasaport' }],
     ['EbeveynMenu', {}], ['EbeveynVeri', {}], ['EbeveynRehber', {}], ['EbeveynAyar', {}], ['EbeveynSes', {}], ['EbeveynKamera', {}], ['ZiplaDeneme', {}], ['EbeveynOzet', {}], ['PasaportAyar', {}], ['TamSurum', {}], ['Sertifika', { bolum: 'turkiye' }],
   ];

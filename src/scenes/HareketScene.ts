@@ -49,6 +49,32 @@ function truvaSuru(sahne: Phaser.Scene) {
   g.fillStyle(0xffc93c).fillTriangle(672, 808, 710, 820, 672, 834).lineStyle(4, cizgi).strokeTriangle(672, 808, 710, 820, 672, 834);
 }
 
+
+// Kapadokya manzarası (28 Ekim, kullanıcı A'yı seçti): altta kum ve dört peri bacası, iki yanda iki küçük balon.
+// Sadece görüntü, sabit çizim; ortası (Zıpzıp ve çocuğun hareket alanı) boş kalır, yazılar ve kamera kutusu önde.
+function periBacasi(g: Phaser.GameObjects.Graphics, x: number, taban: number, boy: number, en: number) {
+  const cizgi = 0x14213d;
+  const govde = [{ x: x - en / 2, y: taban }, { x: x - en * 0.28, y: taban - boy }, { x: x + en * 0.28, y: taban - boy }, { x: x + en / 2, y: taban }];
+  g.fillStyle(0xe8b88a).fillPoints(govde, true).lineStyle(6, cizgi).strokePoints(govde, true);
+  const sapka = new Phaser.Curves.QuadraticBezier(new Phaser.Math.Vector2(x - en * 0.42, taban - boy + 4), new Phaser.Math.Vector2(x, taban - boy - en * 0.55), new Phaser.Math.Vector2(x + en * 0.42, taban - boy + 4)).getPoints(16);
+  g.fillStyle(0xb07d4f).fillPoints(sapka, true).lineStyle(6, cizgi).strokePoints(sapka, true);
+  g.fillStyle(0x6b4226).fillEllipse(x, taban - boy * 0.45, en * 0.16, en * 0.22);
+}
+function balon(g: Phaser.GameObjects.Graphics, x: number, y: number, r: number, renk: number) {
+  const cizgi = 0x14213d;
+  g.lineStyle(4, cizgi).lineBetween(x - r * 0.45, y + r * 0.9, x - r * 0.22, y + r * 1.45).lineBetween(x + r * 0.45, y + r * 0.9, x + r * 0.22, y + r * 1.45);
+  g.fillStyle(renk).fillEllipse(x, y, r * 2, r * 2.2).lineStyle(5, cizgi).strokeEllipse(x, y, r * 2, r * 2.2);
+  g.fillStyle(0xffc93c).fillEllipse(x, y, r * 0.7, r * 2.2).lineStyle(4, cizgi).strokeEllipse(x, y, r * 0.7, r * 2.2);
+  g.fillStyle(0x8a5a36).fillRect(x - r * 0.28, y + r * 1.45, r * 0.56, r * 0.4).lineStyle(4, cizgi).strokeRect(x - r * 0.28, y + r * 1.45, r * 0.56, r * 0.4);
+}
+function kapadokyaManzarasi(sahne: Phaser.Scene) {
+  const g = sahne.add.graphics().setName('kapadokyaManzarasi');
+  g.fillStyle(0xd9a46e).fillRect(-8, 1120, 736, 56).lineStyle(6, 0x14213d).strokeRect(-8, 1120, 736, 56);
+  for (const [x, boy, en] of [[40, 230, 110], [140, 160, 90], [585, 170, 95], [680, 250, 115]]) periBacasi(g, x, 1124, boy, en);
+  balon(g, 66, 560, 34, 0xff6b6b);
+  balon(g, 655, 640, 34, 0x4cc9f0);
+}
+
 // Kamera kutusunun üç hâli (tuval noktası; K40 "önce büyük ayna"):
 // ayna: geri sayımdan önce ekranın yarısına yakın canlı görüntü, çocuk 2-3 m uzaktan kendini görüp kadraja yerleşir.
 // hareket: gösterim ve hareket boyunca sağ altta (eski küçük kutunun ~3 katı), sayı büyük; sayı ve yazı biraz sola kayar.
@@ -120,6 +146,7 @@ export class HareketScene extends Phaser.Scene {
     this.donuk = false;
     yildizliArkaPlan(this);
     if (this.durakId === 'truva') truvaSuru(this);
+    if (this.durakId === 'kapadokya') kapadokyaManzarasi(this);
     const x = this.scale.gameSize.width / 2;
     // Liste adım başında bir kez alınır: "Yaptım!"dan sonra yeniden kurulursa ısınma düşer ve sıradaki (özel) hareket atlanırdı.
     this.oturum = oturumListesi(this.durakId, this.adim);
