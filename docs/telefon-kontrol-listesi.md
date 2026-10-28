@@ -158,6 +158,18 @@ bölümler ödemesiz açık.
 **19 Ekim akşamı:** Android test cihazı şimdilik yok; A-K1…A-K6 denenmedi. **iPhone:** test sitesi sadece main'den yayınlanır;
 #157 main'e girmeden Safari'de yapılan deneme K47'yi kapsamaz.
 
+### 28 Ekim güncellemesi: #157 için gerçek telefon planı (K50 birleştikten sonra)
+Kullanıcı kararı (28 Ekim): #157'ye dokunulmaz; gerçek telefon testi ayrı planla yapılır. Sıra yukarıdaki K49 adımlarıyla aynı, değişenler:
+1. **K50'nin etkisi:** #174'ten sonra mağaza paketinde köprü eksikse "📲 Telefona yükle" **görünmez** ve bölümler ödemesiz açılmaz
+   (ödeme kilitli kalır). Yani A-K5'teki "📲 Telefona yükle" belirtisi sadece K50'den önceki paketlerde işe yarar.
+   `k47-csp` dalı K50'den eski olduğu için oradan üretilen deneme APK'sında bu belirti **hâlâ geçerli**; dal güncellenmeden denenirse plan aynen uygulanır.
+2. K50'li bir pakette köprünün çalıştığını gösteren belirtiler: Zıpzıp konuşur (A-K2), ekran kararmaz (A-K3). Deneme APK'sı Play'den
+   gelmediği için fiyat görünmemesi köprü eksikliği sayılmaz.
+3. `k47-csp`'yi güncel main ile birleştirmek #157'ye dokunmaktır: **ayrıca kullanıcı onayı** ister (28 Ekim kararı).
+4. Önce gereken: Android telefon (bulunamazsa KAYIT'a "bulunamadı", hiçbir madde denenmiş sayılmaz). iPhone maddeleri (I-K1…I-K6)
+   kural test sitesine çıkmadan denenemez; çıkması #157'nin birleşmesi demektir, o da Android sonucundan sonra ayrı onayla.
+5. 🔎 Öneri (karar bekliyor, kod yok): ebeveyn köşesinin altına "Uygulama bağlantısı: var/yok" tanı satırı; telefon testinde köprüyü tek bakışta gösterir.
+
 ### Sonuç kaydı (telefonda doldurulur; Claude doldurmaz)
 
 ```
