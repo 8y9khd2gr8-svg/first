@@ -9,7 +9,7 @@ import { kameraAcikMi } from '../kamera';
 import { KOSTUMLER, seciliKostum } from '../kostumler';
 import { pasaportOku } from '../pasaport';
 import { kazanilanlar } from '../rozetler';
-import { odemeKipi, tamSurumVarMi } from '../satinAlma';
+import { iadeDenetimiSuruyor, odemeKipi, tamSurumVarMi } from '../satinAlma';
 
 // "Bu telefonda neler var?": oyunun bu telefonda sakladığı her şey, ebeveynin kendi gözüyle görmesi için.
 // "Bilgiler sadece bu telefonda" sözünü kanıta çevirir: liste + uçak moduyla kendin dene.
@@ -38,7 +38,7 @@ export class EbeveynVeriScene extends Phaser.Scene {
       ['Kamerayla sayma', kameraAcikMi() ? 'açık (görüntü kaydedilmez)' : 'kapalı'],
       ['Uzaktan oyna', uzaktanAcikMi() ? 'açık' : 'kapalı'],
       ['Tempo · oturarak', `${{ kucuk: 'sakin', buyuk: 'normal', hizli: 'hızlı' }[oyunAyari().yas]} · ${oyunAyari().oturarak ? 'açık' : 'kapalı'}`],
-      ...(odemeKipi() === 'web' ? [] : [['Tam sürüm', tamSurumVarMi() ? 'alındı' : 'alınmadı'] as [string, string]]),
+      ...(odemeKipi() === 'web' ? [] : [['Tam sürüm', tamSurumVarMi() ? (iadeDenetimiSuruyor() ? 'alındı (mağazaya soruluyor)' : 'alındı') : 'alınmadı'] as [string, string]]),
       ['Güvenlik notu · beta', `${guvenlikNotuGoruldu() ? 'okundu' : 'okunmadı'} · ${betaDunyaAcikMi() ? 'bölümler açık' : 'kapalı'}`],
     ];
     // Satırlar sıkı: en kalabalık hâlde (uygulamada "Tam sürüm" satırıyla) alttaki yazılar "Tamam"ın altında kalmasın.

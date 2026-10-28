@@ -240,6 +240,71 @@ test('mağaza paketinde köprü yoksa ödeme kilidi açılmaz (K50)', async () =
   }
 });
 
+// K48: iade edilen tam sürüm kapanır; tek bir hatalı mağaza cevabı ödeyen aileyi kilitlemez.
+test('iade edilen tam sürüm kapanır, hatalı cevap kilitlemez (K48)', async () => {
+  const { magazayaSor, tamSurumVarMi, IADE_BEKLEME_MS } = await import('../src/satinAlma');
+  (globalThis as any).location = { search: '?odeme=deneme' };
+  const sahte = (satinAlimlar: object[], urunVar = true) =>
+    ({
+      PURCHASE_TYPE: { INAPP: 'inapp' },
+      NativePurchases: {
+        getPurchases: async () => ({ purchases: satinAlimlar }),
+        getProducts: async () => ({ products: urunVar ? [{ identifier: 'tam_surum' }] : [] }),
+        acknowledgePurchase: async () => undefined,
+      },
+    }) as any;
+  const gecerli = { productIdentifier: 'tam_surum', purchaseState: '1' };
+  const gun = IADE_BEKLEME_MS;
+  try {
+    // iPhone: Apple'ın iade kaydı → hemen kapanır; hiç işlem yok → değişmez
+    depo.set('zipzip-tam-surum-v1', '1');
+    assert.equal(await magazayaSor(sahte([]), 'ios', 0), false);
+    assert.equal(tamSurumVarMi(), true, 'iPhone, boş liste: açık kalır');
+    assert.equal(await magazayaSor(sahte([{ productIdentifier: 'tam_surum', revocationDate: '2026-10-28T00:00:00Z' }]), 'ios', 0), false);
+    assert.equal(tamSurumVarMi(), false, 'iPhone, iade kaydı: kapanır');
+    // iPhone: iade edilmiş eski işlem + geçerli yeni işlem → açık
+    assert.equal(await magazayaSor(sahte([{ productIdentifier: 'tam_surum', revocationDate: 'x' }, gecerli]), 'ios', 0), true);
+    assert.equal(tamSurumVarMi(), true);
+
+    // Android: Play'e ulaşılamadı (ürün bilgisi yok) → hiç sayılmaz
+    for (let i = 0; i < 3; i++) await magazayaSor(sahte([], false), 'android', i * 2 * gun);
+    assert.equal(tamSurumVarMi(), true, 'bağlantı yokken açık kalır');
+    assert.equal(depo.has('zipzip-tam-surum-kontrol-v1'), false);
+    // Android: ilk "yok" sadece yazılır; 24 saatten önce ikinci "yok" kapatmaz; 24 saat sonra kapatır
+    await magazayaSor(sahte([]), 'android', 1000);
+    assert.equal(tamSurumVarMi(), true, 'tek yok: açık');
+    await magazayaSor(sahte([]), 'android', 1000 + gun - 1);
+    assert.equal(tamSurumVarMi(), true, '24 saatten önce: açık');
+    await magazayaSor(sahte([]), 'android', 1000 + gun);
+    assert.equal(tamSurumVarMi(), false, '24 saat arayla iki yok: kapanır');
+    assert.equal(depo.has('zipzip-tam-surum-kontrol-v1'), false, 'sayaç da silinir');
+    // Android: arada "var" görülürse sayaç sıfırlanır
+    depo.set('zipzip-tam-surum-v1', '1');
+    await magazayaSor(sahte([]), 'android', 0);
+    assert.equal(await magazayaSor(sahte([gecerli]), 'android', gun / 2), true);
+    await magazayaSor(sahte([]), 'android', gun + 1);
+    assert.equal(tamSurumVarMi(), true, 'var görüldükten sonraki ilk yok: açık');
+    // Android: onay bekleyen ödeme hiçbir şeyi değiştirmez
+    depo.delete('zipzip-tam-surum-kontrol-v1');
+    await magazayaSor(sahte([{ productIdentifier: 'tam_surum', purchaseState: '2' }]), 'android', 0);
+    await magazayaSor(sahte([{ productIdentifier: 'tam_surum', purchaseState: '2' }]), 'android', 3 * gun);
+    assert.equal(tamSurumVarMi(), true, 'bekleyen ödeme: açık');
+    // Saat geri alınmışsa (ilk yok gelecekte) kapanmaz, yeniden başlar
+    depo.set('zipzip-tam-surum-kontrol-v1', String(10 * gun));
+    await magazayaSor(sahte([]), 'android', 0);
+    assert.equal(tamSurumVarMi(), true, 'saat geri: açık');
+    // Hiç almamış telefonda kayıt yazılmaz
+    depo.delete('zipzip-tam-surum-v1');
+    depo.delete('zipzip-tam-surum-kontrol-v1');
+    await magazayaSor(sahte([]), 'android', 0);
+    assert.equal(depo.has('zipzip-tam-surum-kontrol-v1'), false, 'almamış telefonda sayaç yok');
+  } finally {
+    depo.delete('zipzip-tam-surum-v1');
+    depo.delete('zipzip-tam-surum-kontrol-v1');
+    delete (globalThis as any).location;
+  }
+});
+
 // Açık/kapalı kayıtları (kamera, tam sürüm, beta; uzaktan oyna Phaser'a bağlı olduğu için oyun.spec.ts'de) sadece tam "1" ile açık sayılır; bozuk/eski değer kapalıdır
 // ve hiçbir okuma kaydı değiştirmez (18 Ekim denetimi: hata yoktu, davranış sabitlendi). Tam sürüm kapalı sayılınca
 // mağazadan açılışta yeniden sorulur; test sitesinde (web) zaten ödeme yok.

@@ -1,6 +1,6 @@
 # K48 — İade edilen tam sürüm: karar ve teknik tasarım (28 Ekim 2026)
 
-Durum: **tasarım, kod yazılmadı.** Karar kullanıcıda (aşağıdaki seçenekler). Hiçbiri gerçek mağazada/telefonda denenmedi.
+Durum: **28 Ekim kullanıcı A'yı seçti; kodlandı** (`src/satinAlma.ts magazayaSor`, test `tests/kayit.test.ts`). Hiçbiri gerçek mağazada/telefonda denenmedi.
 
 ## 1. Bugün ne oluyor (koddan, `src/satinAlma.ts`)
 - Satın alınca ya da mağaza "alınmış" deyince cihaza `zipzip-tam-surum-v1 = 1` yazılır.

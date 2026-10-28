@@ -10,6 +10,10 @@ import { Capacitor } from '@capacitor/core';
 // Mağazada (Play Console / App Store Connect) bu kimlikle "tüketilmeyen" ürün tanımlanır.
 export const URUN_KIMLIGI = 'tam_surum';
 const ANAHTAR = 'zipzip-tam-surum-v1';
+// İade denetimi (K48, Android): mağazanın "satın alım yok" dediği ilk anın zamanı (sadece sayı). Bkz. magazayaSor.
+const KONTROL_ANAHTARI = 'zipzip-tam-surum-kontrol-v1';
+// Android'de iki "yok" cevabı arasında en az bu kadar süre olmalı (tek bir hatalı cevap ödeyen aileyi kilitlemesin).
+export const IADE_BEKLEME_MS = 24 * 60 * 60 * 1000;
 
 // magaza: mağazadan indirilen uygulama (gerçek ödeme).
 // deneme: tarayıcıda adres sonunda ?odeme=deneme varsa sahte mağaza (ekranları denemek ve testler için).
@@ -43,8 +47,42 @@ export function tamSurumVarMi(): boolean {
 function kaydet() {
   try {
     localStorage.setItem(ANAHTAR, '1');
+    localStorage.removeItem(KONTROL_ANAHTARI);
   } catch {
     // Kayıt olmasa da açılışta mağazaya sorulunca yine açılır.
+  }
+}
+
+// İade edilen tam sürüm kapanır (K48). İlerleme, damga, rozet ve kostüm silinmez; sadece ücretli bölümler yeniden kilitlenir.
+function kapat() {
+  try {
+    localStorage.removeItem(ANAHTAR);
+    localStorage.removeItem(KONTROL_ANAHTARI);
+  } catch {
+    // Silinemezse tam sürüm açık kalır (ödeyen aile kilitlenmesin diye güvenli taraf).
+  }
+}
+
+// Android'de mağaza "yok" dedi: ilk seferde sadece zamanı yazılır, en az 24 saat sonraki ikinci "yok"ta kapanır.
+function yokCevabi(simdi: number) {
+  try {
+    const ilk = Number(localStorage.getItem(KONTROL_ANAHTARI));
+    if (Number.isFinite(ilk) && ilk > 0 && ilk <= simdi) {
+      if (simdi - ilk >= IADE_BEKLEME_MS) kapat();
+      return;
+    }
+    localStorage.setItem(KONTROL_ANAHTARI, String(simdi));
+  } catch {
+    // Kayıt yazılamazsa hiçbir şey kapanmaz.
+  }
+}
+
+// Ebeveyn köşesinde "Bu telefonda neler var?" için: iade denetimi başladı mı?
+export function iadeDenetimiSuruyor(): boolean {
+  try {
+    return localStorage.getItem(KONTROL_ANAHTARI) !== null;
+  } catch {
+    return false;
   }
 }
 
@@ -86,20 +124,40 @@ export async function satinAl(): Promise<SatinAlmaSonucu> {
   }
 }
 
-// Velinin mağaza hesabındaki satın alımlarda tam sürüm var mı? Varsa kaydeder.
+type Eklenti = Awaited<ReturnType<typeof eklenti>>;
+
+// Velinin mağaza hesabındaki satın alımlarda tam sürüm var mı? Varsa kaydeder. true: tam sürüm bulundu.
 // Android'de onayı sonradan gelen (bekleyen) ödeme burada onaylanır; onaylanmazsa Google 3 gün sonra iade eder.
-async function magazayaSor(): Promise<boolean> {
-  const { NativePurchases, PURCHASE_TYPE } = await eklenti();
+// İade (K48, docs/k48-iade-tasarimi.md), sadece daha önce tam sürüm kaydı olan telefonda:
+// - iPhone: Apple'ın imzaladığı işlem iade tarihiyle (revocationDate) gelirse ve geçerli başka işlem yoksa hemen kapanır.
+//   Hiç işlem gelmezse (ör. Apple hesabı açık değil) hiçbir şey değişmez.
+// - Android: iade edilen satın alım listeden kaybolur ama eklenti sorgu hatasını da boş liste olarak döndürür. Bu yüzden
+//   "yok" sadece aynı anda ürün bilgisi de gelmişse (Play'e ulaşıldı) sayılır ve 24 saat arayla ikinci kez görülünce kapanır.
+//   Arada "var" görülürse sayaç silinir. Onay bekleyen ödeme ("2") hiçbir şeyi değiştirmez.
+export async function magazayaSor(
+  e?: Eklenti,
+  platform: string = Capacitor.getPlatform(),
+  simdi: number = Date.now(),
+): Promise<boolean> {
+  const { NativePurchases, PURCHASE_TYPE } = e ?? (await eklenti());
   const { purchases } = await NativePurchases.getPurchases({ productType: PURCHASE_TYPE.INAPP });
-  const alinan = purchases.find(
-    (p) => p.productIdentifier === URUN_KIMLIGI && !p.revocationDate && (p.purchaseState === undefined || p.purchaseState === '1'),
-  );
-  if (!alinan) return false;
-  if (alinan.isAcknowledged === false && alinan.purchaseToken) {
-    await NativePurchases.acknowledgePurchase({ purchaseToken: alinan.purchaseToken }).catch(() => undefined);
+  const bizim = purchases.filter((p) => p.productIdentifier === URUN_KIMLIGI);
+  const alinan = bizim.find((p) => !p.revocationDate && (p.purchaseState === undefined || p.purchaseState === '1'));
+  if (alinan) {
+    if (alinan.isAcknowledged === false && alinan.purchaseToken) {
+      await NativePurchases.acknowledgePurchase({ purchaseToken: alinan.purchaseToken }).catch(() => undefined);
+    }
+    kaydet();
+    return true;
   }
-  kaydet();
-  return true;
+  if (!tamSurumVarMi()) return false;
+  if (platform === 'ios') {
+    if (bizim.some((p) => p.revocationDate)) kapat();
+  } else if (platform === 'android' && bizim.length === 0) {
+    const { products } = await NativePurchases.getProducts({ productIdentifiers: [URUN_KIMLIGI], productType: PURCHASE_TYPE.INAPP }).catch(() => ({ products: [] }));
+    if (products.some((u) => u.identifier === URUN_KIMLIGI)) yokCevabi(simdi);
+  }
+  return false;
 }
 
 // "Satın alımı geri yükle" (yeni telefon, silinen veriler). true: tam sürüm bulundu.
