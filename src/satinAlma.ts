@@ -16,8 +16,13 @@ const ANAHTAR = 'zipzip-tam-surum-v1';
 // web: test sitesi; ödeme yok, bölümler eskisi gibi sırayla açılır.
 export type OdemeKipi = 'magaza' | 'deneme' | 'web';
 
-export function odemeKipi(): OdemeKipi {
-  if (Capacitor.isNativePlatform()) return 'magaza';
+// Mağaza paketi `npm run magaza` ile derlenir (vite --mode magaza). Bu işaret derlemeye yazılır: uygulamanın
+// köprüsü (Capacitor) herhangi bir nedenle sayfada olmasa bile kip 'web' olmaz, ödeme kilidi açılmaz (K50).
+// O durumda mağazaya ulaşılamaz: fiyat gelmez, satın alma "tamamlanmadı" der; önceden ödeyen ailenin cihazdaki kaydı geçerli kalır.
+const MAGAZA_PAKETI = import.meta.env?.MODE === 'magaza';
+
+export function odemeKipi(uygulamada = Capacitor.isNativePlatform(), magazaPaketi = MAGAZA_PAKETI): OdemeKipi {
+  if (uygulamada || magazaPaketi) return 'magaza';
   try {
     if (new URLSearchParams(location.search).get('odeme') === 'deneme') return 'deneme';
   } catch {

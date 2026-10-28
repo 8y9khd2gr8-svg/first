@@ -226,6 +226,20 @@ test('istatistik: bozuk kayıtta kameranın gördüğü, kamera açık sayısın
   assert.deepEqual([haftalikOzet().kameraAcik, haftalikOzet().kameraGordu], [4, 1], 'sağlam kayıt aynen kalır');
 });
 
+// K50: uygulamanın köprüsü sayfada olmasa da mağaza paketi 'web' (ödemesiz) sayılmaz.
+test('mağaza paketinde köprü yoksa ödeme kilidi açılmaz (K50)', async () => {
+  const { odemeKipi } = await import('../src/satinAlma');
+  (globalThis as any).location = { search: '' };
+  try {
+    assert.equal(odemeKipi(false, true), 'magaza', 'köprü yok, mağaza paketi');
+    assert.equal(odemeKipi(true, false), 'magaza', 'köprü var');
+    assert.equal(odemeKipi(false, false), 'web', 'test sitesi');
+    assert.equal(odemeKipi(), 'web', 'npm test (node) mağaza paketi değildir');
+  } finally {
+    delete (globalThis as any).location;
+  }
+});
+
 // Açık/kapalı kayıtları (kamera, tam sürüm, beta; uzaktan oyna Phaser'a bağlı olduğu için oyun.spec.ts'de) sadece tam "1" ile açık sayılır; bozuk/eski değer kapalıdır
 // ve hiçbir okuma kaydı değiştirmez (18 Ekim denetimi: hata yoktu, davranış sabitlendi). Tam sürüm kapalı sayılınca
 // mağazadan açılışta yeniden sorulur; test sitesinde (web) zaten ödeme yok.

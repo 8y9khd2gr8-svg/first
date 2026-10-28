@@ -27,7 +27,7 @@ jobs:
           cache: npm
       - run: npm ci
       - name: Oyunu derle ve iPhone projesine aktar
-        run: npm run build && npx cap sync ios
+        run: npm run build -- --mode magaza && npx cap sync ios
       - name: İmzasız iPhone derlemesi
         run: |
           xcodebuild -workspace ios/App/App.xcworkspace -scheme App -configuration Release \
